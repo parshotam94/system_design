@@ -24,7 +24,7 @@
               {
                 "name": "Single Gateway / LB",
                 "type": "gateway",
-                "icon": "\ud83d\udeaa",
+                "icon": "🚪",
                 "what": "Ingress API Gateway & TLS termination",
                 "why": "Single entrypoint for web and mobile clients",
                 "when": "Always used to route traffic across services",
@@ -38,7 +38,7 @@
               {
                 "name": "Auth Service",
                 "type": "service",
-                "icon": "\ud83d\udd11",
+                "icon": "🔑",
                 "what": "JWT tokens & identity validation",
                 "why": "Decoupled authentication logic",
                 "when": "On every authenticated request",
@@ -47,7 +47,7 @@
               {
                 "name": "Order Service",
                 "type": "service",
-                "icon": "\ud83d\udce6",
+                "icon": "📦",
                 "what": "Checkout & order lifecycle workflows",
                 "why": "High transaction isolation",
                 "when": "User creates or checks orders",
@@ -56,7 +56,7 @@
               {
                 "name": "Payment Service",
                 "type": "service",
-                "icon": "\ud83d\udcb3",
+                "icon": "💳",
                 "what": "Third-party payment gateway integration",
                 "why": "PCI-DSS compliance isolation",
                 "when": "Order payment processing",
@@ -70,7 +70,7 @@
               {
                 "name": "Auth DB (Redis/Postgres)",
                 "type": "database",
-                "icon": "\ud83d\uddc4\ufe0f",
+                "icon": "🗄️",
                 "what": "User credentials & refresh tokens",
                 "why": "Sub-millisecond token lookups",
                 "when": "Login and session refresh",
@@ -79,7 +79,7 @@
               {
                 "name": "Order DB (PostgreSQL)",
                 "type": "database",
-                "icon": "\ud83d\udc18",
+                "icon": "🐘",
                 "what": "Relational ACID storage for order line items",
                 "why": "Strict financial consistency",
                 "when": "Order placement",
@@ -88,7 +88,7 @@
               {
                 "name": "Payment DB (DynamoDB)",
                 "type": "database",
-                "icon": "\u26a1",
+                "icon": "⚡",
                 "what": "High throughput append-only ledger",
                 "why": "Infinite scaling with partition keys",
                 "when": "Payment capture events",
@@ -215,7 +215,54 @@
           "question": "What is the primary benefit of Hexagonal Architecture in high-concurrency production systems?",
           "answer": "It allows mocking all I/O boundaries during testing, enables rapid refactoring of database storage engines without rewriting core algorithms, and enforces strict separation between network transport protocols and business invariants."
         }
-      ]
+      ],
+      "system_flow_animation": {
+        "title": "Three-Tier, N-Tier & Hexagonal / Clean Architecture Request Execution Flow",
+        "steps": [
+          {
+            "num": 1,
+            "title": "Client Ingress",
+            "actor": "Client -> API Gateway",
+            "desc": "Client initiates request over TLS 1.3 with auth bearer token.",
+            "node": "API Gateway"
+          },
+          {
+            "num": 2,
+            "title": "Routing & Policy Enforcement",
+            "actor": "Gateway -> Service Router",
+            "desc": "Gateway validates token signature, applies rate limits, and routes request to target bounded context.",
+            "node": "API Gateway"
+          },
+          {
+            "num": 3,
+            "title": "Domain Processing",
+            "actor": "Service -> Domain Model",
+            "desc": "Domain layer validates aggregate invariants and executes business rules in memory.",
+            "node": "Application Service"
+          },
+          {
+            "num": 4,
+            "title": "Persistence & State Mutation",
+            "actor": "Domain -> Repository",
+            "desc": "Data layer persists aggregate state using transactional boundary or append-only event store.",
+            "node": "Database"
+          },
+          {
+            "num": 5,
+            "title": "Async Event Publication",
+            "actor": "Service -> Message Broker",
+            "desc": "Emits domain change event to Kafka/EventBridge topic for downstream projection consumers.",
+            "node": "Event Bus"
+          },
+          {
+            "num": 6,
+            "title": "Client Response",
+            "actor": "Service -> Client",
+            "desc": "Returns sanitized API DTO with HTTP 200/201 and idempotency header.",
+            "node": "API Gateway"
+          }
+        ]
+      }
     },
     {
       "id": "serverless-and-event-driven",
@@ -242,7 +289,54 @@
           "question": "How do you mitigate serverless cold starts in latency-critical APIs?",
           "answer": "Use Provisioned Concurrency, keep deployment packages lightweight (avoid huge dependencies), choose fast runtimes (Go/Rust/Node.js over heavy JVM runtimes), and configure periodic warm-up pings."
         }
-      ]
+      ],
+      "system_flow_animation": {
+        "title": "Serverless Functions (FaaS) & Event-Driven Architecture Request Execution Flow",
+        "steps": [
+          {
+            "num": 1,
+            "title": "Client Ingress",
+            "actor": "Client -> API Gateway",
+            "desc": "Client initiates request over TLS 1.3 with auth bearer token.",
+            "node": "API Gateway"
+          },
+          {
+            "num": 2,
+            "title": "Routing & Policy Enforcement",
+            "actor": "Gateway -> Service Router",
+            "desc": "Gateway validates token signature, applies rate limits, and routes request to target bounded context.",
+            "node": "API Gateway"
+          },
+          {
+            "num": 3,
+            "title": "Domain Processing",
+            "actor": "Service -> Domain Model",
+            "desc": "Domain layer validates aggregate invariants and executes business rules in memory.",
+            "node": "Application Service"
+          },
+          {
+            "num": 4,
+            "title": "Persistence & State Mutation",
+            "actor": "Domain -> Repository",
+            "desc": "Data layer persists aggregate state using transactional boundary or append-only event store.",
+            "node": "Database"
+          },
+          {
+            "num": 5,
+            "title": "Async Event Publication",
+            "actor": "Service -> Message Broker",
+            "desc": "Emits domain change event to Kafka/EventBridge topic for downstream projection consumers.",
+            "node": "Event Bus"
+          },
+          {
+            "num": 6,
+            "title": "Client Response",
+            "actor": "Service -> Client",
+            "desc": "Returns sanitized API DTO with HTTP 200/201 and idempotency header.",
+            "node": "API Gateway"
+          }
+        ]
+      }
     },
     {
       "id": "cqrs-and-event-sourcing",
@@ -303,7 +397,54 @@
           "question": "How do you handle event schema evolution in an Event Sourced system when business rules change over time?",
           "answer": "Use Schema Upcasting (converting old event versions v1 -> v2 dynamically when reading from the log), Weak Schema validation (Avro/Protobuf optional fields), or version-specific event handler methods."
         }
-      ]
+      ],
+      "system_flow_animation": {
+        "title": "CQRS (Command Query Responsibility Segregation) & Event Sourcing Request Execution Flow",
+        "steps": [
+          {
+            "num": 1,
+            "title": "Client Ingress",
+            "actor": "Client -> API Gateway",
+            "desc": "Client initiates request over TLS 1.3 with auth bearer token.",
+            "node": "API Gateway"
+          },
+          {
+            "num": 2,
+            "title": "Routing & Policy Enforcement",
+            "actor": "Gateway -> Service Router",
+            "desc": "Gateway validates token signature, applies rate limits, and routes request to target bounded context.",
+            "node": "API Gateway"
+          },
+          {
+            "num": 3,
+            "title": "Domain Processing",
+            "actor": "Service -> Domain Model",
+            "desc": "Domain layer validates aggregate invariants and executes business rules in memory.",
+            "node": "Application Service"
+          },
+          {
+            "num": 4,
+            "title": "Persistence & State Mutation",
+            "actor": "Domain -> Repository",
+            "desc": "Data layer persists aggregate state using transactional boundary or append-only event store.",
+            "node": "Database"
+          },
+          {
+            "num": 5,
+            "title": "Async Event Publication",
+            "actor": "Service -> Message Broker",
+            "desc": "Emits domain change event to Kafka/EventBridge topic for downstream projection consumers.",
+            "node": "Event Bus"
+          },
+          {
+            "num": 6,
+            "title": "Client Response",
+            "actor": "Service -> Client",
+            "desc": "Returns sanitized API DTO with HTTP 200/201 and idempotency header.",
+            "node": "API Gateway"
+          }
+        ]
+      }
     }
   ]
 }

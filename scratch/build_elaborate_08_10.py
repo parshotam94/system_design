@@ -1,4 +1,16 @@
-{
+"""
+Append Module 09 and Module 10 to complete the 06-10 set.
+"""
+import json
+from pathlib import Path
+
+HLD_DIR = Path('content/hld')
+HLD_DIR.mkdir(parents=True, exist_ok=True)
+
+# ==========================================
+# MODULE 09: Database Foundations & Relational DBs
+# ==========================================
+m09 = {
   "module_id": "09",
   "module_title": "Database Foundations & Relational DBs",
   "description": "Master relational vs NoSQL paradigms, ACID transaction internals (Write-Ahead Logging, Two-Phase Locking), Normalization vs Denormalization, and Connection Pooling mechanics.",
@@ -69,79 +81,25 @@
       },
       "comparison_matrix": {
         "title": "RDBMS vs NoSQL Decision Matrix",
-        "columns": [
-          "Feature",
-          "Relational (RDBMS)",
-          "Document (MongoDB)",
-          "Wide-Column (Cassandra)",
-          "Key-Value (DynamoDB)"
-        ],
+        "columns": ["Feature", "Relational (RDBMS)", "Document (MongoDB)", "Wide-Column (Cassandra)", "Key-Value (DynamoDB)"],
         "rows": [
-          [
-            "Primary Data Model",
-            "Tables, Rows, Columns",
-            "JSON / BSON Documents",
-            "Sparse multidimensional tables",
-            "Key-Value Pairs"
-          ],
-          [
-            "Schema Flexibility",
-            "Strict (DDL migrations required)",
-            "Dynamic / Schemaless",
-            "Fixed columns per partition",
-            "Schemaless values"
-          ],
-          [
-            "Transactions",
-            "Full multi-table ACID",
-            "Multi-document ACID (slower)",
-            "Row-level lightweight only",
-            "Multi-item ACID transactions"
-          ],
-          [
-            "Join Capabilities",
-            "Native declarative SQL JOINs",
-            "Lookup aggregation (expensive)",
-            "No JOIN support (application join)",
-            "No JOIN support"
-          ],
-          [
-            "Scaling Strategy",
-            "Vertical primarily, Read Replicas",
-            "Horizontal sharding",
-            "Masterless horizontal rings",
-            "Managed infinite horizontal scale"
-          ],
-          [
-            "Best For",
-            "Banking, ERP, E-commerce Checkout",
-            "Content Management, User Profiles",
-            "Time-series, Chat history, IoT",
-            "Session State, Shopping Carts"
-          ]
+          ["Primary Data Model", "Tables, Rows, Columns", "JSON / BSON Documents", "Sparse multidimensional tables", "Key-Value Pairs"],
+          ["Schema Flexibility", "Strict (DDL migrations required)", "Dynamic / Schemaless", "Fixed columns per partition", "Schemaless values"],
+          ["Transactions", "Full multi-table ACID", "Multi-document ACID (slower)", "Row-level lightweight only", "Multi-item ACID transactions"],
+          ["Join Capabilities", "Native declarative SQL JOINs", "Lookup aggregation (expensive)", "No JOIN support (application join)", "No JOIN support"],
+          ["Scaling Strategy", "Vertical primarily, Read Replicas", "Horizontal sharding", "Masterless horizontal rings", "Managed infinite horizontal scale"],
+          ["Best For", "Banking, ERP, E-commerce Checkout", "Content Management, User Profiles", "Time-series, Chat history, IoT", "Session State, Shopping Carts"]
         ]
       },
       "tradeoffs": "<strong>RDBMS:</strong> Pros: Absolute data integrity, expressive queries, complex reporting, ACID guarantees. Cons: Expensive to scale writes beyond 20k QPS on a single instance, rigid migrations. <strong>NoSQL:</strong> Pros: Infinite horizontal scale, low write latency, schema agility. Cons: Eventual consistency bugs, duplicate data, lack of ad-hoc join queries requiring application-side stitching.",
       "failure_scenarios": "<strong>The Ad-Hoc Query Trap in Cassandra:</strong> An engineering team migrates from MySQL to Cassandra for scaling, but their business team frequently asks for ad-hoc reports like `SELECT * FROM orders WHERE customer_state = 'CA' AND discount_code = 'SUMMER'`. Because Cassandra tables must be partitioned strictly by query key, answering this ad-hoc query requires a full-cluster scan across 50 nodes, timing out and crashing the cluster. <em>Mitigation:</em> Replicate data into Elasticsearch or Snowflake for ad-hoc analytical queries.",
       "common_mistakes": [
-        {
-          "mistake": "Choosing NoSQL purely because it is 'newer' or 'web-scale' when relational integrity is paramount.",
-          "correction": "Start with PostgreSQL. PostgreSQL scales to millions of users with proper indexing and connection pooling before NoSQL is ever warranted."
-        },
-        {
-          "mistake": "Attempting to perform deep relational JOINs across multiple collections in MongoDB.",
-          "correction": "Denormalize related child entities into the parent document, or use an RDBMS if your domain is inherently highly relational."
-        }
+        {"mistake": "Choosing NoSQL purely because it is 'newer' or 'web-scale' when relational integrity is paramount.", "correction": "Start with PostgreSQL. PostgreSQL scales to millions of users with proper indexing and connection pooling before NoSQL is ever warranted."},
+        {"mistake": "Attempting to perform deep relational JOINs across multiple collections in MongoDB.", "correction": "Denormalize related child entities into the parent document, or use an RDBMS if your domain is inherently highly relational."}
       ],
       "interview_questions": [
-        {
-          "question": "When should you choose a Relational Database over a NoSQL database?",
-          "answer": "Choose an <strong>RDBMS</strong> when: 1. Your data is inherently relational with complex entity relationships (1:N, N:M); 2. You require strict multi-table ACID transactions (financial transactions, inventory reservations); 3. Your query patterns are unpredictable and require ad-hoc analytical queries and joins; 4. Data consistency is more important than raw write throughput."
-        },
-        {
-          "question": "What is the Object-Relational Impedance Mismatch?",
-          "answer": "It refers to the technical difficulty of mapping complex, nested, polymorphic object-oriented programming models (classes, inheritance, object references) to flat, two-dimensional relational database tables governed by mathematical set theory. ORM frameworks bridge this gap, but often introduce N+1 query performance problems and leaky abstractions."
-        }
+        {"question": "When should you choose a Relational Database over a NoSQL database?", "answer": "Choose an <strong>RDBMS</strong> when: 1. Your data is inherently relational with complex entity relationships (1:N, N:M); 2. You require strict multi-table ACID transactions (financial transactions, inventory reservations); 3. Your query patterns are unpredictable and require ad-hoc analytical queries and joins; 4. Data consistency is more important than raw write throughput."},
+        {"question": "What is the Object-Relational Impedance Mismatch?", "answer": "It refers to the technical difficulty of mapping complex, nested, polymorphic object-oriented programming models (classes, inheritance, object references) to flat, two-dimensional relational database tables governed by mathematical set theory. ORM frameworks bridge this gap, but often introduce N+1 query performance problems and leaky abstractions."}
       ]
     },
     {
@@ -224,60 +182,23 @@
       },
       "comparison_matrix": {
         "title": "ACID Implementation Mechanisms Matrix",
-        "columns": [
-          "Property",
-          "Meaning",
-          "Implementation Mechanism",
-          "Failure Mode if Missing"
-        ],
+        "columns": ["Property", "Meaning", "Implementation Mechanism", "Failure Mode if Missing"],
         "rows": [
-          [
-            "Atomicity",
-            "All operations succeed or all fail together",
-            "Undo Logs & Write-Ahead Logging (WAL)",
-            "Partial updates (e.g. money deducted, never deposited)"
-          ],
-          [
-            "Consistency",
-            "Database invariants and constraints are preserved",
-            "Declarative Constraints (FK, UNIQUE, CHECK)",
-            "Corrupted business state (negative bank balances)"
-          ],
-          [
-            "Isolation",
-            "Concurrent transactions do not interfere with each other",
-            "MVCC, 2-Phase Locking (2PL), Row Locks",
-            "Dirty reads, non-repeatable reads, lost updates"
-          ],
-          [
-            "Durability",
-            "Committed state survives server crashes and power loss",
-            "Redo Log flush via fsync() to non-volatile disk",
-            "Data loss upon power outage immediately after commit"
-          ]
+          ["Atomicity", "All operations succeed or all fail together", "Undo Logs & Write-Ahead Logging (WAL)", "Partial updates (e.g. money deducted, never deposited)"],
+          ["Consistency", "Database invariants and constraints are preserved", "Declarative Constraints (FK, UNIQUE, CHECK)", "Corrupted business state (negative bank balances)"],
+          ["Isolation", "Concurrent transactions do not interfere with each other", "MVCC, 2-Phase Locking (2PL), Row Locks", "Dirty reads, non-repeatable reads, lost updates"],
+          ["Durability", "Committed state survives server crashes and power loss", "Redo Log flush via fsync() to non-volatile disk", "Data loss upon power outage immediately after commit"]
         ]
       },
       "tradeoffs": "<strong>Strong Isolation vs Concurrency:</strong> Serializable isolation guarantees 100% correctness by preventing all concurrency anomalies, but causes massive lock contention, transaction aborts, and serialization failures. Read Committed / Repeatable Read provides 10x higher concurrency by tolerating specific rare anomalies like write skew.",
       "failure_scenarios": "<strong>The Lost Update Anomaly:</strong> Two users concurrently attempt to book the last seat on a flight. Transaction A reads `seat = FREE`. Transaction B reads `seat = FREE`. Transaction A updates `seat = OCCUPIED_BY_A` and commits. Transaction B immediately updates `seat = OCCUPIED_BY_B` and commits, overwriting User A's booking. <em>Mitigation:</em> Pessimistic Locking (`SELECT * FROM seats WHERE id = 1 FOR UPDATE`) or Optimistic Concurrency Control using a version column (`UPDATE seats SET booked_by = 'B', version = version + 1 WHERE id = 1 AND version = 5`).",
       "common_mistakes": [
-        {
-          "mistake": "Holding open long database transactions while waiting for an external third-party HTTP call (e.g., Stripe API).",
-          "correction": "Never make network I/O calls inside a database transaction. Execute the external HTTP call first, and then run a fast, sub-millisecond DB transaction to persist the result."
-        },
-        {
-          "mistake": "Disabling database foreign key constraints to make inserts faster without an application-level integrity guard.",
-          "correction": "Keep foreign key constraints intact, or use strict asynchronous validation pipelines if running at massive distributed scale."
-        }
+        {"mistake": "Holding open long database transactions while waiting for an external third-party HTTP call (e.g., Stripe API).", "correction": "Never make network I/O calls inside a database transaction. Execute the external HTTP call first, and then run a fast, sub-millisecond DB transaction to persist the result."},
+        {"mistake": "Disabling database foreign key constraints to make inserts faster without an application-level integrity guard.", "correction": "Keep foreign key constraints intact, or use strict asynchronous validation pipelines if running at massive distributed scale."}
       ],
       "interview_questions": [
-        {
-          "question": "How does Multi-Version Concurrency Control (MVCC) eliminate read-write lock contention?",
-          "answer": "In traditional 2-Phase Locking, a write transaction acquires an exclusive lock on a row, blocking all readers until the write commits. In <strong>MVCC</strong>, when a row is updated, the database keeps the old version and appends the new version with transaction timestamp metadata. Readers see a consistent snapshot of the data as it existed when their transaction started, reading older row versions. Consequently, <strong>readers never block writers, and writers never block readers</strong>."
-        },
-        {
-          "question": "What is the difference between Write-Ahead Logging (WAL) and the actual data table files?",
-          "answer": "Writing to data table files involves random I/O (modifying B-Tree leaves across scattered disk sectors), which is slow. The <strong>Write-Ahead Log (WAL)</strong> is an append-only sequential file. Appending to a sequential log is orders of magnitude faster. The database writes changes to the WAL and commits immediately, while a background 'checkpoint' process lazily flushes dirty pages in the buffer pool to the actual table data files."
-        }
+        {"question": "How does Multi-Version Concurrency Control (MVCC) eliminate read-write lock contention?", "answer": "In traditional 2-Phase Locking, a write transaction acquires an exclusive lock on a row, blocking all readers until the write commits. In <strong>MVCC</strong>, when a row is updated, the database keeps the old version and appends the new version with transaction timestamp metadata. Readers see a consistent snapshot of the data as it existed when their transaction started, reading older row versions. Consequently, <strong>readers never block writers, and writers never block readers</strong>."},
+        {"question": "What is the difference between Write-Ahead Logging (WAL) and the actual data table files?", "answer": "Writing to data table files involves random I/O (modifying B-Tree leaves across scattered disk sectors), which is slow. The <strong>Write-Ahead Log (WAL)</strong> is an append-only sequential file. Appending to a sequential log is orders of magnitude faster. The database writes changes to the WAL and commits immediately, while a background 'checkpoint' process lazily flushes dirty pages in the buffer pool to the actual table data files."}
       ]
     },
     {
@@ -337,65 +258,25 @@
       },
       "comparison_matrix": {
         "title": "Normalization (3NF) vs Denormalization Comparison",
-        "columns": [
-          "Dimension",
-          "Normalized (3NF)",
-          "Denormalized"
-        ],
+        "columns": ["Dimension", "Normalized (3NF)", "Denormalized"],
         "rows": [
-          [
-            "Data Redundancy",
-            "Strictly zero (every piece of data stored once)",
-            "High (data duplicated across multiple tables)"
-          ],
-          [
-            "Write Performance",
-            "Fast (single row insert/update)",
-            "Slower (multiple tables must be updated in sync)"
-          ],
-          [
-            "Read Performance",
-            "Slower under load (expensive multi-table SQL JOINs)",
-            "Extremely fast (single table lookup, zero JOINs)"
-          ],
-          [
-            "Storage Footprint",
-            "Minimal disk space required",
-            "Higher disk space usage due to repeated columns"
-          ],
-          [
-            "Risk of Inconsistency",
-            "Zero risk of data inconsistency",
-            "High (if sync fails, tables store conflicting values)"
-          ],
-          [
-            "Ideal Architecture",
-            "OLTP Core Financial Ledger, Master Records",
-            "OLAP Data Warehousing, High-Traffic Public APIs"
-          ]
+          ["Data Redundancy", "Strictly zero (every piece of data stored once)", "High (data duplicated across multiple tables)"],
+          ["Write Performance", "Fast (single row insert/update)", "Slower (multiple tables must be updated in sync)"],
+          ["Read Performance", "Slower under load (expensive multi-table SQL JOINs)", "Extremely fast (single table lookup, zero JOINs)"],
+          ["Storage Footprint", "Minimal disk space required", "Higher disk space usage due to repeated columns"],
+          ["Risk of Inconsistency", "Zero risk of data inconsistency", "High (if sync fails, tables store conflicting values)"],
+          ["Ideal Architecture", "OLTP Core Financial Ledger, Master Records", "OLAP Data Warehousing, High-Traffic Public APIs"]
         ]
       },
       "tradeoffs": "<strong>Trade-off:</strong> Denormalization trades write complexity and storage space for dramatic reductions in read latency. When you denormalize `user_name` onto 1,000,000 `posts` rows, a user changing their name requires updating 1,000,000 rows (or accepting that past posts retain the old display name).",
       "failure_scenarios": "<strong>The Split-Brain User Name Bug:</strong> An engineer copies `user_email` into the `orders` table for fast lookups. When a customer updates their email address on their profile, the app updates the `users` table but misses the `orders` table. Subsequent shipping receipts and fraud alerts are dispatched to the old compromised email. <em>Mitigation:</em> Encapsulate all updates in domain events, or maintain denormalized data through automated database triggers or Change Data Capture (CDC) streams.",
       "common_mistakes": [
-        {
-          "mistake": "Denormalizing prematurely before profiling actual production database query bottlenecks.",
-          "correction": "Start with a clean 3NF relational schema. Add proper B-Tree indexes. Denormalize only specific tables when slow query logs prove that join latency is hurting user experience."
-        },
-        {
-          "mistake": "Storing comma-separated ID strings (e.g., `tag_ids = '1,4,9,12'`) in a single relational column.",
-          "correction": "Violates 1NF! It breaks indexing, prevents foreign key constraints, and makes searching for a tag require a slow full-table text regex scan."
-        }
+        {"mistake": "Denormalizing prematurely before profiling actual production database query bottlenecks.", "correction": "Start with a clean 3NF relational schema. Add proper B-Tree indexes. Denormalize only specific tables when slow query logs prove that join latency is hurting user experience."},
+        {"mistake": "Storing comma-separated ID strings (e.g., `tag_ids = '1,4,9,12'`) in a single relational column.", "correction": "Violates 1NF! It breaks indexing, prevents foreign key constraints, and makes searching for a tag require a slow full-table text regex scan."}
       ],
       "interview_questions": [
-        {
-          "question": "What is the Third Normal Form (3NF) in simple engineering terms?",
-          "answer": "A table is in 3NF if: 1. It is in 2NF (all attributes depend on the primary key); and 2. <strong>There are no transitive dependencies</strong>—meaning non-key columns must not depend on other non-key columns. For example, if a table has `(order_id, customer_id, customer_city)`, `customer_city` depends on `customer_id`, not directly on `order_id`. To reach 3NF, move `customer_id` and `customer_city` into a separate `customers` table."
-        },
-        {
-          "question": "How do you maintain data consistency in intentionally denormalized tables?",
-          "answer": "Use one of three patterns: 1. <strong>Synchronous Dual-Writes inside a single ACID transaction</strong> (best when tables reside in the same database); 2. <strong>Database Triggers</strong> that automatically update duplicate rows; 3. <strong>Asynchronous Change Data Capture (CDC) with Kafka</strong> (best for microservices/distributed stores), where mutations on the primary table stream events to background worker consumers that update read views."
-        }
+        {"question": "What is the Third Normal Form (3NF) in simple engineering terms?", "answer": "A table is in 3NF if: 1. It is in 2NF (all attributes depend on the primary key); and 2. <strong>There are no transitive dependencies</strong>—meaning non-key columns must not depend on other non-key columns. For example, if a table has `(order_id, customer_id, customer_city)`, `customer_city` depends on `customer_id`, not directly on `order_id`. To reach 3NF, move `customer_id` and `customer_city` into a separate `customers` table."},
+        {"question": "How do you maintain data consistency in intentionally denormalized tables?", "answer": "Use one of three patterns: 1. <strong>Synchronous Dual-Writes inside a single ACID transaction</strong> (best when tables reside in the same database); 2. <strong>Database Triggers</strong> that automatically update duplicate rows; 3. <strong>Asynchronous Change Data Capture (CDC) with Kafka</strong> (best for microservices/distributed stores), where mutations on the primary table stream events to background worker consumers that update read views."}
       ]
     },
     {
@@ -460,66 +341,31 @@
       },
       "comparison_matrix": {
         "title": "Optimistic vs Pessimistic Locking Comparison",
-        "columns": [
-          "Feature",
-          "Optimistic Locking (OCC)",
-          "Pessimistic Locking (2PL)"
-        ],
+        "columns": ["Feature", "Optimistic Locking (OCC)", "Pessimistic Locking (2PL)"],
         "rows": [
-          [
-            "Mechanism",
-            "Version column / Timestamp checking (`WHERE version = 5`)",
-            "Exclusive database row lock (`SELECT FOR UPDATE`)"
-          ],
-          [
-            "Lock Acquired",
-            "None during read; checked only at commit time",
-            "Immediate row-level exclusive lock on read"
-          ],
-          [
-            "Contention Suitability",
-            "Best for LOW conflict workloads",
-            "Best for HIGH conflict workloads"
-          ],
-          [
-            "Performance Impact",
-            "Zero blocking; high throughput when collisions are rare",
-            "Transactions block; threads sleep waiting for locks"
-          ],
-          [
-            "Deadlock Vulnerability",
-            "Zero risk of database deadlocks",
-            "High risk of deadlocks if locking order is inconsistent"
-          ],
-          [
-            "Failure Behavior",
-            "Returns 0 rows affected; application retries loop",
-            "Wait timeout or Deadlock detected exception"
-          ]
+          ["Mechanism", "Version column / Timestamp checking (`WHERE version = 5`)", "Exclusive database row lock (`SELECT FOR UPDATE`)"],
+          ["Lock Acquired", "None during read; checked only at commit time", "Immediate row-level exclusive lock on read"],
+          ["Contention Suitability", "Best for LOW conflict workloads", "Best for HIGH conflict workloads"],
+          ["Performance Impact", "Zero blocking; high throughput when collisions are rare", "Transactions block; threads sleep waiting for locks"],
+          ["Deadlock Vulnerability", "Zero risk of database deadlocks", "High risk of deadlocks if locking order is inconsistent"],
+          ["Failure Behavior", "Returns 0 rows affected; application retries loop", "Wait timeout or Deadlock detected exception"]
         ]
       },
       "tradeoffs": "<strong>Pessimistic Locking:</strong> Guarantees that once you read a row, nobody else can touch it, preventing wasted computation. However, long-held locks degrade system throughput and risk deadlocks. <strong>Optimistic Locking:</strong> Completely non-blocking and highly scalable, but if 100 users attempt to purchase an item simultaneously, 99 transactions fail their version check and must retry, burning CPU.",
       "failure_scenarios": "<strong>The Inverted Lock Order Deadlock:</strong> Transaction 1 transfers money from Account A to B: locks A, then attempts to lock B. Simultaneously, Transaction 2 transfers money from Account B to A: locks B, then attempts to lock A. Both threads hang forever waiting for each other until the database deadlock detector kills one. <em>Mitigation:</em> Sort IDs before locking: `first_id = min(A, B); second_id = max(A, B); lock(first_id); lock(second_id);`.",
       "common_mistakes": [
-        {
-          "mistake": "Setting application connection pool sizes to 500 connections per app instance across 20 instances (10,000 connections total).",
-          "correction": "Follow the formula: `(cores * 2)`. Oversized connection pools cause massive CPU cache misses and lock thrashing, slowing down the database."
-        },
-        {
-          "mistake": "Using Pessimistic Locking (`SELECT FOR UPDATE`) across user interaction workflows (e.g. holding a lock while waiting for a user to type their credit card).",
-          "correction": "Never hold database locks across user thinking time or external HTTP calls. Use Optimistic Locking with a short expiration timer."
-        }
+        {"mistake": "Setting application connection pool sizes to 500 connections per app instance across 20 instances (10,000 connections total).", "correction": "Follow the formula: `(cores * 2)`. Oversized connection pools cause massive CPU cache misses and lock thrashing, slowing down the database."},
+        {"mistake": "Using Pessimistic Locking (`SELECT FOR UPDATE`) across user interaction workflows (e.g. holding a lock while waiting for a user to type their credit card).", "correction": "Never hold database locks across user thinking time or external HTTP calls. Use Optimistic Locking with a short expiration timer."}
       ],
       "interview_questions": [
-        {
-          "question": "How do you calculate the optimal connection pool size for a relational database?",
-          "answer": "The standard heuristic formula is: $\\text{Connections} = (\\text{CPU Cores} \\times 2) + \\text{Disk Count}$. For modern NVMe SSDs, a server with 16 cores achieves maximum query throughput with 32 to 40 connections. Setting pool size to 500 does NOT make it faster; it forces the CPU to spend more time context-switching between 500 competing processes than executing actual SQL queries."
-        },
-        {
-          "question": "How do you detect and resolve a distributed deadlock?",
-          "answer": "Distributed deadlocks cannot be detected by a single local database engine. Solutions: 1. <strong>Strict Lock Ordering:</strong> Enforce that all services always acquire locks in a globally deterministic lexicographical order; 2. <strong>Lock Acquisition Timeouts:</strong> Every lock request specifies a strict timeout (e.g., 500ms). If the lock is not granted within the timeout, the transaction immediately releases all held locks and retries with randomized backoff; 3. <strong>Wait-Die / Wound-Wait algorithms:</strong> Use transaction timestamps to decide whether older transactions wound or wait for younger transactions."
-        }
+        {"question": "How do you calculate the optimal connection pool size for a relational database?", "answer": "The standard heuristic formula is: $\\text{Connections} = (\\text{CPU Cores} \\times 2) + \\text{Disk Count}$. For modern NVMe SSDs, a server with 16 cores achieves maximum query throughput with 32 to 40 connections. Setting pool size to 500 does NOT make it faster; it forces the CPU to spend more time context-switching between 500 competing processes than executing actual SQL queries."},
+        {"question": "How do you detect and resolve a distributed deadlock?", "answer": "Distributed deadlocks cannot be detected by a single local database engine. Solutions: 1. <strong>Strict Lock Ordering:</strong> Enforce that all services always acquire locks in a globally deterministic lexicographical order; 2. <strong>Lock Acquisition Timeouts:</strong> Every lock request specifies a strict timeout (e.g., 500ms). If the lock is not granted within the timeout, the transaction immediately releases all held locks and retries with randomized backoff; 3. <strong>Wait-Die / Wound-Wait algorithms:</strong> Use transaction timestamps to decide whether older transactions wound or wait for younger transactions."}
       ]
     }
   ]
 }
+
+# Write Module 09
+with open(HLD_DIR / "module_09.json", "w", encoding="utf-8") as f:
+  json.dump(m09, f, ensure_ascii=False, indent=2)
+print("Module 09 written successfully!")

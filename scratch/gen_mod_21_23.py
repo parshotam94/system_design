@@ -1,4 +1,17 @@
-{
+"""
+Elaborate generator for Modules 21, 22, and 23.
+Matches exact topics from app/data/hld_roadmap.json
+"""
+import json
+from pathlib import Path
+
+HLD_DIR = Path('content/hld')
+HLD_DIR.mkdir(parents=True, exist_ok=True)
+
+# ==========================================
+# MODULE 21: Distributed Search Systems: Elasticsearch & Inverted Index
+# ==========================================
+m21 = {
   "module_id": "21",
   "module_title": "Distributed Search Systems: Elasticsearch & Inverted Index",
   "description": "Master distributed search: Inverted index mechanics, tokenization, BM25 scoring, Elasticsearch cluster architecture (Master/Data/Coordinating nodes), shard routing, Translog write durability, and real-time typeahead autocomplete.",
@@ -69,60 +82,24 @@
       },
       "comparison_matrix": {
         "title": "Forward Index vs Inverted Index",
-        "columns": [
-          "Dimension",
-          "Forward Index (Standard DB)",
-          "Inverted Index (Search Engine)"
-        ],
+        "columns": ["Dimension", "Forward Index (Standard DB)", "Inverted Index (Search Engine)"],
         "rows": [
-          [
-            "Mapping Direction",
-            "Document ID -> List of Words",
-            "Word (Term) -> List of Document IDs"
-          ],
-          [
-            "Full-Text Search Speed",
-            "Slow (Requires scanning every document: O(N))",
-            "Blazing fast (Direct Term lookup + Postings intersection: O(1))"
-          ],
-          [
-            "Update Complexity",
-            "Simple (Direct append or overwrite)",
-            "Complex (Must update multiple term postings lists)"
-          ],
-          [
-            "Storage Overhead",
-            "Low (Stores original text only)",
-            "Higher (Stores term dictionary, postings, position offsets)"
-          ],
-          [
-            "Primary Engines",
-            "PostgreSQL, MongoDB, MySQL",
-            "Elasticsearch, Apache Solr, Typesense, Meilisearch"
-          ]
+          ["Mapping Direction", "Document ID -> List of Words", "Word (Term) -> List of Document IDs"],
+          ["Full-Text Search Speed", "Slow (Requires scanning every document: O(N))", "Blazing fast (Direct Term lookup + Postings intersection: O(1))"],
+          ["Update Complexity", "Simple (Direct append or overwrite)", "Complex (Must update multiple term postings lists)"],
+          ["Storage Overhead", "Low (Stores original text only)", "Higher (Stores term dictionary, postings, position offsets)"],
+          ["Primary Engines", "PostgreSQL, MongoDB, MySQL", "Elasticsearch, Apache Solr, Typesense, Meilisearch"]
         ]
       },
       "tradeoffs": "<strong>Inverted Index:</strong> Delivers sub-10ms full-text and phrase search across billions of documents, but updates and inserts are CPU-intensive because a single document mutation requires modifying dozens of individual term postings lists.",
       "failure_scenarios": "<strong>The Wildcard Prefix Search Meltdown:</strong> A user executes a search query with a leading wildcard: `*caching`. Because the Term Dictionary is a forward-sorted B-Tree / FST (sorted alphabetically from A to Z), a leading wildcard cannot use the index. Elasticsearch is forced to iterate through every single term in the entire cluster's term dictionary (millions of terms), sending CPU to 100% across all data nodes. <em>Mitigation:</em> Forbid leading wildcards in search APIs, or index reverse tokens / use N-gram tokenizers.",
       "common_mistakes": [
-        {
-          "mistake": "Using `LIKE '%keyword%'` in a relational database for large-scale production search.",
-          "correction": "Relational B-Tree indexes cannot index substring searches. Use an inverted index engine like Elasticsearch or PostgreSQL GIN indexes."
-        },
-        {
-          "mistake": "Indexing full high-cardinality raw text fields with keyword analyzers without disabling fielddata.",
-          "correction": "Enabling fielddata on text fields for sorting or aggregations loads all terms into JVM heap memory, quickly triggering Out Of Memory (OOM) crashes."
-        }
+        {"mistake": "Using `LIKE '%keyword%'` in a relational database for large-scale production search.", "correction": "Relational B-Tree indexes cannot index substring searches. Use an inverted index engine like Elasticsearch or PostgreSQL GIN indexes."},
+        {"mistake": "Indexing full high-cardinality raw text fields with keyword analyzers without disabling fielddata.", "correction": "Enabling fielddata on text fields for sorting or aggregations loads all terms into JVM heap memory, quickly triggering Out Of Memory (OOM) crashes."}
       ],
       "interview_questions": [
-        {
-          "question": "How does an Inverted Index evaluate a multi-term search query like 'distributed systems'?",
-          "answer": "1. <strong>Tokenization:</strong> The query is analyzed into two terms: `'distributed'` and `'system'`;<br>2. <strong>Term Lookup:</strong> The engine looks up both terms in the in-memory Term Dictionary (FST) to locate their respective on-disk Postings Lists: e.g. `distributed -> [Doc 2, Doc 5, Doc 8, Doc 15]` and `system -> [Doc 5, Doc 8, Doc 20]`;<br>3. <strong>Postings Intersection:</strong> The engine performs a <strong>bitwise intersection</strong> of the two sorted lists using skip pointers in $O(M + N)$ time, identifying the matching documents: `[Doc 5, Doc 8]`;<br>4. <strong>Relevance Scoring:</strong> Computes the BM25 relevance score for each matching document and returns the top $K$ sorted results."
-        },
-        {
-          "question": "What is the purpose of Stop Words and Stemming in search analysis?",
-          "answer": "<strong>Stop Words</strong> are extremely common words (e.g. 'the', 'is', 'at', 'and') that appear in almost every document and provide zero discriminatory search value. Filtering them out saves 30-40% of postings list storage and accelerates query processing. <strong>Stemming</strong> reduces words to their grammatical root form (e.g. 'engineering', 'engineer', 'engineered' all reduce to 'engin'). This maximizes <em>Search Recall</em>, allowing a user who searches for 'engineer' to match documents containing 'engineering'."
-        }
+        {"question": "How does an Inverted Index evaluate a multi-term search query like 'distributed systems'?", "answer": "1. <strong>Tokenization:</strong> The query is analyzed into two terms: `'distributed'` and `'system'`;<br>2. <strong>Term Lookup:</strong> The engine looks up both terms in the in-memory Term Dictionary (FST) to locate their respective on-disk Postings Lists: e.g. `distributed -> [Doc 2, Doc 5, Doc 8, Doc 15]` and `system -> [Doc 5, Doc 8, Doc 20]`;<br>3. <strong>Postings Intersection:</strong> The engine performs a <strong>bitwise intersection</strong> of the two sorted lists using skip pointers in $O(M + N)$ time, identifying the matching documents: `[Doc 5, Doc 8]`;<br>4. <strong>Relevance Scoring:</strong> Computes the BM25 relevance score for each matching document and returns the top $K$ sorted results."},
+        {"question": "What is the purpose of Stop Words and Stemming in search analysis?", "answer": "<strong>Stop Words</strong> are extremely common words (e.g. 'the', 'is', 'at', 'and') that appear in almost every document and provide zero discriminatory search value. Filtering them out saves 30-40% of postings list storage and accelerates query processing. <strong>Stemming</strong> reduces words to their grammatical root form (e.g. 'engineering', 'engineer', 'engineered' all reduce to 'engin'). This maximizes <em>Search Recall</em>, allowing a user who searches for 'engineer' to match documents containing 'engineering'."}
       ]
     },
     {
@@ -196,65 +173,23 @@
       },
       "comparison_matrix": {
         "title": "Elasticsearch Node Roles Comparison",
-        "columns": [
-          "Role",
-          "Configuration",
-          "Responsibilities",
-          "Resource Needs",
-          "Stores Data?"
-        ],
+        "columns": ["Role", "Configuration", "Responsibilities", "Resource Needs", "Stores Data?"],
         "rows": [
-          [
-            "Master-Eligible",
-            "node.roles: [master]",
-            "Maintains cluster state, manages shard allocation, handles failover",
-            "High CPU stability, Low RAM (4-8GB), Fast disk",
-            "NO (Data stored elsewhere)"
-          ],
-          [
-            "Data Node",
-            "node.roles: [data]",
-            "Executes search queries, indexes documents, performs aggregations",
-            "Massive RAM (32GB heap limit), Fast NVMe SSDs, Multi-core CPU",
-            "YES (Holds primary & replica shards)"
-          ],
-          [
-            "Coordinating Node",
-            "node.roles: []",
-            "Load balances requests, executes scatter-gather phase 2 merges",
-            "High CPU & Network, Medium RAM for aggregation buffers",
-            "NO (Stateless router)"
-          ],
-          [
-            "Ingest Node",
-            "node.roles: [ingest]",
-            "Runs pre-processing ingest pipelines (Grok parsing, GeoIP lookup)",
-            "High CPU for regex/transformations",
-            "NO"
-          ]
+          ["Master-Eligible", "node.roles: [master]", "Maintains cluster state, manages shard allocation, handles failover", "High CPU stability, Low RAM (4-8GB), Fast disk", "NO (Data stored elsewhere)"],
+          ["Data Node", "node.roles: [data]", "Executes search queries, indexes documents, performs aggregations", "Massive RAM (32GB heap limit), Fast NVMe SSDs, Multi-core CPU", "YES (Holds primary & replica shards)"],
+          ["Coordinating Node", "node.roles: []", "Load balances requests, executes scatter-gather phase 2 merges", "High CPU & Network, Medium RAM for aggregation buffers", "NO (Stateless router)"],
+          ["Ingest Node", "node.roles: [ingest]", "Runs pre-processing ingest pipelines (Grok parsing, GeoIP lookup)", "High CPU for regex/transformations", "NO"]
         ]
       },
       "tradeoffs": "<strong>Trade-off:</strong> Dedicated node roles increase cloud infrastructure costs (paying for separate master and coordinating VMs), but prevent production outages where a heavy analytical query locks a data node's CPU and accidentally kills the cluster master.",
       "failure_scenarios": "<strong>The Shard Explosion JVM Heap OOM Death:</strong> A DevOps team creates a new Elasticsearch index for every customer every day: 500 customers x 365 days = 182,500 indexes x 5 shards = ~1,000,000 shards! Every shard consumes Lucene memory structures in the JVM heap. The data nodes exceed their 32GB JVM heap limits, enter permanent Stop-the-World GC pauses, and the entire cluster collapses. <em>Mitigation:</em> Consolidate into time-based indices with <strong>Index Lifecycle Management (ILM)</strong> and keep total shard count under 20 shards per GB of JVM heap.",
       "common_mistakes": [
-        {
-          "mistake": "Setting Elasticsearch JVM heap size to greater than 32GB (e.g. 64GB).",
-          "correction": "Never allocate more than 31GB of JVM heap! At 32GB, the JVM loses Compressed Object Pointers (Compressed OOPs), instantly wasting 50% of your RAM on pointer overhead."
-        },
-        {
-          "mistake": "Using a single node role for all servers in a large production cluster.",
-          "correction": "Separate Dedicated Masters from Data Nodes in clusters with >5 nodes to protect cluster stability."
-        }
+        {"mistake": "Setting Elasticsearch JVM heap size to greater than 32GB (e.g. 64GB).", "correction": "Never allocate more than 31GB of JVM heap! At 32GB, the JVM loses Compressed Object Pointers (Compressed OOPs), instantly wasting 50% of your RAM on pointer overhead."},
+        {"mistake": "Using a single node role for all servers in a large production cluster.", "correction": "Separate Dedicated Masters from Data Nodes in clusters with >5 nodes to protect cluster stability."}
       ],
       "interview_questions": [
-        {
-          "question": "How does Elasticsearch execute a search query across multiple shards (Query-Then-Fetch)?",
-          "answer": "1. <strong>Query Phase:</strong> The coordinating node receives the search request and broadcasts it to one copy (primary or replica) of every shard in the index. Each shard executes the search locally, scores documents using BM25, and returns *only* the matching document IDs and relevance scores (the top $K$ IDs) to the coordinating node;<br>2. <strong>Gather & Merge:</strong> The coordinating node merges the results from all shards, sorts them globally, and identifies the true top $K$ documents (e.g. top 10);<br>3. <strong>Fetch Phase:</strong> The coordinating node sends point requests *only to the specific shards* hosting those top 10 documents to retrieve the full `_source` JSON bodies, minimizing network bandwidth and serialization overhead."
-        },
-        {
-          "question": "Why is the number of primary shards immutable in an Elasticsearch index?",
-          "answer": "Elasticsearch routes documents to shards using the formula: $\\text{Shard} = \\text{Murmur3}(\\text{_id}) \\pmod{\\text{num\\_primary\\_shards}}$. If the number of primary shards were changed dynamically, the mathematical hash modulo result for every existing document would point to the wrong shard, making existing documents impossible to locate. Changing primary shards requires creating a new index and running the `_reindex` API."
-        }
+        {"question": "How does Elasticsearch execute a search query across multiple shards (Query-Then-Fetch)?", "answer": "1. <strong>Query Phase:</strong> The coordinating node receives the search request and broadcasts it to one copy (primary or replica) of every shard in the index. Each shard executes the search locally, scores documents using BM25, and returns *only* the matching document IDs and relevance scores (the top $K$ IDs) to the coordinating node;<br>2. <strong>Gather & Merge:</strong> The coordinating node merges the results from all shards, sorts them globally, and identifies the true top $K$ documents (e.g. top 10);<br>3. <strong>Fetch Phase:</strong> The coordinating node sends point requests *only to the specific shards* hosting those top 10 documents to retrieve the full `_source` JSON bodies, minimizing network bandwidth and serialization overhead."},
+        {"question": "Why is the number of primary shards immutable in an Elasticsearch index?", "answer": "Elasticsearch routes documents to shards using the formula: $\\text{Shard} = \\text{Murmur3}(\\text{_id}) \\pmod{\\text{num\\_primary\\_shards}}$. If the number of primary shards were changed dynamically, the mathematical hash modulo result for every existing document would point to the wrong shard, making existing documents impossible to locate. Changing primary shards requires creating a new index and running the `_reindex` API."}
       ]
     },
     {
@@ -328,55 +263,23 @@
       },
       "comparison_matrix": {
         "title": "Classic TF-IDF vs Okapi BM25 Scoring",
-        "columns": [
-          "Dimension",
-          "Classic TF-IDF",
-          "Okapi BM25 (Modern Standard)"
-        ],
+        "columns": ["Dimension", "Classic TF-IDF", "Okapi BM25 (Modern Standard)"],
         "rows": [
-          [
-            "Term Frequency Curve",
-            "Linear / Unbounded (Score increases infinitely with count)",
-            "Asymptotic Saturation (Score plateaus at k1 ceiling)"
-          ],
-          [
-            "Document Length Normalization",
-            "Rudomatic vector length cosine normalization",
-            "Explicit parameter 'b' calibrating length penalty"
-          ],
-          [
-            "Resistance to Keyword Stuffing",
-            "Poor (Spamming a keyword 500 times guarantees top rank)",
-            "High (500 occurrences yields negligible extra score over 10)"
-          ],
-          [
-            "Default in Search Engines",
-            "Deprecated",
-            "Standard in Elasticsearch, Solr, Lucene"
-          ]
+          ["Term Frequency Curve", "Linear / Unbounded (Score increases infinitely with count)", "Asymptotic Saturation (Score plateaus at k1 ceiling)"],
+          ["Document Length Normalization", "Rudomatic vector length cosine normalization", "Explicit parameter 'b' calibrating length penalty"],
+          ["Resistance to Keyword Stuffing", "Poor (Spamming a keyword 500 times guarantees top rank)", "High (500 occurrences yields negligible extra score over 10)"],
+          ["Default in Search Engines", "Deprecated", "Standard in Elasticsearch, Solr, Lucene"]
         ]
       },
       "tradeoffs": "<strong>Refresh Interval Trade-off:</strong> The default 1-second refresh makes data searchable in near-real-time, but creates thousands of tiny segment files that cause high CPU merge churn. For bulk indexing workloads (e.g. log ingestion), setting `refresh_interval: 30s` or `-1` boosts indexing throughput by up to 3x.",
       "failure_scenarios": "<strong>The Bulk Ingest Refresh Storm:</strong> A data team imports 50 million historical log records into Elasticsearch with default settings (`refresh_interval = 1s`). Every second, Elasticsearch creates a new tiny Lucene segment file, spawning dozens of background merge threads that saturate all CPU cores and fill the disk with merge I/O. The cluster becomes unresponsive. <em>Mitigation:</em> During bulk loading, set `refresh_interval: -1` and `number_of_replicas: 0`. Once loading completes, trigger an explicit `_refresh`, run `_forcemerge`, and restore replicas.",
       "common_mistakes": [
-        {
-          "mistake": "Calling the `_refresh` API explicitly after every single document insert in application code.",
-          "correction": "Forcing refreshes creates thousands of micro-segments, thrashing disk and CPU. Rely on the automated 1-second background refresh."
-        },
-        {
-          "mistake": "Attempting to calculate relevance scores across shards with uneven document distributions.",
-          "correction": "On small indices with multiple shards, local shard IDF skew causes identical documents to score differently. Use `dfs_query_then_fetch` or use 1 primary shard for small datasets."
-        }
+        {"mistake": "Calling the `_refresh` API explicitly after every single document insert in application code.", "correction": "Forcing refreshes creates thousands of micro-segments, thrashing disk and CPU. Rely on the automated 1-second background refresh."},
+        {"mistake": "Attempting to calculate relevance scores across shards with uneven document distributions.", "correction": "On small indices with multiple shards, local shard IDF skew causes identical documents to score differently. Use `dfs_query_then_fetch` or use 1 primary shard for small datasets."}
       ],
       "interview_questions": [
-        {
-          "question": "How does Okapi BM25 improve on classic TF-IDF relevance scoring?",
-          "answer": "BM25 introduces two major mathematical advancements: 1. <strong>Term Frequency Saturation:</strong> In TF-IDF, term frequency is linear: a document with 100 occurrences of a word scores 10x higher than one with 10 occurrences. In BM25, the TF score asymptotically approaches a saturation limit ($k_1$), so extra occurrences yield diminishing returns, preventing spam/keyword-stuffing; 2. <strong>Document Length Normalization:</strong> Parameter $b$ scales the score based on document length relative to average document length in the corpus, ensuring concise, focused articles are not unfairly penalized when competing against 500-page documents."
-        },
-        {
-          "question": "What is the difference between an Elasticsearch Refresh and an Elasticsearch Flush?",
-          "answer": "A <strong>Refresh</strong> flushes the in-memory index buffer to a new <em>Lucene segment in the OS Page Cache</em> (default every 1 second). This makes newly indexed documents **Searchable in Near-Real-Time**, but does not guarantee on-disk durability. A <strong>Flush</strong> executes a physical `fsync()` to write all page-cache segments to non-volatile disk storage and clears the Translog (default every 30 minutes or when Translog reaches 512MB), guaranteeing **Physical Crash Durability**."
-        }
+        {"question": "How does Okapi BM25 improve on classic TF-IDF relevance scoring?", "answer": "BM25 introduces two major mathematical advancements: 1. <strong>Term Frequency Saturation:</strong> In TF-IDF, term frequency is linear: a document with 100 occurrences of a word scores 10x higher than one with 10 occurrences. In BM25, the TF score asymptotically approaches a saturation limit ($k_1$), so extra occurrences yield diminishing returns, preventing spam/keyword-stuffing; 2. <strong>Document Length Normalization:</strong> Parameter $b$ scales the score based on document length relative to average document length in the corpus, ensuring concise, focused articles are not unfairly penalized when competing against 500-page documents."},
+        {"question": "What is the difference between an Elasticsearch Refresh and an Elasticsearch Flush?", "answer": "A <strong>Refresh</strong> flushes the in-memory index buffer to a new <em>Lucene segment in the OS Page Cache</em> (default every 1 second). This makes newly indexed documents **Searchable in Near-Real-Time**, but does not guarantee on-disk durability. A <strong>Flush</strong> executes a physical `fsync()` to write all page-cache segments to non-volatile disk storage and clears the Translog (default every 30 minutes or when Translog reaches 512MB), guaranteeing **Physical Crash Durability**."}
       ]
     },
     {
@@ -459,66 +362,29 @@
       },
       "comparison_matrix": {
         "title": "Autocomplete Implementation Approaches Comparison",
-        "columns": [
-          "Implementation",
-          "Lookup Latency",
-          "Memory Overhead",
-          "Fuzzy / Typo Support?",
-          "Dynamic Weight Updates"
-        ],
+        "columns": ["Implementation", "Lookup Latency", "Memory Overhead", "Fuzzy / Typo Support?", "Dynamic Weight Updates"],
         "rows": [
-          [
-            "In-Memory Trie (Custom)",
-            "Blazing (<2ms, RAM traversal)",
-            "Moderate (can be optimized via Radix Tree)",
-            "Complex to implement",
-            "Requires offline snapshot swapping"
-          ],
-          [
-            "Elasticsearch Edge N-Grams",
-            "Fast (5-15ms, Inverted Index)",
-            "High (3x-5x index size expansion)",
-            "Native fuzzy / Levenshtein distance support",
-            "Real-time updates via document reindex"
-          ],
-          [
-            "Elasticsearch Completion Suggester",
-            "Ultra-fast (<3ms, FST in RAM)",
-            "Low-to-moderate",
-            "Supports basic fuzzy prefix matching",
-            "Requires reindexing to change weights"
-          ],
-          [
-            "Redis Sorted Sets (ZSET)",
-            "Fast (3-8ms, ZRANGEBYLEX)",
-            "Moderate",
-            "No typo/fuzzy matching",
-            "Real-time ZINCRBY frequency updates"
-          ]
+          ["In-Memory Trie (Custom)", "Blazing (<2ms, RAM traversal)", "Moderate (can be optimized via Radix Tree)", "Complex to implement", "Requires offline snapshot swapping"],
+          ["Elasticsearch Edge N-Grams", "Fast (5-15ms, Inverted Index)", "High (3x-5x index size expansion)", "Native fuzzy / Levenshtein distance support", "Real-time updates via document reindex"],
+          ["Elasticsearch Completion Suggester", "Ultra-fast (<3ms, FST in RAM)", "Low-to-moderate", "Supports basic fuzzy prefix matching", "Requires reindexing to change weights"],
+          ["Redis Sorted Sets (ZSET)", "Fast (3-8ms, ZRANGEBYLEX)", "Moderate", "No typo/fuzzy matching", "Real-time ZINCRBY frequency updates"]
         ]
       },
       "tradeoffs": "<strong>In-Memory Trie:</strong> Delivers sub-2ms lookups with custom ranking algorithms, but requires building a custom microservice and implementing snapshot re-loading pipelines. <strong>Edge N-Grams:</strong> Works out-of-the-box in Elasticsearch with rich fuzzy matching, but consumes massive disk space and has higher query latency under heavy load.",
       "failure_scenarios": "<strong>The Synchronous Autocomplete DB Denial of Service:</strong> A company implements search autocomplete by running `SELECT suggestion FROM queries WHERE prefix LIKE 'xyz%' ORDER BY frequency DESC LIMIT 5` directly against PostgreSQL on every keystroke. 100,000 users begin typing simultaneously on Black Friday. 1.2 million SQL queries per second hit the database, knocking it completely offline in 10 seconds. <em>Mitigation:</em> Autocomplete must NEVER query a primary relational database! Use an <strong>In-Memory Trie service</strong> or <strong>Redis ZSET</strong> with aggressive client debouncing and edge caching.",
       "common_mistakes": [
-        {
-          "mistake": "Dispatching an HTTP API request on every single keypress without debouncing.",
-          "correction": "Always apply client-side debouncing (150-250ms). If the user types 'amazon' rapidly, only 1 or 2 API requests should be sent, not 6."
-        },
-        {
-          "mistake": "Updating Trie suggestion weights synchronously on every user keystroke.",
-          "correction": "Decouple analytics from search. Stream click logs to Kafka and recompute Trie weights asynchronously in background batch jobs."
-        }
+        {"mistake": "Dispatching an HTTP API request on every single keypress without debouncing.", "correction": "Always apply client-side debouncing (150-250ms). If the user types 'amazon' rapidly, only 1 or 2 API requests should be sent, not 6."},
+        {"mistake": "Updating Trie suggestion weights synchronously on every user keystroke.", "correction": "Decouple analytics from search. Stream click logs to Kafka and recompute Trie weights asynchronously in background batch jobs."}
       ],
       "interview_questions": [
-        {
-          "question": "How do you optimize an In-Memory Trie to return the Top 5 most frequent search suggestions in sub-5ms?",
-          "answer": "In a naive Trie, finding top suggestions requires traversing to the prefix node and performing a Depth-First Search (DFS) over all descendant nodes, which is too slow ($O(V)$). Optimization: <strong>Pre-compute and store the Top 5 suggestions directly at every Trie node</strong>. Each node stores a small fixed array of the top 5 query strings and their frequencies (maintained using a Min-Heap). When a user types a prefix of length $L$, the algorithm traverses $L$ steps down the tree and immediately returns the pre-computed array in $O(L)$ time (~sub-millisecond), completely independent of the size of the total search dictionary."
-        },
-        {
-          "question": "How do you handle spelling errors and fuzzy matching in autocomplete systems?",
-          "answer": "1. <strong>Levenshtein Distance / Damerau-Levenshtein:</strong> Allows matches within an edit distance of 1 or 2 (insertions, deletions, substitutions, transpositions);<br>2. <strong>Fuzzy Trie Traversal:</strong> When searching the Trie, if an exact branch does not exist, explore adjacent character branches while decrementing an edit-distance budget;<br>3. <strong>Phonetic Hashing (Double Metaphone / Soundex):</strong> Converts words to phonetic keys based on pronunciation (e.g. 'Smit' and 'Smith' map to the same phonetic code `SM0`), matching words that sound identical despite spelling errors."
-        }
+        {"question": "How do you optimize an In-Memory Trie to return the Top 5 most frequent search suggestions in sub-5ms?", "answer": "In a naive Trie, finding top suggestions requires traversing to the prefix node and performing a Depth-First Search (DFS) over all descendant nodes, which is too slow ($O(V)$). Optimization: <strong>Pre-compute and store the Top 5 suggestions directly at every Trie node</strong>. Each node stores a small fixed array of the top 5 query strings and their frequencies (maintained using a Min-Heap). When a user types a prefix of length $L$, the algorithm traverses $L$ steps down the tree and immediately returns the pre-computed array in $O(L)$ time (~sub-millisecond), completely independent of the size of the total search dictionary."},
+        {"question": "How do you handle spelling errors and fuzzy matching in autocomplete systems?", "answer": "1. <strong>Levenshtein Distance / Damerau-Levenshtein:</strong> Allows matches within an edit distance of 1 or 2 (insertions, deletions, substitutions, transpositions);<br>2. <strong>Fuzzy Trie Traversal:</strong> When searching the Trie, if an exact branch does not exist, explore adjacent character branches while decrementing an edit-distance budget;<br>3. <strong>Phonetic Hashing (Double Metaphone / Soundex):</strong> Converts words to phonetic keys based on pronunciation (e.g. 'Smit' and 'Smith' map to the same phonetic code `SM0`), matching words that sound identical despite spelling errors."}
       ]
     }
   ]
 }
+
+# Write Module 21
+with open(HLD_DIR / "module_21.json", "w", encoding="utf-8") as f:
+  json.dump(m21, f, ensure_ascii=False, indent=2)
+print("Module 21 written successfully!")

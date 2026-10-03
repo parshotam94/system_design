@@ -1,27 +1,406 @@
 {
   "module_id": "28",
-  "module_title": "Real-World Case Studies 5: Gaming, IoT & FinTech",
-  "description": "End-to-end interview blueprints: Design Real-Time Gaming Leaderboard (Redis Sorted Sets), IoT Sensor Ingestion Pipeline (Kafka + Time-Series DB), and Distributed Crypto/Stock Exchange Order Book.",
+  "module_title": "Service Discovery & Dynamic Routing",
+  "description": "Master dynamic cloud networking: Why static IP routing fails in auto-scaling environments, Client-Side Discovery (Eureka) vs Server-Side Discovery (AWS ALB / K8s CoreDNS), and Service Registry architecture with TTL heartbeats.",
   "topics": [
     {
-      "id": "design-gaming-leaderboard",
-      "title": "Case Study: Design Real-Time Gaming Leaderboard (Redis Sorted Sets)",
-      "definition": "Design a real-time gaming leaderboard system for 50 million active players supporting instant score updates and sub-10ms queries for Top-100 global players and Player Rank lookups.",
-      "why_we_need_it": "Relational queries like `SELECT COUNT(*) FROM scores WHERE score > my_score` take 10+ seconds on 50 million rows. Redis Sorted Sets (Skip Lists) evaluate rank in $O(\\log N)$ time (~1 millisecond).",
-      "real_world_analogy": "A physical race track scoreboard: when a car crosses the finish line, the scoreboard instantly moves their number card up the board without recalculating the times of all 10,000 cars from scratch.",
-      "how_it_works": "<p>1. <strong>Redis Sorted Sets (ZSET):</strong> Combines a Hash Map (for $O(1)$ player score lookups) with a Skip List (for $O(\\log N)$ score insertion and rank retrieval).<br>2. <strong>Score Update:</strong> `ZINCRBY leaderboard:global 50 user_123` ($O(\\log N)$).<br>3. <strong>Top 100 Players:</strong> `ZREVRANGE leaderboard:global 0 99 WITHSCORES` ($O(\\log N + M)$ - sub-1ms).<br>4. <strong>Get My Rank:</strong> `ZREVRANK leaderboard:global user_123` ($O(\\log N)$).<br>5. <strong>Time-Bounded Leaderboards:</strong> Separate Redis keys for `leaderboard:daily:2026-10-03`, `leaderboard:weekly`, and `leaderboard:monthly`.</p>",
+      "id": "why-dynamic-service-discovery",
+      "title": "Why Static IP Configs Fail in Elastic Cloud Auto-Scaling Environments",
+      "definition": "Service Discovery is the automatic detection and tracking of network locations (IP addresses and ports) of dynamically changing microservice instances. In modern elastic cloud environments (Kubernetes, AWS ECS, Auto-Scaling Groups), containers spin up, crash, reschedule, and scale out dynamically, causing IP addresses to change unpredictably within seconds, rendering static IP configuration files obsolete.",
+      "why_we_need_it": "In traditional on-premise infrastructure, servers had static IP addresses configured in configuration files (`192.168.1.50`). In Kubernetes, a pod's IP address exists only as long as that specific pod runs (ephemeral). When a pod crashes or auto-scales, its IP address is destroyed and replaced. Hardcoding IPs in configuration files will result in traffic routing to dead addresses within minutes.",
+      "real_world_analogy": "A dynamic ride-share app (Uber) vs a fixed bus route: A static bus route has fixed bus stops (Static IPs); you always wait at Corner 5th and Main. An elastic cloud is ride-sharing: 500 drivers (container pods) are roaming the city dynamically. When you request a ride, you don't call a static phone number; you query the Uber dispatch server (Service Registry), which instantly locates the live GPS position of the closest active driver.",
+      "how_it_works": "<p>1. <strong>The Ephemeral Nature of Cloud Compute:</strong><br>&bull; Auto-scalers dynamically scale pods from 10 to 100 instances during a traffic surge, and scale back to 10 at night.<br>&bull; Cloud spot instances can be terminated with a 2-minute warning.<br>&bull; Zero-downtime rolling deployments replace 100% of running container IPs with new IPs on every release.</p><p>2. <strong>The Service Registry (The Dynamic Phone Book):</strong> A centralized, highly available database (Consul, Eureka, ZooKeeper, Kubernetes CoreDNS) storing the real-time mapping of `Service Name` &rarr; `[List of Healthy IP:Port Endpoints]`.</p><p>3. <strong>Registration & Liveness Heartbeats:</strong><br>&bull; <em>Self-Registration:</em> A new container boots, discovers its own assigned private IP, and sends an `HTTP PUT /register` to the Service Registry.<br>&bull; <em>Third-Party Registration (Registrator / K8s Controller):</em> An external daemon detects container lifecycle events from the Docker/Kubernetes API and registers the endpoint automatically.<br>&bull; <em>Heartbeat Leases:</em> The service sends periodic heartbeats (e.g. every 5 seconds). If heartbeats stop for 15 seconds, the registry evicts the dead IP.</p>",
       "conceptual_breakdown": [
-        "<strong>Skip List Internals:</strong> Multi-level linked list with probabilistic forward pointers enabling logarithmic $O(\\log N)$ search and insertion.",
-        "<strong>Tie-Breaking:</strong> When two players have identical scores, encode the earlier timestamp into the fractional part: `Final_Score = Score + (1 - (Timestamp / 1e12))` so earlier players rank higher."
+        "<strong>Ephemeral IP Addresses:</strong> Cloud containers treat IP addresses as disposable ephemeral resources that change on every restart or deployment.",
+        "<strong>Heartbeat Leases (TTL):</strong> Prevents 'Ghost Instances' where crashed containers remain in the routing pool.",
+        "<strong>Dual Responsibility:</strong> Service Discovery solves two problems simultaneously: <em>Endpoint Registration</em> (tracking who is alive) and <em>Health Monitoring</em> (evicting degraded nodes).",
+        "<strong>Kubernetes Endpoints Controller:</strong> Automatically syncs the list of healthy pod IPs matching a service's label selector into a `Endpoints` / `EndpointSlice` object."
+      ],
+      "arch_diagram": {
+        "title": "Dynamic Service Discovery Lifecycle (Registration -> Heartbeat -> Query)",
+        "tiers": [
+          {
+            "label": "Ephemeral Pod Lifecycle (Kubernetes)",
+            "nodes": [
+              {
+                "name": "Order Pod (Spins up: 10.2.4.12)",
+                "type": "service",
+                "icon": "🚀",
+                "what": "1. Boots & Registers IP with Registry",
+                "why": "Auto-scaling event creates pod",
+                "when": "Startup",
+                "failure": "K8s controller auto-registers"
+              },
+              {
+                "name": "Continuous Heartbeat Ping",
+                "type": "lb",
+                "icon": "💓",
+                "what": "2. Sends Heartbeat every 5s",
+                "why": "Renews TTL lease in registry",
+                "when": "Continuous",
+                "failure": "Evicted after 15s if crashed"
+              }
+            ]
+          },
+          {
+            "label": "Dynamic Service Registry (CoreDNS / Consul)",
+            "nodes": [
+              {
+                "name": "Service Registry ('order-service')",
+                "type": "database",
+                "icon": "📖",
+                "what": "Healthy IPs: [10.2.4.12, 10.2.4.15]",
+                "why": "Real-time dynamic endpoint directory",
+                "when": "Client query / watch",
+                "failure": "Replicated across consensus cluster"
+              }
+            ]
+          },
+          {
+            "label": "Calling Client Pod",
+            "nodes": [
+              {
+                "name": "Payment Pod (Consumer)",
+                "type": "client",
+                "icon": "💳",
+                "what": "3. Queries Registry for 'order-service'",
+                "why": "Retrieves live healthy IP list for routing",
+                "when": "Before outbound RPC",
+                "failure": "Caches IP list locally in RAM"
+              }
+            ]
+          }
+        ]
+      },
+      "comparison_matrix": {
+        "title": "Static IP Configuration vs Dynamic Service Discovery",
+        "columns": [
+          "Feature",
+          "Static IP Configuration (Config Files)",
+          "Dynamic Service Discovery (Consul / K8s)"
+        ],
+        "rows": [
+          [
+            "Auto-Scaling Compatibility",
+            "Completely Broken (Cannot handle dynamic scaling)",
+            "Native (Instant registration of new container nodes)"
+          ],
+          [
+            "Failure Detection Speed",
+            "Slow (Requires manual configuration update and redeploy)",
+            "Fast (Heartbeat TTL evicts dead IPs in seconds)"
+          ],
+          [
+            "Zero-Downtime Rolling Deploys",
+            "Painful (Manual traffic draining per server)",
+            "Seamless (Old IPs drained; new IPs registered automatically)"
+          ],
+          [
+            "Infrastructure Suitability",
+            "Fixed physical bare-metal on-premise servers",
+            "Cloud-native, Kubernetes, Docker, Spot instances"
+          ]
+        ]
+      },
+      "tradeoffs": "<strong>Trade-off:</strong> Dynamic service discovery enables elastic auto-scaling and zero-downtime rolling deploys, but introduces a critical centralized infrastructure component (the Service Registry) that must be maintained with high availability.",
+      "failure_scenarios": "<strong>The Zombie Ghost IP Traffic Black Hole:</strong> A service pod crashes violently due to a kernel panic. The service used a static configuration file where its IP was hardcoded in calling services. Calling services continue sending 25% of all production traffic to the dead IP address. Every request hangs until socket timeout, dropping thousands of user checkouts. <em>Mitigation:</em> Migrate to <strong>Dynamic Service Discovery with Heartbeat Leases</strong>: the registry evicts the dead pod within 10 seconds, and calling services route exclusively to healthy instances.",
+      "common_mistakes": [
+        {
+          "mistake": "Caching DNS lookup results indefinitely inside JVM applications (`networkaddress.cache.ttl = -1`).",
+          "correction": "Java JVM caches DNS forever by default! When a pod IP changes, Java continues calling the old IP. Always set `networkaddress.cache.ttl` to 5-10 seconds in cloud environments."
+        },
+        {
+          "mistake": "Hardcoding IP addresses in microservice environment variables.",
+          "correction": "Always use service discovery logical names (e.g. `http://order-service.production.svc.cluster.local`)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why do traditional static IP addresses fail in modern cloud-native container environments like Kubernetes?",
+          "answer": "In traditional infrastructure, servers were long-lived 'pets' with persistent IP addresses. In cloud-native container architectures (Kubernetes/Docker), containers are ephemeral 'cattle': 1. <strong>Elastic Scaling:</strong> Pods dynamically scale up and down based on traffic spikes, receiving random IP addresses from the overlay subnet; 2. <strong>Node Failures & Rescheduling:</strong> If a physical VM dies, Kubernetes restarts the pod on a different VM with a brand-new IP; 3. <strong>Rolling Deployments:</strong> CI/CD pipelines replace 100% of running pods multiple times a day. Relying on static IP configs would require continuously rewriting configuration files across thousands of servers, resulting in routing traffic to dead IPs."
+        },
+        {
+          "question": "What happens when a service instance crashes in a system using TTL heartbeat leases?",
+          "answer": "When an instance registers with a Service Registry (like Consul or Eureka), it acquires a lease with a <strong>Time-To-Live (TTL)</strong> (e.g. 15 seconds) and must send periodic heartbeats (e.g. every 5 seconds). When the instance crashes, its heartbeat thread dies. After the 15-second TTL expires without a heartbeat, the Service Registry's lease reaper automatically <strong>deregisters and evicts the dead IP</strong> from the service directory. The registry then broadcasts an update or invalidates the cache on calling clients, ensuring traffic is immediately diverted to surviving healthy instances."
+        }
       ]
     },
     {
-      "id": "design-iot-telemetry-pipeline",
-      "title": "Case Study: Design IoT Telemetry Pipeline (MQTT, Kafka & TimescaleDB)",
-      "definition": "Design a connected-vehicle telemetry pipeline ingesting 1 million IoT smart meters / cars emitting sensor telemetry every 5 seconds (200,000 events/sec), processing alerts in real-time, and archiving for historical analytics.",
-      "why_we_need_it": "Tests lightweight binary protocols (MQTT), high-throughput ingest pipelines, downsampling rollups, and Time-Series Databases (TimescaleDB / InfluxDB).",
-      "real_world_analogy": "A network of 1 million weather stations: each station transmits temperature and humidity every 5 seconds over radio. A central weather computer alerts for forest fire heat spikes in 1 second while storing daily averages for climate research.",
-      "how_it_works": "<p>1. <strong>MQTT Ingestion:</strong> Devices connect to MQTT Brokers (EMQX / Mosquitto) over lightweight binary TCP packets.<br>2. <strong>Kafka Stream Buffer:</strong> MQTT broker bridges messages into Apache Kafka `sensor-telemetry` topic.<br>3. <strong>Real-Time Anomaly Engine:</strong> Apache Flink processes sliding windows (e.g. engine temperature > 120\u00b0C for 3 consecutive readings) and pushes immediate push notifications via WebSockets.<br>4. <strong>Time-Series Storage (TimescaleDB / InfluxDB):</strong> Ingests raw data using Hypertables with automatic chunk-based disk compression (90% compression ratio).<br>5. <strong>Continuous Downsampling:</strong> Roll up 5-second raw data into 1-minute, 1-hour, and 1-day averages after 30 days to optimize storage.</p>"
+      "id": "client-side-vs-server-side-discovery",
+      "title": "Client-Side Discovery (Eureka/Ribbon) vs Server-Side Discovery (AWS ALB / K8s CoreDNS)",
+      "definition": "Service discovery architectures are categorized into two primary patterns: Client-Side Discovery (where the calling client queries the service registry directly and executes client-side load balancing algorithms) and Server-Side Discovery (where the client sends requests to an intermediate load balancer/router that queries the registry and forwards traffic).",
+      "why_we_need_it": "Choosing between Client-Side and Server-Side discovery determines network hop latency, language portability across microservices, and how load balancing policies are governed.",
+      "real_world_analogy": "Ordering food delivery: Client-Side Discovery is opening an app, seeing a live list of 5 local pizza drivers and their exact GPS coordinates, and calling Driver #3 directly yourself. Server-Side Discovery is calling the central pizza restaurant dispatch phone number (Load Balancer); the dispatcher looks at their private computer screen and routes your order to whichever driver is currently available.",
+      "how_it_works": "<p>1. <strong>Client-Side Discovery (Netflix Eureka / Ribbon / Finagle):</strong><br>&bull; Step 1: Client queries the Service Registry (Eureka/Consul) on startup and caches the full list of healthy instance IPs locally in memory.<br>&bull; Step 2: The client runs an internal load balancing algorithm (e.g. Round Robin, Peak EWMA, Zone-Aware).<br>&bull; Step 3: The client connects <strong>directly to the chosen backend pod IP</strong> in a single network hop!<br>&bull; Step 4: The client receives asynchronous push updates or polls the registry every 30 seconds to refresh its cached IP table.<br>&bull; <em>Trade-off:</em> Blazing fast (zero intermediate proxy hops), but requires implementing client discovery SDKs in every programming language used in the company.</p><p>2. <strong>Server-Side Discovery (AWS ALB / Kubernetes Services / Envoy):</strong><br>&bull; Step 1: Client sends request to a stable, fixed DNS name or Virtual IP: `http://order-service`.<br>&bull; Step 2: The request hits an intermediate Load Balancer or Kubernetes Kube-Proxy / AWS ALB.<br>&bull; Step 3: The Load Balancer queries the service registry (or reads K8s Endpoints), picks a healthy target pod, and forwards the request.<br>&bull; <em>Trade-off:</em> 100% language-agnostic (clients use standard HTTP), but introduces an extra network proxy hop and adds load balancer infrastructure costs.</p>",
+      "conceptual_breakdown": [
+        "<strong>Network Hops:</strong> Client-Side Discovery is 1 network hop (Client &rarr; Target Pod). Server-Side Discovery is 2 network hops (Client &rarr; Load Balancer &rarr; Target Pod).",
+        "<strong>Language Portability:</strong> Client-Side Discovery binds you to specific language SDKs (e.g. Java Spring Cloud Netflix); Server-Side Discovery works with any language (cURL, Python, Go, Rust) out of the box.",
+        "<strong>Kubernetes ClusterIP Mechanism:</strong> In K8s, a Service IP (ClusterIP) is NOT a real physical machine! It is a virtual IP managed by `kube-proxy` via Linux kernel `iptables` / `IPVS` rules that transparently rewrite the destination IP to a pod IP.",
+        "<strong>Zone-Aware Client Routing:</strong> Client-side load balancers can prioritize servers in the *same cloud Availability Zone*, eliminating cross-AZ latency and cloud data transfer egress fees."
+      ],
+      "arch_diagram": {
+        "title": "Client-Side Discovery (1 Hop) vs Server-Side Discovery (2 Hops)",
+        "tiers": [
+          {
+            "label": "Client-Side Discovery (Netflix Eureka Model)",
+            "nodes": [
+              {
+                "name": "Calling Service (Local Cache)",
+                "type": "client",
+                "icon": "💻",
+                "what": "Executes Client-Side Load Balancing",
+                "why": "Direct point-to-point connection in 1 HOP!",
+                "when": "Cached IP table",
+                "failure": "Single network hop to backend"
+              },
+              {
+                "name": "Backend Pod 1 (Direct)",
+                "type": "service",
+                "icon": "📦",
+                "what": "Target Microservice (10.2.1.4)",
+                "why": "Zero intermediate proxy latency",
+                "when": "Direct connection",
+                "failure": "Client retries Pod 2 if connection drops"
+              }
+            ]
+          },
+          {
+            "label": "Server-Side Discovery (Kubernetes / AWS ALB Model)",
+            "nodes": [
+              {
+                "name": "Calling Service (Standard HTTP)",
+                "type": "client",
+                "icon": "📱",
+                "what": "Calls: http://order-service",
+                "why": "Zero client discovery libraries needed!",
+                "when": "Any language",
+                "failure": "Routes to intermediate LB"
+              },
+              {
+                "name": "Server-Side Load Balancer (ALB / K8s)",
+                "type": "lb",
+                "icon": "⚖️",
+                "what": "Queries Registry & Forwards Traffic",
+                "why": "Language-agnostic routing proxy",
+                "when": "Hop 1",
+                "failure": "Extra proxy hop added"
+              },
+              {
+                "name": "Backend Pod 2",
+                "type": "service",
+                "icon": "📦",
+                "what": "Target Microservice",
+                "why": "Isolated behind load balancer",
+                "when": "Hop 2",
+                "failure": "Health check evicts unhealthy pods"
+              }
+            ]
+          }
+        ]
+      },
+      "comparison_matrix": {
+        "title": "Client-Side vs Server-Side Discovery Comparison",
+        "columns": [
+          "Dimension",
+          "Client-Side Discovery (Eureka / Finagle)",
+          "Server-Side Discovery (AWS ALB / K8s CoreDNS)"
+        ],
+        "rows": [
+          [
+            "Network Hops",
+            "1 Hop (Direct Client -> Target Pod)",
+            "2 Hops (Client -> Load Balancer -> Target Pod)"
+          ],
+          [
+            "Language Agnostic?",
+            "No (Requires client library SDK per language)",
+            "100% Language Agnostic (Standard HTTP/DNS)"
+          ],
+          [
+            "Latency",
+            "Lowest (<1ms direct socket connection)",
+            "Slightly higher (+1-3ms proxy hop overhead)"
+          ],
+          [
+            "Load Balancer Infrastructure",
+            "None (No expensive load balancer hardware needed)",
+            "Requires maintaining Load Balancers / Envoy fleets"
+          ],
+          [
+            "Traffic Policy Control",
+            "Distributed inside client application code",
+            "Centralized at the Load Balancer / API Gateway"
+          ],
+          [
+            "Primary Real-World Usage",
+            "Netflix, Twitter (legacy high-throughput microservices)",
+            "Kubernetes (de facto industry standard), AWS ECS"
+          ]
+        ]
+      },
+      "tradeoffs": "<strong>Client-Side Discovery:</strong> Saves network proxy latency and eliminates load balancer bottlenecks, but couples applications to language-specific client libraries and creates cache inconsistency if client local IP caches lag behind registry updates. <strong>Server-Side Discovery:</strong> Adds a minor latency hop, but is completely language-agnostic and centralizes routing policy, making it the dominant industry standard in Kubernetes.",
+      "failure_scenarios": "<strong>The Stale Client-Side Cache Stampede:</strong> A company uses Client-Side Discovery where clients cache service IP lists for 60 seconds. A database deadlock causes 10 of 20 backend pods to crash simultaneously. The service registry detects the crashes and updates the directory. However, calling clients continue sending 50% of their requests to the dead 10 pods for the remaining 50 seconds of their local cache TTL window, causing massive user-facing timeouts! <em>Mitigation:</em> Configure client libraries to use <strong>Active Push Notifications (WebSocket/gRPC streaming watches)</strong> from the registry rather than long polling intervals.",
+      "common_mistakes": [
+        {
+          "mistake": "Attempting to use Netflix Eureka client-side discovery in a polyglot microservice team using Go, Node.js, and Python.",
+          "correction": "Eureka client libraries are mature only in Java. In polyglot environments, use Server-Side Discovery (Kubernetes CoreDNS / Envoy) to remain language-agnostic."
+        },
+        {
+          "mistake": "Ignoring cross-Availability Zone egress costs in server-side load balancers.",
+          "correction": "Use Topology-Aware Routing in Kubernetes to route traffic to pods within the same Availability Zone whenever possible."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What are the trade-offs between Client-Side Discovery and Server-Side Discovery?",
+          "answer": "<strong>Client-Side Discovery:</strong><br>&bull; <em>Pros:</em> Eliminates the intermediate load balancer proxy, reducing latency to a single network hop; eliminates the load balancer as a potential bottleneck or SPOF; supports intelligent client-side routing (e.g. zone affinity).<br>&bull; <em>Cons:</em> Requires implementing discovery and load balancing client SDKs in every programming language used; client local cache can become stale during rapid pod churn.<br><strong>Server-Side Discovery:</strong><br>&bull; <em>Pros:</em> 100% language-agnostic (clients make standard HTTP calls without special SDKs); routing policies and security controls are centralized.<br>&bull; <em>Cons:</em> Adds an extra network proxy hop (+1-3ms latency); requires provisioning and managing load balancer infrastructure."
+        },
+        {
+          "question": "How does Kubernetes implement Server-Side Service Discovery without running a dedicated load balancer proxy for every service?",
+          "answer": "Kubernetes uses <strong>`kube-proxy` combined with CoreDNS</strong>. When you create a Service, it is assigned a virtual <strong>ClusterIP</strong>. `kube-proxy` runs on every node and programs the Linux kernel's <strong>`iptables` or `IPVS` packet-filtering tables</strong>. When a client pod sends a packet to the ClusterIP, the Linux kernel intercepts the packet at the network layer and rewrites the destination IP (via DNAT) directly to one of the healthy backend pod IPs chosen at random. This achieves server-side discovery with near-zero latency because traffic is routed directly inside the Linux kernel without traversing a user-space proxy!"
+        }
+      ]
+    },
+    {
+      "id": "service-registries-and-health-checks",
+      "title": "Service Registry Architecture: Heartbeat Leases, TTL Eviction & Cluster Coordination",
+      "definition": "A Service Registry is the authoritative database of available service instances and their health states. Architectural implementations rely on distributed consensus (Consul using Raft, ZooKeeper using ZAB) or peer-to-peer eventual consistency (Netflix Eureka using masterless peer replication). Heartbeat Leases and TTL Eviction guarantee that degraded or crashed nodes are automatically pruned from active routing tables.",
+      "why_we_need_it": "If a service registry serves stale data, upstream callers will route traffic to dead instances or newly booted instances that haven't finished warming up. The service registry must balance rapid failure detection (sub-10s eviction) with resilience against transient network blips.",
+      "real_world_analogy": "A live air-traffic control radar screen: Every airplane in the sky (microservice instance) continuously broadcasts an ADS-B transponder radio ping (Heartbeat). The air-traffic controller's radar screen (Service Registry) updates every 3 seconds. If a plane's transponder signal vanishes for 15 seconds, the radar screen sounds an emergency alarm and clears that runway slot for other flights.",
+      "how_it_works": "<p>1. <strong>Consensus-Based Registries (CP - HashiCorp Consul / etcd):</strong><br>&bull; Stores service registrations using Raft consensus. Guarantees <strong>Linearizable Strong Consistency</strong>: every client querying the registry sees the exact same authoritative endpoint list.<br>&bull; <em>Health Checks:</em> Supports active HTTP checks, TCP pings, and Docker exec probes executed directly by Consul client agents.<br>&bull; <em>Trade-off:</em> High data consistency, but write throughput is limited by Raft leader serialization.</p><p>2. <strong>Peer-to-Peer Eventual Consistency (AP - Netflix Eureka):</strong><br>&bull; Eureka servers form a decentralized, masterless mesh. When an instance registers with Eureka Node 1, Node 1 asynchronously replicates the registration to its peer Eureka nodes via HTTP.<br>&bull; <em>Eureka Self-Preservation Mode:</em> If an active network partition occurs and a Eureka server loses heartbeats from >15% of instances simultaneously, Eureka assumes the <em>network is failing</em> (not all those instances died at once!). It enters <strong>Self-Preservation Mode</strong>: it freezes registry eviction completely, continuing to serve stale instance lists to prevent mass service deletion during network partitions!</p><p>3. <strong>Heartbeat Lease Mechanics:</strong><br>&bull; Registration includes `lease_duration = 30s` and `renewal_interval = 10s`.<br>&bull; The service sends an HTTP renew heartbeat every 10 seconds.<br>&bull; If the registry receives no renewal before the 30-second TTL expires, it evicts the instance and notifies subscribers.</p>",
+      "conceptual_breakdown": [
+        "<strong>Eureka Self-Preservation Mode:</strong> Prevents an AP registry from wiping out 100% of service instances during a brief cross-rack network partition.",
+        "<strong>CP vs AP Registry Debate:</strong> Is service discovery inherently AP or CP? Netflix argues it is AP (better to route to a stale instance that might be alive than return an empty list); HashiCorp argues it is CP (stale routing causes cascading errors).",
+        "<strong>Readiness vs Liveness:</strong> A service might be alive (process running), but not ready (still loading 2GB of cache into RAM). Registries must evaluate <em>Readiness Checks</em> before advertising an instance.",
+        "<strong>Client Watch API:</strong> Clients stream updates from the registry via long-polling or gRPC streams rather than polling every second."
+      ],
+      "arch_diagram": {
+        "title": "Service Registry Architecture (Heartbeat Leases & TTL Eviction Engine)",
+        "tiers": [
+          {
+            "label": "Microservice Fleet Tier",
+            "nodes": [
+              {
+                "name": "Service Pod 1 (Healthy)",
+                "type": "service",
+                "icon": "🟢",
+                "what": "Sends Heartbeat every 10s",
+                "why": "Renews 30s TTL lease",
+                "when": "Continuous",
+                "failure": "Active in directory"
+              },
+              {
+                "name": "Service Pod 2 (Deadlocked)",
+                "type": "service",
+                "icon": "🔴",
+                "what": "Heartbeat thread frozen / crashed",
+                "why": "Failed to renew lease",
+                "when": "TTL > 30s elapsed",
+                "failure": "Reaped by eviction thread"
+              }
+            ]
+          },
+          {
+            "label": "Service Registry Cluster Tier (Consul / Eureka)",
+            "nodes": [
+              {
+                "name": "Registry Leader (Consul)",
+                "type": "database",
+                "icon": "🏛️",
+                "what": "Manages Leases & Active Routing Table",
+                "why": "Authoritative directory of live instances",
+                "when": "Heartbeat renewal / registration",
+                "failure": "Replicated across Raft peers"
+              },
+              {
+                "name": "TTL Eviction Reaper Engine",
+                "type": "service",
+                "icon": "🧹",
+                "what": "Scans expired leases: evicts Pod 2!",
+                "why": "Removes dead IPs from routing table",
+                "when": "Continuous background sweep",
+                "failure": "Pushes update event to watchers"
+              }
+            ]
+          },
+          {
+            "label": "Consuming Microservice Tier",
+            "nodes": [
+              {
+                "name": "API Gateway / Consumer",
+                "type": "client",
+                "icon": "🧭",
+                "what": "Holds Persistent gRPC Watch",
+                "why": "Receives instant notification of Pod 2 eviction",
+                "when": "Sub-millisecond update",
+                "failure": "Immediately stops routing traffic to Pod 2!"
+              }
+            ]
+          }
+        ]
+      },
+      "comparison_matrix": {
+        "title": "Consul (CP) vs Netflix Eureka (AP) Service Registry Comparison",
+        "columns": [
+          "Feature",
+          "HashiCorp Consul (CP)",
+          "Netflix Eureka (AP)"
+        ],
+        "rows": [
+          [
+            "Consensus Model",
+            "Raft Consensus (Strongly Consistent)",
+            "Peer-to-Peer Asynchronous Gossip (Eventually Consistent)"
+          ],
+          [
+            "Partition Behavior",
+            "Refuses registrations in minority partition",
+            "Accepts writes everywhere; enters Self-Preservation Mode"
+          ],
+          [
+            "Health Checking",
+            "Rich multi-protocol (HTTP, TCP, Docker, Exec, gRPC)",
+            "Heartbeat lease expiration only"
+          ],
+          [
+            "DNS Interface",
+            "Native built-in DNS server (`order.service.consul`)",
+            "REST API only (No native DNS)"
+          ],
+          [
+            "Key-Value Configuration Store",
+            "Yes (Built-in distributed KV with watches)",
+            "No (Service registry only)"
+          ],
+          [
+            "Multi-Datacenter Support",
+            "Native WAN federation built-in",
+            "Supported via region/zone clustering"
+          ]
+        ]
+      },
+      "tradeoffs": "<strong>Consul (CP):</strong> Guarantees 100% accurate, linearizable routing tables with zero stale entries, but halts registrations in minority partitions during network splits. <strong>Eureka (AP):</strong> Uninterrupted availability and resilient to network partitions (via Self-Preservation), but can return stale or dead instances during churn.",
+      "failure_scenarios": "<strong>The Mass Eviction Cascade in Eureka:</strong> A momentary 30-second network switch blip disconnects a datacenter rack hosting 200 microservice pods from the Eureka registry. If Eureka did NOT have <strong>Self-Preservation Mode</strong>, it would evict all 200 pods simultaneously. When the network heals, calling services would see an empty registry and reject 100% of user traffic globally. <em>Mitigation:</em> Eureka's Self-Preservation Mode detects that >15% of heartbeats failed at once, freezes eviction, and keeps serving the existing routing table until heartbeats resume.",
+      "common_mistakes": [
+        {
+          "mistake": "Setting heartbeat interval to 1 second across 5,000 microservices.",
+          "correction": "5,000 pods pinging every second generates 5,000 HTTP requests/sec purely on health checks. Set heartbeat intervals to 10-30 seconds with jitter."
+        },
+        {
+          "mistake": "Failing to configure a Readiness Probe alongside a Liveness Probe.",
+          "correction": "If an instance takes 45 seconds to load database models into RAM at boot, a simple TCP liveness check will advertise it prematurely, routing traffic to a pod that immediately returns errors."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What is Netflix Eureka's Self-Preservation Mode and what disaster does it prevent?",
+          "answer": "In an eventually consistent AP service registry like Eureka, instances send heartbeats every 30 seconds. If a severe network partition occurs between cloud availability zones, Eureka might suddenly stop receiving heartbeats from 40% of its instances. Under normal rules, Eureka would evict all 40% of instances, destroying their routing records. <strong>Self-Preservation Mode</strong> activates automatically if the percentage of renewed heartbeats drops below a threshold (default 85%). Eureka assumes that a <em>network partition has occurred</em> rather than all instances crashing at once. It <strong>freezes all lease evictions</strong>, continuing to serve its existing routing table to preserve system traffic flow until network connectivity heals."
+        },
+        {
+          "question": "How do modern service registries use Watches instead of client polling to notify services of topology changes?",
+          "answer": "Traditional polling (clients querying `GET /services` every 5 seconds) creates high network overhead and delayed failure detection. Modern registries (Consul, etcd, Kubernetes) implement <strong>Long-Polling or persistent HTTP/2 gRPC Streaming Watches</strong>. A client opens a long-lived connection: `watch('/services/order-service', version=42)`. The registry server does NOT respond immediately; it holds the connection open in memory. The millisecond an instance registers, unregisters, or fails a health check, the registry server <strong>pushes the updated endpoint delta down the open stream</strong> in O(1) time, achieving sub-10ms topology synchronization with near-zero idle network traffic."
+        }
+      ]
     }
   ]
 }

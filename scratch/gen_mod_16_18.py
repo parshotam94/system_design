@@ -1,4 +1,17 @@
-{
+"""
+Elaborate generator for Modules 16, 17, and 18.
+Matches exact topics from app/data/hld_roadmap.json
+"""
+import json
+from pathlib import Path
+
+HLD_DIR = Path('content/hld')
+HLD_DIR.mkdir(parents=True, exist_ok=True)
+
+# ==========================================
+# MODULE 16: Distributed Consensus: Raft, Paxos & Quorums
+# ==========================================
+m16 = {
   "module_id": "16",
   "module_title": "Distributed Consensus: Raft, Paxos & Quorums",
   "description": "Master distributed consensus algorithms: Quorum mathematics (R + W > N), the Raft consensus protocol (Leader Election, Log Replication, Safety Invariants), and Paxos / ZooKeeper ZAB / etcd in production.",
@@ -78,72 +91,25 @@
       },
       "comparison_matrix": {
         "title": "Cluster Size vs Fault Tolerance Matrix",
-        "columns": [
-          "Cluster Size (N)",
-          "Majority Quorum (N/2 + 1)",
-          "Maximum Tolerable Node Failures",
-          "Recommendation"
-        ],
+        "columns": ["Cluster Size (N)", "Majority Quorum (N/2 + 1)", "Maximum Tolerable Node Failures", "Recommendation"],
         "rows": [
-          [
-            "1 Node",
-            "1",
-            "0 Failures",
-            "Development / Testing only (Single point of failure)"
-          ],
-          [
-            "2 Nodes",
-            "2",
-            "0 Failures (Losing 1 node loses quorum!)",
-            "NEVER USE IN PRODUCTION (Worse than 1 node)"
-          ],
-          [
-            "3 Nodes",
-            "2",
-            "1 Failure",
-            "Standard production for non-critical coordination"
-          ],
-          [
-            "4 Nodes",
-            "3",
-            "1 Failure (Same as 3 nodes, but more failure points)",
-            "Avoid (Even number anti-pattern)"
-          ],
-          [
-            "5 Nodes",
-            "3",
-            "2 Failures",
-            "Gold standard for etcd, ZooKeeper, and Consul in enterprise"
-          ],
-          [
-            "7 Nodes",
-            "4",
-            "3 Failures",
-            "High-security global control planes (higher write latency)"
-          ]
+          ["1 Node", "1", "0 Failures", "Development / Testing only (Single point of failure)"],
+          ["2 Nodes", "2", "0 Failures (Losing 1 node loses quorum!)", "NEVER USE IN PRODUCTION (Worse than 1 node)"],
+          ["3 Nodes", "2", "1 Failure", "Standard production for non-critical coordination"],
+          ["4 Nodes", "3", "1 Failure (Same as 3 nodes, but more failure points)", "Avoid (Even number anti-pattern)"],
+          ["5 Nodes", "3", "2 Failures", "Gold standard for etcd, ZooKeeper, and Consul in enterprise"],
+          ["7 Nodes", "4", "3 Failures", "High-security global control planes (higher write latency)"]
         ]
       },
       "tradeoffs": "<strong>Trade-off:</strong> Increasing cluster size from 3 to 7 nodes improves crash resilience (survives 3 dead servers instead of 1), but increases write latency because the leader must collect more network votes before committing any log entry.",
       "failure_scenarios": "<strong>The Split-Brain Dual-Primary Catastrophe:</strong> A 4-node cluster splits into two equal 2-node partitions during a switch failure. Both sides attempt to elect a leader. If the quorum check is buggy (e.g. requires $\\ge 50\\%$ instead of $> 50\\%$), both sides elect a leader and accept customer payments independently. When the network heals, transactions conflict irrecoverably. <em>Mitigation:</em> Strict odd node sizing ($N=5$) and mathematically strict majority checking ($> \\lfloor N/2 \\rfloor$).",
       "common_mistakes": [
-        {
-          "mistake": "Setting up a 2-node consensus cluster assuming it provides high availability.",
-          "correction": "A 2-node cluster requires 2 votes for a majority. If either node dies, quorum is lost and the cluster freezes. Always use 3 or 5 nodes."
-        },
-        {
-          "mistake": "Configuring Cassandra with Read=1 and Write=1 and expecting strong consistency.",
-          "correction": "For strong consistency, you must configure $R=\\text{QUORUM}$ and $W=\\text{QUORUM}$ so that $R + W > N$."
-        }
+        {"mistake": "Setting up a 2-node consensus cluster assuming it provides high availability.", "correction": "A 2-node cluster requires 2 votes for a majority. If either node dies, quorum is lost and the cluster freezes. Always use 3 or 5 nodes."},
+        {"mistake": "Configuring Cassandra with Read=1 and Write=1 and expecting strong consistency.", "correction": "For strong consistency, you must configure $R=\\text{QUORUM}$ and $W=\\text{QUORUM}$ so that $R + W > N$."}
       ],
       "interview_questions": [
-        {
-          "question": "What is the FLP Impossibility Theorem and how do real-world consensus systems bypass it?",
-          "answer": "The <strong>FLP Theorem</strong> (Fischer, Lynch, Paterson) proves that in an asynchronous network, no deterministic consensus protocol can guarantee both safety (correctness) and liveness (eventual progress) if even one node can crash. Real-world systems like Raft and Paxos bypass FLP by: 1. Making <strong>partial synchrony assumptions</strong> (network delays and processing speeds are bounded *most* of the time); and 2. Introducing <strong>randomized election timeouts</strong> (in Raft), which breaks deterministic symmetry and ensures split votes resolve quickly."
-        },
-        {
-          "question": "If a Cassandra cluster has Replication Factor N=5, what values of R and W guarantee strong consistency?",
-          "answer": "Any combination where $R + W > 5$. Common configurations: 1. <strong>Balanced:</strong> $W=3$ (QUORUM) and $R=3$ (QUORUM) ($3 + 3 = 6 > 5$); 2. <strong>Fast Reads:</strong> $R=1$ and $W=5$ (ALL) ($1 + 5 = 6 > 5$, ideal for read-heavy caches); 3. <strong>Fast Writes:</strong> $W=1$ and $R=5$ (ALL) ($1 + 5 = 6 > 5$, ideal for high-throughput write ingestion)."
-        }
+        {"question": "What is the FLP Impossibility Theorem and how do real-world consensus systems bypass it?", "answer": "The <strong>FLP Theorem</strong> (Fischer, Lynch, Paterson) proves that in an asynchronous network, no deterministic consensus protocol can guarantee both safety (correctness) and liveness (eventual progress) if even one node can crash. Real-world systems like Raft and Paxos bypass FLP by: 1. Making <strong>partial synchrony assumptions</strong> (network delays and processing speeds are bounded *most* of the time); and 2. Introducing <strong>randomized election timeouts</strong> (in Raft), which breaks deterministic symmetry and ensures split votes resolve quickly."},
+        {"question": "If a Cassandra cluster has Replication Factor N=5, what values of R and W guarantee strong consistency?", "answer": "Any combination where $R + W > 5$. Common configurations: 1. <strong>Balanced:</strong> $W=3$ (QUORUM) and $R=3$ (QUORUM) ($3 + 3 = 6 > 5$); 2. <strong>Fast Reads:</strong> $R=1$ and $W=5$ (ALL) ($1 + 5 = 6 > 5$, ideal for read-heavy caches); 3. <strong>Fast Writes:</strong> $W=1$ and $R=5$ (ALL) ($1 + 5 = 6 > 5$, ideal for high-throughput write ingestion)."}
       ]
     },
     {
@@ -217,60 +183,24 @@
       },
       "comparison_matrix": {
         "title": "Raft vs Multi-Paxos Comparison Matrix",
-        "columns": [
-          "Dimension",
-          "Raft Consensus",
-          "Multi-Paxos"
-        ],
+        "columns": ["Dimension", "Raft Consensus", "Multi-Paxos"],
         "rows": [
-          [
-            "Understandability & Teaching",
-            "High (Structured into election, replication, safety)",
-            "Very Low (Abstract, notoriously difficult)"
-          ],
-          [
-            "Leader Election",
-            "Randomized timeouts, heartbeats, single leader per term",
-            "Complex phase-1 leader proposals, dual leaders possible"
-          ],
-          [
-            "Log Structure",
-            "Strict sequential append-only; no holes permitted",
-            "Log can contain out-of-order uncommitted holes"
-          ],
-          [
-            "Membership Changes",
-            "Joint Consensus / Single-server stepping",
-            "Complex phase reconfiguration"
-          ],
-          [
-            "Production Adoption",
-            "etcd (K8s), Consul, CockroachDB, TiKV, Kafka (KRaft)",
-            "Google Spanner, Google Chubby, Apache Cassandra"
-          ]
+          ["Understandability & Teaching", "High (Structured into election, replication, safety)", "Very Low (Abstract, notoriously difficult)"],
+          ["Leader Election", "Randomized timeouts, heartbeats, single leader per term", "Complex phase-1 leader proposals, dual leaders possible"],
+          ["Log Structure", "Strict sequential append-only; no holes permitted", "Log can contain out-of-order uncommitted holes"],
+          ["Membership Changes", "Joint Consensus / Single-server stepping", "Complex phase reconfiguration"],
+          ["Production Adoption", "etcd (K8s), Consul, CockroachDB, TiKV, Kafka (KRaft)", "Google Spanner, Google Chubby, Apache Cassandra"]
         ]
       },
       "tradeoffs": "<strong>Pros of Raft:</strong> Formal safety, high performance, clean decomposition, easy to audit and reason about, battle-tested in Kubernetes. <strong>Cons:</strong> All client writes must funnel through the single elected leader, creating a potential throughput bottleneck. Systems with extreme write scale use Multi-Raft (sharding data into independent Raft groups).",
       "failure_scenarios": "<strong>The Split-Vote Stalemate (Non-Randomized Timers):</strong> An engineer implements Raft but sets a fixed 200ms election timeout on all 5 nodes. The leader dies. At exactly 200ms, all 4 followers time out, increment their term, and vote for themselves. Every candidate receives exactly 1 vote. The election fails. 200ms later, all 4 time out again and vote for themselves. The cluster remains leaderless indefinitely! <em>Mitigation:</em> Election timeouts MUST be randomized: `rand(150ms, 300ms)` so one candidate always claims majority first.",
       "common_mistakes": [
-        {
-          "mistake": "Allowing a Raft follower to vote for a candidate whose log is older or shorter than its own.",
-          "correction": "Followers must reject candidates with less up-to-date logs (`candidate.last_term < voter.last_term` or equal term but shorter log length) to enforce the Leader Completeness invariant."
-        },
-        {
-          "mistake": "Serving client read queries directly from a Raft leader's local memory without verifying leadership lease.",
-          "correction": "An isolated leader might not know it was deposed. Use ReadIndex or Leader Leases to guarantee non-stale reads."
-        }
+        {"mistake": "Allowing a Raft follower to vote for a candidate whose log is older or shorter than its own.", "correction": "Followers must reject candidates with less up-to-date logs (`candidate.last_term < voter.last_term` or equal term but shorter log length) to enforce the Leader Completeness invariant."},
+        {"mistake": "Serving client read queries directly from a Raft leader's local memory without verifying leadership lease.", "correction": "An isolated leader might not know it was deposed. Use ReadIndex or Leader Leases to guarantee non-stale reads."}
       ],
       "interview_questions": [
-        {
-          "question": "How does Raft ensure that a newly elected leader never overwrites or misses previously committed log entries?",
-          "answer": "Through the <strong>Leader Completeness Property</strong> enforced during leader election: when a candidate broadcasts `RequestVote`, it includes its last log index and term. A voter compares the candidate's log with its own log. The voter <strong>refuses to vote</strong> if the candidate's log is less up-to-date (if the candidate's last term is lower, or if terms match but the candidate's log is shorter). Because any committed entry must reside on a majority of nodes, and electing a leader requires a majority of votes, the two majorities must overlap by at least one node. That overlapping node will deny its vote to any candidate lacking the committed entry, ensuring the winner already contains all committed entries."
-        },
-        {
-          "question": "What is Multi-Raft and why is it used in CockroachDB and TiKV?",
-          "answer": "In standard Raft, a single cluster has one leader, limiting write throughput to what a single server can process. In <strong>Multi-Raft</strong>, the database divides its key space into small ranges (e.g. 64MB chunks). Each range forms an independent, isolated Raft consensus group with its own leader and followers. A single physical machine acts as leader for some ranges and follower for others. This scales write throughput horizontally across hundreds of nodes while maintaining strict linearizable consensus per range."
-        }
+        {"question": "How does Raft ensure that a newly elected leader never overwrites or misses previously committed log entries?", "answer": "Through the <strong>Leader Completeness Property</strong> enforced during leader election: when a candidate broadcasts `RequestVote`, it includes its last log index and term. A voter compares the candidate's log with its own log. The voter <strong>refuses to vote</strong> if the candidate's log is less up-to-date (if the candidate's last term is lower, or if terms match but the candidate's log is shorter). Because any committed entry must reside on a majority of nodes, and electing a leader requires a majority of votes, the two majorities must overlap by at least one node. That overlapping node will deny its vote to any candidate lacking the committed entry, ensuring the winner already contains all committed entries."},
+        {"question": "What is Multi-Raft and why is it used in CockroachDB and TiKV?", "answer": "In standard Raft, a single cluster has one leader, limiting write throughput to what a single server can process. In <strong>Multi-Raft</strong>, the database divides its key space into small ranges (e.g. 64MB chunks). Each range forms an independent, isolated Raft consensus group with its own leader and followers. A single physical machine acts as leader for some ranges and follower for others. This scales write throughput horizontally across hundreds of nodes while maintaining strict linearizable consensus per range."}
       ]
     },
     {
@@ -348,67 +278,30 @@
       },
       "comparison_matrix": {
         "title": "ZooKeeper vs etcd vs Consul Comparison Matrix",
-        "columns": [
-          "Dimension",
-          "Apache ZooKeeper",
-          "CoreOS etcd",
-          "HashiCorp Consul"
-        ],
+        "columns": ["Dimension", "Apache ZooKeeper", "CoreOS etcd", "HashiCorp Consul"],
         "rows": [
-          [
-            "Consensus Protocol",
-            "ZAB (ZooKeeper Atomic Broadcast)",
-            "Raft Consensus",
-            "Raft (Consensus) + Serf (Gossip)"
-          ],
-          [
-            "Data Model",
-            "Hierarchical Tree (Znodes)",
-            "Flat Key-Value with MVCC Revisions",
-            "Hierarchical Key-Value + Service Catalog"
-          ],
-          [
-            "API Protocol",
-            "Custom TCP binary protocol (JNI/Curator)",
-            "gRPC over HTTP/2 + Protobuf",
-            "HTTP / REST + DNS Interface"
-          ],
-          [
-            "Built-in Service Discovery",
-            "No (must be built on znodes)",
-            "No (used via Kubernetes DNS)",
-            "Yes (Native DNS endpoint: service.consul)"
-          ],
-          [
-            "Primary Real-World Usage",
-            "Kafka (legacy), Hadoop, HBase",
-            "Kubernetes control plane, Cloud Foundry",
-            "Service Mesh (Envoy), Multi-datacenter discovery"
-          ]
+          ["Consensus Protocol", "ZAB (ZooKeeper Atomic Broadcast)", "Raft Consensus", "Raft (Consensus) + Serf (Gossip)"],
+          ["Data Model", "Hierarchical Tree (Znodes)", "Flat Key-Value with MVCC Revisions", "Hierarchical Key-Value + Service Catalog"],
+          ["API Protocol", "Custom TCP binary protocol (JNI/Curator)", "gRPC over HTTP/2 + Protobuf", "HTTP / REST + DNS Interface"],
+          ["Built-in Service Discovery", "No (must be built on znodes)", "No (used via Kubernetes DNS)", "Yes (Native DNS endpoint: service.consul)"],
+          ["Primary Real-World Usage", "Kafka (legacy), Hadoop, HBase", "Kubernetes control plane, Cloud Foundry", "Service Mesh (Envoy), Multi-datacenter discovery"]
         ]
       },
       "tradeoffs": "<strong>Trade-off:</strong> Coordination services guarantee strict linearizable consistency and bulletproof failure recovery, but cannot scale write throughput horizontally. All cluster mutations must serialize through a single Raft/ZAB leader and write to disk, limiting cluster write throughput to ~10,000-50,000 ops/second.",
       "failure_scenarios": "<strong>The etcd Database Size Limit Meltdown:</strong> By default, etcd enforces a 2GB to 8GB database size quota limit to keep Raft snapshots fast. A misconfigured Kubernetes controller creates millions of ephemeral event objects. etcd hits its 2GB limit, raises an alarm, and switches to <strong>Read-Only Mode</strong>. The entire Kubernetes cluster freezes: no new pods can deploy, auto-scaling stops, and dead pods cannot restart! <em>Mitigation:</em> Enable automated etcd history compaction (`--auto-compaction-retention=1h`), defragment disk spaces periodically, and store ephemeral event metrics outside etcd in a time-series database.",
       "common_mistakes": [
-        {
-          "mistake": "Running etcd or ZooKeeper on slow network storage (e.g. standard cloud EBS HDD volumes).",
-          "correction": "Consensus algorithms require low-latency disk fsync. Always run coordination services on dedicated local NVMe SSDs to prevent heartbeat timeouts and leader flapping."
-        },
-        {
-          "mistake": "Using ZooKeeper or etcd as a general-purpose application cache or message queue.",
-          "correction": "Never store large user payloads or high-velocity messaging streams in a consensus store. Reserve it exclusively for critical cluster metadata."
-        }
+        {"mistake": "Running etcd or ZooKeeper on slow network storage (e.g. standard cloud EBS HDD volumes).", "correction": "Consensus algorithms require low-latency disk fsync. Always run coordination services on dedicated local NVMe SSDs to prevent heartbeat timeouts and leader flapping."},
+        {"mistake": "Using ZooKeeper or etcd as a general-purpose application cache or message queue.", "correction": "Never store large user payloads or high-velocity messaging streams in a consensus store. Reserve it exclusively for critical cluster metadata."}
       ],
       "interview_questions": [
-        {
-          "question": "How does etcd implement Watch streams efficiently without polling?",
-          "answer": "In etcd v3, Watches use persistent <strong>HTTP/2 gRPC streaming connections</strong>. The client registers a watch on a key or range prefix starting at a specific revision number: `watch(key, start_revision)`. etcd maintains an in-memory B-Tree index of keys to historical MVCC revisions. When a transaction commits, etcd matches the mutated keys against active watchers and pushes the update events down the gRPC stream in O(1) time with sub-millisecond latency and zero polling overhead."
-        },
-        {
-          "question": "Why did Apache Kafka remove its dependency on ZooKeeper in favor of KRaft (Kafka Raft)?",
-          "answer": "At massive scale (millions of partitions), maintaining dual state between Kafka brokers and ZooKeeper caused severe synchronization bottlenecks. When a broker crashed, ZooKeeper had to notify all controllers and rebuild metadata, taking tens of minutes to recover. <strong>KRaft (Kafka Raft)</strong> embeds the consensus log directly inside Kafka brokers as an internal metadata topic. This enables instant metadata propagation, accelerates broker failover from 20 minutes to under 1 second, and allows a single Kafka cluster to scale to 10+ million partitions."
-        }
+        {"question": "How does etcd implement Watch streams efficiently without polling?", "answer": "In etcd v3, Watches use persistent <strong>HTTP/2 gRPC streaming connections</strong>. The client registers a watch on a key or range prefix starting at a specific revision number: `watch(key, start_revision)`. etcd maintains an in-memory B-Tree index of keys to historical MVCC revisions. When a transaction commits, etcd matches the mutated keys against active watchers and pushes the update events down the gRPC stream in O(1) time with sub-millisecond latency and zero polling overhead."},
+        {"question": "Why did Apache Kafka remove its dependency on ZooKeeper in favor of KRaft (Kafka Raft)?", "answer": "At massive scale (millions of partitions), maintaining dual state between Kafka brokers and ZooKeeper caused severe synchronization bottlenecks. When a broker crashed, ZooKeeper had to notify all controllers and rebuild metadata, taking tens of minutes to recover. <strong>KRaft (Kafka Raft)</strong> embeds the consensus log directly inside Kafka brokers as an internal metadata topic. This enables instant metadata propagation, accelerates broker failover from 20 minutes to under 1 second, and allows a single Kafka cluster to scale to 10+ million partitions."}
       ]
     }
   ]
 }
+
+# Write Module 16
+with open(HLD_DIR / "module_16.json", "w", encoding="utf-8") as f:
+  json.dump(m16, f, ensure_ascii=False, indent=2)
+print("Module 16 written successfully!")

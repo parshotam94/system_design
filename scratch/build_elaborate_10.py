@@ -1,4 +1,16 @@
-{
+"""
+Elaborate content generator for Module 10: Deep Dive SQL: PostgreSQL, MySQL & Indexing.
+"""
+import json
+from pathlib import Path
+
+HLD_DIR = Path('content/hld')
+HLD_DIR.mkdir(parents=True, exist_ok=True)
+
+# ==========================================
+# MODULE 10: Deep Dive SQL: PostgreSQL, MySQL & Indexing
+# ==========================================
+m10 = {
   "module_id": "10",
   "module_title": "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
   "description": "Master B-Tree and LSM indexing internals, composite index leftmost prefix rules, covering indexes, ANSI SQL isolation levels, and EXPLAIN query plan optimization.",
@@ -69,65 +81,25 @@
       },
       "comparison_matrix": {
         "title": "B+ Tree vs LSM-Tree Storage Engine Matrix",
-        "columns": [
-          "Feature",
-          "B+ Tree (Postgres / MySQL InnoDB)",
-          "LSM-Tree (RocksDB / Cassandra / ScyllaDB)"
-        ],
+        "columns": ["Feature", "B+ Tree (Postgres / MySQL InnoDB)", "LSM-Tree (RocksDB / Cassandra / ScyllaDB)"],
         "rows": [
-          [
-            "Write Performance",
-            "Slower (Random I/O page updates, page splits)",
-            "Blazing fast (100% sequential append-only writes)"
-          ],
-          [
-            "Point Read Performance",
-            "Fast & predictable (3-4 disk page reads via tree)",
-            "Moderate (May require checking MemTable + multiple SSTables)"
-          ],
-          [
-            "Range Scan Performance",
-            "Superior (Leaves linked in continuous sorted order)",
-            "Slower (Must merge iterators across multiple SSTable files)"
-          ],
-          [
-            "Space Overhead",
-            "Higher (Internal fragmentation from 50-70% page fills)",
-            "Low (High compression ratio on immutable SSTables)"
-          ],
-          [
-            "Memory Requirement",
-            "Moderate (Buffer pool for hot pages)",
-            "High (Bloom filters and block indexes for every SSTable)"
-          ],
-          [
-            "Ideal Workloads",
-            "OLTP, E-commerce, Financial Ledgers, Web APIs",
-            "Time-series, Messaging logs, Metrics ingestion, Key-Value"
-          ]
+          ["Write Performance", "Slower (Random I/O page updates, page splits)", "Blazing fast (100% sequential append-only writes)"],
+          ["Point Read Performance", "Fast & predictable (3-4 disk page reads via tree)", "Moderate (May require checking MemTable + multiple SSTables)"],
+          ["Range Scan Performance", "Superior (Leaves linked in continuous sorted order)", "Slower (Must merge iterators across multiple SSTable files)"],
+          ["Space Overhead", "Higher (Internal fragmentation from 50-70% page fills)", "Low (High compression ratio on immutable SSTables)"],
+          ["Memory Requirement", "Moderate (Buffer pool for hot pages)", "High (Bloom filters and block indexes for every SSTable)"],
+          ["Ideal Workloads", "OLTP, E-commerce, Financial Ledgers, Web APIs", "Time-series, Messaging logs, Metrics ingestion, Key-Value"]
         ]
       },
       "tradeoffs": "<strong>B+ Tree:</strong> Best for read-heavy or mixed transactional workloads requiring fast point lookups, predictable range scans, and multi-version concurrency control. <strong>LSM-Tree:</strong> Best for write-heavy workloads (e.g., logging 500,000 events/sec) where write throughput cannot be bottlenecked by random disk I/O.",
       "failure_scenarios": "<strong>Random UUID Primary Key Fragmentation Disaster:</strong> An application uses randomly generated `UUIDv4` as the clustered primary key in MySQL InnoDB. As the table grows to 20 million rows, every new insert lands on an arbitrary leaf page scattered randomly across disk. Leaf pages fill up and trigger continuous expensive 50/50 page splits, degrading insert throughput by 95% and inflating disk storage by 2.5x. <em>Mitigation:</em> Use time-ordered sequential UUIDv7 or ULIDs, or an auto-incrementing BigInt primary key with a secondary unique index on UUID.",
       "common_mistakes": [
-        {
-          "mistake": "Adding an index on every single column in a table.",
-          "correction": "Each index adds write overhead. Only index columns that appear in WHERE clauses, JOIN conditions, or ORDER BY statements of high-frequency queries."
-        },
-        {
-          "mistake": "Creating a secondary index on low-cardinality columns (e.g. `gender` or `is_active`).",
-          "correction": "B-Tree indexes are inefficient on low-cardinality columns. The query planner will ignore the index and perform a full table scan. Use Partial Indexes or Bitmap Indexes instead."
-        }
+        {"mistake": "Adding an index on every single column in a table.", "correction": "Each index adds write overhead. Only index columns that appear in WHERE clauses, JOIN conditions, or ORDER BY statements of high-frequency queries."},
+        {"mistake": "Creating a secondary index on low-cardinality columns (e.g. `gender` or `is_active`).", "correction": "B-Tree indexes are inefficient on low-cardinality columns. The query planner will ignore the index and perform a full table scan. Use Partial Indexes or Bitmap Indexes instead."}
       ],
       "interview_questions": [
-        {
-          "question": "Why are B+ Trees preferred over Binary Search Trees (BST) or Red-Black Trees for database indexes?",
-          "answer": "Binary Search Trees have a fanout of only 2. For 100 million rows, a BST would have a depth of ~27 levels, requiring up to 27 separate random disk reads per query. A <strong>B+ Tree has a massive fanout of 100 to 500</strong>, meaning a tree depth of only 3 or 4 levels can index hundreds of millions of rows, requiring at most 3-4 disk reads (and the top 2-3 levels typically fit entirely in RAM)."
-        },
-        {
-          "question": "What is the difference between a Clustered Index and a Secondary Index in MySQL InnoDB?",
-          "answer": "In MySQL InnoDB, the <strong>Clustered Index</strong> is the table itself: leaf pages contain the complete table row data, physically organized by the Primary Key. A <strong>Secondary Index</strong> is an independent B+ Tree where leaf pages store only the indexed column value and the corresponding Primary Key. When querying via a secondary index, the engine first traverses the secondary index to find the primary key, and then traverses the clustered index to retrieve the full row (an operation known as an Index Lookup or Bookmark Lookup)."
-        }
+        {"question": "Why are B+ Trees preferred over Binary Search Trees (BST) or Red-Black Trees for database indexes?", "answer": "Binary Search Trees have a fanout of only 2. For 100 million rows, a BST would have a depth of ~27 levels, requiring up to 27 separate random disk reads per query. A <strong>B+ Tree has a massive fanout of 100 to 500</strong>, meaning a tree depth of only 3 or 4 levels can index hundreds of millions of rows, requiring at most 3-4 disk reads (and the top 2-3 levels typically fit entirely in RAM)."},
+        {"question": "What is the difference between a Clustered Index and a Secondary Index in MySQL InnoDB?", "answer": "In MySQL InnoDB, the <strong>Clustered Index</strong> is the table itself: leaf pages contain the complete table row data, physically organized by the Primary Key. A <strong>Secondary Index</strong> is an independent B+ Tree where leaf pages store only the indexed column value and the corresponding Primary Key. When querying via a secondary index, the engine first traverses the secondary index to find the primary key, and then traverses the clustered index to retrieve the full row (an operation known as an Index Lookup or Bookmark Lookup)."}
       ]
     },
     {
@@ -192,60 +164,23 @@
       },
       "comparison_matrix": {
         "title": "Index Scan Types Comparison",
-        "columns": [
-          "Scan Type",
-          "Heap Access Required",
-          "Relative Speed",
-          "Cost Metric"
-        ],
+        "columns": ["Scan Type", "Heap Access Required", "Relative Speed", "Cost Metric"],
         "rows": [
-          [
-            "Sequential Scan (Table Scan)",
-            "Reads 100% of table heap pages",
-            "Slowest (O(N))",
-            "High disk I/O, saturates buffer pool"
-          ],
-          [
-            "Index Scan",
-            "Reads index, then fetches row from heap",
-            "Fast (O(log N) + random heap read)",
-            "Moderate (Random I/O per matched row)"
-          ],
-          [
-            "Bitmap Index Scan",
-            "Reads index, builds RAM bitmap, batches heap reads",
-            "Fast for multi-row results",
-            "Converts random heap I/O into sequential chunks"
-          ],
-          [
-            "Index-Only Scan (Covering)",
-            "ZERO heap access (all data in index)",
-            "Blazing fast (sub-millisecond)",
-            "Optimal (Zero table heap disk lookups)"
-          ]
+          ["Sequential Scan (Table Scan)", "Reads 100% of table heap pages", "Slowest (O(N))", "High disk I/O, saturates buffer pool"],
+          ["Index Scan", "Reads index, then fetches row from heap", "Fast (O(log N) + random heap read)", "Moderate (Random I/O per matched row)"],
+          ["Bitmap Index Scan", "Reads index, builds RAM bitmap, batches heap reads", "Fast for multi-row results", "Converts random heap I/O into sequential chunks"],
+          ["Index-Only Scan (Covering)", "ZERO heap access (all data in index)", "Blazing fast (sub-millisecond)", "Optimal (Zero table heap disk lookups)"]
         ]
       },
       "tradeoffs": "<strong>Covering Index Trade-off:</strong> Attaching extra columns (`INCLUDE (email, created_at)`) expands the physical disk size of the index B+ Tree and consumes more Buffer Pool RAM. However, it completely eliminates table heap lookups, making it an essential pattern for hot API endpoints.",
       "failure_scenarios": "<strong>The Unusable Index in Production:</strong> A developer builds a composite index on `(created_at, status)`. The API endpoint runs: `SELECT * FROM orders WHERE status = 'PENDING' ORDER BY created_at DESC`. Because the query filters by `status` without specifying `created_at` first, it violates the Leftmost Prefix Rule. The database ignores the index and performs a full-table sequential scan, spiking query latency to 8 seconds. <em>Mitigation:</em> Reorder the composite index columns to `(status, created_at)`.",
       "common_mistakes": [
-        {
-          "mistake": "Applying functions or math to indexed columns in WHERE clauses (e.g. `WHERE YEAR(created_at) = 2026` or `WHERE LOWER(email) = 'user@example.com'`).",
-          "correction": "Wrapping an indexed column in a function disables B-Tree search. Use Expression / Functional Indexes (`CREATE INDEX ON users (LOWER(email))`) or range bounds: `WHERE created_at >= '2026-01-01' AND created_at < '2027-01-01'`."
-        },
-        {
-          "mistake": "Assuming `SELECT *` can use a covering index.",
-          "correction": "`SELECT *` requests all columns, forcing the engine to fetch the table heap. Explicitly select only the indexed columns to enable an Index-Only Scan."
-        }
+        {"mistake": "Applying functions or math to indexed columns in WHERE clauses (e.g. `WHERE YEAR(created_at) = 2026` or `WHERE LOWER(email) = 'user@example.com'`).", "correction": "Wrapping an indexed column in a function disables B-Tree search. Use Expression / Functional Indexes (`CREATE INDEX ON users (LOWER(email))`) or range bounds: `WHERE created_at >= '2026-01-01' AND created_at < '2027-01-01'`."},
+        {"mistake": "Assuming `SELECT *` can use a covering index.", "correction": "`SELECT *` requests all columns, forcing the engine to fetch the table heap. Explicitly select only the indexed columns to enable an Index-Only Scan."}
       ],
       "interview_questions": [
-        {
-          "question": "Given an index on (A, B, C), will the query `SELECT * FROM tbl WHERE A = 5 AND C = 10` use the index?",
-          "answer": "Yes, but only for column A. The engine uses the index to narrow down rows where $A = 5$. However, because column B was omitted from the filter condition, the engine cannot use the index to seek on $C = 10$. It must evaluate $C = 10$ as a secondary filter across all matching $A = 5$ index entries or heap rows."
-        },
-        {
-          "question": "How do you design an optimal composite index for a query with an equality filter, a range filter, and an ORDER BY clause?",
-          "answer": "Follow the <strong>Equality &rarr; Sort &rarr; Range</strong> rule. 1. Place columns with exact equality filters (`status = 'ACTIVE'`) first; 2. Place the sorting column (`ORDER BY created_at`) second to avoid an in-memory Filesort; 3. Place range filter columns (`amount > 100`) last. For example: `INDEX (status, created_at, amount)`."
-        }
+        {"question": "Given an index on (A, B, C), will the query `SELECT * FROM tbl WHERE A = 5 AND C = 10` use the index?", "answer": "Yes, but only for column A. The engine uses the index to narrow down rows where $A = 5$. However, because column B was omitted from the filter condition, the engine cannot use the index to seek on $C = 10$. It must evaluate $C = 10$ as a secondary filter across all matching $A = 5$ index entries or heap rows."},
+        {"question": "How do you design an optimal composite index for a query with an equality filter, a range filter, and an ORDER BY clause?", "answer": "Follow the <strong>Equality &rarr; Sort &rarr; Range</strong> rule. 1. Place columns with exact equality filters (`status = 'ACTIVE'`) first; 2. Place the sorting column (`ORDER BY created_at`) second to avoid an in-memory Filesort; 3. Place range filter columns (`amount > 100`) last. For example: `INDEX (status, created_at, amount)`."}
       ]
     },
     {
@@ -309,65 +244,23 @@
       },
       "comparison_matrix": {
         "title": "ANSI SQL Isolation Levels vs Anomalies Matrix",
-        "columns": [
-          "Isolation Level",
-          "Dirty Read",
-          "Non-Repeatable Read",
-          "Phantom Read",
-          "Write Skew"
-        ],
+        "columns": ["Isolation Level", "Dirty Read", "Non-Repeatable Read", "Phantom Read", "Write Skew"],
         "rows": [
-          [
-            "Read Uncommitted",
-            "Permitted",
-            "Permitted",
-            "Permitted",
-            "Permitted"
-          ],
-          [
-            "Read Committed (Postgres Default)",
-            "Prevented",
-            "Permitted",
-            "Permitted",
-            "Permitted"
-          ],
-          [
-            "Repeatable Read (MySQL Default)",
-            "Prevented",
-            "Prevented",
-            "Permitted (Prevented in InnoDB)",
-            "Permitted"
-          ],
-          [
-            "Serializable",
-            "Prevented",
-            "Prevented",
-            "Prevented",
-            "Prevented"
-          ]
+          ["Read Uncommitted", "Permitted", "Permitted", "Permitted", "Permitted"],
+          ["Read Committed (Postgres Default)", "Prevented", "Permitted", "Permitted", "Permitted"],
+          ["Repeatable Read (MySQL Default)", "Prevented", "Prevented", "Permitted (Prevented in InnoDB)", "Permitted"],
+          ["Serializable", "Prevented", "Prevented", "Prevented", "Prevented"]
         ]
       },
       "tradeoffs": "<strong>Trade-off:</strong> Increasing isolation from Read Committed to Serializable guarantees 100% mathematical correctness, but increases transaction abort rates and lock contention. In high-concurrency systems, Serializable transactions must be accompanied by application-level retry loops with exponential backoff.",
       "failure_scenarios": "<strong>The On-Call Doctor Write Skew Disaster:</strong> A hospital system requires at least one doctor active. Alice and Bob are currently on call. Both simultaneously submit a request to take time off. Under Repeatable Read isolation, Alice's transaction checks `SELECT COUNT(*) FROM on_call` (returns 2), and Bob's transaction checks the same count (returns 2). Both transactions update their status to OFF and commit successfully. The hospital has NO doctors on call. <em>Mitigation:</em> Use `SERIALIZABLE` isolation or explicit lock elevation (`SELECT ... FOR UPDATE`).",
       "common_mistakes": [
-        {
-          "mistake": "Assuming that Repeatable Read prevents all concurrency bugs.",
-          "correction": "Repeatable Read permits Write Skew and Read-Only Transaction Anomalies. For complex multi-row invariant validation, use Serializable or explicit locks."
-        },
-        {
-          "mistake": "Not writing application-level retry logic when using Serializable isolation.",
-          "correction": "Serializable engines abort transactions that encounter serialization conflicts. Applications MUST catch 40001 serialization errors and retry automatically."
-        }
+        {"mistake": "Assuming that Repeatable Read prevents all concurrency bugs.", "correction": "Repeatable Read permits Write Skew and Read-Only Transaction Anomalies. For complex multi-row invariant validation, use Serializable or explicit locks."},
+        {"mistake": "Not writing application-level retry logic when using Serializable isolation.", "correction": "Serializable engines abort transactions that encounter serialization conflicts. Applications MUST catch 40001 serialization errors and retry automatically."}
       ],
       "interview_questions": [
-        {
-          "question": "What is Write Skew and why does Repeatable Read fail to prevent it?",
-          "answer": "<strong>Write Skew</strong> occurs when two concurrent transactions read overlapping data sets, satisfy an invariant, and then make disjoint writes that collectively violate the invariant. Because each transaction writes to a different row, row-level locks and MVCC snapshots in Repeatable Read detect no write conflict, allowing both to commit. Only <strong>Serializable isolation</strong> detects the cross-transaction dependency cycle and aborts one."
-        },
-        {
-          "question": "How does MySQL InnoDB prevent Phantom Reads in Repeatable Read?",
-          "answer": "MySQL InnoDB uses <strong>Next-Key Locking</strong> (a combination of a record lock and a gap lock). When executing a range query like `SELECT * FROM orders WHERE id > 100 FOR UPDATE`, InnoDB locks not only the existing matching index records, but also the 'gaps' between them and beyond. If a concurrent transaction tries to `INSERT` a new record into that gap, it is blocked until the first transaction commits."
-        }
+        {"question": "What is Write Skew and why does Repeatable Read fail to prevent it?", "answer": "<strong>Write Skew</strong> occurs when two concurrent transactions read overlapping data sets, satisfy an invariant, and then make disjoint writes that collectively violate the invariant. Because each transaction writes to a different row, row-level locks and MVCC snapshots in Repeatable Read detect no write conflict, allowing both to commit. Only <strong>Serializable isolation</strong> detects the cross-transaction dependency cycle and aborts one."},
+        {"question": "How does MySQL InnoDB prevent Phantom Reads in Repeatable Read?", "answer": "MySQL InnoDB uses <strong>Next-Key Locking</strong> (a combination of a record lock and a gap lock). When executing a range query like `SELECT * FROM orders WHERE id > 100 FOR UPDATE`, InnoDB locks not only the existing matching index records, but also the 'gaps' between them and beyond. If a concurrent transaction tries to `INSERT` a new record into that gap, it is blocked until the first transaction commits."}
       ]
     },
     {
@@ -450,55 +343,28 @@
       },
       "comparison_matrix": {
         "title": "SQL Join Strategies Comparison",
-        "columns": [
-          "Join Algorithm",
-          "Memory Requirement",
-          "Best Dataset Size",
-          "Requires Sorted Input?"
-        ],
+        "columns": ["Join Algorithm", "Memory Requirement", "Best Dataset Size", "Requires Sorted Input?"],
         "rows": [
-          [
-            "Nested Loop",
-            "Minimal (O(1))",
-            "Small outer table + Indexed inner table",
-            "No"
-          ],
-          [
-            "Hash Join",
-            "High (O(M) memory for in-memory hash table)",
-            "Medium-to-large unindexed datasets",
-            "No"
-          ],
-          [
-            "Merge Join",
-            "Low-to-moderate",
-            "Large datasets with pre-sorted keys (or B-Tree indexed)",
-            "Yes (Input tables must be sorted on join key)"
-          ]
+          ["Nested Loop", "Minimal (O(1))", "Small outer table + Indexed inner table", "No"],
+          ["Hash Join", "High (O(M) memory for in-memory hash table)", "Medium-to-large unindexed datasets", "No"],
+          ["Merge Join", "Low-to-moderate", "Large datasets with pre-sorted keys (or B-Tree indexed)", "Yes (Input tables must be sorted on join key)"]
         ]
       },
       "tradeoffs": "<strong>Trade-off:</strong> The optimizer evaluates join permutations ($N!$). For complex queries with 12+ tables, the planning phase itself can take longer than query execution. Databases use genetic query algorithms (GEQO) to approximate optimal plans when table counts exceed thresholds.",
       "failure_scenarios": "<strong>The Stale Statistics Disconnect:</strong> A company imports 10 million new orders in a bulk batch overnight. The database autovacuum has not updated statistics yet, so the optimizer believes the table has only 1,000 rows. It chooses a Nested Loop Join instead of a Hash Join, causing a 5-minute CPU lockup that halts all checkout processing. <em>Mitigation:</em> Explicitly trigger `ANALYZE orders;` immediately following bulk data loads.",
       "common_mistakes": [
-        {
-          "mistake": "Running `EXPLAIN ANALYZE DELETE FROM orders;` in production to check performance.",
-          "correction": "`EXPLAIN ANALYZE` actually executes the statement! Always wrap test mutations in a transaction that you rollback: `BEGIN; EXPLAIN ANALYZE ...; ROLLBACK;`."
-        },
-        {
-          "mistake": "Using `LIKE '%keyword%'` with a leading wildcard and wondering why the B-Tree index is not used.",
-          "correction": "Leading wildcards cannot use B-Tree indexes. Use PostgreSQL Full-Text Search with a GIN index, or Trigram indexes (`pg_trgm`)."
-        }
+        {"mistake": "Running `EXPLAIN ANALYZE DELETE FROM orders;` in production to check performance.", "correction": "`EXPLAIN ANALYZE` actually executes the statement! Always wrap test mutations in a transaction that you rollback: `BEGIN; EXPLAIN ANALYZE ...; ROLLBACK;`."},
+        {"mistake": "Using `LIKE '%keyword%'` with a leading wildcard and wondering why the B-Tree index is not used.", "correction": "Leading wildcards cannot use B-Tree indexes. Use PostgreSQL Full-Text Search with a GIN index, or Trigram indexes (`pg_trgm`)."}
       ],
       "interview_questions": [
-        {
-          "question": "How do you diagnose and fix a slow SQL query in a production environment?",
-          "answer": "1. Identify the slow query using database slow query logs (`pg_stat_statements` or MySQL Slow Query Log);<br>2. Run `EXPLAIN (ANALYZE, BUFFERS)` to inspect the execution plan;<br>3. Check for high-cost nodes: look for `Seq Scan` on large tables, high `Rows Removed by Filter`, disk spills in `Sort Method: external merge Disk`, or massive discrepancies between estimated rows and actual rows;<br>4. Remediate: Add missing composite/covering indexes, update stale table statistics via `ANALYZE`, increase `work_mem` to prevent disk spills, or rewrite queries to eliminate correlated subqueries."
-        },
-        {
-          "question": "What is the difference between a Nested Loop Join and a Hash Join?",
-          "answer": "A <strong>Nested Loop Join</strong> takes each row from the outer table and performs a lookup into the inner table (optimal when the outer table is tiny and the inner table has a B-Tree index on the join key). A <strong>Hash Join</strong> scans the smaller table, builds an in-memory hash table of join keys in RAM, and then scans the second table probing the hash table (optimal for joining large, unindexed datasets where reading the tables sequentially is faster than random index hops)."
-        }
+        {"question": "How do you diagnose and fix a slow SQL query in a production environment?", "answer": "1. Identify the slow query using database slow query logs (`pg_stat_statements` or MySQL Slow Query Log);<br>2. Run `EXPLAIN (ANALYZE, BUFFERS)` to inspect the execution plan;<br>3. Check for high-cost nodes: look for `Seq Scan` on large tables, high `Rows Removed by Filter`, disk spills in `Sort Method: external merge Disk`, or massive discrepancies between estimated rows and actual rows;<br>4. Remediate: Add missing composite/covering indexes, update stale table statistics via `ANALYZE`, increase `work_mem` to prevent disk spills, or rewrite queries to eliminate correlated subqueries."},
+        {"question": "What is the difference between a Nested Loop Join and a Hash Join?", "answer": "A <strong>Nested Loop Join</strong> takes each row from the outer table and performs a lookup into the inner table (optimal when the outer table is tiny and the inner table has a B-Tree index on the join key). A <strong>Hash Join</strong> scans the smaller table, builds an in-memory hash table of join keys in RAM, and then scans the second table probing the hash table (optimal for joining large, unindexed datasets where reading the tables sequentially is faster than random index hops)."}
       ]
     }
   ]
 }
+
+# Write Module 10
+with open(HLD_DIR / "module_10.json", "w", encoding="utf-8") as f:
+  json.dump(m10, f, ensure_ascii=False, indent=2)
+print("Module 10 written successfully!")

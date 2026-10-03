@@ -1,87 +1,397 @@
 {
   "module_id": "20",
-  "module_title": "Content Delivery Networks (CDNs) & Edge Computing",
-  "description": "Master CDN Edge caching, Dynamic Site Acceleration (DSA), BGP Anycast routing, Cache-Control headers, invalidation strategies, and Edge Workers (Cloudflare Workers / Lambda@Edge).",
+  "module_title": "File & Storage Systems: Object, Block & File",
+  "description": "Master distributed storage architectures: Block Storage (SAN/EBS) vs Network File Systems (NFS/EFS) vs Object Storage (AWS S3/Ceph), metadata engines, presigned URLs, and Reed-Solomon Erasure Coding.",
   "topics": [
     {
-      "id": "cdn-architecture-and-edge-caching",
-      "title": "CDN Architecture: Points of Presence (PoPs), Edge Caching & Anycast BGP",
-      "definition": "A Content Delivery Network (CDN) is a geographically distributed network of Edge proxy servers (Points of Presence / PoPs) that cache and deliver web content (images, videos, HTML, API responses) close to end users to minimize latency and offload origin server infrastructure.",
-      "why_we_need_it": "Speed of light in fiber optic cables takes ~70ms to travel from Tokyo to Virginia. A user in Tokyo requesting data from an origin in Virginia experiences high latency and TCP handshake delays. Serving from a Tokyo CDN Edge PoP delivers content in <5ms.",
-      "real_world_analogy": "A global chain of neighborhood grocery convenience stores: instead of every customer flying to the central factory in Switzerland to buy chocolate, the factory ships pallets to local neighborhood stores so customers buy chocolate in 2 minutes.",
-      "how_it_works": "<p>1. <strong>BGP Anycast Routing:</strong> Multiple CDN PoP servers across 100+ countries share the exact same public IP address. Internet routers automatically direct user packets to the topologically closest PoP.<br>2. <strong>Static Content Delivery:</strong> Images, CSS, JS, and video segments are cached with long TTLs. Cache Hits never touch origin servers.<br>3. <strong>Dynamic Site Acceleration (DSA):</strong> For non-cacheable dynamic requests, CDN maintains persistent, warmed TCP/TLS connection pools to the origin and uses route optimization across private backbone fibers to bypass congested public internet routes.</p>",
+      "id": "block-vs-file-vs-object-storage",
+      "title": "Storage Typology: Block Storage (SAN/EBS) vs Network File Systems (NFS) vs Object Storage (S3)",
+      "definition": "Modern computer systems utilize three distinct storage typologies: Block Storage (AWS EBS, SAN) exposes raw disk sectors managed by an OS filesystem; File Storage (NFS, AWS EFS, SMB) organizes data into a hierarchical directory tree with shared multi-client file locks; Object Storage (AWS S3, Ceph, Cloudflare R2) stores immutable unstructured data in a flat namespace accessed via HTTP REST APIs.",
+      "why_we_need_it": "Attempting to store 50 petabytes of Instagram photos on a Network File System (NFS) will crash the operating system's directory inode tables. Attempting to run a high-performance PostgreSQL database on Object Storage (S3) will produce catastrophic query latencies. Choosing the right storage engine is foundational to system design.",
+      "real_world_analogy": "Vehicle parking: Block Storage is owning a private dedicated garage stall right under your apartment (fast, low-latency, only accessible by your car). File Storage is an office shared valet parking lot with assigned rows and numbered spots (shared access, organized hierarchy). Object Storage is an infinite automated commercial shipping container port: containers have unique serial numbers (Keys); you hand a shipping slip to an automated crane, and it fetches the container from an infinite flat yard.",
+      "how_it_works": "<p>1. <strong>Block Storage (Low Latency, Single Host):</strong> Exposes raw 512-byte or 4096-byte blocks to the operating system over Fibre Channel, iSCSI, or NVMe-oF. The host OS formats the volume with a filesystem (ext4, XFS, NTFS). Delivers single-digit microsecond latency and extreme IOPS (up to 256,000 IOPS on AWS EBS io2). Strictly limited to attachment by a single VM/compute host at a time.</p><p>2. <strong>File Storage (Shared Hierarchical POSIX):</strong> Exposes a POSIX-compliant hierarchical folder directory tree (`/mnt/shared/data/file.pdf`). Supports shared multi-reader / multi-writer access over the network with byte-range locking. However, file locking and directory traversal overhead cause performance degradation past millions of files.</p><p>3. <strong>Object Storage (Infinite Scale, Flat Namespace):</strong> Data is stored as immutable <strong>Objects</strong> comprising: <em>Unique Key</em> (string name), <em>Data Payload</em> (unstructured binary bytes), and <em>Metadata</em> (custom key-value pairs). Accessed strictly over HTTP via REST APIs (`GET`, `PUT`, `DELETE`). The namespace is completely flat (directories are merely visual slash `/` prefixes in key strings). Scales to exabytes of storage with 99.999999999% (11 9's) durability.</p>",
       "conceptual_breakdown": [
-        "<strong>Origin Shield (Tiered Caching):</strong> An intermediate caching layer between Edge PoPs and Origin that consolidates cache misses, preventing origin thundering herds.",
-        "<strong>Cache-Control Directives:</strong> `public, max-age=31536000, immutable` for versioned static assets; `s-maxage` for CDN caches vs `max-age` for browser caches.",
-        "<strong>Stale-While-Revalidate:</strong> Serves stale cached content instantly to user while asynchronously fetching fresh content from origin in the background."
+        "<strong>POSIX Compliance:</strong> Block and File storage support POSIX operations (random byte writes, file appends, atomic renames). Object storage does NOT support POSIX (you cannot modify 10 bytes inside a 5GB video file; you must overwrite the entire object).",
+        "<strong>Throughput vs Latency:</strong> Block storage optimizes for ultra-low latency (&lt;1ms); Object storage optimizes for massive aggregate throughput (terabits/sec across thousands of parallel workers) and near-zero cost per gigabyte.",
+        "<strong>Metadata Flexibility:</strong> Object storage allows attaching arbitrary custom metadata headers (e.g. `x-amz-meta-photographer: Alice`), enabling powerful search and lifecycle tagging.",
+        "<strong>Cost Disparity:</strong> Block storage (EBS) costs ~$0.10/GB/month. Object storage (S3) costs ~$0.023/GB/month (4x cheaper), and S3 Glacier archive costs ~$0.00099/GB/month (100x cheaper!)."
       ],
+      "arch_diagram": {
+        "title": "Storage Typology Architecture Comparison (Block vs File vs Object)",
+        "tiers": [
+          {
+            "label": "Workload Classification",
+            "nodes": [
+              {
+                "name": "Database Engines (Postgres/MySQL)",
+                "type": "database",
+                "icon": "🐘",
+                "what": "Requires random read/write byte I/O",
+                "why": "Needs POSIX filesystem & sub-millisecond IOPS",
+                "when": "ACID transactions",
+                "failure": "Attached to Block Storage (EBS)"
+              },
+              {
+                "name": "User Media & Archives (YouTube/Drive)",
+                "type": "client",
+                "icon": "🎥",
+                "what": "Petabytes of videos, images, logs",
+                "why": "Immutable binary data accessed via HTTP",
+                "when": "Streaming & archiving",
+                "failure": "Stored in Object Storage (S3)"
+              }
+            ]
+          },
+          {
+            "label": "Storage Engine Implementations",
+            "nodes": [
+              {
+                "name": "Block Storage (AWS EBS / SAN)",
+                "type": "database",
+                "icon": "🧱",
+                "what": "Raw Sector Blocks (iSCSI/NVMe)",
+                "why": "Dedicated single-instance extreme IOPS",
+                "when": "Database disk volumes",
+                "failure": "EBS snapshot backup"
+              },
+              {
+                "name": "Shared File Storage (NFS / EFS)",
+                "type": "database",
+                "icon": "📁",
+                "what": "Hierarchical POSIX Directory Tree",
+                "why": "Shared multi-instance read/write",
+                "when": "Legacy apps, WordPress media",
+                "failure": "Network mount reconnect"
+              },
+              {
+                "name": "Object Storage (AWS S3 / Ceph)",
+                "type": "database",
+                "icon": "🪣",
+                "what": "Flat Key-Value REST Namespace",
+                "why": "Exabyte scale, 11 9s durability, HTTP API",
+                "when": "Cloud native file storage",
+                "failure": "Cross-AZ Erasure Coding"
+              }
+            ]
+          }
+        ]
+      },
       "comparison_matrix": {
-        "title": "Edge PoP vs Origin Server Delivery",
+        "title": "Block vs File vs Object Storage Comparison Matrix",
         "columns": [
-          "Metric",
-          "Direct Origin Request",
-          "CDN Edge PoP Delivery"
+          "Feature",
+          "Block Storage (AWS EBS)",
+          "File Storage (NFS / EFS)",
+          "Object Storage (AWS S3)"
         ],
         "rows": [
           [
-            "Global User Latency",
-            "100ms - 300ms (Cross-continental)",
-            "Sub-10ms (Local edge server)"
+            "Data Access Protocol",
+            "Raw SCSI / NVMe blocks",
+            "File protocols (NFS, SMB, CIFS)",
+            "HTTP / REST API (GET, PUT, DELETE)"
           ],
           [
-            "Origin Server Load",
-            "100% of all requests hit origin",
-            "90% - 98% absorbed by CDN edge"
+            "Namespace Structure",
+            "Flat disk blocks (formatted by OS)",
+            "Hierarchical Directory Tree (Folders)",
+            "Flat Key-Value namespace (Virtual prefixes)"
           ],
           [
-            "TLS Handshake Latency",
-            "Full 1-RTT to distant origin",
-            "Terminated at local edge in 2ms"
+            "Latency",
+            "Lowest (<1ms IOPS)",
+            "Moderate (2 - 10ms)",
+            "High (50 - 100ms first byte latency)"
           ],
           [
-            "DDoS Absorption",
-            "Origin easily saturated",
-            "Absorbed by multi-terabit CDN edge capacity"
+            "POSIX Compatibility",
+            "Full POSIX compliance",
+            "Full POSIX compliance",
+            "Non-POSIX (Immutable full object writes only)"
+          ],
+          [
+            "Scalability Limit",
+            "Terabytes per volume (e.g. 64TB max)",
+            "Petabytes (limited by directory metadata)",
+            "Virtually Infinite (Exabytes across billions of keys)"
+          ],
+          [
+            "Cost per GB",
+            "Highest (~$0.10 / GB)",
+            "Moderate (~$0.30 / GB)",
+            "Lowest (~$0.02 / GB; Archive: $0.001)"
+          ],
+          [
+            "Best Use Case",
+            "Databases, OS Boot drives, Caches",
+            "Shared home dirs, legacy multi-server apps",
+            "Static assets, Big Data lakes, Backups, Videos"
           ]
         ]
       },
-      "failure_scenarios": "<strong>Instant Global Cache Invalidation Storm:</strong> Running a global wildcard purge (`PURGE /*`) on an e-commerce CDN flushes millions of cached items, causing 100,000 QPS of subsequent user traffic to hit origin servers simultaneously, crashing the database. <em>Mitigation:</em> Use versioned URLs (`/app.v2.js`) and soft purging.",
+      "tradeoffs": "<strong>Block Storage:</strong> Unbeatable latency and IOPS for databases, but cannot be shared across multiple web servers and is expensive. <strong>Object Storage:</strong> Boundless scale, massive aggregate throughput, and dirt cheap, but cannot perform partial byte modifications in place and has higher per-request latency.",
+      "failure_scenarios": "<strong>The Inode Exhaustion Outage on File Storage:</strong> An application stores 20 million small uploaded profile avatars in a single directory on an NFS file share (`/var/uploads/`). The operating system's filesystem runs out of directory inodes and memory trying to stat the folder. New uploads fail with `No space left on device` even though 80% of disk gigabytes are completely free! <em>Mitigation:</em> Migrate all unstructured user file uploads to <strong>Object Storage (AWS S3)</strong>, which has a flat namespace with zero inode constraints.",
       "common_mistakes": [
         {
-          "mistake": "Using CDN cache purging as the primary mechanism for static asset updates.",
-          "correction": "Use Content Hashing / Cache Busting in file names (`bundle.a8f2c.js`) with 1-year immutable cache headers."
+          "mistake": "Attempting to run a relational database (PostgreSQL/MySQL) directly on top of AWS EFS or S3.",
+          "correction": "Network file systems lack the low latency, precise byte-locking, and high IOPS required by relational engines. Always use dedicated Block Storage (AWS EBS) for database data files."
+        },
+        {
+          "mistake": "Storing petabytes of media files on local VM block storage volumes.",
+          "correction": "Block volumes are expensive and hard to rebalance. Store all media files in S3 and distribute them globally via a CDN."
         }
       ],
       "interview_questions": [
         {
-          "question": "How does BGP Anycast direct users to the nearest CDN Point of Presence (PoP)?",
-          "answer": "With BGP Anycast, all CDN edge data centers advertise the exact same IP prefix into the global Internet routing table (BGP). Upstream ISP routers compute the shortest AS-Path and automatically route the user's TCP packets to the topologically nearest PoP data center."
+          "question": "Why is Object Storage like AWS S3 preferred over Network File Systems (NFS) for storing petabytes of user data?",
+          "answer": "1. <strong>Unlimited Flat Scalability:</strong> NFS relies on hierarchical directory trees where directory locking and inode limits degrade past millions of files; S3 uses a flat key-value namespace partitioned across massive storage clusters;<br>2. <strong>Cost Efficiency:</strong> S3 is 5x-10x cheaper per GB and offers automated tiered lifecycle archiving (Glacier at $0.001/GB);<br>3. <strong>Extreme Durability:</strong> S3 uses Reed-Solomon Erasure Coding across 3+ Availability Zones, delivering 99.999999999% (11 9s) durability;<br>4. <strong>Native HTTP/REST Integration:</strong> Clients can stream media directly over HTTP using Presigned URLs without requiring network mount agents."
+        },
+        {
+          "question": "Can you modify a portion of an existing object in AWS S3?",
+          "answer": "No. Object storage treats objects as <strong>immutable entities</strong>. You cannot perform in-place random byte writes (e.g. updating 10 bytes in the middle of a file). To change an object, you must upload the complete new version of the object (`PUT`), replacing the old version entirely. (Though S3 does support byte-range reads via the `Range: bytes=0-1000` HTTP header)."
         }
       ]
     },
     {
-      "id": "edge-computing-and-workers",
-      "title": "Edge Computing: Cloudflare Workers, Lambda@Edge & V8 Isolates",
-      "definition": "Edge Computing executes lightweight application code and serverless functions directly at CDN edge nodes across the globe, processing user requests within microseconds of their physical location.",
-      "why_we_need_it": "Executing authentication checks, geolocation redirects, A/B testing variations, and personalization at the origin adds unnecessary cross-continental latency. Edge computing evaluates logic right at the user's doorstep.",
-      "real_world_analogy": "A border customs officer stamping visas at the airport gate (Edge) instead of making passengers fly to the capital city just to get a stamp before entering.",
-      "how_it_works": "<p>1. <strong>V8 Isolates (Cloudflare Workers):</strong> Instead of spinning up heavy Docker containers or VMs (which take 500ms+ to boot), Edge Workers run inside lightweight Google V8 JavaScript Isolates with <5ms startup time and tiny memory footprints.<br>2. <strong>Edge Key-Value / D1 Databases:</strong> Globally distributed, eventually consistent edge key-value stores (Workers KV, Upstash) replicated to all PoPs.<br>3. <strong>Common Use Cases:</strong> Dynamic A/B testing, JWT validation, geo-fencing, header mutation, dynamic image resizing, and bot mitigation.</p>",
+      "id": "object-storage-internals",
+      "title": "Object Storage Architecture: Buckets, Keys, Metadata, Immutability & Signed URLs",
+      "definition": "Object Storage organizes data into flat containers called Buckets, where each item is identified by a unique String Key. Internally, the architecture decouples Metadata Management (LSM-trees / Key-Value indexes storing permissions, size, and chunk locations) from Blob Storage Engines (storage nodes persisting raw data chunks). Presigned URLs enable secure, direct client uploads without proxying heavy binary data through application servers.",
+      "why_we_need_it": "Proxying 1GB video uploads through application web servers saturates application thread pools, exhausts network bandwidth, and inflates server costs. Presigned URLs allow web browsers to upload directly to S3 storage nodes securely, while S3's decoupled metadata architecture enables searching and lifecycle policy enforcement across billions of files.",
+      "real_world_analogy": "A coat check at a luxury hotel: You hand your coat to the attendant. The attendant clips a plastic ticket with a unique number (Key) to your coat, puts the coat into an enormous automated warehouse (Blob Storage), and records your name and phone number on an index card (Metadata). When you return, you show your ticket, and the automated rack brings your coat back. You never enter the warehouse yourself.",
+      "how_it_works": "<p>1. <strong>Decoupled Architecture:</strong> Object storage is split into two independent tiers:<br>&bull; <em>Metadata Tier:</em> Distributed key-value store (e.g., CockroachDB / Cassandra / RocksDB) that maps `Bucket + Key` &rarr; `[Chunk IDs, Version, Size, ACL, Custom Metadata]`.<br>&bull; <em>Storage Node Tier:</em> High-density commodity storage servers holding raw data chunks on disk with local block filesystems.</p><p>2. <strong>Flat Namespace Virtual Hierarchy:</strong> In S3, the key `images/2026/user_101.jpg` is a <em>single flat string</em>. S3 does not create an `images` directory or a `2026` folder. The forward slashes `/` are simply delimiter characters that the AWS console UI parses as virtual folders.</p><p>3. <strong>Strong Consistency in Modern S3:</strong> Since December 2020, AWS S3 provides <strong>Read-After-Write Strong Consistency</strong> for `PUT` and `DELETE` requests of objects in all regions without performance penalties.</p><p>4. <strong>Presigned URLs Workflow:</strong><br>&bull; Step 1: Web client asks backend: 'I want to upload a 500MB video `cat.mp4`'.<br>&bull; Step 2: Backend verifies user auth, calls AWS SDK to generate a <strong>Presigned PUT URL</strong> signed with IAM secret credentials, configured with a 15-minute expiration and exact S3 key destination.<br>&bull; Step 3: Backend returns the signed URL to the browser.<br>&bull; Step 4: Browser sends an `HTTP PUT` directly to S3's edge endpoints with the binary payload.<br>&bull; Step 5: S3 receives bytes directly, validates the cryptographic signature, persists the object, and emits an S3 Event Notification to AWS SQS/Lambda to notify the backend that the upload is complete!</p>",
       "conceptual_breakdown": [
-        "<strong>Zero Cold Starts:</strong> V8 Isolates start in under 5 milliseconds.",
-        "<strong>Sub-Request Limits:</strong> Edge workers have strict CPU execution time limits (e.g. 50ms) to maintain edge throughput.",
-        "<strong>Edge Rendering (SSR):</strong> Rendering HTML pages at the edge using frameworks like Next.js and Remix."
+        "<strong>Zero Application Server Load:</strong> Presigned URLs completely offload gigabytes of file upload/download traffic from your backend application servers directly to S3.",
+        "<strong>Key Prefix Sharding:</strong> S3 automatically scales throughput across partitions based on key prefixes. To maximize throughput (thousands of PUTs/sec), design prefixes with high entropy.",
+        "<strong>S3 Lifecycle Rules:</strong> Automated policies that transition objects between storage classes: Hot (Standard) &rarr; Warm (Infrequent Access, 30 days) &rarr; Cold Archive (Glacier, 90 days) &rarr; Delete (365 days).",
+        "<strong>Multipart Upload Requirement:</strong> Any object larger than 100MB should be uploaded using S3 Multipart Upload."
       ],
-      "failure_scenarios": "<strong>Origin State Desynchronization at Edge:</strong> An edge worker writes to a locally replicated edge KV store that has a 60-second replication propagation delay, causing a user traveling between regions to read stale state. <em>Mitigation:</em> Route writes to centralized databases or use strong consistency options.",
+      "arch_diagram": {
+        "title": "Secure Direct Upload via S3 Presigned URLs Architecture",
+        "tiers": [
+          {
+            "label": "Client Browser Tier",
+            "nodes": [
+              {
+                "name": "Web / Mobile Client",
+                "type": "client",
+                "icon": "📱",
+                "what": "1. Requests Upload Permit | 3. PUTs 500MB Video",
+                "why": "Streams bytes directly to S3; skips app server!",
+                "when": "Media upload flow",
+                "failure": "Resumes via Multipart Upload"
+              }
+            ]
+          },
+          {
+            "label": "Application Control Plane",
+            "nodes": [
+              {
+                "name": "App Auth Server",
+                "type": "service",
+                "icon": "🔑",
+                "what": "2. Generates Cryptographic Presigned URL",
+                "why": "Enforces authorization and file size limits",
+                "when": "Initial upload intent",
+                "failure": "Rejects unauthorized users"
+              }
+            ]
+          },
+          {
+            "label": "AWS S3 Object Storage Tier",
+            "nodes": [
+              {
+                "name": "S3 Bucket Ingress Endpoint",
+                "type": "database",
+                "icon": "🪣",
+                "what": "Validates IAM Signature & Stores Object",
+                "why": "Direct streaming ingestion at terabit scale",
+                "when": "Client PUT execution",
+                "failure": "Emits S3:ObjectCreated Event to SQS"
+              }
+            ]
+          }
+        ]
+      },
+      "comparison_matrix": {
+        "title": "Direct S3 Upload via Presigned URL vs App Server Proxy",
+        "columns": [
+          "Dimension",
+          "Proxy Through Application Server",
+          "Direct S3 Upload via Presigned URL"
+        ],
+        "rows": [
+          [
+            "App Server Bandwidth",
+            "Saturated (Every byte streams through app memory)",
+            "Zero (App only generates a 200-byte URL string)"
+          ],
+          [
+            "App Server Thread Blocking",
+            "High (Threads blocked for duration of slow upload)",
+            "Zero (App server finishes in <10ms)"
+          ],
+          [
+            "Max File Size",
+            "Constrained by web server RAM / reverse proxy limits",
+            "Up to 5 Terabytes (via S3 Multipart Upload)"
+          ],
+          [
+            "Security Model",
+            "App verifies cookies on upload",
+            "Cryptographic HMAC-SHA256 signature in query params with strict TTL"
+          ],
+          [
+            "Failure Resilience",
+            "Upload fails if app server redeploys",
+            "Upload succeeds independently directly against S3 edge"
+          ]
+        ]
+      },
+      "tradeoffs": "<strong>Presigned URLs:</strong> Offload 100% of bandwidth and scale to thousands of concurrent multi-gigabyte uploads with zero server load. However, the application loses real-time visibility into upload progress (must rely on S3 Event Notifications upon completion) and must handle post-upload virus/NSFW scanning asynchronously.",
+      "failure_scenarios": "<strong>The App Server Thread Pool OOM Death:</strong> A company allows users to upload 4K video files by submitting `POST /api/upload` directly to their Node.js/Python backend. 200 users on slow 3G cellular connections begin uploading 1GB files simultaneously. 200 web worker threads are tied up for 20 minutes buffering network bytes in RAM. The web server runs out of heap memory, crashes with OOM, and takes down the entire public REST API for all users. <em>Mitigation:</em> Never proxy large file uploads through application servers. Always use <strong>S3 Presigned URLs</strong>.",
       "common_mistakes": [
         {
-          "mistake": "Running long compute-heavy machine learning inference or heavy batch parsing inside edge workers.",
-          "correction": "Keep Edge Workers focused on lightweight routing, auth validation, and rapid caching transforms; delegate heavy computing to core cloud data centers."
+          "mistake": "Setting Presigned URL expiration to 24 hours.",
+          "correction": "Presigned URLs should expire in 10-15 minutes. Once generated, the browser should begin the upload immediately."
+        },
+        {
+          "mistake": "Using predictable sequential prefixes (e.g. `s3://bucket/2026-10-03/...`) for ultra-high-throughput ingest.",
+          "correction": "Partition keys should have high entropy or random prefixes (e.g. `s3://bucket/a8f2-2026-10-03/...`) to avoid hotspotting S3 storage partitions when exceeding 3,500 PUTs/second."
         }
       ],
       "interview_questions": [
         {
-          "question": "Why are V8 Isolates superior to containerized micro-VMs for Edge Computing?",
-          "answer": "V8 Isolates share a single running process memory space while enforcing strict security isolation, allowing thousands of tenant scripts to run on a single edge server with zero container startup overhead, sub-millisecond cold starts, and minimal RAM footprint per tenant."
+          "question": "How do S3 Presigned URLs work under the hood and why are they cryptographically secure?",
+          "answer": "A <strong>Presigned URL</strong> encodes authentication credentials into the URL query parameters using AWS Signature Version 4 (SigV4). The backend creates a canonical request string including the HTTP method (`PUT`), target S3 bucket, exact object key, expiration timestamp, and content headers. It computes an <strong>HMAC-SHA256 signature</strong> of this request using the backend's secret IAM access key. When the browser sends a `PUT` to the URL, S3 validates the signature using its internal key copy and verifies that the current timestamp is within the expiration window. The client never gets access to AWS credentials, but can upload to that exact key safely."
+        },
+        {
+          "question": "How does S3 achieve Read-After-Write Strong Consistency?",
+          "answer": "Historically, S3 was eventually consistent (using read-replicas for metadata). In 2020, AWS re-architected S3 metadata to provide <strong>Strong Read-After-Write Consistency</strong> for all `PUT` and `DELETE` operations. When an object is created or deleted, the mutation is committed to a replicated, strongly consistent metadata consensus tier before returning success to the caller. Any subsequent read immediately observes the new object or version."
+        }
+      ]
+    },
+    {
+      "id": "erasure-coding-and-multipart-uploads",
+      "title": "High Durability: Reed-Solomon Erasure Coding, Chunking & Resumable Multipart Uploads",
+      "definition": "Reed-Solomon Erasure Coding is a mathematical data protection algorithm that divides an object into $K$ data chunks and computes $M$ parity chunks (total $N = K + M$). The original data can be 100% reconstructed from ANY $K$ of the $N$ chunks. Resumable Multipart Uploads divide large binary files into independent parallel parts (5MB to 5GB each) that can be uploaded concurrently and retried independently upon failure.",
+      "why_we_need_it": "Traditional 3x replication consumes 200% storage overhead (storing 1PB requires 3PB of raw disk!). Reed-Solomon Erasure Coding (e.g. $8+4$) delivers equivalent or superior durability (99.999999999%) with only 50% storage overhead, saving cloud providers billions of dollars in hard drives.",
+      "real_world_analogy": "A mathematical equation with variables: If you know that $x + y = 10$, and you lose $y$, but you still have $x=4$, you can solve for $y$ instantly. Erasure coding writes redundant mathematical parity equations across disks. If a hard drive explodes, the storage engine solves the linear equations using the surviving disks to reconstruct the missing data in real time.",
+      "how_it_works": "<p>1. <strong>Reed-Solomon ($K + M$) Mechanics:</strong> An object is sliced into $K$ data blocks. Using Galois Field ($GF(2^8)$) matrix multiplication, the engine generates $M$ parity blocks.<br>&bull; Example: $K = 8, M = 4$. Total blocks = 12.<br>&bull; The 12 blocks are distributed across 12 physically separate server racks / Availability Zones.<br>&bull; The system can tolerate the simultaneous catastrophic failure of <strong>ANY 4 disks or servers</strong> with ZERO data loss!<br>&bull; Storage Overhead = $M/K = 4/8 = 50\\%$ (compared to 200% for 3x replication!).</p><p>2. <strong>Multipart Upload Lifecycle (Files > 100MB):</strong><br>&bull; Step 1 (`InitiateMultipartUpload`): S3 returns an `UploadId`.<br>&bull; Step 2 (`UploadPart`): Client slices a 10GB file into 1,000 independent 10MB chunks. Chunks are uploaded in parallel across 10 network threads. If Part #42 fails due to a network drop, <em>only Part #42 is retried</em> (saving 9.9GB of wasted bandwidth!). Each uploaded part returns an `ETag` checksum.<br>&bull; Step 3 (`CompleteMultipartUpload`): Client sends an ordered manifest of part numbers and ETags. S3 validates the checksums, concatenates the chunks into a single object, and completes the transaction.</p><p>3. <strong>Chunk Healing & Bit-Rot Scrubbing:</strong> Background scrubber daemons continuously compute SHA-256 checksums of stored blocks on disk. If bit-rot or sector decay is detected, the engine reads $K$ surviving blocks, reconstructs the damaged block via erasure coding, and writes it to a fresh disk.</p>",
+      "conceptual_breakdown": [
+        "<strong>11 9's Durability (99.999999999%):</strong> Statistically means that if you store 10,000,000 objects in S3, you can expect to lose a single object once every 10,000 years.",
+        "<strong>CPU Trade-off:</strong> Erasure coding saves disk storage costs, but requires CPU compute cycles to calculate parity matrices during writes and reconstruct lost blocks during reads.",
+        "<strong>Resumable Uploads:</strong> Multipart upload is mandatory for mobile or unstable networks; an interrupted 5GB upload can resume from the last completed part.",
+        "<strong>S3 Part Constraints:</strong> Part size must be between 5MB and 5GB. Maximum number of parts per object is 10,000 (enabling maximum single object size of 5 Terabytes)."
+      ],
+      "arch_diagram": {
+        "title": "Reed-Solomon Erasure Coding (K=8 Data + M=4 Parity across 12 Nodes)",
+        "tiers": [
+          {
+            "label": "Data Slicing & Parity Matrix Tier",
+            "nodes": [
+              {
+                "name": "Raw File (100MB)",
+                "type": "client",
+                "icon": "📄",
+                "what": "Sliced into K=8 Data Chunks (12.5MB each)",
+                "why": "Generates M=4 Parity Chunks via Vandermonde Matrix",
+                "when": "Ingestion write path",
+                "failure": "Distributed across 12 separate servers"
+              }
+            ]
+          },
+          {
+            "label": "12 Dispersed Storage Nodes (Tolerates 4 Crashes)",
+            "nodes": [
+              {
+                "name": "Data Nodes D1..D8",
+                "type": "database",
+                "icon": "💾",
+                "what": "8 Primary Data Chunks",
+                "why": "Standard data blocks",
+                "when": "Normal reads",
+                "failure": "If D2 and D5 crash, reconstructed from parity!"
+              },
+              {
+                "name": "Parity Nodes P1..P4",
+                "type": "database",
+                "icon": "🛡️",
+                "what": "4 Redundancy Parity Chunks",
+                "why": "Provides mathematical recovery",
+                "when": "Disk failure detected",
+                "failure": "Can lose up to 4 nodes simultaneously"
+              }
+            ]
+          },
+          {
+            "label": "Dynamic Reconstruction Tier",
+            "nodes": [
+              {
+                "name": "Erasure Code Reconstructor",
+                "type": "service",
+                "icon": "🧮",
+                "what": "Reads ANY 8 surviving chunks",
+                "why": "Solves matrix equations to rebuild missing chunks",
+                "when": "Disk crash or background scrubber repair",
+                "failure": "100% data recovery guarantee"
+              }
+            ]
+          }
+        ]
+      },
+      "comparison_matrix": {
+        "title": "3x Replication vs Reed-Solomon Erasure Coding",
+        "columns": [
+          "Protection Scheme",
+          "Storage Overhead",
+          "Tolerable Node Failures",
+          "Write CPU Overhead",
+          "Reconstruction I/O Cost"
+        ],
+        "rows": [
+          [
+            "3x Replication",
+            "200% (1PB data requires 3PB raw disk)",
+            "Tolerates 2 node failures",
+            "Zero (simple byte copy)",
+            "Low (copy surviving replica)"
+          ],
+          [
+            "Erasure Coding (RS 8+4)",
+            "50% (1PB data requires 1.5PB raw disk)",
+            "Tolerates 4 node failures (Double resilience!)",
+            "High (Galois field matrix math)",
+            "Higher (Must read 8 chunks to rebuild 1 dead chunk)"
+          ],
+          [
+            "Erasure Coding (RS 16+4)",
+            "25% (1PB data requires 1.25PB raw disk)",
+            "Tolerates 4 node failures",
+            "Highest",
+            "Must read 16 chunks to rebuild 1 dead chunk"
+          ]
+        ]
+      },
+      "tradeoffs": "<strong>Replication:</strong> Best for ultra-low latency, small hot files, or local database WALs where CPU overhead cannot be tolerated. <strong>Erasure Coding:</strong> The universal standard for large-scale object storage, cold archives, and big data lakes, cutting infrastructure disk hardware costs by 50-75%.",
+      "failure_scenarios": "<strong>The Incomplete Multipart Upload Billing Leak:</strong> A video platform's users initiate 50,000 multipart uploads a day. Many uploads fail or are abandoned halfway through. S3 stores all uploaded 100MB parts indefinitely until `CompleteMultipartUpload` or `AbortMultipartUpload` is called. Over 2 years, 500 Terabytes of orphan uncompleted parts accumulate, costing the company $12,000/month in wasted storage bills! <em>Mitigation:</em> Configure an automated <strong>S3 Lifecycle Rule</strong> to automatically abort and purge incomplete multipart uploads after 7 days.",
+      "common_mistakes": [
+        {
+          "mistake": "Uploading a 5GB file to S3 as a single standard `PUT` request.",
+          "correction": "Single `PUT` requests over 100MB are fragile; a dropped packet at 99% forces re-uploading the entire 5GB. Always use Multipart Upload for files >100MB."
+        },
+        {
+          "mistake": "Applying Erasure Coding to small 1KB metadata files.",
+          "correction": "Erasure coding small files creates chunk fragment overhead. Group small files into larger packs (like HDFS SequenceFiles or Ceph RADOS objects) before erasure coding."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Reed-Solomon Erasure Coding provide 11 9's durability with only 50% storage overhead compared to 3x replication?",
+          "answer": "In <strong>3x replication</strong>, 1GB of data is copied 3 times, requiring 3GB of disk (200% overhead) and can survive losing at most 2 copies. In <strong>Reed-Solomon Erasure Coding (e.g. $8+4$)</strong>, 1GB of data is sliced into 8 data chunks (125MB each) and 4 parity chunks (125MB each) using Galois field matrix math, totaling 1.5GB of disk (only 50% overhead!). The original data can be mathematically reconstructed from <strong>ANY 8 of the 12 chunks</strong>. This configuration survives the loss of <strong>4 simultaneous disk/server failures</strong>—providing twice the fault tolerance of 3x replication while saving 50% of raw disk costs."
+        },
+        {
+          "question": "How do you design a reliable, resumable large video upload system (e.g. YouTube video upload)?",
+          "answer": "1. <strong>Chunking & Multipart Upload:</strong> The client application slices the video into 10MB chunks; 2. <strong>Direct S3 Ingestion via Presigned URLs:</strong> The client requests Presigned URLs for each part and uploads parts in parallel directly to S3; 3. <strong>Client-Side Resumption Manifest:</strong> The client tracks uploaded part ETags in IndexedDB/local storage. If the user loses Wi-Fi or closes the browser, reopening the page checks the manifest and resumes uploading only the missing chunks; 4. <strong>Checksum Verification:</strong> S3 verifies MD5/SHA256 checksums per part; 5. <strong>Asynchronous Transcoding Trigger:</strong> Upon `CompleteMultipartUpload`, S3 emits an event to SQS to trigger the asynchronous transcoding worker pipeline."
         }
       ]
     }

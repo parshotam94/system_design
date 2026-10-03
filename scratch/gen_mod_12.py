@@ -1,4 +1,10 @@
-{
+"""
+Elaborate generator for Module 12: Database Scaling: Replication, Sharding & Partitioning
+"""
+import json
+from pathlib import Path
+
+m12 = {
   "module_id": "12",
   "module_title": "Database Scaling: Replication, Sharding & Partitioning",
   "description": "Master horizontal database scaling: Primary-Replica replication, handling replication lag, horizontal sharding strategies (hash, range, directory), consistent hashing, hot partition rebalancing, and distributed joins.",
@@ -74,58 +80,22 @@
       },
       "comparison_matrix": {
         "title": "Replication Modes Comparison Matrix",
-        "columns": [
-          "Mode",
-          "Write Latency",
-          "Data Loss on Primary Crash (RPO)",
-          "Availability on Replica Failure",
-          "Typical Use Case"
-        ],
+        "columns": ["Mode", "Write Latency", "Data Loss on Primary Crash (RPO)", "Availability on Replica Failure", "Typical Use Case"],
         "rows": [
-          [
-            "Asynchronous",
-            "Lowest (commits immediately)",
-            "High (un-replicated transactions are lost)",
-            "High (primary continues writing)",
-            "Standard web applications, social media"
-          ],
-          [
-            "Synchronous",
-            "Highest (waits for replica disk fsync)",
-            "Zero (RPO = 0 guaranteed)",
-            "Low (primary hangs if replica dies)",
-            "High-stakes banking, stock exchanges"
-          ],
-          [
-            "Semi-Synchronous",
-            "Medium (waits for replica memory ACK)",
-            "Near-zero (lost only if both die simultaneously)",
-            "High (falls back to async if replica times out)",
-            "Modern high-reliability cloud databases"
-          ]
+          ["Asynchronous", "Lowest (commits immediately)", "High (un-replicated transactions are lost)", "High (primary continues writing)", "Standard web applications, social media"],
+          ["Synchronous", "Highest (waits for replica disk fsync)", "Zero (RPO = 0 guaranteed)", "Low (primary hangs if replica dies)", "High-stakes banking, stock exchanges"],
+          ["Semi-Synchronous", "Medium (waits for replica memory ACK)", "Near-zero (lost only if both die simultaneously)", "High (falls back to async if replica times out)", "Modern high-reliability cloud databases"]
         ]
       },
       "tradeoffs": "<strong>Replicas solve read scalability, NOT write scalability.</strong> Every write must execute on the primary AND replay on every single replica. If your workload reaches 50,000 writes/sec, adding more read replicas makes performance WORSE because the primary must stream replication logs to more network destinations.",
       "failure_scenarios": "<strong>The Post-and-Refresh Disappearing Content Bug:</strong> A user posts a comment on an article. The write hits the Primary. The user's browser immediately refreshes the page, and the read request routes to a Read Replica that is 150ms behind. The user does not see their comment, panics, and submits the comment 5 times. <em>Mitigation:</em> Enforce <strong>Read-Your-Own-Writes</strong>: route reads for the submitting user to the Primary for 5 seconds after a mutation.",
       "common_mistakes": [
-        {
-          "mistake": "Adding read replicas to fix a write-heavy database bottleneck.",
-          "correction": "Read replicas do not increase write capacity. To scale writes, you must implement Database Sharding or adopt a distributed multi-master engine."
-        },
-        {
-          "mistake": "Failing to monitor replication lag in alerting systems.",
-          "correction": "Alert on replication lag metrics (`pg_stat_replication.replay_lag` or `Seconds_Behind_Master`). When lag exceeds 5 seconds, temporarily take the replica out of the load balancing pool."
-        }
+        {"mistake": "Adding read replicas to fix a write-heavy database bottleneck.", "correction": "Read replicas do not increase write capacity. To scale writes, you must implement Database Sharding or adopt a distributed multi-master engine."},
+        {"mistake": "Failing to monitor replication lag in alerting systems.", "correction": "Alert on replication lag metrics (`pg_stat_replication.replay_lag` or `Seconds_Behind_Master`). When lag exceeds 5 seconds, temporarily take the replica out of the load balancing pool."}
       ],
       "interview_questions": [
-        {
-          "question": "How do you guarantee Read-Your-Own-Writes consistency in a system with asynchronous read replicas?",
-          "answer": "1. <strong>Time-based routing:</strong> Track the timestamp of a user's last write. If $T_{\\text{current}} - T_{\\text{write}} < 5\\text{s}$, route that user's read queries directly to the Primary;<br>2. <strong>Replication Token (LSN tracking):</strong> On a write, the primary returns the Log Sequence Number (LSN). The client sends this token with read requests. The router only forwards the query to a replica if `replica.lsn >= token`; otherwise, it routes to primary;<br>3. <strong>Optimistic Client UI:</strong> Immediately update the client-side UI state in memory from the write response without waiting for a re-fetch from the database."
-        },
-        {
-          "question": "What is the Split-Brain scenario during database primary failover and how is it prevented?",
-          "answer": "<strong>Split-brain</strong> occurs when the primary temporarily becomes unresponsive (e.g. transient network blip). A health checker assumes the primary is dead and promotes a replica to be the new primary. When the old primary recovers, both nodes believe they are the authoritative primary and accept conflicting writes, permanently corrupting the data set. Prevention: <strong>STONITH ('Shoot The Other Node In The Head')</strong> or hardware fencing to forcibly power off the old primary, combined with distributed consensus (Raft/ZooKeeper/Consul) where a primary must hold a majority quorum lease to accept writes."
-        }
+        {"question": "How do you guarantee Read-Your-Own-Writes consistency in a system with asynchronous read replicas?", "answer": "1. <strong>Time-based routing:</strong> Track the timestamp of a user's last write. If $T_{\\text{current}} - T_{\\text{write}} < 5\\text{s}$, route that user's read queries directly to the Primary;<br>2. <strong>Replication Token (LSN tracking):</strong> On a write, the primary returns the Log Sequence Number (LSN). The client sends this token with read requests. The router only forwards the query to a replica if `replica.lsn >= token`; otherwise, it routes to primary;<br>3. <strong>Optimistic Client UI:</strong> Immediately update the client-side UI state in memory from the write response without waiting for a re-fetch from the database."},
+        {"question": "What is the Split-Brain scenario during database primary failover and how is it prevented?", "answer": "<strong>Split-brain</strong> occurs when the primary temporarily becomes unresponsive (e.g. transient network blip). A health checker assumes the primary is dead and promotes a replica to be the new primary. When the old primary recovers, both nodes believe they are the authoritative primary and accept conflicting writes, permanently corrupting the data set. Prevention: <strong>STONITH ('Shoot The Other Node In The Head')</strong> or hardware fencing to forcibly power off the old primary, combined with distributed consensus (Raft/ZooKeeper/Consul) where a primary must hold a majority quorum lease to accept writes."}
       ]
     },
     {
@@ -203,65 +173,23 @@
       },
       "comparison_matrix": {
         "title": "Sharding Strategies Comparison Matrix",
-        "columns": [
-          "Strategy",
-          "Data Distribution",
-          "Range Query Efficiency",
-          "Resharding Complexity",
-          "Hotspot Vulnerability"
-        ],
+        "columns": ["Strategy", "Data Distribution", "Range Query Efficiency", "Resharding Complexity", "Hotspot Vulnerability"],
         "rows": [
-          [
-            "Hash-Based",
-            "Uniform / Evenly distributed",
-            "Poor (Scatter-Gather across all shards)",
-            "High (changing N moves almost all data)",
-            "Low (randomized hashing breaks up clusters)"
-          ],
-          [
-            "Range-Based",
-            "Can be skewed",
-            "Excellent (Targeted to 1 or 2 shards)",
-            "Low (split range boundaries)",
-            "Severe (auto-incrementing IDs burn latest shard)"
-          ],
-          [
-            "Directory-Based",
-            "Completely configurable",
-            "Moderate (consults directory table)",
-            "Zero (update directory entry)",
-            "Low (can isolate hot tenants to dedicated shards)"
-          ],
-          [
-            "Consistent Hashing",
-            "Uniform via Virtual Nodes",
-            "Poor (keys distributed along ring)",
-            "Minimal (only K/N keys rebalance)",
-            "Low (Vnodes balance load across physical nodes)"
-          ]
+          ["Hash-Based", "Uniform / Evenly distributed", "Poor (Scatter-Gather across all shards)", "High (changing N moves almost all data)", "Low (randomized hashing breaks up clusters)"],
+          ["Range-Based", "Can be skewed", "Excellent (Targeted to 1 or 2 shards)", "Low (split range boundaries)", "Severe (auto-incrementing IDs burn latest shard)"],
+          ["Directory-Based", "Completely configurable", "Moderate (consults directory table)", "Zero (update directory entry)", "Low (can isolate hot tenants to dedicated shards)"],
+          ["Consistent Hashing", "Uniform via Virtual Nodes", "Poor (keys distributed along ring)", "Minimal (only K/N keys rebalance)", "Low (Vnodes balance load across physical nodes)"]
         ]
       },
       "tradeoffs": "<strong>Sharding is the ultimate scalability weapon, but introduces immense architectural pain:</strong> Cross-shard joins are impossible without scatter-gather, cross-shard transactions require complex two-phase commit protocols, schema migrations must run across 100 databases in parallel, and foreign keys cannot span shards.",
       "failure_scenarios": "<strong>The Monotonic ID Range Shard Meltdown:</strong> A company shards orders by date range: Shard 1 = January, Shard 2 = February, Shard 3 = March. In March, 100% of the company's writes and 95% of active reads hit Shard 3. Shard 3 crashes under load while Shards 1 and 2 sit at 1% CPU utilization. <em>Mitigation:</em> Shard by `Hash(order_id)` or `Hash(user_id)` to distribute writes uniformly across all nodes regardless of time.",
       "common_mistakes": [
-        {
-          "mistake": "Sharding prematurely when proper indexing, read replicas, and caching would solve the problem.",
-          "correction": "Sharding introduces massive operational complexity. Exhaust caching, vertical scaling, read replicas, and partitioning first."
-        },
-        {
-          "mistake": "Selecting a shard key that does not appear in your most critical API queries.",
-          "correction": "If 90% of your queries filter by `user_id`, make `user_id` the shard key. If you shard by `created_at`, every single user profile lookup becomes an expensive broadcast query."
-        }
+        {"mistake": "Sharding prematurely when proper indexing, read replicas, and caching would solve the problem.", "correction": "Sharding introduces massive operational complexity. Exhaust caching, vertical scaling, read replicas, and partitioning first."},
+        {"mistake": "Selecting a shard key that does not appear in your most critical API queries.", "correction": "If 90% of your queries filter by `user_id`, make `user_id` the shard key. If you shard by `created_at`, every single user profile lookup becomes an expensive broadcast query."}
       ],
       "interview_questions": [
-        {
-          "question": "How do you pick an effective Shard Key in a system design interview?",
-          "answer": "Evaluate candidate keys against 4 criteria: 1. <strong>High Cardinality:</strong> Millions of unique values (e.g., `user_id`, NOT `status`); 2. <strong>Uniform Distribution:</strong> Evenly distributes data volume and write QPS across shards (avoid celebrity keys); 3. <strong>Query Alignment:</strong> Must be present in the `WHERE` clause of >85% of critical read and write queries to avoid Scatter-Gather; 4. <strong>Immutability:</strong> The value must never change after creation."
-        },
-        {
-          "question": "What is Scatter-Gather and why is it dangerous at scale?",
-          "answer": "<strong>Scatter-Gather</strong> occurs when a query does not include the shard key. The shard router must 'scatter' the query by broadcasting it to all $N$ shards in parallel, wait for every shard to respond, and 'gather' (merge/sort) the results in memory. It is dangerous because: 1. A single slow shard delays the entire response (tail latency / p99 explosion); 2. It multiplies cluster CPU and connection load by $N$ for a single user query."
-        }
+        {"question": "How do you pick an effective Shard Key in a system design interview?", "answer": "Evaluate candidate keys against 4 criteria: 1. <strong>High Cardinality:</strong> Millions of unique values (e.g., `user_id`, NOT `status`); 2. <strong>Uniform Distribution:</strong> Evenly distributes data volume and write QPS across shards (avoid celebrity keys); 3. <strong>Query Alignment:</strong> Must be present in the `WHERE` clause of >85% of critical read and write queries to avoid Scatter-Gather; 4. <strong>Immutability:</strong> The value must never change after creation."},
+        {"question": "What is Scatter-Gather and why is it dangerous at scale?", "answer": "<strong>Scatter-Gather</strong> occurs when a query does not include the shard key. The shard router must 'scatter' the query by broadcasting it to all $N$ shards in parallel, wait for every shard to respond, and 'gather' (merge/sort) the results in memory. It is dangerous because: 1. A single slow shard delays the entire response (tail latency / p99 explosion); 2. It multiplies cluster CPU and connection load by $N$ for a single user query."}
       ]
     },
     {
@@ -335,58 +263,22 @@
       },
       "comparison_matrix": {
         "title": "Migration Strategies Comparison Matrix",
-        "columns": [
-          "Strategy",
-          "Downtime Required",
-          "Rollback Safety",
-          "Implementation Effort",
-          "Risk Level"
-        ],
+        "columns": ["Strategy", "Downtime Required", "Rollback Safety", "Implementation Effort", "Risk Level"],
         "rows": [
-          [
-            "Maintenance Window (Cold Cutover)",
-            "High (Hours of maintenance downtime)",
-            "Easy (revert DNS to old DB)",
-            "Lowest",
-            "High (unforeseen bugs under live traffic)"
-          ],
-          [
-            "Dual-Write + Backfill",
-            "Zero downtime",
-            "Instant (reads stay on old DB until verified)",
-            "Moderate-to-high",
-            "Lowest (battle-tested industry standard)"
-          ],
-          [
-            "Logical Replication / CDC Cutover",
-            "Near-zero (<30s connection pause)",
-            "Moderate (reverse replication stream required)",
-            "Moderate",
-            "Low (engine-native replication minimizes app code changes)"
-          ]
+          ["Maintenance Window (Cold Cutover)", "High (Hours of maintenance downtime)", "Easy (revert DNS to old DB)", "Lowest", "High (unforeseen bugs under live traffic)"],
+          ["Dual-Write + Backfill", "Zero downtime", "Instant (reads stay on old DB until verified)", "Moderate-to-high", "Lowest (battle-tested industry standard)"],
+          ["Logical Replication / CDC Cutover", "Near-zero (<30s connection pause)", "Moderate (reverse replication stream required)", "Moderate", "Low (engine-native replication minimizes app code changes)"]
         ]
       },
       "tradeoffs": "<strong>Dual-Write Migration:</strong> Guarantees zero downtime and zero user impact with instant rollback capability, but requires maintaining dual-write application logic, running two complete database infrastructures simultaneously for weeks (double cost), and building a custom reconciliation checker.",
       "failure_scenarios": "<strong>The Celebrity Live-Stream Crash:</strong> A live-streaming platform shards by `stream_id`. An influencer with 5 million concurrent viewers goes live. The single shard hosting that `stream_id` receives 400,000 chat messages and viewer heartbeats per second, running out of socket buffers and crashing. <em>Mitigation:</em> Salt the chat stream into 20 sub-rooms (`stream_id:room_1`, `stream_id:room_2`), and use an in-memory Redis cluster with Read Replicas to fan-out chat messages.",
       "common_mistakes": [
-        {
-          "mistake": "Attempting a 'Big Bang' instant cutover for a 10TB production database over a weekend.",
-          "correction": "Big Bang cutovers almost always fail due to unforeseen query plan changes or latency regressions. Always use Dual-Write with canary traffic shifting."
-        },
-        {
-          "mistake": "Overwriting newer live writes with older historical backfill records during migration.",
-          "correction": "Use timestamps or version checks on the target database so historical backfill jobs never overwrite newer live transactions."
-        }
+        {"mistake": "Attempting a 'Big Bang' instant cutover for a 10TB production database over a weekend.", "correction": "Big Bang cutovers almost always fail due to unforeseen query plan changes or latency regressions. Always use Dual-Write with canary traffic shifting."},
+        {"mistake": "Overwriting newer live writes with older historical backfill records during migration.", "correction": "Use timestamps or version checks on the target database so historical backfill jobs never overwrite newer live transactions."}
       ],
       "interview_questions": [
-        {
-          "question": "How do you solve the Celebrity / Hot Key problem in a sharded database?",
-          "answer": "1. <strong>Key Salting:</strong> Append a random suffix (0 to $M$) to the partition key on write to distribute data across $M$ shards. Reads query all $M$ shards and merge results;<br>2. <strong>Aggressive Multi-Tier Caching:</strong> Cache the celebrity's profile and public posts in local in-memory L1 cache (Caffeine) and distributed Redis L2 to intercept 99.9% of read traffic before it touches the database;<br>3. <strong>Hybrid Fan-out Architecture:</strong> For ordinary users, use fan-out on write (push). For celebrities, use fan-out on read (pull) to prevent a single post from triggering 50 million database write events."
-        },
-        {
-          "question": "Walk me through the zero-downtime database migration process.",
-          "answer": "The standard 4-phase process: 1. <strong>Dual Writing:</strong> Modify application code to write to both Old and New databases (with errors on New logged but non-blocking); 2. <strong>Historical Backfill:</strong> Run a background script copying past records from Old to New, using idempotent upserts; 3. <strong>CDC Verification:</strong> Stream change data capture events and run automated checksum diffing to verify 100% parity; 4. <strong>Canary Read Shift:</strong> Route 1% of reads to New, monitor p99 latency and error rates, gradually ramp to 100%, and finally stop writes to the Old database."
-        }
+        {"question": "How do you solve the Celebrity / Hot Key problem in a sharded database?", "answer": "1. <strong>Key Salting:</strong> Append a random suffix (0 to $M$) to the partition key on write to distribute data across $M$ shards. Reads query all $M$ shards and merge results;<br>2. <strong>Aggressive Multi-Tier Caching:</strong> Cache the celebrity's profile and public posts in local in-memory L1 cache (Caffeine) and distributed Redis L2 to intercept 99.9% of read traffic before it touches the database;<br>3. <strong>Hybrid Fan-out Architecture:</strong> For ordinary users, use fan-out on write (push). For celebrities, use fan-out on read (pull) to prevent a single post from triggering 50 million database write events."},
+        {"question": "Walk me through the zero-downtime database migration process.", "answer": "The standard 4-phase process: 1. <strong>Dual Writing:</strong> Modify application code to write to both Old and New databases (with errors on New logged but non-blocking); 2. <strong>Historical Backfill:</strong> Run a background script copying past records from Old to New, using idempotent upserts; 3. <strong>CDC Verification:</strong> Stream change data capture events and run automated checksum diffing to verify 100% parity; 4. <strong>Canary Read Shift:</strong> Route 1% of reads to New, monitor p99 latency and error rates, gradually ramp to 100%, and finally stop writes to the Old database."}
       ]
     },
     {
@@ -451,66 +343,28 @@
       },
       "comparison_matrix": {
         "title": "Cross-Shard Resolution Patterns Comparison",
-        "columns": [
-          "Pattern",
-          "Network Overhead",
-          "Latency",
-          "Data Freshness",
-          "Implementation Cost"
-        ],
+        "columns": ["Pattern", "Network Overhead", "Latency", "Data Freshness", "Implementation Cost"],
         "rows": [
-          [
-            "Scatter-Gather Broadcast",
-            "High (Broadcasts to all N shards)",
-            "High (bounded by slowest shard p99)",
-            "Strictly fresh",
-            "Low (handled in routing layer)"
-          ],
-          [
-            "Global Secondary Index (GSI)",
-            "Low (1 lookup + 1 point read)",
-            "Low (single-digit ms)",
-            "Eventually consistent (async index sync)",
-            "Medium (maintain secondary index table)"
-          ],
-          [
-            "Table Co-Location",
-            "Zero (Executes entirely on 1 machine)",
-            "Fastest (Sub-millisecond local join)",
-            "Strictly consistent (ACID)",
-            "Requires designing schema around 1 root key"
-          ],
-          [
-            "Replicated Lookup Tables",
-            "Zero on reads (replicated everywhere)",
-            "Fastest for dimension joins",
-            "Eventual (slow on table updates)",
-            "Low (ideal for country codes, categories)"
-          ]
+          ["Scatter-Gather Broadcast", "High (Broadcasts to all N shards)", "High (bounded by slowest shard p99)", "Strictly fresh", "Low (handled in routing layer)"],
+          ["Global Secondary Index (GSI)", "Low (1 lookup + 1 point read)", "Low (single-digit ms)", "Eventually consistent (async index sync)", "Medium (maintain secondary index table)"],
+          ["Table Co-Location", "Zero (Executes entirely on 1 machine)", "Fastest (Sub-millisecond local join)", "Strictly consistent (ACID)", "Requires designing schema around 1 root key"],
+          ["Replicated Lookup Tables", "Zero on reads (replicated everywhere)", "Fastest for dimension joins", "Eventual (slow on table updates)", "Low (ideal for country codes, categories)"]
         ]
       },
       "tradeoffs": "<strong>Table Co-Location:</strong> Provides full relational joins and local ACID transactions without network hops, but limits cross-entity queries and forces all related data for an entity onto a single physical server.",
       "failure_scenarios": "<strong>The Deep Pagination Scatter-Gather Death Spiral:</strong> A user queries page 500 of an e-commerce order history: `SELECT * FROM orders WHERE status = 'PENDING' ORDER BY date DESC LIMIT 20 OFFSET 10000`. The coordinator broadcasts this to 50 shards. Each of the 50 shards scans and sorts 10,020 rows, transmitting 501,000 rows across the internal network to the coordinator. The coordinator runs out of memory sorting 500,000 rows and crashes with OOM. <em>Mitigation:</em> Forbid deep `OFFSET` pagination on distributed queries. Enforce <strong>Keyset / Cursor Pagination</strong>: `WHERE (date, id) < (:last_date, :last_id) LIMIT 20`.",
       "common_mistakes": [
-        {
-          "mistake": "Attempting to execute distributed transactions across 20 shards using Two-Phase Commit (2PC) under high throughput.",
-          "correction": "2PC is blocking and fragile. Use the asynchronous Saga Pattern with compensating transactions instead."
-        },
-        {
-          "mistake": "Using `ORDER BY` and `LIMIT` without an indexed tie-breaking column across sharded datasets.",
-          "correction": "Always include a unique primary key in the sort order (`ORDER BY created_at DESC, id DESC`) to ensure deterministic pagination across multiple shards."
-        }
+        {"mistake": "Attempting to execute distributed transactions across 20 shards using Two-Phase Commit (2PC) under high throughput.", "correction": "2PC is blocking and fragile. Use the asynchronous Saga Pattern with compensating transactions instead."},
+        {"mistake": "Using `ORDER BY` and `LIMIT` without an indexed tie-breaking column across sharded datasets.", "correction": "Always include a unique primary key in the sort order (`ORDER BY created_at DESC, id DESC`) to ensure deterministic pagination across multiple shards."}
       ],
       "interview_questions": [
-        {
-          "question": "How do you perform a JOIN between two tables that are sharded across different physical database nodes?",
-          "answer": "1. <strong>Table Co-Location (Best):</strong> Shard both tables using the same shard key (e.g. `customer_id`). All matching rows reside on the exact same physical instance, allowing standard local SQL `JOIN`s;<br>2. <strong>Broadcast Join:</strong> If one table is a small static dimension table (e.g., `tax_rates`), replicate that table entirely onto every shard;<br>3. <strong>Application-Side Join:</strong> Query Service A for IDs, and query Service B with `WHERE id IN (...)`, merging results in application memory;<br>4. <strong>Denormalization / CQRS:</strong> Pre-join the data using asynchronous event pipelines and store read-optimized documents in Elasticsearch or MongoDB."
-        },
-        {
-          "question": "What is the difference between a Local Secondary Index (LSI) and a Global Secondary Index (GSI)?",
-          "answer": "A <strong>Local Secondary Index (LSI)</strong> is scoped to a single partition: it is partitioned on the exact same partition key as the table, indexing only rows within that specific shard (fast to update, but queries without the partition key require scatter-gather). A <strong>Global Secondary Index (GSI)</strong> is partitioned on an entirely different column (e.g., table partitioned by `user_id`, GSI partitioned by `email`). GSIs allow direct point lookups on secondary attributes across the entire cluster, but require asynchronous cross-shard replication to stay up-to-date."
-        }
+        {"question": "How do you perform a JOIN between two tables that are sharded across different physical database nodes?", "answer": "1. <strong>Table Co-Location (Best):</strong> Shard both tables using the same shard key (e.g. `customer_id`). All matching rows reside on the exact same physical instance, allowing standard local SQL `JOIN`s;<br>2. <strong>Broadcast Join:</strong> If one table is a small static dimension table (e.g., `tax_rates`), replicate that table entirely onto every shard;<br>3. <strong>Application-Side Join:</strong> Query Service A for IDs, and query Service B with `WHERE id IN (...)`, merging results in application memory;<br>4. <strong>Denormalization / CQRS:</strong> Pre-join the data using asynchronous event pipelines and store read-optimized documents in Elasticsearch or MongoDB."},
+        {"question": "What is the difference between a Local Secondary Index (LSI) and a Global Secondary Index (GSI)?", "answer": "A <strong>Local Secondary Index (LSI)</strong> is scoped to a single partition: it is partitioned on the exact same partition key as the table, indexing only rows within that specific shard (fast to update, but queries without the partition key require scatter-gather). A <strong>Global Secondary Index (GSI)</strong> is partitioned on an entirely different column (e.g., table partitioned by `user_id`, GSI partitioned by `email`). GSIs allow direct point lookups on secondary attributes across the entire cluster, but require asynchronous cross-shard replication to stay up-to-date."}
       ]
     }
   ]
 }
+
+with open(Path('content/hld/module_12.json'), 'w', encoding='utf-8') as f:
+    json.dump(m12, f, ensure_ascii=False, indent=2)
+print("Module 12 written successfully!")

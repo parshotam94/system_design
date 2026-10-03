@@ -1,4 +1,10 @@
-{
+"""
+Elaborate generator for Module 08: Caching Strategies & Distributed Caches
+"""
+import json
+from pathlib import Path
+
+m08 = {
   "module_id": "08",
   "module_title": "Caching Strategies & Distributed Caches",
   "description": "Master cache topologies, write policies (Cache-Aside, Write-Through, Write-Back), Redis vs Memcached architecture, eviction policies (LRU/LFU), and stampede/avalanche prevention.",
@@ -60,65 +66,23 @@
       },
       "comparison_matrix": {
         "title": "Cache Eviction Policies Comparison",
-        "columns": [
-          "Policy",
-          "Eviction Criteria",
-          "Data Structure",
-          "Best Use Case",
-          "Weakness"
-        ],
+        "columns": ["Policy", "Eviction Criteria", "Data Structure", "Best Use Case", "Weakness"],
         "rows": [
-          [
-            "LRU (Least Recently Used)",
-            "Oldest access timestamp",
-            "Hash Map + Doubly-Linked List",
-            "General web and API workloads",
-            "Vulnerable to single full-table scan flushing cache"
-          ],
-          [
-            "LFU (Least Frequently Used)",
-            "Lowest total hit count",
-            "Hash Map + Frequency Buckets",
-            "Stable long-term popularity",
-            "Old historic keys hold onto slots even if no longer accessed"
-          ],
-          [
-            "FIFO (First In First Out)",
-            "Oldest insertion timestamp",
-            "Simple Queue",
-            "Streaming time-ordered logs",
-            "Frequently accessed popular keys get purged prematurely"
-          ],
-          [
-            "W-TinyLFU",
-            "Window LRU + Count-Min Sketch",
-            "Dual Ring + Bloom Filter Sketch",
-            "High-throughput Java/Go microservices",
-            "Higher algorithmic implementation complexity"
-          ]
+          ["LRU (Least Recently Used)", "Oldest access timestamp", "Hash Map + Doubly-Linked List", "General web and API workloads", "Vulnerable to single full-table scan flushing cache"],
+          ["LFU (Least Frequently Used)", "Lowest total hit count", "Hash Map + Frequency Buckets", "Stable long-term popularity", "Old historic keys hold onto slots even if no longer accessed"],
+          ["FIFO (First In First Out)", "Oldest insertion timestamp", "Simple Queue", "Streaming time-ordered logs", "Frequently accessed popular keys get purged prematurely"],
+          ["W-TinyLFU", "Window LRU + Count-Min Sketch", "Dual Ring + Bloom Filter Sketch", "High-throughput Java/Go microservices", "Higher algorithmic implementation complexity"]
         ]
       },
       "tradeoffs": "<strong>LRU vs LFU:</strong> LRU is simple and adapts quickly to shifting trends, but a batch job doing a full scan can flush out all hot data in seconds. LFU resists scan-pollution because new cold items have access count = 1, but historic keys with 10,000 hits can become 'zombies' that never get evicted even when their popularity drops to zero.",
       "failure_scenarios": "<strong>Batch Scan Cache Flushing:</strong> A nightly analytical cron job executes `SELECT * FROM users` and iterates through 10 million rows, populating the cache with keys that will never be read again. In doing so, it evicts all real user session keys, dropping the production cache hit ratio from 98% to 5% and overwhelming the primary database. <em>Mitigation:</em> Bypass the cache for analytical batch jobs using a dedicated read-replica or use W-TinyLFU eviction.",
       "common_mistakes": [
-        {
-          "mistake": "Setting no TTL on cached keys, relying entirely on memory eviction policies.",
-          "correction": "Always configure a sane TTL on every key. Even if eviction is configured, stale or orphaned keys from deleted entities will waste precious RAM indefinitely."
-        },
-        {
-          "mistake": "Caching large binary objects (e.g., 50MB PDF files or raw video) directly inside Redis.",
-          "correction": "Store large binary files in object storage (AWS S3) and cache only metadata and CDN presigned URLs in Redis."
-        }
+        {"mistake": "Setting no TTL on cached keys, relying entirely on memory eviction policies.", "correction": "Always configure a sane TTL on every key. Even if eviction is configured, stale or orphaned keys from deleted entities will waste precious RAM indefinitely."},
+        {"mistake": "Caching large binary objects (e.g., 50MB PDF files or raw video) directly inside Redis.", "correction": "Store large binary files in object storage (AWS S3) and cache only metadata and CDN presigned URLs in Redis."}
       ],
       "interview_questions": [
-        {
-          "question": "How would you implement an LRU Cache in code with O(1) time complexity for both get and put operations?",
-          "answer": "Use a <strong>Hash Map combined with a Doubly-Linked List</strong>. The Hash Map stores the key as the hash key, and the value is a pointer to the corresponding node in the Doubly-Linked List. `get(key)` looks up the node in O(1), unlinks it from the list, and attaches it at the head. `put(key, value)` adds or updates the node at the head. If capacity is exceeded, remove the tail node from both the list and the hash map in O(1)."
-        },
-        {
-          "question": "What is the difference between active and passive cache expiration in Redis?",
-          "answer": "In <strong>passive expiration</strong>, Redis only checks the TTL of a key when a client attempts to read it. If expired, it deletes the key and returns null. In <strong>active expiration</strong>, Redis runs a periodic background task (10 times per second) that randomly samples 20 keys with TTLs, deletes expired ones, and repeats until fewer than 25% of sampled keys are expired."
-        }
+        {"question": "How would you implement an LRU Cache in code with O(1) time complexity for both get and put operations?", "answer": "Use a <strong>Hash Map combined with a Doubly-Linked List</strong>. The Hash Map stores the key as the hash key, and the value is a pointer to the corresponding node in the Doubly-Linked List. `get(key)` looks up the node in O(1), unlinks it from the list, and attaches it at the head. `put(key, value)` adds or updates the node at the head. If capacity is exceeded, remove the tail node from both the list and the hash map in O(1)."},
+        {"question": "What is the difference between active and passive cache expiration in Redis?", "answer": "In <strong>passive expiration</strong>, Redis only checks the TTL of a key when a client attempts to read it. If expired, it deletes the key and returns null. In <strong>active expiration</strong>, Redis runs a periodic background task (10 times per second) that randomly samples 20 keys with TTLs, deletes expired ones, and repeats until fewer than 25% of sampled keys are expired."}
       ]
     },
     {
@@ -183,72 +147,24 @@
       },
       "comparison_matrix": {
         "title": "Caching Strategies Comparison Matrix",
-        "columns": [
-          "Strategy",
-          "Read Latency",
-          "Write Latency",
-          "Data Freshness",
-          "Risk of Data Loss"
-        ],
+        "columns": ["Strategy", "Read Latency", "Write Latency", "Data Freshness", "Risk of Data Loss"],
         "rows": [
-          [
-            "Cache-Aside",
-            "Low on hit, High on miss",
-            "Low (writes only to DB, invalidates cache)",
-            "Eventually consistent (bounded by TTL)",
-            "Zero data loss (DB is source of truth)"
-          ],
-          [
-            "Read-Through",
-            "Low on hit, High on miss",
-            "N/A (Read strategy only)",
-            "Always synchronized via cache provider",
-            "Zero data loss"
-          ],
-          [
-            "Write-Through",
-            "Ultra-low (data is pre-warmed)",
-            "High (synchronous dual write: Cache + DB)",
-            "Strictly consistent between cache and DB",
-            "Zero data loss"
-          ],
-          [
-            "Write-Back",
-            "Ultra-low",
-            "Blazing fast (<1ms in-memory ACK)",
-            "Inconsistent until background flush completes",
-            "High (crashed cache loses unwritten writes)"
-          ],
-          [
-            "Write-Around",
-            "High on first read (always miss)",
-            "Fast (single write directly to DB)",
-            "Stale if key exists in cache without eviction",
-            "Zero data loss"
-          ]
+          ["Cache-Aside", "Low on hit, High on miss", "Low (writes only to DB, invalidates cache)", "Eventually consistent (bounded by TTL)", "Zero data loss (DB is source of truth)"],
+          ["Read-Through", "Low on hit, High on miss", "N/A (Read strategy only)", "Always synchronized via cache provider", "Zero data loss"],
+          ["Write-Through", "Ultra-low (data is pre-warmed)", "High (synchronous dual write: Cache + DB)", "Strictly consistent between cache and DB", "Zero data loss"],
+          ["Write-Back", "Ultra-low", "Blazing fast (<1ms in-memory ACK)", "Inconsistent until background flush completes", "High (crashed cache loses unwritten writes)"],
+          ["Write-Around", "High on first read (always miss)", "Fast (single write directly to DB)", "Stale if key exists in cache without eviction", "Zero data loss"]
         ]
       },
       "tradeoffs": "<strong>Cache-Aside:</strong> Pros: Resilient to cache failure (app gracefully degrades to DB), only caches actually requested data. Cons: Cache miss penalty on first read, potential for stale reads if invalidation fails. <strong>Write-Back:</strong> Pros: Massive write throughput absorption. Cons: Extreme data loss risk if the cache process crashes.",
       "failure_scenarios": "<strong>Race Condition on Cache Update:</strong> Thread 1 writes new balance $100 to DB. Thread 2 writes $200 to DB. Due to network jitter, Thread 2 updates Redis first with $200, and Thread 1 updates Redis with $100. Cache permanently holds stale $100 while DB holds $200! <em>Mitigation:</em> Never update cache on writes—always <strong>DELETE</strong> the cache key: `redis.del(key)`.",
       "common_mistakes": [
-        {
-          "mistake": "Updating the cache value on every database write instead of invalidating (deleting) the key.",
-          "correction": "Always delete the key from the cache (`DEL key`). Let the next read lazily repopulate fresh state to avoid concurrency write race conditions."
-        },
-        {
-          "mistake": "Using Write-Back caching for financial balances or checkout transactions.",
-          "correction": "Write-Back should only be used for loss-tolerant high-throughput data (e.g., video view counters, game telemetry). Never use it for financial ledgers."
-        }
+        {"mistake": "Updating the cache value on every database write instead of invalidating (deleting) the key.", "correction": "Always delete the key from the cache (`DEL key`). Let the next read lazily repopulate fresh state to avoid concurrency write race conditions."},
+        {"mistake": "Using Write-Back caching for financial balances or checkout transactions.", "correction": "Write-Back should only be used for loss-tolerant high-throughput data (e.g., video view counters, game telemetry). Never use it for financial ledgers."}
       ],
       "interview_questions": [
-        {
-          "question": "Why should you delete a cache entry instead of updating it during a database write?",
-          "answer": "Deleting the key avoids <strong>concurrent write race conditions</strong>. If two requests update the database in order A then B, but network delays cause the cache updates to arrive in order B then A, the cache will permanently store stale value A while the database stores value B. Evicting the key ensures the subsequent read atomically fetches authoritative database state."
-        },
-        {
-          "question": "How does Facebook's Tao handle cache consistency across global data centers?",
-          "answer": "Tao uses <strong>Cache-Aside with asynchronous invalidation via database replication logs</strong>. When a write hits the primary MySQL database, a tailer daemon reads the MySQL binlog and broadcasts invalidation messages to regional caching tiers. To prevent stale reads during replication lag, clients receive a version token that routes subsequent reads to the primary until the replica catches up."
-        }
+        {"question": "Why should you delete a cache entry instead of updating it during a database write?", "answer": "Deleting the key avoids <strong>concurrent write race conditions</strong>. If two requests update the database in order A then B, but network delays cause the cache updates to arrive in order B then A, the cache will permanently store stale value A while the database stores value B. Evicting the key ensures the subsequent read atomically fetches authoritative database state."},
+        {"question": "How does Facebook's Tao handle cache consistency across global data centers?", "answer": "Tao uses <strong>Cache-Aside with asynchronous invalidation via database replication logs</strong>. When a write hits the primary MySQL database, a tailer daemon reads the MySQL binlog and broadcasts invalidation messages to regional caching tiers. To prevent stale reads during replication lag, clients receive a version token that routes subsequent reads to the primary until the replica catches up."}
       ]
     },
     {
@@ -331,65 +247,25 @@
       },
       "comparison_matrix": {
         "title": "Redis vs Memcached Comparison Matrix",
-        "columns": [
-          "Feature",
-          "Redis",
-          "Memcached"
-        ],
+        "columns": ["Feature", "Redis", "Memcached"],
         "rows": [
-          [
-            "Thread Architecture",
-            "Single-threaded execution loop (Multi-threaded I/O in v6+)",
-            "True Multi-threaded (scales linearly with CPU cores)"
-          ],
-          [
-            "Data Structures",
-            "Strings, Lists, Sets, Hashes, Sorted Sets, Streams, Bitmaps",
-            "Pure Key-Value Strings only"
-          ],
-          [
-            "Persistence to Disk",
-            "Yes: RDB Snapshots + AOF (Append-Only File)",
-            "No: 100% In-Memory volatile only"
-          ],
-          [
-            "Clustering & Sharding",
-            "Native Redis Cluster (16,384 Hash Slots, auto-failover)",
-            "Client-side consistent hashing only"
-          ],
-          [
-            "Pub/Sub & Streaming",
-            "Native Pub/Sub, Redis Streams with Consumer Groups",
-            "No message brokering capabilities"
-          ],
-          [
-            "Maximum Value Size",
-            "512 MB per key/string",
-            "1 MB default"
-          ]
+          ["Thread Architecture", "Single-threaded execution loop (Multi-threaded I/O in v6+)", "True Multi-threaded (scales linearly with CPU cores)"],
+          ["Data Structures", "Strings, Lists, Sets, Hashes, Sorted Sets, Streams, Bitmaps", "Pure Key-Value Strings only"],
+          ["Persistence to Disk", "Yes: RDB Snapshots + AOF (Append-Only File)", "No: 100% In-Memory volatile only"],
+          ["Clustering & Sharding", "Native Redis Cluster (16,384 Hash Slots, auto-failover)", "Client-side consistent hashing only"],
+          ["Pub/Sub & Streaming", "Native Pub/Sub, Redis Streams with Consumer Groups", "No message brokering capabilities"],
+          ["Maximum Value Size", "512 MB per key/string", "1 MB default"]
         ]
       },
       "tradeoffs": "<strong>Choose Memcached when:</strong> You have a simple read-heavy key-value workload, require linear multi-threaded scaling on massive multi-core servers (32+ cores), and need zero operational complexity. <strong>Choose Redis when:</strong> You need complex data types (e.g. leaderboards with ZSETs), disk persistence, atomic operations, Pub/Sub messaging, or native high-availability clustering.",
       "failure_scenarios": "<strong>Redis AOF Fsync Disk Stalls:</strong> Configuring Redis with `appendfsync always` forces a synchronous disk write on every single command. When running on cloud EBS volumes with burst limits, disk write queues fill up, blocking the single-threaded Redis event loop for 100+ milliseconds and freezing all read traffic. <em>Mitigation:</em> Configure `appendfsync everysec` or use read-replicas for persistence offloading.",
       "common_mistakes": [
-        {
-          "mistake": "Running the `KEYS *` command in a production Redis instance with 10 million keys.",
-          "correction": "`KEYS *` blocks the single-threaded event loop for seconds, completely freezing production traffic. Always use cursor-based non-blocking `SCAN` instead."
-        },
-        {
-          "mistake": "Treating Redis as your primary authoritative database without secondary backups.",
-          "correction": "Redis replication is asynchronous and memory-constrained. Always use a durable database (Postgres, DynamoDB) as source of truth."
-        }
+        {"mistake": "Running the `KEYS *` command in a production Redis instance with 10 million keys.", "correction": "`KEYS *` blocks the single-threaded event loop for seconds, completely freezing production traffic. Always use cursor-based non-blocking `SCAN` instead."},
+        {"mistake": "Treating Redis as your primary authoritative database without secondary backups.", "correction": "Redis replication is asynchronous and memory-constrained. Always use a durable database (Postgres, DynamoDB) as source of truth."}
       ],
       "interview_questions": [
-        {
-          "question": "How does Redis achieve high performance despite being largely single-threaded?",
-          "answer": "1. <strong>In-Memory Operations:</strong> All operations run purely in RAM, eliminating disk I/O bottlenecks.<br>2. <strong>Non-Blocking I/O Multiplexing:</strong> Uses `epoll` (Linux) or `kqueue` (BSD) to monitor thousands of concurrent client sockets on a single thread.<br>3. <strong>Zero Lock Contention:</strong> Eliminates mutex locks, semaphores, context switching, and thread synchronization overhead.<br>4. <strong>Efficient Data Structures:</strong> Optimized implementations like Skip Lists (ZSET), IntSets, and ZipLists reduce memory footprint."
-        },
-        {
-          "question": "What happens when a Redis master node crashes in Redis Cluster?",
-          "answer": "The cluster nodes detect the failure via Gossip heartbeats. If a majority of master nodes fail to receive a heartbeat from Master A within `cluster-node-timeout`, Master A is declared `FAIL`. Replicas of Master A hold an election; the replica with the most up-to-date replication offset requests votes from the remaining masters. Upon receiving majority approval, the replica is promoted to Master and assumes ownership of Master A's hash slots."
-        }
+        {"question": "How does Redis achieve high performance despite being largely single-threaded?", "answer": "1. <strong>In-Memory Operations:</strong> All operations run purely in RAM, eliminating disk I/O bottlenecks.<br>2. <strong>Non-Blocking I/O Multiplexing:</strong> Uses `epoll` (Linux) or `kqueue` (BSD) to monitor thousands of concurrent client sockets on a single thread.<br>3. <strong>Zero Lock Contention:</strong> Eliminates mutex locks, semaphores, context switching, and thread synchronization overhead.<br>4. <strong>Efficient Data Structures:</strong> Optimized implementations like Skip Lists (ZSET), IntSets, and ZipLists reduce memory footprint."},
+        {"question": "What happens when a Redis master node crashes in Redis Cluster?", "answer": "The cluster nodes detect the failure via Gossip heartbeats. If a majority of master nodes fail to receive a heartbeat from Master A within `cluster-node-timeout`, Master A is declared `FAIL`. Replicas of Master A hold an election; the replica with the most up-to-date replication offset requests votes from the remaining masters. Upon receiving majority approval, the replica is promoted to Master and assumes ownership of Master A's hash slots."}
       ]
     },
     {
@@ -472,66 +348,28 @@
       },
       "comparison_matrix": {
         "title": "Cache Attack Modes & Defense Strategies Matrix",
-        "columns": [
-          "Failure Mode",
-          "Root Cause",
-          "Symptoms",
-          "Primary Defense",
-          "Secondary Defense"
-        ],
+        "columns": ["Failure Mode", "Root Cause", "Symptoms", "Primary Defense", "Secondary Defense"],
         "rows": [
-          [
-            "Cache Stampede (Thundering Herd)",
-            "A single hot key expires under massive concurrent QPS",
-            "Thousands of parallel DB queries for 1 key; DB CPU spikes to 100%",
-            "Distributed Mutex Lock (SETNX)",
-            "Probabilistic Early Expiration (XFetch algorithm)"
-          ],
-          [
-            "Cache Avalanche",
-            "Massive volume of keys expire at the exact same second",
-            "Global cache hit ratio plunges to 0%; total database collapse",
-            "Add Randomized Jitter to all TTLs (+/- 10-20%)",
-            "Pre-warming cache before major launch events"
-          ],
-          [
-            "Cache Penetration",
-            "Queries for keys that do not exist in DB or Cache",
-            "High constant database read load on non-existent records",
-            "Bloom Filter at ingress tier",
-            "Cache Null values with short 60s TTL"
-          ],
-          [
-            "Cache Breakdown (Hot Key)",
-            "Single key receives 500k+ QPS, saturating 1 Redis node NIC",
-            "Single Redis node network bandwidth saturated, packet drops",
-            "Local L1 in-process memory cache (Caffeine)",
-            "Key Splitting: key_1, key_2 across shards"
-          ]
+          ["Cache Stampede (Thundering Herd)", "A single hot key expires under massive concurrent QPS", "Thousands of parallel DB queries for 1 key; DB CPU spikes to 100%", "Distributed Mutex Lock (SETNX)", "Probabilistic Early Expiration (XFetch algorithm)"],
+          ["Cache Avalanche", "Massive volume of keys expire at the exact same second", "Global cache hit ratio plunges to 0%; total database collapse", "Add Randomized Jitter to all TTLs (+/- 10-20%)", "Pre-warming cache before major launch events"],
+          ["Cache Penetration", "Queries for keys that do not exist in DB or Cache", "High constant database read load on non-existent records", "Bloom Filter at ingress tier", "Cache Null values with short 60s TTL"],
+          ["Cache Breakdown (Hot Key)", "Single key receives 500k+ QPS, saturating 1 Redis node NIC", "Single Redis node network bandwidth saturated, packet drops", "Local L1 in-process memory cache (Caffeine)", "Key Splitting: key_1, key_2 across shards"]
         ]
       },
       "tradeoffs": "<strong>Bloom Filters:</strong> Pros: Drastically reduces database load from rogue non-existent queries, tiny memory footprint. Cons: Cannot easily delete items from standard Bloom filters without using complex Counting Bloom Filters, and requires periodic synchronization with the database.",
       "failure_scenarios": "<strong>The Synchronized Midnight Avalanche:</strong> An e-commerce developer sets all product cache TTLs to `expires_at = midnight`. At 00:00:00 UTC, 500,000 product cache entries expire simultaneously. Flash-sale traffic arrives at 00:00:01, producing 80,000 database queries per second. The primary database pool crashes, and the web app displays HTTP 500 across the entire storefront for 45 minutes. <em>Mitigation:</em> Mandatory TTL jittering: `ttl = 86400 + rand(-3600, 3600)`.",
       "common_mistakes": [
-        {
-          "mistake": "Setting static TTL values like exactly 60 minutes across all entities.",
-          "correction": "Always apply a jitter multiplier: `ttl = base_ttl + (Math.random() * jitter_range)`."
-        },
-        {
-          "mistake": "Not caching negative / null responses when a database query returns no record.",
-          "correction": "If an ID is not found, write `cache.set(key, 'NULL', 60)` to prevent the client from repeatedly bypassing the cache."
-        }
+        {"mistake": "Setting static TTL values like exactly 60 minutes across all entities.", "correction": "Always apply a jitter multiplier: `ttl = base_ttl + (Math.random() * jitter_range)`."},
+        {"mistake": "Not caching negative / null responses when a database query returns no record.", "correction": "If an ID is not found, write `cache.set(key, 'NULL', 60)` to prevent the client from repeatedly bypassing the cache."}
       ],
       "interview_questions": [
-        {
-          "question": "How does the XFetch algorithm prevent cache stampedes without explicit distributed locks?",
-          "answer": "The XFetch algorithm evaluates: delta - beta * ln(random()) > TTL. As the key nears expiration, the probability that an incoming read initiates an <strong>asynchronous background refresh</strong> approaches 1.0. The first lucky request kicks off background recomputation while immediately returning the stale cached value to the user, preventing any blocking thundering herd."
-        },
-        {
-          "question": "How does a Bloom Filter work and what are its memory characteristics?",
-          "answer": "A Bloom Filter consists of a bit array of size m initialized to all 0s, and k independent hash functions. When adding an element, compute all k hashes and set the corresponding bit positions to 1. To query an element, check if all k bits are 1. If any bit is 0, the item is <strong>definitely not in the set</strong>. It uses ~10 bits per item for a 1% false positive rate, requiring only 1.2MB of RAM to index 1,000,000 items."
-        }
+        {"question": "How does the XFetch algorithm prevent cache stampedes without explicit distributed locks?", "answer": "The XFetch algorithm evaluates: delta - beta * ln(random()) > TTL. As the key nears expiration, the probability that an incoming read initiates an <strong>asynchronous background refresh</strong> approaches 1.0. The first lucky request kicks off background recomputation while immediately returning the stale cached value to the user, preventing any blocking thundering herd."},
+        {"question": "How does a Bloom Filter work and what are its memory characteristics?", "answer": "A Bloom Filter consists of a bit array of size m initialized to all 0s, and k independent hash functions. When adding an element, compute all k hashes and set the corresponding bit positions to 1. To query an element, check if all k bits are 1. If any bit is 0, the item is <strong>definitely not in the set</strong>. It uses ~10 bits per item for a 1% false positive rate, requiring only 1.2MB of RAM to index 1,000,000 items."}
       ]
     }
   ]
 }
+
+with open(Path('content/hld/module_08.json'), 'w', encoding='utf-8') as f:
+    json.dump(m08, f, ensure_ascii=False, indent=2)
+print("Module 08 written successfully!")
