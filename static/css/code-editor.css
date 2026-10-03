@@ -1,0 +1,156 @@
+/* ==========================================================================
+   Code Editor & C++ Syntax Highlighting Styles
+   ========================================================================== */
+
+.code-container {
+  margin: 1.5rem 0 2rem;
+  background: #090d16;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.code-header {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.code-filename {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.code-lang-tag {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.code-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.code-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all var(--transition-fast);
+}
+
+.code-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+
+.code-body {
+  display: flex;
+  overflow-x: auto;
+  padding: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.code-line-numbers {
+  padding: 0 1rem;
+  text-align: right;
+  color: #475569;
+  user-select: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.82rem;
+}
+
+.code-content {
+  padding: 0 1.25rem;
+  flex: 1;
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* Syntax Highlighting Tokens for C++ */
+.token-keyword { color: #f43f5e; font-weight: 600; }        /* class, struct, public, private, virtual, explicit, override, return */
+.token-type { color: #38bdf8; font-weight: 600; }           /* int, void, std::string, std::unique_ptr, size_t */
+.token-string { color: #a3e635; }                            /* "strings" */
+.token-comment { color: #64748b; font-style: italic; }       /* // comments, /* block */ */
+.token-preprocessor { color: #e879f9; }                      /* #include, #define, #pragma */
+.token-function { color: #60a5fa; }                          /* functionName() */
+.token-number { color: #fb923c; }                            /* 123, 0.5f */
+.token-operator { color: #94a3b8; }                          /* ->, ::, &, *, =, +, - */
+.token-const { color: #c084fc; font-weight: 600; }           /* const, constexpr, nullptr */
+
+/* Side-by-Side Refactoring Diff View */
+.refactor-diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.refactor-panel {
+  background: #090d16;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.refactor-panel.bad {
+  border-color: rgba(244, 63, 94, 0.4);
+}
+
+.refactor-panel.good {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.refactor-panel-header {
+  padding: 0.65rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.refactor-panel.bad .refactor-panel-header {
+  background: rgba(244, 63, 94, 0.12);
+  color: #fb7185;
+}
+
+.refactor-panel.good .refactor-panel-header {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+}
+
+@media (max-width: 900px) {
+  .refactor-diff-grid {
+    grid-template-columns: 1fr;
+  }
+}

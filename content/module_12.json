@@ -1,0 +1,521 @@
+{
+  "module_id": "12",
+  "title": "C++ Idioms & Advanced Design Techniques",
+  "level": "Advanced",
+  "category": "C++ Idioms",
+  "description": "PImpl Idiom (Compilation Firewalls), CRTP (Static Polymorphism), Type Erasure (std::function), and Callback Architectures.",
+  "topics": [
+    {
+      "id": "pimpl-idiom",
+      "title": "PImpl Idiom (Pointer to Implementation)",
+      "description": "Hiding private implementation details and third-party headers behind an opaque pointer to speed up compilation.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>PImpl Idiom</strong> (Pointer to Implementation / Compilation Firewall) moves private data and methods into an internal struct defined only in the <code>.cpp</code> file.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Changing a private member in a header file forces every file that includes that header to recompile. PImpl eliminates compilation cascades and provides ABI stability.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Header declares <code>struct Impl; std::unique_ptr&lt;Impl&gt; pImpl;</code>. Definition lives in <code>.cpp</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Client only includes the lightweight header; the heavy implementation and dependencies are isolated in the <code>.cpp</code> translation unit.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Compilation Firewall",
+            "text": "Header.hpp: struct Impl; unique_ptr<Impl> pImpl; (Zero 3rd-party includes!)\\nHeader.cpp: struct Impl { HeavyWindowsSdk sdk; }; (Only this .cpp recompiles!)"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "pimpl_demo.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\n// --- Public Header File (widget.hpp) ---\nclass Widget {\npublic:\n    Widget();\n    ~Widget(); // MUST be declared in header and defined in .cpp for unique_ptr<Impl>!\n    Widget(Widget&&) noexcept;\n    Widget& operator=(Widget&&) noexcept;\n\n    void doHeavyOperation();\n\nprivate:\n    struct Impl; // Forward declared opaque struct\n    std::unique_ptr<Impl> pImpl;\n};\n\n// --- Private Source File (widget.cpp) ---\nstruct Widget::Impl {\n    std::string internalBuffer;\n    void performInternalTask() {\n        std::cout << \"[PImpl] Executed heavy internal task with buffer: \" << internalBuffer << \"\\n\";\n    }\n};\n\nWidget::Widget() : pImpl(std::make_unique<Impl>()) {\n    pImpl->internalBuffer = \"Allocated 64MB buffer\";\n}\n\nWidget::~Widget() = default; // Defined where Impl is complete!\nWidget::Widget(Widget&&) noexcept = default;\nWidget& Widget::operator=(Widget&&) noexcept = default;\n\nvoid Widget::doHeavyOperation() {\n    pImpl->performInternalTask();\n}\n\nint main() {\n    Widget w;\n    w.doHeavyOperation();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Widget delegates private operations to opaque struct Impl via std::unique_ptr.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Qt Framework (Q_D pointer), Windows API SDKs, Proprietary Closed-Source C++ SDK distributions.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use in public library headers to preserve ABI compatibility and minimize client compilation times.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use for small, performance-critical math structs where heap allocation overhead is unacceptable.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Fast build times; true encapsulation of private dependencies; stable binary ABI.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Extra heap allocation for Impl and pointer indirection overhead per call.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>PImpl with std::unique_ptr, Fast PImpl (placement new in fixed stack buffer).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Defining ~Widget() in the header file (causes compile error: cannot delete incomplete type Impl).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why must the destructor of a PImpl class be defined in the .cpp file?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because <code>std::unique_ptr&lt;Impl&gt;</code> requires <code>sizeof(Impl)</code> to generate its default deleter. In the header, <code>Impl</code> is an incomplete type; defining the destructor in the <code>.cpp</code> file ensures <code>Impl</code> is fully defined.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Wrap a heavy DatabaseClient using the PImpl idiom.</p>",
+          "practice": {
+            "title": "DatabaseClient PImpl",
+            "problemStatement": "Wrap a heavy DatabaseClient using the PImpl idiom.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "DatabaseClient PImpl",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class DbClient { struct Impl; std::unique_ptr<Impl> pImpl; public: DbClient(); ~DbClient(); };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering PImpl Idiom (Pointer to Implementation) is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "crtp-static-polymorphism",
+      "title": "CRTP (Curiously Recurring Template Pattern)",
+      "description": "Achieving compile-time static polymorphism without VTable and VPTR runtime overhead.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>CRTP</strong> is a C++ idiom where a class derives from a template base class instantiated with the derived class itself (<code>class Derived : public Base&lt;Derived&gt;</code>).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Allows static polymorphism with method overriding that is 100% inlined at compile time with zero VTable overhead.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Base class casts <code>this</code> to <code>Derived*</code> (<code>static_cast&lt;Derived*&gt;(this)</code>) and calls derived methods statically.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Zero indirect function pointer lookups; maximum performance in tight loops.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "CRTP Static Dispatch",
+            "text": "template <typename Derived> class Base { public: void speak() { static_cast<Derived*>(this)->speakImpl(); } };"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "crtp_static_poly.cpp",
+            "code": "#include <iostream>\n\n// CRTP Base Class (Static Polymorphism)\ntemplate <typename Derived>\nclass BaseProcessor {\npublic:\n    void process() {\n        // Static dispatch resolved at compile time with zero VTable lookup!\n        static_cast<Derived*>(this)->executeStep();\n    }\n};\n\nclass FastAudioProcessor : public BaseProcessor<FastAudioProcessor> {\npublic:\n    void executeStep() {\n        std::cout << \"[CRTP] FastAudioProcessor: Executing inlined DSP cycle.\\n\";\n    }\n};\n\ntemplate <typename T>\nvoid runProcessingLoop(BaseProcessor<T>& proc) {\n    proc.process(); // Fully inlinable!\n}\n\nint main() {\n    FastAudioProcessor audio;\n    runProcessingLoop(audio);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>BaseProcessor dispatches statically to FastAudioProcessor without virtual functions.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>High-Frequency Trading (HFT) matching engines, Eigen matrix math library, PyBind11 bindings.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use in performance-critical code where virtual dispatch overhead or cache misses are bottlenecks.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if you need runtime heterogeneous collections (e.g. vector of mixed objects).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Zero runtime overhead; allows complete compiler inlining.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Complex template compiler error messages.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>CRTP Mixins, CRTP Static Interfaces, CRTP Object Counters.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Forgetting to mark derived methods public or friend with the base class.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does CRTP differ from standard runtime polymorphism?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> CRTP resolves method binding at <strong>compile time</strong> via template instantiation (zero runtime cost, inlinable), whereas runtime polymorphism resolves methods at <strong>runtime</strong> via a VTable lookup (indirect branch).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a generic CRTP Cloneable mixin that automatically provides clone().</p>",
+          "practice": {
+            "title": "CRTP Cloneable Mixin",
+            "problemStatement": "Implement a generic CRTP Cloneable mixin that automatically provides clone().",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "CRTP Cloneable Mixin",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "template<class D> struct Cloneable { std::unique_ptr<D> clone() const { return std::make_unique<D>(*static_cast<const D*>(this)); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering CRTP (Curiously Recurring Template Pattern) is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "type-erasure",
+      "title": "Type Erasure (std::function & Custom Erasures)",
+      "description": "Encapsulating objects of any type that support a given interface without requiring a common inheritance hierarchy.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Type Erasure</strong> is a technique that provides a unified, polymorphic interface to unrelated concrete types without forcing them to inherit from a common base class.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Allows storing function pointers, lambdas with captures, and custom function objects uniformly in <code>std::function</code>.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Combines templates (compile time) with inheritance and virtual functions (runtime) hidden inside an internal bridge wrapper.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>std::function&lt;void()&gt;</code> can hold any callable: free function, lambda, or member function bind.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Type Erasure Anatomy",
+            "text": "std::function / std::any / custom erasures store a template Concept<T> inside an opaque non-template interface!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "type_erasure_demo.cpp",
+            "code": "#include <iostream>\n#include <functional>\n#include <vector>\n\n// Type-Erased Event Dispatcher using std::function\nclass EventDispatcher {\nprivate:\n    std::vector<std::function<void(int)>> listeners;\npublic:\n    void subscribe(std::function<void(int)> listener) {\n        listeners.push_back(std::move(listener));\n    }\n\n    void emit(int eventData) {\n        for (const auto& fn : listeners) fn(eventData);\n    }\n};\n\nvoid freeFunctionListener(int x) { std::cout << \"Free function received: \" << x << \"\\n\"; }\n\nint main() {\n    EventDispatcher dispatcher;\n\n    // 1. Subscribe free function\n    dispatcher.subscribe(freeFunctionListener);\n\n    // 2. Subscribe lambda with state capture\n    int multiplier = 10;\n    dispatcher.subscribe([multiplier](int x) {\n        std::cout << \"Lambda received: \" << x * multiplier << \"\\n\";\n    });\n\n    dispatcher.emit(42);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>EventDispatcher stores free functions and stateful lambdas uniformly via type-erased std::function.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p><code>std::function</code>, <code>std::any</code>, <code>std::move_only_function</code> (C++23), Adobe Type Erasure library.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when you want duck-typing flexibility in C++ without rigid inheritance coupling.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when template generics or standard interfaces suffice with less boilerplate.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Duck-typing in strongly typed C++; callers don't need to inherit from base classes.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Minor dynamic memory allocation and indirect call overhead in std::function.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>std::function, std::any, Custom Value-Semantic Type Erasure.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Excessive dynamic allocations when passing small lambdas (mitigated by Small Buffer Optimization - SBO).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does std::function implement Type Erasure internally?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> It holds a pointer to an internal abstract <code>CallableBase</code> and template derived <code>CallableImpl&lt;Functor&gt;</code> that stores and invokes the actual callable.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build a type-erased container that prints any object with operator<<.</p>",
+          "practice": {
+            "title": "Type-Erased Printable Container",
+            "problemStatement": "Build a type-erased container that prints any object with operator<<.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Type-Erased Printable Container",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class AnyPrintable { struct Concept { virtual void print() = 0; }; /* template Model<T> */ };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Type Erasure (std::function & Custom Erasures) is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "function-objects-lambdas",
+      "title": "Function Objects, Lambdas & Callback Architecture",
+      "description": "Modern event-driven design using lambdas, closures, std::bind, and asynchronous callbacks.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Function Objects (Functors)</strong> and <strong>Lambdas</strong> are objects that can be called like functions using <code>operator()</code>.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Enables clean callback-driven architectures (e.g. Button click handlers, asynchronous network response callbacks) without rigid inheritance.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Lambdas generate anonymous compiler structs with captured variables stored as member fields.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Pass <code>std::function&lt;void(const Response&)&gt;</code> as callback handlers.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Lambda Capture Semantics",
+            "text": "[=] captures by value (copy); [&] captures by reference (watch out for dangling stack references!); [this] captures member pointer."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "callbacks_async.cpp",
+            "code": "#include <iostream>\n#include <functional>\n#include <string>\n\nclass AsyncHttpClient {\npublic:\n    using Callback = std::function<void(int statusCode, const std::string& body)>;\n\n    void get(const std::string& url, Callback onComplete) {\n        std::cout << \"[HTTP] Fetching \" << url << \"...\\n\";\n        // Simulate network completion\n        onComplete(200, \"{\\\"status\\\": \\\"success\\\"}\");\n    }\n};\n\nint main() {\n    AsyncHttpClient client;\n    std::string userContext = \"Session_9921\";\n\n    // Lambda capturing local context\n    client.get(\"https://api.system.org/v1/user\", [userContext](int code, const std::string& data) {\n        std::cout << \"Callback executed for [\" << userContext << \"] - Code: \" << code << \", Body: \" << data << \"\\n\";\n    });\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>AsyncHttpClient executes modern lambda callback with captured local session context.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Asynchronous I/O (Boost.Asio, libuv), GUI button listeners, threading task delegations.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use for event callbacks, custom container sorting comparators, and filter predicates.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not capture local references <code>[&]</code> in asynchronous callbacks that outlive the stack frame (dangling reference bug).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Concise, expressive, inline callback definitions.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Capturing large state by value incurs copy overhead.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Stateless Lambdas, Stateful Closures, Generic Lambdas (C++14), Template Lambdas (C++20).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Capturing local variables by reference in asynchronous background tasks.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is a dangling reference bug in C++ lambda captures?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> If a lambda captures a local stack variable by reference (<code>[&x]</code>) and the lambda executes asynchronously after the enclosing function has returned, accessing <code>x</code> causes undefined behavior / crash.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build a Timer utility accepting std::function callback executed on tick.</p>",
+          "practice": {
+            "title": "Timer Callback Handler",
+            "problemStatement": "Build a Timer utility accepting std::function callback executed on tick.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Timer Callback Handler",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Timer { public: void onTick(std::function<void()> cb) { cb(); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Function Objects, Lambdas & Callback Architecture is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    }
+  ]
+}

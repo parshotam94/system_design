@@ -1,0 +1,1832 @@
+[
+  {
+    "title": "Classes & Objects in C++ (Module 01)",
+    "url": "/module/01#classes-and-objects",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "classes-and-objects",
+    "summary": "Fundamental building blocks of object-oriented design in C++, memory layout, and stack vs heap object lifetimes.",
+    "tags": [
+      "",
+      "Classes & Objects in C++",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Constructors & Destructors (Module 01)",
+    "url": "/module/01#constructors-destructors",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "constructors-destructors",
+    "summary": "Object initialization lifecycles, member initializer lists, delegating constructors, explicit specifiers, and deterministic destruction.",
+    "tags": [
+      "",
+      "Constructors & Destructors",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Access Modifiers & Encapsulation (Module 01)",
+    "url": "/module/01#access-modifiers",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "access-modifiers",
+    "summary": "Information hiding via public, private, protected access specifiers, friend classes, and encapsulation boundary defense.",
+    "tags": [
+      "",
+      "Access Modifiers & Encapsulation",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Static Members & Const Correctness (Module 01)",
+    "url": "/module/01#static-and-const",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "static-and-const",
+    "summary": "Static class-level shared state, utility factories, const member functions, mutable caching fields, and physical vs logical constness.",
+    "tags": [
+      "",
+      "Static Members & Const Correctness",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Pointers, References & the 'this' Pointer (Module 01)",
+    "url": "/module/01#pointers-and-references",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "pointers-and-references",
+    "summary": "Memory addresses, pointer arithmetic, references vs pointers, method chaining with *this, and nullability semantics in LLD.",
+    "tags": [
+      "",
+      "Pointers, References & the 'this' Pointer",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Namespaces & Header/Source Separation (Module 01)",
+    "url": "/module/01#friend-and-namespaces",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "friend-and-namespaces",
+    "summary": "Organizing modular C++ architectures, header guards, forward declarations, and compilation firewall techniques.",
+    "tags": [
+      "",
+      "Namespaces & Header/Source Separation",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Header & Source File Separation (Module 01)",
+    "url": "/module/01#header-source-separation",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "header-source-separation",
+    "summary": "Mastering the compilation model: header files (.hpp), implementation files (.cpp), Include Guards (#pragma once), Forward Declarations, and the One Definition Rule (ODR).",
+    "tags": [
+      "",
+      "Header & Source File Separation",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "RAII (Resource Acquisition Is Initialization) (Module 01)",
+    "url": "/module/01#raii-and-resource-mgmt",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "raii-and-resource-mgmt",
+    "summary": "The fundamental idiom of C++: binding resource acquisition to constructor initialization and resource release to destructor execution.",
+    "tags": [
+      "",
+      "RAII (Resource Acquisition Is Initialization)",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Rule of 0, Rule of 3, and Rule of 5 (Module 01)",
+    "url": "/module/01#rule-of-0-3-5",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "rule-of-0-3-5",
+    "summary": "Managing special member functions: Destructor, Copy Constructor, Copy Assignment, Move Constructor, Move Assignment, and the Copy-and-Swap idiom.",
+    "tags": [
+      "",
+      "Rule of 0, Rule of 3, and Rule of 5",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Copy vs Move Semantics (rvalue references) (Module 01)",
+    "url": "/module/01#copy-and-move-semantics",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "copy-and-move-semantics",
+    "summary": "Lvalues, Rvalues, std::move, std::forward, rvalue references (&&), and high-performance zero-copy resource transfers in C++20.",
+    "tags": [
+      "",
+      "Copy vs Move Semantics (rvalue references)",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Smart Pointers (unique_ptr, shared_ptr, weak_ptr) (Module 01)",
+    "url": "/module/01#smart-pointers-ownership",
+    "type": "topic",
+    "module_id": "01",
+    "module_title": "",
+    "topic_id": "smart-pointers-ownership",
+    "summary": "Modern C++ memory ownership models: exclusive ownership with std::unique_ptr, reference-counted std::shared_ptr, circular dependency resolution with std::weak_ptr, and custom deleters.",
+    "tags": [
+      "",
+      "Smart Pointers (unique_ptr, shared_ptr, weak_ptr)",
+      "Module 01"
+    ]
+  },
+  {
+    "title": "Encapsulation & Data Hiding (Module 02)",
+    "url": "/module/02#encapsulation",
+    "type": "topic",
+    "module_id": "02",
+    "module_title": "",
+    "topic_id": "encapsulation",
+    "summary": "Bundling data and operations into a single unit while strictly shielding internal state from external tampering.",
+    "tags": [
+      "",
+      "Encapsulation & Data Hiding",
+      "Module 02"
+    ]
+  },
+  {
+    "title": "Abstraction & Information Hiding (Module 02)",
+    "url": "/module/02#abstraction",
+    "type": "topic",
+    "module_id": "02",
+    "module_title": "",
+    "topic_id": "abstraction",
+    "summary": "Hiding implementation complexity behind high-level interfaces, pure virtual functions, and abstract base contracts.",
+    "tags": [
+      "",
+      "Abstraction & Information Hiding",
+      "Module 02"
+    ]
+  },
+  {
+    "title": "Inheritance Types in C++ (Module 02)",
+    "url": "/module/02#inheritance-types",
+    "type": "topic",
+    "module_id": "02",
+    "module_title": "",
+    "topic_id": "inheritance-types",
+    "summary": "Code reuse and hierarchy modeling: Single, Multilevel, Multiple, Hierarchical, and Hybrid inheritance with visibility modes.",
+    "tags": [
+      "",
+      "Inheritance Types in C++",
+      "Module 02"
+    ]
+  },
+  {
+    "title": "Compile-time Polymorphism (Overloading & Templates) (Module 02)",
+    "url": "/module/02#compile-time-polymorphism",
+    "type": "topic",
+    "module_id": "02",
+    "module_title": "",
+    "topic_id": "compile-time-polymorphism",
+    "summary": "Zero-overhead static dispatch: Function overloading, Operator overloading, and Generic Templates in C++20.",
+    "tags": [
+      "",
+      "Compile-time Polymorphism (Overloading & Templates)",
+      "Module 02"
+    ]
+  },
+  {
+    "title": "Runtime Polymorphism (Virtual Functions & Overriding) (Module 02)",
+    "url": "/module/02#runtime-polymorphism",
+    "type": "topic",
+    "module_id": "02",
+    "module_title": "",
+    "topic_id": "runtime-polymorphism",
+    "summary": "Dynamic method dispatch, virtual functions, method overriding, override and final keywords, and heterogeneous polymorphic collections.",
+    "tags": [
+      "",
+      "Runtime Polymorphism (Virtual Functions & Overriding)",
+      "Module 02"
+    ]
+  },
+  {
+    "title": "Virtual Table (VTable) & VPTR Mechanism (Module 02)",
+    "url": "/module/02#vtable-and-vptr",
+    "type": "topic",
+    "module_id": "02",
+    "module_title": "",
+    "topic_id": "vtable-and-vptr",
+    "summary": "Under-the-hood dynamic dispatch internals: VTable structure, VPTR pointer injection, memory overhead, and step-by-step lookup animation.",
+    "tags": [
+      "",
+      "Virtual Table (VTable) & VPTR Mechanism",
+      "Module 02"
+    ]
+  },
+  {
+    "title": "Abstract Classes & Pure Virtual Functions (Module 03)",
+    "url": "/module/03#abstract-classes-interfaces",
+    "type": "topic",
+    "module_id": "03",
+    "module_title": "",
+    "topic_id": "abstract-classes-interfaces",
+    "summary": "Defining immutable API contracts with pure virtual functions (= 0) and interface segregation in C++.",
+    "tags": [
+      "",
+      "Abstract Classes & Pure Virtual Functions",
+      "Module 03"
+    ]
+  },
+  {
+    "title": "Virtual Destructors & Polymorphic Deletion (Module 03)",
+    "url": "/module/03#virtual-destructors",
+    "type": "topic",
+    "module_id": "03",
+    "module_title": "",
+    "topic_id": "virtual-destructors",
+    "summary": "Why base classes with virtual functions must have virtual destructors to prevent fatal undefined behavior and memory leaks.",
+    "tags": [
+      "",
+      "Virtual Destructors & Polymorphic Deletion",
+      "Module 03"
+    ]
+  },
+  {
+    "title": "Object Slicing & Value Semantics Trap (Module 03)",
+    "url": "/module/03#object-slicing",
+    "type": "topic",
+    "module_id": "03",
+    "module_title": "",
+    "topic_id": "object-slicing",
+    "summary": "Understanding object slicing when passing polymorphic objects by value, and how to defend against it.",
+    "tags": [
+      "",
+      "Object Slicing & Value Semantics Trap",
+      "Module 03"
+    ]
+  },
+  {
+    "title": "Diamond Problem & Virtual Inheritance (Module 03)",
+    "url": "/module/03#diamond-problem-virtual-inheritance",
+    "type": "topic",
+    "module_id": "03",
+    "module_title": "",
+    "topic_id": "diamond-problem-virtual-inheritance",
+    "summary": "Resolving multiple inheritance ambiguity and duplicate base class instances using virtual base classes.",
+    "tags": [
+      "",
+      "Diamond Problem & Virtual Inheritance",
+      "Module 03"
+    ]
+  },
+  {
+    "title": "Composition vs Inheritance in C++ (Module 03)",
+    "url": "/module/03#composition-vs-inheritance",
+    "type": "topic",
+    "module_id": "03",
+    "module_title": "",
+    "topic_id": "composition-vs-inheritance",
+    "summary": "Architectural trade-offs: Why composition provides loose coupling, dynamic flexibility, and avoids brittle base class hierarchies.",
+    "tags": [
+      "",
+      "Composition vs Inheritance in C++",
+      "Module 03"
+    ]
+  },
+  {
+    "title": "Dependency Injection & Delegation Idioms (Module 03)",
+    "url": "/module/03#dependency-injection-delegation",
+    "type": "topic",
+    "module_id": "03",
+    "module_title": "",
+    "topic_id": "dependency-injection-delegation",
+    "summary": "Constructor injection, interface delegation, inversion of control, and testable C++ architecture.",
+    "tags": [
+      "",
+      "Dependency Injection & Delegation Idioms",
+      "Module 03"
+    ]
+  },
+  {
+    "title": "UML Class Diagram Notations (+, -, #) (Module 04)",
+    "url": "/module/04#uml-class-diagrams",
+    "type": "topic",
+    "module_id": "04",
+    "module_title": "",
+    "topic_id": "uml-class-diagrams",
+    "summary": "Standard UML 3-box compartment notation: Class name, attributes, methods, and visibility specifiers.",
+    "tags": [
+      "",
+      "UML Class Diagram Notations (+, -, #)",
+      "Module 04"
+    ]
+  },
+  {
+    "title": "UML Relationship Arrows & Multiplicities (Module 04)",
+    "url": "/module/04#uml-relationships-notation",
+    "type": "topic",
+    "module_id": "04",
+    "module_title": "",
+    "topic_id": "uml-relationships-notation",
+    "summary": "Mastering UML connector symbols: Inheritance, Realization, Composition, Aggregation, Association, and Dependency.",
+    "tags": [
+      "",
+      "UML Relationship Arrows & Multiplicities",
+      "Module 04"
+    ]
+  },
+  {
+    "title": "Sequence Diagrams & Lifelines (Module 04)",
+    "url": "/module/04#uml-sequence-diagrams",
+    "type": "topic",
+    "module_id": "04",
+    "module_title": "",
+    "topic_id": "uml-sequence-diagrams",
+    "summary": "Visualizing dynamic runtime message passing, synchronous calls, return messages, and object lifelines over time.",
+    "tags": [
+      "",
+      "Sequence Diagrams & Lifelines",
+      "Module 04"
+    ]
+  },
+  {
+    "title": "State Machines & Activity Diagrams (Module 04)",
+    "url": "/module/04#uml-state-and-activity",
+    "type": "topic",
+    "module_id": "04",
+    "module_title": "",
+    "topic_id": "uml-state-and-activity",
+    "summary": "Modeling object lifecycle state transitions, guard conditions, and algorithmic flowcharts in UML.",
+    "tags": [
+      "",
+      "State Machines & Activity Diagrams",
+      "Module 04"
+    ]
+  },
+  {
+    "title": "Association ('uses a') (Module 05)",
+    "url": "/module/05#association",
+    "type": "topic",
+    "module_id": "05",
+    "module_title": "",
+    "topic_id": "association",
+    "summary": "A structural 'uses a' relationship where two independent objects interact without owning each other's lifetimes.",
+    "tags": [
+      "",
+      "Association ('uses a')",
+      "Module 05"
+    ]
+  },
+  {
+    "title": "Aggregation ('has a' - weak ownership) (Module 05)",
+    "url": "/module/05#aggregation",
+    "type": "topic",
+    "module_id": "05",
+    "module_title": "",
+    "topic_id": "aggregation",
+    "summary": "Weak container ownership where child objects can belong to multiple parents and outlive the container.",
+    "tags": [
+      "",
+      "Aggregation ('has a' - weak ownership)",
+      "Module 05"
+    ]
+  },
+  {
+    "title": "Composition ('has a' - strong ownership) (Module 05)",
+    "url": "/module/05#composition",
+    "type": "topic",
+    "module_id": "05",
+    "module_title": "",
+    "topic_id": "composition",
+    "summary": "Exclusive lifetime ownership where the parent object manages the complete creation and destruction of its child components.",
+    "tags": [
+      "",
+      "Composition ('has a' - strong ownership)",
+      "Module 05"
+    ]
+  },
+  {
+    "title": "Inheritance ('is a') vs Realization ('implements') (Module 05)",
+    "url": "/module/05#inheritance-vs-realization",
+    "type": "topic",
+    "module_id": "05",
+    "module_title": "",
+    "topic_id": "inheritance-vs-realization",
+    "summary": "Class extension with concrete code reuse vs Interface implementation contracts in C++.",
+    "tags": [
+      "",
+      "Inheritance ('is a') vs Realization ('implements')",
+      "Module 05"
+    ]
+  },
+  {
+    "title": "Dependency ('depends on') (Module 05)",
+    "url": "/module/05#dependency",
+    "type": "topic",
+    "module_id": "05",
+    "module_title": "",
+    "topic_id": "dependency",
+    "summary": "The weakest relationship: temporary method parameter, local variable, or return type dependency.",
+    "tags": [
+      "",
+      "Dependency ('depends on')",
+      "Module 05"
+    ]
+  },
+  {
+    "title": "The Master Class Relationship Comparison Matrix (Module 05)",
+    "url": "/module/05#relationships-matrix",
+    "type": "topic",
+    "module_id": "05",
+    "module_title": "",
+    "topic_id": "relationships-matrix",
+    "summary": "Comprehensive comparative matrix mapping all 6 class relationships with lifetime, ownership, coupling, and C++ code representations.",
+    "tags": [
+      "",
+      "The Master Class Relationship Comparison Matrix",
+      "Module 05"
+    ]
+  },
+  {
+    "title": "Single Responsibility Principle (SRP) (Module 06)",
+    "url": "/module/06#srp",
+    "type": "topic",
+    "module_id": "06",
+    "module_title": "",
+    "topic_id": "srp",
+    "summary": "A class should have one, and only one, reason to change. Separating business logic, persistence, formatting, and validation.",
+    "tags": [
+      "",
+      "Single Responsibility Principle (SRP)",
+      "Module 06"
+    ]
+  },
+  {
+    "title": "Open/Closed Principle (OCP) (Module 06)",
+    "url": "/module/06#ocp",
+    "type": "topic",
+    "module_id": "06",
+    "module_title": "",
+    "topic_id": "ocp",
+    "summary": "Software entities should be open for extension, but closed for modification. Leveraging polymorphism to add new features without altering tested code.",
+    "tags": [
+      "",
+      "Open/Closed Principle (OCP)",
+      "Module 06"
+    ]
+  },
+  {
+    "title": "Liskov Substitution Principle (LSP) (Module 06)",
+    "url": "/module/06#lsp",
+    "type": "topic",
+    "module_id": "06",
+    "module_title": "",
+    "topic_id": "lsp",
+    "summary": "Subtypes must be substitutable for their base types without altering system correctness or violating preconditions/postconditions.",
+    "tags": [
+      "",
+      "Liskov Substitution Principle (LSP)",
+      "Module 06"
+    ]
+  },
+  {
+    "title": "Interface Segregation Principle (ISP) (Module 06)",
+    "url": "/module/06#isp",
+    "type": "topic",
+    "module_id": "06",
+    "module_title": "",
+    "topic_id": "isp",
+    "summary": "Clients should not be forced to depend upon interfaces that they do not use. Designing fine-grained, cohesive role interfaces.",
+    "tags": [
+      "",
+      "Interface Segregation Principle (ISP)",
+      "Module 06"
+    ]
+  },
+  {
+    "title": "Dependency Inversion Principle (DIP) (Module 06)",
+    "url": "/module/06#dip",
+    "type": "topic",
+    "module_id": "06",
+    "module_title": "",
+    "topic_id": "dip",
+    "summary": "High-level modules should not depend upon low-level modules; both should depend upon abstractions. Abstractions should not depend upon details.",
+    "tags": [
+      "",
+      "Dependency Inversion Principle (DIP)",
+      "Module 06"
+    ]
+  },
+  {
+    "title": "Entities vs Value Objects (Module 07)",
+    "url": "/module/07#entities-vs-value-objects",
+    "type": "topic",
+    "module_id": "07",
+    "module_title": "",
+    "topic_id": "entities-vs-value-objects",
+    "summary": "Differentiating between stateful entities with distinct identities and immutable value objects.",
+    "tags": [
+      "",
+      "Entities vs Value Objects",
+      "Module 07"
+    ]
+  },
+  {
+    "title": "CRC Cards & Identifying Responsibilities (Module 07)",
+    "url": "/module/07#identifying-responsibilities",
+    "type": "topic",
+    "module_id": "07",
+    "module_title": "",
+    "topic_id": "identifying-responsibilities",
+    "summary": "Class-Responsibility-Collaboration (CRC) technique to identify domain boundaries.",
+    "tags": [
+      "",
+      "CRC Cards & Identifying Responsibilities",
+      "Module 07"
+    ]
+  },
+  {
+    "title": "Domain Invariants & Boundary Design (Module 07)",
+    "url": "/module/07#domain-invariants-boundaries",
+    "type": "topic",
+    "module_id": "07",
+    "module_title": "",
+    "topic_id": "domain-invariants-boundaries",
+    "summary": "Enforcing business invariants and defining Aggregate Roots in domain modeling.",
+    "tags": [
+      "",
+      "Domain Invariants & Boundary Design",
+      "Module 07"
+    ]
+  },
+  {
+    "title": "High Cohesion & Low Coupling (Module 07)",
+    "url": "/module/07#cohesion-and-coupling",
+    "type": "topic",
+    "module_id": "07",
+    "module_title": "",
+    "topic_id": "cohesion-and-coupling",
+    "summary": "The twin metrics of software quality: maximizing internal focus and minimizing inter-module dependencies.",
+    "tags": [
+      "",
+      "High Cohesion & Low Coupling",
+      "Module 07"
+    ]
+  },
+  {
+    "title": "DRY, KISS, and YAGNI (Module 08)",
+    "url": "/module/08#dry-kiss-yagni",
+    "type": "topic",
+    "module_id": "08",
+    "module_title": "",
+    "topic_id": "dry-kiss-yagni",
+    "summary": "Don't Repeat Yourself, Keep It Simple Stupid, and You Aren't Gonna Need It.",
+    "tags": [
+      "",
+      "DRY, KISS, and YAGNI",
+      "Module 08"
+    ]
+  },
+  {
+    "title": "Law of Demeter (Principle of Least Knowledge) (Module 08)",
+    "url": "/module/08#law-of-demeter",
+    "type": "topic",
+    "module_id": "08",
+    "module_title": "",
+    "topic_id": "law-of-demeter",
+    "summary": "A method should only talk to its immediate friends, avoiding long train-wreck call chains.",
+    "tags": [
+      "",
+      "Law of Demeter (Principle of Least Knowledge)",
+      "Module 08"
+    ]
+  },
+  {
+    "title": "Separation of Concerns & Modularity (Module 08)",
+    "url": "/module/08#separation-of-concerns",
+    "type": "topic",
+    "module_id": "08",
+    "module_title": "",
+    "topic_id": "separation-of-concerns",
+    "summary": "Dividing a software application into distinct features that overlap in functionality as little as possible.",
+    "tags": [
+      "",
+      "Separation of Concerns & Modularity",
+      "Module 08"
+    ]
+  },
+  {
+    "title": "Encapsulate What Varies & Favor Immutability (Module 08)",
+    "url": "/module/08#encapsulate-variation",
+    "type": "topic",
+    "module_id": "08",
+    "module_title": "",
+    "topic_id": "encapsulate-variation",
+    "summary": "Identify the aspects of your application that vary and separate them from what stays the same.",
+    "tags": [
+      "",
+      "Encapsulate What Varies & Favor Immutability",
+      "Module 08"
+    ]
+  },
+  {
+    "title": "Singleton (Meyers Singleton & Concurrency) (Module 09)",
+    "url": "/module/09#singleton-pattern",
+    "type": "topic",
+    "module_id": "09",
+    "module_title": "",
+    "topic_id": "singleton-pattern",
+    "summary": "Ensuring a class has exactly one instance and providing a global point of access.",
+    "tags": [
+      "",
+      "Singleton (Meyers Singleton & Concurrency)",
+      "Module 09",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Factory Method Pattern (Module 09)",
+    "url": "/module/09#factory-method-pattern",
+    "type": "topic",
+    "module_id": "09",
+    "module_title": "",
+    "topic_id": "factory-method-pattern",
+    "summary": "Defining an interface for creating an object, but letting subclasses decide which class to instantiate.",
+    "tags": [
+      "",
+      "Factory Method Pattern",
+      "Module 09",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Abstract Factory Pattern (Module 09)",
+    "url": "/module/09#abstract-factory-pattern",
+    "type": "topic",
+    "module_id": "09",
+    "module_title": "",
+    "topic_id": "abstract-factory-pattern",
+    "summary": "Creating families of related or dependent objects without specifying their concrete classes.",
+    "tags": [
+      "",
+      "Abstract Factory Pattern",
+      "Module 09",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Builder Pattern & Fluent Interfaces (Module 09)",
+    "url": "/module/09#builder-pattern",
+    "type": "topic",
+    "module_id": "09",
+    "module_title": "",
+    "topic_id": "builder-pattern",
+    "summary": "Separating the construction of a complex object from its representation.",
+    "tags": [
+      "",
+      "Builder Pattern & Fluent Interfaces",
+      "Module 09",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Prototype Pattern & Virtual Clone Idiom (Module 09)",
+    "url": "/module/09#prototype-pattern",
+    "type": "topic",
+    "module_id": "09",
+    "module_title": "",
+    "topic_id": "prototype-pattern",
+    "summary": "Creating new objects by copying an existing instance using virtual clone methods.",
+    "tags": [
+      "",
+      "Prototype Pattern & Virtual Clone Idiom",
+      "Module 09",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Adapter Pattern (Class & Object Adapter) (Module 10)",
+    "url": "/module/10#adapter-pattern",
+    "type": "topic",
+    "module_id": "10",
+    "module_title": "",
+    "topic_id": "adapter-pattern",
+    "summary": "Converting the interface of a class into another interface clients expect.",
+    "tags": [
+      "",
+      "Adapter Pattern (Class & Object Adapter)",
+      "Module 10",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Bridge Pattern (Module 10)",
+    "url": "/module/10#bridge-pattern",
+    "type": "topic",
+    "module_id": "10",
+    "module_title": "",
+    "topic_id": "bridge-pattern",
+    "summary": "Decoupling an abstraction from its implementation so that the two can vary independently.",
+    "tags": [
+      "",
+      "Bridge Pattern",
+      "Module 10",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Composite Pattern (Tree Hierarchies) (Module 10)",
+    "url": "/module/10#composite-pattern",
+    "type": "topic",
+    "module_id": "10",
+    "module_title": "",
+    "topic_id": "composite-pattern",
+    "summary": "Composing objects into tree structures to represent part-whole hierarchies, treating individual objects and compositions uniformly.",
+    "tags": [
+      "",
+      "Composite Pattern (Tree Hierarchies)",
+      "Module 10",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Decorator Pattern (Module 10)",
+    "url": "/module/10#decorator-pattern",
+    "type": "topic",
+    "module_id": "10",
+    "module_title": "",
+    "topic_id": "decorator-pattern",
+    "summary": "Attaching additional responsibilities to an object dynamically without subclassing.",
+    "tags": [
+      "",
+      "Decorator Pattern",
+      "Module 10",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Facade Pattern (Module 10)",
+    "url": "/module/10#facade-pattern",
+    "type": "topic",
+    "module_id": "10",
+    "module_title": "",
+    "topic_id": "facade-pattern",
+    "summary": "Providing a unified, simplified higher-level interface to a complex subsystem.",
+    "tags": [
+      "",
+      "Facade Pattern",
+      "Module 10",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Flyweight Pattern (Module 10)",
+    "url": "/module/10#flyweight-pattern",
+    "type": "topic",
+    "module_id": "10",
+    "module_title": "",
+    "topic_id": "flyweight-pattern",
+    "summary": "Minimizing memory usage by sharing fine-grained intrinsic state among thousands of objects.",
+    "tags": [
+      "",
+      "Flyweight Pattern",
+      "Module 10",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Proxy Pattern (Virtual, Remote, Protection) (Module 10)",
+    "url": "/module/10#proxy-pattern",
+    "type": "topic",
+    "module_id": "10",
+    "module_title": "",
+    "topic_id": "proxy-pattern",
+    "summary": "Providing a surrogate or placeholder for another object to control access to it.",
+    "tags": [
+      "",
+      "Proxy Pattern (Virtual, Remote, Protection)",
+      "Module 10",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Observer Pattern & Event Dispatchers (Module 11)",
+    "url": "/module/11#observer-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "observer-pattern",
+    "summary": "Defining a one-to-many dependency so that when one object changes state, all dependents are notified automatically.",
+    "tags": [
+      "",
+      "Observer Pattern & Event Dispatchers",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Strategy Pattern & Interchangeable Algorithms (Module 11)",
+    "url": "/module/11#strategy-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "strategy-pattern",
+    "summary": "Defining a family of algorithms, encapsulating each one, and making them interchangeable at runtime.",
+    "tags": [
+      "",
+      "Strategy Pattern & Interchangeable Algorithms",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Command Pattern & Undo/Redo Architecture (Module 11)",
+    "url": "/module/11#command-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "command-pattern",
+    "summary": "Encapsulating a request as an object, enabling parameterization with queues, logs, and undoable operations.",
+    "tags": [
+      "",
+      "Command Pattern & Undo/Redo Architecture",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "State Pattern & Finite State Machines (Module 11)",
+    "url": "/module/11#state-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "state-pattern",
+    "summary": "Allowing an object to alter its behavior when its internal state changes, appearing to change its class.",
+    "tags": [
+      "",
+      "State Pattern & Finite State Machines",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Chain of Responsibility Pattern (Module 11)",
+    "url": "/module/11#chain-of-responsibility",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "chain-of-responsibility",
+    "summary": "Passing requests along a chain of potential handlers until one of them handles it.",
+    "tags": [
+      "",
+      "Chain of Responsibility Pattern",
+      "Module 11"
+    ]
+  },
+  {
+    "title": "Template Method Pattern (Module 11)",
+    "url": "/module/11#template-method-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "template-method-pattern",
+    "summary": "Defining the skeleton of an algorithm in a base class, letting subclasses override specific steps without changing structure.",
+    "tags": [
+      "",
+      "Template Method Pattern",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Mediator Pattern & Loose Coupling (Module 11)",
+    "url": "/module/11#mediator-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "mediator-pattern",
+    "summary": "Reducing chaotic dependencies between objects by forcing them to communicate through a central mediator object.",
+    "tags": [
+      "",
+      "Mediator Pattern & Loose Coupling",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Iterator Pattern & Custom Iterators (Module 11)",
+    "url": "/module/11#iterator-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "iterator-pattern",
+    "summary": "Accessing elements of an aggregate object sequentially without exposing its underlying representation.",
+    "tags": [
+      "",
+      "Iterator Pattern & Custom Iterators",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Memento Pattern (State Snapshots) (Module 11)",
+    "url": "/module/11#memento-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "memento-pattern",
+    "summary": "Capturing and externalizing an object's internal state so it can be restored later without violating encapsulation.",
+    "tags": [
+      "",
+      "Memento Pattern (State Snapshots)",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Visitor Pattern & Double Dispatch (Module 11)",
+    "url": "/module/11#visitor-pattern",
+    "type": "topic",
+    "module_id": "11",
+    "module_title": "",
+    "topic_id": "visitor-pattern",
+    "summary": "Representing an operation to be performed on elements of an object structure without changing their classes.",
+    "tags": [
+      "",
+      "Visitor Pattern & Double Dispatch",
+      "Module 11",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "PImpl Idiom (Pointer to Implementation) (Module 12)",
+    "url": "/module/12#pimpl-idiom",
+    "type": "topic",
+    "module_id": "12",
+    "module_title": "",
+    "topic_id": "pimpl-idiom",
+    "summary": "Hiding private implementation details and third-party headers behind an opaque pointer to speed up compilation.",
+    "tags": [
+      "",
+      "PImpl Idiom (Pointer to Implementation)",
+      "Module 12"
+    ]
+  },
+  {
+    "title": "CRTP (Curiously Recurring Template Pattern) (Module 12)",
+    "url": "/module/12#crtp-static-polymorphism",
+    "type": "topic",
+    "module_id": "12",
+    "module_title": "",
+    "topic_id": "crtp-static-polymorphism",
+    "summary": "Achieving compile-time static polymorphism without VTable and VPTR runtime overhead.",
+    "tags": [
+      "",
+      "CRTP (Curiously Recurring Template Pattern)",
+      "Module 12"
+    ]
+  },
+  {
+    "title": "Type Erasure (std::function & Custom Erasures) (Module 12)",
+    "url": "/module/12#type-erasure",
+    "type": "topic",
+    "module_id": "12",
+    "module_title": "",
+    "topic_id": "type-erasure",
+    "summary": "Encapsulating objects of any type that support a given interface without requiring a common inheritance hierarchy.",
+    "tags": [
+      "",
+      "Type Erasure (std::function & Custom Erasures)",
+      "Module 12"
+    ]
+  },
+  {
+    "title": "Function Objects, Lambdas & Callback Architecture (Module 12)",
+    "url": "/module/12#function-objects-lambdas",
+    "type": "topic",
+    "module_id": "12",
+    "module_title": "",
+    "topic_id": "function-objects-lambdas",
+    "summary": "Modern event-driven design using lambdas, closures, std::bind, and asynchronous callbacks.",
+    "tags": [
+      "",
+      "Function Objects, Lambdas & Callback Architecture",
+      "Module 12"
+    ]
+  },
+  {
+    "title": "Threads, Data Races & Memory Safety (Module 13)",
+    "url": "/module/13#threads-and-race-conditions",
+    "type": "topic",
+    "module_id": "13",
+    "module_title": "",
+    "topic_id": "threads-and-race-conditions",
+    "summary": "Understanding multi-threaded execution, data races, race conditions, and memory visibility in modern C++.",
+    "tags": [
+      "",
+      "Threads, Data Races & Memory Safety",
+      "Module 13"
+    ]
+  },
+  {
+    "title": "std::mutex, std::lock_guard & std::unique_lock (Module 13)",
+    "url": "/module/13#mutexes-and-lock-guards",
+    "type": "topic",
+    "module_id": "13",
+    "module_title": "",
+    "topic_id": "mutexes-and-lock-guards",
+    "summary": "RAII-based mutual exclusion locking in C++.",
+    "tags": [
+      "",
+      "std::mutex, std::lock_guard & std::unique_lock",
+      "Module 13",
+      "Concurrency"
+    ]
+  },
+  {
+    "title": "Read-Write Locks (std::shared_mutex) (Module 13)",
+    "url": "/module/13#read-write-locks",
+    "type": "topic",
+    "module_id": "13",
+    "module_title": "",
+    "topic_id": "read-write-locks",
+    "summary": "Optimizing read-heavy workloads with multiple concurrent readers and exclusive single writers.",
+    "tags": [
+      "",
+      "Read-Write Locks (std::shared_mutex)",
+      "Module 13"
+    ]
+  },
+  {
+    "title": "Deadlock Prevention & std::scoped_lock (Module 13)",
+    "url": "/module/13#deadlock-prevention",
+    "type": "topic",
+    "module_id": "13",
+    "module_title": "",
+    "topic_id": "deadlock-prevention",
+    "summary": "Preventing deadly mutual exclusion deadlocks using lock ordering, lock hierarchies, and std::scoped_lock.",
+    "tags": [
+      "",
+      "Deadlock Prevention & std::scoped_lock",
+      "Module 13"
+    ]
+  },
+  {
+    "title": "Condition Variables & Producer-Consumer Queues (Module 13)",
+    "url": "/module/13#condition-variables",
+    "type": "topic",
+    "module_id": "13",
+    "module_title": "",
+    "topic_id": "condition-variables",
+    "summary": "Signaling and thread synchronization using std::condition_variable for blocking concurrent task queues.",
+    "tags": [
+      "",
+      "Condition Variables & Producer-Consumer Queues",
+      "Module 13"
+    ]
+  },
+  {
+    "title": "std::atomic & Lock-Free Design Concepts (Module 13)",
+    "url": "/module/13#atomics-lock-free-basics",
+    "type": "topic",
+    "module_id": "13",
+    "module_title": "",
+    "topic_id": "atomics-lock-free-basics",
+    "summary": "Lock-free atomic primitives, memory orderings, and hardware CPU cache line synchronization in C++20.",
+    "tags": [
+      "",
+      "std::atomic & Lock-Free Design Concepts",
+      "Module 13",
+      "Concurrency"
+    ]
+  },
+  {
+    "title": "Thread-safe Singleton & Double-Checked Locking Trap (Module 13)",
+    "url": "/module/13#thread-safe-singleton",
+    "type": "topic",
+    "module_id": "13",
+    "module_title": "",
+    "topic_id": "thread-safe-singleton",
+    "summary": "Why naive double-checked locking was broken in C++98, and why Meyers Singleton is the optimal modern C++ solution.",
+    "tags": [
+      "",
+      "Thread-safe Singleton & Double-Checked Locking Trap",
+      "Module 13"
+    ]
+  },
+  {
+    "title": "Stack vs Heap Lifetime & Ownership Semantics (Module 14)",
+    "url": "/module/14#stack-vs-heap-lifetime",
+    "type": "topic",
+    "module_id": "14",
+    "module_title": "",
+    "topic_id": "stack-vs-heap-lifetime",
+    "summary": "Understanding memory allocation mechanics, cache locality, and deterministic stack lifetimes.",
+    "tags": [
+      "",
+      "Stack vs Heap Lifetime & Ownership Semantics",
+      "Module 14"
+    ]
+  },
+  {
+    "title": "Smart Pointer Ownership Models & Custom Deleters (Module 14)",
+    "url": "/module/14#smart-pointer-ownership-models",
+    "type": "topic",
+    "module_id": "14",
+    "module_title": "",
+    "topic_id": "smart-pointer-ownership-models",
+    "summary": "Deep dive into std::unique_ptr, std::shared_ptr control blocks, and integrating C API custom deleters.",
+    "tags": [
+      "",
+      "Smart Pointer Ownership Models & Custom Deleters",
+      "Module 14"
+    ]
+  },
+  {
+    "title": "Circular Dependency Resolution with std::weak_ptr (Module 14)",
+    "url": "/module/14#circular-reference-weak-ptr",
+    "type": "topic",
+    "module_id": "14",
+    "module_title": "",
+    "topic_id": "circular-reference-weak-ptr",
+    "summary": "Breaking cyclic shared_ptr memory leaks using non-owning weak references.",
+    "tags": [
+      "",
+      "Circular Dependency Resolution with std::weak_ptr",
+      "Module 14"
+    ]
+  },
+  {
+    "title": "Exception Safety Guarantees (Basic, Strong, Nothrow) (Module 15)",
+    "url": "/module/15#exception-safety-guarantees",
+    "type": "topic",
+    "module_id": "15",
+    "module_title": "",
+    "topic_id": "exception-safety-guarantees",
+    "summary": "Mastering the 3 levels of exception safety: Basic guarantee, Strong (Commit-or-Rollback), and Nothrow.",
+    "tags": [
+      "",
+      "Exception Safety Guarantees (Basic, Strong, Nothrow)",
+      "Module 15"
+    ]
+  },
+  {
+    "title": "std::optional & std::expected for Explicit Errors (Module 15)",
+    "url": "/module/15#optional-and-expected-design",
+    "type": "topic",
+    "module_id": "15",
+    "module_title": "",
+    "topic_id": "optional-and-expected-design",
+    "summary": "Modern error handling without exception overhead using std::optional (C++17) and std::expected (C++23).",
+    "tags": [
+      "",
+      "std::optional & std::expected for Explicit Errors",
+      "Module 15"
+    ]
+  },
+  {
+    "title": "Exceptions vs Error Codes in Low-Level Design (Module 15)",
+    "url": "/module/15#error-handling-tradeoffs",
+    "type": "topic",
+    "module_id": "15",
+    "module_title": "",
+    "topic_id": "error-handling-tradeoffs",
+    "summary": "Architectural evaluation: Performance, stack unwinding latency, binary size, and domain error strategies.",
+    "tags": [
+      "",
+      "Exceptions vs Error Codes in Low-Level Design",
+      "Module 15"
+    ]
+  },
+  {
+    "title": "Designing Intuitive & Hard-to-Misuse Interfaces (Module 16)",
+    "url": "/module/16#stable-public-interfaces",
+    "type": "topic",
+    "module_id": "16",
+    "module_title": "",
+    "topic_id": "stable-public-interfaces",
+    "summary": "Scott Meyers' rule: 'Make interfaces easy to use correctly and hard to use incorrectly.'",
+    "tags": [
+      "",
+      "Designing Intuitive & Hard-to-Misuse Interfaces",
+      "Module 16"
+    ]
+  },
+  {
+    "title": "Design by Contract (Preconditions, Postconditions, Invariants) (Module 16)",
+    "url": "/module/16#design-by-contract",
+    "type": "topic",
+    "module_id": "16",
+    "module_title": "",
+    "topic_id": "design-by-contract",
+    "summary": "Formalizing software correctness through preconditions, postconditions, and class invariants.",
+    "tags": [
+      "",
+      "Design by Contract (Preconditions, Postconditions, Invariants)",
+      "Module 16"
+    ]
+  },
+  {
+    "title": "API Evolution, Versioning & Extensibility (Module 16)",
+    "url": "/module/16#backward-compatibility-versioning",
+    "type": "topic",
+    "module_id": "16",
+    "module_title": "",
+    "topic_id": "backward-compatibility-versioning",
+    "summary": "Evolving C++ APIs without breaking existing clients or binary ABI compatibility.",
+    "tags": [
+      "",
+      "API Evolution, Versioning & Extensibility",
+      "Module 16"
+    ]
+  },
+  {
+    "title": "Refactoring Giant Switch/If-Else Chains (Module 17)",
+    "url": "/module/17#refactoring-switch-chains",
+    "type": "topic",
+    "module_id": "17",
+    "module_title": "",
+    "topic_id": "refactoring-switch-chains",
+    "summary": "Techniques to replace hardcoded procedural switch-case chains with polymorphic strategy dispatch.",
+    "tags": [
+      "",
+      "Refactoring Giant Switch/If-Else Chains",
+      "Module 17"
+    ]
+  },
+  {
+    "title": "Plugin & Registry Architectures in C++ (Module 17)",
+    "url": "/module/17#plugin-and-registry-architecture",
+    "type": "topic",
+    "module_id": "17",
+    "module_title": "",
+    "topic_id": "plugin-and-registry-architecture",
+    "summary": "Designing dynamic self-registering plugin architectures using static initialization and factory maps.",
+    "tags": [
+      "",
+      "Plugin & Registry Architectures in C++",
+      "Module 17"
+    ]
+  },
+  {
+    "title": "Case Study: Multi-Gateway Extensible Payment Engine (Module 17)",
+    "url": "/module/17#extensible-payment-system-case-study",
+    "type": "topic",
+    "module_id": "17",
+    "module_title": "",
+    "topic_id": "extensible-payment-system-case-study",
+    "summary": "End-to-end architectural case study refactoring a monolithic payment engine into an open-closed extensible system.",
+    "tags": [
+      "",
+      "Case Study: Multi-Gateway Extensible Payment Engine",
+      "Module 17"
+    ]
+  },
+  {
+    "title": "Object Pool Pattern for High-Performance C++ (Module 18)",
+    "url": "/module/18#object-pool-pattern",
+    "type": "topic",
+    "module_id": "18",
+    "module_title": "",
+    "topic_id": "object-pool-pattern",
+    "summary": "Reusing expensive-to-construct objects from a pre-allocated pool to eliminate dynamic heap allocation overhead.",
+    "tags": [
+      "",
+      "Object Pool Pattern for High-Performance C++",
+      "Module 18",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Repository & Data Access Object (DAO) Patterns (Module 18)",
+    "url": "/module/18#repository-dao-pattern",
+    "type": "topic",
+    "module_id": "18",
+    "module_title": "",
+    "topic_id": "repository-dao-pattern",
+    "summary": "Decoupling domain business logic from database persistence layers.",
+    "tags": [
+      "",
+      "Repository & Data Access Object (DAO) Patterns",
+      "Module 18",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Service Locator vs Dependency Injection (Module 18)",
+    "url": "/module/18#service-locator-di",
+    "type": "topic",
+    "module_id": "18",
+    "module_title": "",
+    "topic_id": "service-locator-di",
+    "summary": "Comparing Dependency Injection and Service Locator: Why DI is superior for testability and explicit dependencies.",
+    "tags": [
+      "",
+      "Service Locator vs Dependency Injection",
+      "Module 18"
+    ]
+  },
+  {
+    "title": "Parking Lot System (Beginner) (Module 19)",
+    "url": "/module/19#parking-lot-system",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "parking-lot-system",
+    "summary": "A multi-level parking lot system managing distinct vehicle types, parking spot allocation strategies, multi-floor navigation, real-time availability tracking, and automated ticket/fee calculation.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Parking Lot System (Beginner)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Elevator System (Beginner) (Module 19)",
+    "url": "/module/19#elevator-system",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "elevator-system",
+    "summary": "A multi-elevator dispatching and controller system managing hall calls (external floor buttons), car calls (internal floor buttons), direction scheduling (SCAN / LOOK algorithm), and door safety inter...",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Elevator System (Beginner)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Vending Machine System (Beginner) (Module 19)",
+    "url": "/module/19#vending-machine-system",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "vending-machine-system",
+    "summary": "A state-driven automated snack and beverage dispenser managing inventory, currency acceptance, exact change calculation, product dispensing, and transaction rollbacks.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Vending Machine System (Beginner)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Splitwise / Expense Sharing App (Intermediate) (Module 19)",
+    "url": "/module/19#splitwise-expense-manager",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "splitwise-expense-manager",
+    "summary": "A collaborative expense-sharing and balance settlement engine supporting multiple split strategies (Equal, Exact, Percentage, Shares) and graph-based debt simplification.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Splitwise / Expense Sharing App (Intermediate)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Movie Ticket Booking System (Intermediate) (Module 19)",
+    "url": "/module/19#movie-ticket-booking-bookmyshow",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "movie-ticket-booking-bookmyshow",
+    "summary": "A high-concurrency seat reservation and movie ticketing platform managing multiplex cinema halls, show timings, transient seat locking (10-minute hold), and payment confirmations.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Movie Ticket Booking System (Intermediate)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Ride Sharing System (Intermediate) (Module 19)",
+    "url": "/module/19#ride-sharing-uber-ola",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "ride-sharing-uber-ola",
+    "summary": "A location-based dynamic dispatch and ride-hailing service managing geospatial driver location updates, nearest-driver matching, surge pricing, and trip lifecycle state.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Ride Sharing System (Intermediate)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Thread-safe LRU Cache (Advanced) (Module 19)",
+    "url": "/module/19#in-memory-lru-cache",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "in-memory-lru-cache",
+    "summary": "A high-performance in-memory key-value cache combining $O(1)$ Hash Map lookups with a Doubly Linked List for Least-Recently-Used eviction, protected by fine-grained thread synchronization.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Thread-safe LRU Cache (Advanced)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Rate Limiter System (Advanced) (Module 19)",
+    "url": "/module/19#rate-limiter-system",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "rate-limiter-system",
+    "summary": "A high-throughput API throttling and traffic-shaping component implementing Token Bucket, Leaky Bucket, and Sliding Window Log algorithms to prevent DDoS and API abuse.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Rate Limiter System (Advanced)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Pub/Sub In-Memory Message Queue (Advanced) (Module 19)",
+    "url": "/module/19#pub-sub-message-queue",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "pub-sub-message-queue",
+    "summary": "A thread-safe in-memory publish-subscribe broker supporting multiple topics, concurrent consumer groups, message offset tracking, and asynchronous dispatch.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Pub/Sub In-Memory Message Queue (Advanced)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Stock Trading Matching Order Book (Advanced) (Module 19)",
+    "url": "/module/19#stock-order-book",
+    "type": "topic",
+    "module_id": "19",
+    "module_title": "Real-World LLD Problem Library",
+    "topic_id": "stock-order-book",
+    "summary": "An ultra-low-latency financial matching engine organizing Buy (Bids) and Sell (Asks) orders by Price-Time Priority and executing trades at matching price points.",
+    "tags": [
+      "Real-World LLD Problem Library",
+      "Stock Trading Matching Order Book (Advanced)",
+      "Module 19"
+    ]
+  },
+  {
+    "title": "Cache Locality & Data-Oriented Design vs OOP (Module 20)",
+    "url": "/module/20#cache-locality-data-oriented-design",
+    "type": "topic",
+    "module_id": "20",
+    "module_title": "Advanced Low-Level Design & Scaling",
+    "topic_id": "cache-locality-data-oriented-design",
+    "summary": "Data-Oriented Design (DOD) prioritizes the layout of data in hardware memory (L1/L2/L3 caches) to maximize cache hits, contrasting traditional OOP (Array of Structures - AoS) with Structure of Arrays ...",
+    "tags": [
+      "Advanced Low-Level Design & Scaling",
+      "Cache Locality & Data-Oriented Design vs OOP",
+      "Module 20"
+    ]
+  },
+  {
+    "title": "Lock-free SPSC Ring Buffer Design (Module 20)",
+    "url": "/module/20#lock-free-spsc-queue",
+    "type": "topic",
+    "module_id": "20",
+    "module_title": "Advanced Low-Level Design & Scaling",
+    "topic_id": "lock-free-spsc-queue",
+    "summary": "A Single-Producer Single-Consumer (SPSC) circular queue utilizing atomic head/tail indices and memory order fences (Acquire-Release) to achieve wait-free, zero-lock IPC and inter-thread messaging.",
+    "tags": [
+      "Advanced Low-Level Design & Scaling",
+      "Lock-free SPSC Ring Buffer Design",
+      "Module 20"
+    ]
+  },
+  {
+    "title": "Zero-Copy Buffer Abstractions (Module 20)",
+    "url": "/module/20#zero-copy-buffer-abstractions",
+    "type": "topic",
+    "module_id": "20",
+    "module_title": "Advanced Low-Level Design & Scaling",
+    "topic_id": "zero-copy-buffer-abstractions",
+    "summary": "Designing network and file I/O abstractions (`std::string_view`, `std::span`, scatter-gather I/O) that inspect and slice data without copying bytes across user and kernel memory spaces.",
+    "tags": [
+      "Advanced Low-Level Design & Scaling",
+      "Zero-Copy Buffer Abstractions",
+      "Module 20"
+    ]
+  },
+  {
+    "title": "The 14-Step Systematic Interview Roadmap (Module 21)",
+    "url": "/module/21#the-14-step-interview-process",
+    "type": "topic",
+    "module_id": "21",
+    "module_title": "14-Step LLD Interview Framework",
+    "topic_id": "the-14-step-interview-process",
+    "summary": "A battle-tested, structured 45-minute execution blueprint designed to navigate any ambiguous Low-Level Design interview smoothly from problem definition to working modern C++ code.",
+    "tags": [
+      "14-Step LLD Interview Framework",
+      "The 14-Step Systematic Interview Roadmap",
+      "Module 21"
+    ]
+  },
+  {
+    "title": "Step 1-4: Clarification & Domain Decomposition (Module 21)",
+    "url": "/module/21#clarifying-functional-and-non-functional",
+    "type": "topic",
+    "module_id": "21",
+    "module_title": "14-Step LLD Interview Framework",
+    "topic_id": "clarifying-functional-and-non-functional",
+    "summary": "Techniques for asking probing questions to define precise system boundaries, distinguish functional from non-functional requirements, and establish entity vocabularies.",
+    "tags": [
+      "14-Step LLD Interview Framework",
+      "Step 1-4: Clarification & Domain Decomposition",
+      "Module 21"
+    ]
+  },
+  {
+    "title": "Step 5-9: Drawing Class & Sequence Diagrams Live (Module 21)",
+    "url": "/module/21#designing-clean-diagrams-live",
+    "type": "topic",
+    "module_id": "21",
+    "module_title": "14-Step LLD Interview Framework",
+    "topic_id": "designing-clean-diagrams-live",
+    "summary": "Visualizing domain models rapidly using standard UML class notations (attributes, methods, visibility), relationships (Inheritance, Composition, Aggregation, Association), and interaction sequence dia...",
+    "tags": [
+      "14-Step LLD Interview Framework",
+      "Step 5-9: Drawing Class & Sequence Diagrams Live",
+      "Module 21"
+    ]
+  },
+  {
+    "title": "Step 10-14: Live C++ Coding & Concurrency Defense (Module 21)",
+    "url": "/module/21#writing-idiomatic-cpp-live",
+    "type": "topic",
+    "module_id": "21",
+    "module_title": "14-Step LLD Interview Framework",
+    "topic_id": "writing-idiomatic-cpp-live",
+    "summary": "Executing the live coding phase cleanly using modern C++20 idioms: RAII, smart pointer ownership, const-correctness, thread safety guarantees, and defending design choices against edge cases.",
+    "tags": [
+      "14-Step LLD Interview Framework",
+      "Step 10-14: Live C++ Coding & Concurrency Defense",
+      "Module 21",
+      "C++"
+    ]
+  },
+  {
+    "title": "Practice 1: Tic-Tac-Toe Game Engine (Module 22)",
+    "url": "/module/22#practice-tic-tac-toe",
+    "type": "topic",
+    "module_id": "22",
+    "module_title": "Interactive LLD Practice Sandbox",
+    "topic_id": "practice-tic-tac-toe",
+    "summary": "An interactive $N \\times N$ multiplayer Tic-Tac-Toe game engine supporting customizable board sizes, arbitrary winning streak rules ($K$ in a row), Undo/Redo moves via Command Pattern, and AI bot play...",
+    "tags": [
+      "Interactive LLD Practice Sandbox",
+      "Practice 1: Tic-Tac-Toe Game Engine",
+      "Module 22"
+    ]
+  },
+  {
+    "title": "Practice 2: Snake & Ladder Multiplayer Game (Module 22)",
+    "url": "/module/22#practice-snake-and-ladder",
+    "type": "topic",
+    "module_id": "22",
+    "module_title": "Interactive LLD Practice Sandbox",
+    "topic_id": "practice-snake-and-ladder",
+    "summary": "A complete multiplayer board game simulation featuring variable board sizes, snake and ladder jump mappings, multi-dice rolling strategies, and winner ranking.",
+    "tags": [
+      "Interactive LLD Practice Sandbox",
+      "Practice 2: Snake & Ladder Multiplayer Game",
+      "Module 22"
+    ]
+  },
+  {
+    "title": "Practice 3: Multi-recipe Coffee Machine (Module 22)",
+    "url": "/module/22#practice-coffee-machine",
+    "type": "topic",
+    "module_id": "22",
+    "module_title": "Interactive LLD Practice Sandbox",
+    "topic_id": "practice-coffee-machine",
+    "summary": "An interactive smart coffee brewing system managing raw ingredient inventory (water, milk, coffee beans), recipe customization, dynamic price calculation, and parallel brewing dispensers.",
+    "tags": [
+      "Interactive LLD Practice Sandbox",
+      "Practice 3: Multi-recipe Coffee Machine",
+      "Module 22"
+    ]
+  },
+  {
+    "title": "Practice 4: Asynchronous Logging Framework (Module 22)",
+    "url": "/module/22#practice-logging-framework",
+    "type": "topic",
+    "module_id": "22",
+    "module_title": "Interactive LLD Practice Sandbox",
+    "topic_id": "practice-logging-framework",
+    "summary": "A high-throughput non-blocking asynchronous logging framework buffering log events in memory and flushing to multiple sinks (Console, File, Socket) via a dedicated background worker thread.",
+    "tags": [
+      "Interactive LLD Practice Sandbox",
+      "Practice 4: Asynchronous Logging Framework",
+      "Module 22"
+    ]
+  },
+  {
+    "title": "C++ OOP & Memory Interview Questions (Module 23)",
+    "url": "/module/23#cpp-oop-interview-questions",
+    "type": "topic",
+    "module_id": "23",
+    "module_title": "Curated LLD Interview Question Bank",
+    "topic_id": "cpp-oop-interview-questions",
+    "summary": "High-yield interview questions probing object layout, virtual tables, dynamic casting, object slicing, RAII, and custom memory management in C++.",
+    "tags": [
+      "Curated LLD Interview Question Bank",
+      "C++ OOP & Memory Interview Questions",
+      "Module 23",
+      "C++"
+    ]
+  },
+  {
+    "title": "SOLID Principles Interview Questions (Module 23)",
+    "url": "/module/23#solid-interview-questions",
+    "type": "topic",
+    "module_id": "23",
+    "module_title": "Curated LLD Interview Question Bank",
+    "topic_id": "solid-interview-questions",
+    "summary": "Curated questions and deep technical trade-off scenarios on Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion in C++.",
+    "tags": [
+      "Curated LLD Interview Question Bank",
+      "SOLID Principles Interview Questions",
+      "Module 23",
+      "SOLID"
+    ]
+  },
+  {
+    "title": "Design Patterns & Trade-offs Questions (Module 23)",
+    "url": "/module/23#design-patterns-interview-questions",
+    "type": "topic",
+    "module_id": "23",
+    "module_title": "Curated LLD Interview Question Bank",
+    "topic_id": "design-patterns-interview-questions",
+    "summary": "Deep-dive questions comparing creational, structural, and behavioral patterns: Factory vs Abstract Factory, Strategy vs State, Observer vs Pub/Sub, and Decorator vs Adapter.",
+    "tags": [
+      "Curated LLD Interview Question Bank",
+      "Design Patterns & Trade-offs Questions",
+      "Module 23",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "Concurrency & Multi-threading LLD Questions (Module 23)",
+    "url": "/module/23#concurrency-interview-questions",
+    "type": "topic",
+    "module_id": "23",
+    "module_title": "Curated LLD Interview Question Bank",
+    "topic_id": "concurrency-interview-questions",
+    "summary": "Advanced questions on deadlocks, race conditions, memory models, reader-writer locking, double-checked locking, and thread pool starvation in C++.",
+    "tags": [
+      "Curated LLD Interview Question Bank",
+      "Concurrency & Multi-threading LLD Questions",
+      "Module 23",
+      "Concurrency"
+    ]
+  },
+  {
+    "title": "Top 20 Critical C++ Interview Traps (Module 23)",
+    "url": "/module/23#top-interview-traps",
+    "type": "topic",
+    "module_id": "23",
+    "module_title": "Curated LLD Interview Question Bank",
+    "topic_id": "top-interview-traps",
+    "summary": "The definitive compilation of subtle C++ traps, undefined behaviors, and design anti-patterns that frequently catch candidates off-guard in technical rounds.",
+    "tags": [
+      "Curated LLD Interview Question Bank",
+      "Top 20 Critical C++ Interview Traps",
+      "Module 23"
+    ]
+  },
+  {
+    "title": "SOLID Quick Reference Matrix (Module 24)",
+    "url": "/module/24#solid-cheat-sheet",
+    "type": "topic",
+    "module_id": "24",
+    "module_title": "Quick Revision Cheat Sheets",
+    "topic_id": "solid-cheat-sheet",
+    "summary": "A 1-page condensed review cheat sheet of the 5 SOLID design principles with violation symptoms and immediate modern C++ refactoring remedies.",
+    "tags": [
+      "Quick Revision Cheat Sheets",
+      "SOLID Quick Reference Matrix",
+      "Module 24",
+      "SOLID"
+    ]
+  },
+  {
+    "title": "Design Pattern Selection Decision Tree (Module 24)",
+    "url": "/module/24#design-pattern-decision-tree",
+    "type": "topic",
+    "module_id": "24",
+    "module_title": "Quick Revision Cheat Sheets",
+    "topic_id": "design-pattern-decision-tree",
+    "summary": "A visual and conceptual decision tree mapping any system design problem directly to the optimal GoF design pattern.",
+    "tags": [
+      "Quick Revision Cheat Sheets",
+      "Design Pattern Selection Decision Tree",
+      "Module 24",
+      "Design Patterns"
+    ]
+  },
+  {
+    "title": "UML Relationships & C++ Code Mappings (Module 24)",
+    "url": "/module/24#uml-relationship-cheat-sheet",
+    "type": "topic",
+    "module_id": "24",
+    "module_title": "Quick Revision Cheat Sheets",
+    "topic_id": "uml-relationship-cheat-sheet",
+    "summary": "Visual cheat sheet mapping every UML arrow symbol (Dependency, Association, Aggregation, Composition, Generalization, Realization) to exact C++20 pointer and reference code.",
+    "tags": [
+      "Quick Revision Cheat Sheets",
+      "UML Relationships & C++ Code Mappings",
+      "Module 24"
+    ]
+  },
+  {
+    "title": "Smart Pointers Ownership Cheat Sheet (Module 24)",
+    "url": "/module/24#smart-pointer-lifecycle-cheat-sheet",
+    "type": "topic",
+    "module_id": "24",
+    "module_title": "Quick Revision Cheat Sheets",
+    "topic_id": "smart-pointer-lifecycle-cheat-sheet",
+    "summary": "Fast-reference guide for modern C++ smart pointer ownership semantics: `unique_ptr`, `shared_ptr`, `weak_ptr`, and custom deleters.",
+    "tags": [
+      "Quick Revision Cheat Sheets",
+      "Smart Pointers Ownership Cheat Sheet",
+      "Module 24"
+    ]
+  },
+  {
+    "title": "C++ Concurrency & Thread Safety Rules (Module 24)",
+    "url": "/module/24#concurrency-safety-cheat-sheet",
+    "type": "topic",
+    "module_id": "24",
+    "module_title": "Quick Revision Cheat Sheets",
+    "topic_id": "concurrency-safety-cheat-sheet",
+    "summary": "A 1-page condensed reference of C++ concurrency primitives: `std::mutex`, `std::shared_mutex`, `std::atomic`, memory orders, and condition variable idioms.",
+    "tags": [
+      "Quick Revision Cheat Sheets",
+      "C++ Concurrency & Thread Safety Rules",
+      "Module 24",
+      "Concurrency"
+    ]
+  },
+  {
+    "title": "14-Step Systematic LLD Interview Roadmap",
+    "url": "/interview-framework",
+    "type": "guide",
+    "module_id": "21",
+    "module_title": "14-Step LLD Interview Framework",
+    "topic_id": "the-14-step-interview-process",
+    "summary": "Master the repeatable 14-step battle-tested interview roadmap from requirement gathering to clean C++ code.",
+    "tags": [
+      "Interview",
+      "Framework",
+      "Roadmap",
+      "Process"
+    ]
+  },
+  {
+    "title": "Quick Revision Cheat Sheets (SOLID, Patterns, UML, Pointers, Mutexes)",
+    "url": "/cheat-sheets",
+    "type": "cheatsheet",
+    "module_id": "24",
+    "module_title": "Quick Revision Cheat Sheets",
+    "topic_id": "solid-cheat-sheet",
+    "summary": "High-yield summary sheets for fast revision before tech interviews: SOLID matrix, Pattern decision tree, UML cheat sheet, Smart Pointers, Concurrency.",
+    "tags": [
+      "Cheat Sheet",
+      "SOLID",
+      "Patterns",
+      "UML",
+      "Smart Pointers",
+      "Mutex"
+    ]
+  },
+  {
+    "title": "Interactive Modern C++ LLD Playground",
+    "url": "/playground",
+    "type": "playground",
+    "module_id": "00",
+    "module_title": "Interactive Playground",
+    "topic_id": "playground",
+    "summary": "Interactive C++ design sandbox with preset design patterns (Singleton, Strategy, Observer, Factory, State, ThreadSafe LRU Cache).",
+    "tags": [
+      "Playground",
+      "Sandbox",
+      "Interactive",
+      "C++"
+    ]
+  }
+]

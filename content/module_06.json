@@ -1,0 +1,696 @@
+{
+  "module_id": "06",
+  "title": "SOLID Principles in C++",
+  "level": "Intermediate",
+  "category": "Principles",
+  "description": "Comprehensive study of S.O.L.I.D. principles in modern C++ with code smells, anti-patterns, and interactive before-vs-after refactoring architectures.",
+  "topics": [
+    {
+      "id": "srp",
+      "title": "Single Responsibility Principle (SRP)",
+      "description": "A class should have one, and only one, reason to change. Separating business logic, persistence, formatting, and validation.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Single Responsibility Principle (SRP)</strong> states: <em>'A class should have one, and only one, reason to change.'</em> Each class should encapsulate a single, focused responsibility.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>When a class handles multiple responsibilities (e.g., calculating taxes, saving to SQL, and printing HTML receipts), modifying one feature risks breaking all unrelated features.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Separate domain business rules from persistence, reporting, and notification mechanisms.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Split 'God classes' into cohesive cooperating entities: <code>Invoice</code> (business data & calculations), <code>InvoiceRepository</code> (database persistence), and <code>InvoicePrinter</code> (formatting).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>SRP Decomposition Flow:</p>",
+          "callout": {
+            "type": "important",
+            "title": "SRP Decomposition",
+            "text": "Before: Order Class [Calculate Total + Save to MySQL + Send SMTP Email + Generate PDF] (4 reasons to change!)\\nAfter: Order (Data) + PricingCalculator + OrderRepository + NotificationService + InvoiceFormatter (1 reason each)."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Refactoring Violation into Clean SRP Architecture:</p>",
+          "code_example": {
+            "filename": "srp_refactoring.cpp",
+            "code": "#include <iostream>\n#include <string>\n#include <vector>\n\n// 1. Entity responsible ONLY for holding Order Data & Invariants\nclass Order {\npublic:\n    std::string orderId;\n    double amount;\n    Order(std::string id, double amt) : orderId(std::move(id)), amount(amt) {}\n};\n\n// 2. Class responsible ONLY for Tax Calculation\nclass TaxCalculator {\npublic:\n    static double calculateTotalWithTax(const Order& order, double taxRate) {\n        return order.amount * (1.0 + taxRate);\n    }\n};\n\n// 3. Class responsible ONLY for Database Persistence\nclass OrderRepository {\npublic:\n    void saveToDatabase(const Order& order) {\n        std::cout << \"[DB] Saved order \" << order.orderId << \" to PostgreSQL.\\n\";\n    }\n};\n\n// 4. Class responsible ONLY for Invoice Rendering\nclass InvoicePrinter {\npublic:\n    void printHtmlReceipt(const Order& order, double total) {\n        std::cout << \"<div class='receipt'>Order #\" << order.orderId \n                  << \": $\" << total << \"</div>\\n\";\n    }\n};\n\nint main() {\n    Order order{\"ORD-101\", 100.0};\n    double total = TaxCalculator::calculateTotalWithTax(order, 0.08);\n    \n    OrderRepository repo;\n    repo.saveToDatabase(order);\n\n    InvoicePrinter printer;\n    printer.printHtmlReceipt(order, total);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 6-11:</strong> <code>Order</code> only holds state.<br><strong>Lines 14-19:</strong> Tax logic can change without touching database code.<br><strong>Lines 22-27:</strong> Database engine can switch to MongoDB without touching HTML templates.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Layered microservice architecture (Controller -&gt; Service -&gt; Repository -&gt; Serializer).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Always design classes around a single cohesive domain responsibility.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not create 10 micro-classes for a trivial 5-line script (avoid premature over-fragmentation).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>High cohesion, easy unit testing, low merge conflicts in team codebases.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Increases the total number of class files.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>SRP in Domain-Driven Design (Entities, Value Objects, Repositories, Domain Services).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Creating a 'Manager' or 'Helper' class that accumulates dozens of unrelated tasks (God Class smell).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is a code smell that indicates a violation of SRP?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> A class that imports both database libraries (e.g., SQL/Redis) and formatting/presentation libraries (e.g., JSON/HTML), or a class with constructor parameters from unrelated domain contexts.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Refactor a flawed <code>UserAccount</code> that validates passwords, connects to MySQL, and sends SMTP emails into 3 SRP-compliant classes.</p>",
+          "refactor": {
+            "title": "SRP UserAccount Refactoring",
+            "problemSummary": "UserAccount handles credentials, database persistence, and email delivery.",
+            "violations": [
+              "Multiple reasons to change",
+              "Tightly coupled to MySQL and SMTP"
+            ],
+            "badCode": {
+              "filename": "bad_srp_user.cpp",
+              "code": "class BadUserAccount {\npublic:\n    void saveToMySQL() {}\n    void sendWelcomeEmail() {}\n    void calculatePasswordHash() {}\n};"
+            },
+            "goodCode": {
+              "filename": "clean_srp_user.cpp",
+              "code": "class UserAccount { /* State only */ };\nclass UserRepository { public: void save(const UserAccount&) {} };\nclass EmailNotificationService { public: void sendWelcome(const UserAccount&) {} };"
+            },
+            "benefits": [
+              "Database changes do not affect email logic",
+              "100% testable"
+            ]
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>SRP ensures that changes to one subsystem never introduce regressions into unrelated business logic.</p>"
+        }
+      ]
+    },
+    {
+      "id": "ocp",
+      "title": "Open/Closed Principle (OCP)",
+      "description": "Software entities should be open for extension, but closed for modification. Leveraging polymorphism to add new features without altering tested code.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Open/Closed Principle (OCP)</strong> states: <em>'Software entities (classes, modules, functions) should be open for extension, but closed for modification.'</em></p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Modifying tested production classes to add new features risks introducing regressions and requires re-testing the entire application.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Add new behavior by writing <strong>new subclasses or strategy implementations</strong>, not by editing existing <code>if-else</code> or <code>switch</code> chains.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Define abstract interfaces. When a new requirement arrives (e.g. Adding Crypto payment to CreditCard and PayPal), create a new class implementing the interface without modifying the payment dispatcher.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>OCP Architecture:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "OCP in Action",
+            "text": "Closed: PaymentProcessor::pay(IPaymentStrategy& method)\\nOpen: class ApplePay : public IPaymentStrategy (Zero changes to PaymentProcessor!)"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Extensible Discount Calculation Engine obeying OCP:</p>",
+          "code_example": {
+            "filename": "ocp_discount_engine.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <vector>\n\n// Abstract Discount Strategy Interface\nclass IDiscountStrategy {\npublic:\n    virtual ~IDiscountStrategy() = default;\n    virtual double applyDiscount(double rawPrice) const = 0;\n};\n\n// Concrete Discount 1: Flat 10%\nclass PercentageDiscount : public IDiscountStrategy {\n    double percentage;\npublic:\n    explicit PercentageDiscount(double pct) : percentage(pct) {}\n    double applyDiscount(double rawPrice) const override {\n        return rawPrice * (1.0 - percentage / 100.0);\n    }\n};\n\n// Concrete Discount 2: Flat $20 off\nclass FlatVoucherDiscount : public IDiscountStrategy {\n    double discountAmount;\npublic:\n    explicit FlatVoucherDiscount(double amt) : discountAmount(amt) {}\n    double applyDiscount(double rawPrice) const override {\n        return std::max(0.0, rawPrice - discountAmount);\n    }\n};\n\n// EXTENSION: Added Black Friday VIP discount with ZERO changes to existing classes!\nclass BlackFridayVipDiscount : public IDiscountStrategy {\npublic:\n    double applyDiscount(double rawPrice) const override {\n        return rawPrice * 0.50; // 50% off\n    }\n};\n\n// Checkout Engine is CLOSED for modification, OPEN for extension!\nclass CheckoutEngine {\npublic:\n    static double calculateFinal(double price, const IDiscountStrategy& strategy) {\n        return strategy.applyDiscount(price);\n    }\n};\n\nint main() {\n    double basePrice = 200.0;\n    BlackFridayVipDiscount vipDiscount;\n    std::cout << \"Final VIP Price: $\" << CheckoutEngine::calculateFinal(basePrice, vipDiscount) << \"\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Line 32:</strong> <code>BlackFridayVipDiscount</code> was added as a new class. <code>CheckoutEngine</code> required zero modifications.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Plugin architectures (Chrome extensions, VS Code language servers, audio VST plugins).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use whenever new variants of a business rule (tax rates, discounts, payment types) are expected to grow over time.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not create abstract hierarchies for static constants that will never vary.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Zero risk of regression bugs in existing, tested code.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires up-front abstraction design.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Strategy Pattern OCP, Template Method OCP, Plugin/Registry OCP.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Modifying a base class and breaking all existing derived subclasses.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does OCP relate to the Strategy and Factory design patterns?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> The Strategy pattern provides the polymorphic extension points for OCP, while the Factory pattern isolates the creation of those strategies in a single location, keeping client business logic closed for modification.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Design a <code>NotificationManager</code> that adheres to OCP when adding Discord and Telegram alerts.</p>",
+          "practice": {
+            "title": "OCP Notification Manager",
+            "problemStatement": "Build notification manager that accepts new channels without modifications.",
+            "requirements": [
+              "INotificationChannel interface",
+              "NotificationManager broadcast"
+            ],
+            "constraints": [
+              "Zero switch-cases"
+            ],
+            "hint": "Loop over vector of INotificationChannel shared_ptr.",
+            "expectedEntities": [
+              {
+                "name": "NotificationManager",
+                "responsibility": "Broadcasts notifications."
+              }
+            ],
+            "referenceCode": {
+              "filename": "ocp_notif.cpp",
+              "code": "#include <vector>\n#include <memory>\nclass INotificationChannel { public: virtual ~INotificationChannel() = default; virtual void send() = 0; };\nclass NotificationManager {\n    std::vector<std::shared_ptr<INotificationChannel>> channels;\npublic:\n    void addChannel(std::shared_ptr<INotificationChannel> c) { channels.push_back(c); }\n    void notifyAll() { for(auto& c : channels) c->send(); }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>OCP allows systems to grow organically by writing new classes rather than hacking existing ones.</p>"
+        }
+      ]
+    },
+    {
+      "id": "lsp",
+      "title": "Liskov Substitution Principle (LSP)",
+      "description": "Subtypes must be substitutable for their base types without altering system correctness or violating preconditions/postconditions.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Liskov Substitution Principle (LSP)</strong> states: <em>'If S is a subtype of T, then objects of type T may be replaced with objects of type S without altering any of the desirable properties of the program.'</em></p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Inheritance without LSP leads to runtime crashes where derived classes throw unexpected exceptions or violate base class contracts (e.g. The classic Square-Rectangle dilemma).</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Derived classes must fulfill the base class contract completely. Preconditions cannot be strengthened; postconditions cannot be weakened; invariants must be preserved.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>A <code>Square</code> is mathematically a rectangle, but in object-oriented programming, setting <code>width</code> independently of <code>height</code> is a base invariant of <code>Rectangle</code>. <code>Square</code> breaks this invariant, so <code>Square</code> MUST NOT inherit from <code>Rectangle</code>!</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>The Classic Square-Rectangle LSP Violation:</p>",
+          "callout": {
+            "type": "trap",
+            "title": "The Square-Rectangle Trap",
+            "text": "void resize(Rectangle& r) { r.setWidth(5); r.setHeight(10); assert(r.getArea() == 50); }\\nIf a Square is passed: setHeight(10) also changes width to 10 -> Area becomes 100 -> Assertion FAILS! LSP is violated."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Refactoring the Square-Rectangle Dilemma to Obey LSP:</p>",
+          "code_example": {
+            "filename": "lsp_square_rectangle.cpp",
+            "code": "#include <iostream>\n#include <cassert>\n\n// Abstract Shape Contract: Focuses on what both truly share (Area)\nclass IShape {\npublic:\n    virtual ~IShape() = default;\n    virtual double getArea() const = 0;\n};\n\n// Rectangle maintains independent width and height\nclass Rectangle : public IShape {\nprivate:\n    double width, height;\npublic:\n    Rectangle(double w, double h) : width(w), height(h) {}\n    void setWidth(double w) { width = w; }\n    void setHeight(double h) { height = h; }\n    double getArea() const override { return width * height; }\n};\n\n// Square maintains equal side length independently (NOT derived from Rectangle!)\nclass Square : public IShape {\nprivate:\n    double side;\npublic:\n    explicit Square(double s) : side(s) {}\n    void setSide(double s) { side = s; }\n    double getArea() const override { return side * side; }\n};\n\nvoid verifyAreaCalculation(const IShape& shape) {\n    // 100% LSP Compliant: Any IShape subtype behaves predictably!\n    std::cout << \"Computed Area: \" << shape.getArea() << \"\\n\";\n}\n\nint main() {\n    Rectangle rect{5.0, 10.0};\n    Square sq{4.0};\n\n    verifyAreaCalculation(rect); // Output: 50\n    verifyAreaCalculation(sq);   // Output: 16\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 5-9:</strong> <code>IShape</code> defines the common denominator.<br><strong>Lines 12 & 23:</strong> <code>Rectangle</code> and <code>Square</code> both implement <code>IShape</code> independently without corrupting each other's setter contracts.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Read-only file descriptors vs Read-Write file streams in OS virtual file systems.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Always test derived class behavior against base class expectations before creating inheritance links.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Never subclass just to reuse code if the subclass violates any base method contract.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Guarantees safe polymorphic substitution without surprise exceptions.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires rethinking intuitive real-world taxonomies that do not hold in software contracts.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Contract Invariants, Precondition rules, Postcondition rules.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Overriding a base method to throw <code>NotSupportedException</code>.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> If a derived class overrides a virtual method and throws <code>std::runtime_error(\"Not supported\")</code>, is LSP violated?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Yes, absolutely. If the base class contract guarantees that the method succeeds or performs an action, throwing an unsupported exception in a derived class breaks caller expectations and violates LSP. The interface should be segregated instead.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Refactor a <code>ReadOnlyFile</code> that throws on <code>write()</code> into segregated <code>IReadable</code> and <code>IWritable</code> interfaces.</p>",
+          "refactor": {
+            "title": "File System LSP Refactoring",
+            "problemSummary": "ReadOnlyFile inherits File and throws on write(), violating LSP.",
+            "violations": [
+              "Subtype cannot substitute for base File",
+              "Throws unexpected exception"
+            ],
+            "badCode": {
+              "filename": "bad_file_lsp.cpp",
+              "code": "class File { public: virtual void write() {} };\nclass ReadOnlyFile : public File {\npublic:\n    void write() override { throw std::runtime_error(\"Cannot write to read-only file!\"); }\n};"
+            },
+            "goodCode": {
+              "filename": "clean_file_lsp.cpp",
+              "code": "class IReadable { public: virtual void read() = 0; };\nclass IWritable { public: virtual void write() = 0; };\nclass ReadOnlyFile : public IReadable { public: void read() override {} };\nclass ReadWriteFile : public IReadable, public IWritable { public: void read() override {} void write() override {} };"
+            },
+            "benefits": [
+              "Zero runtime exceptions",
+              "Complete type safety"
+            ]
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>LSP guarantees that derived classes honor the contracts established by their base abstractions.</p>"
+        }
+      ]
+    },
+    {
+      "id": "isp",
+      "title": "Interface Segregation Principle (ISP)",
+      "description": "Clients should not be forced to depend upon interfaces that they do not use. Designing fine-grained, cohesive role interfaces.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Interface Segregation Principle (ISP)</strong> states: <em>'Clients should not be forced to depend upon interfaces that they do not use.'</em></p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Fat, bloated interfaces force implementers to write empty dummy methods or throw unsupported exceptions, polluting the architecture.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Split 'Fat Interfaces' into small, client-specific role interfaces (e.g. <code>IPrinter</code>, <code>IScanner</code>, <code>IFax</code> instead of one giant <code>IMachine</code>).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Clients depend only on the minimal role interface they require. Concrete classes can implement multiple small interfaces simultaneously via multiple inheritance.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>ISP Decomposition:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Fat Interface vs Role Interfaces",
+            "text": "Fat: IMultiFunctionDevice [print(), scan(), fax(), staple()] (Simple printer forced to implement fax!)\\nSegregated: IPrinter [print()] + IScanner [scan()] + IFax [fax()]. SimplePrinter implements ONLY IPrinter!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Production-Grade ISP Role Interface Design:</p>",
+          "code_example": {
+            "filename": "isp_printer_demo.cpp",
+            "code": "#include <iostream>\n\n// Role Interface 1\nclass IPrinter {\npublic:\n    virtual ~IPrinter() = default;\n    virtual void printDocument() = 0;\n};\n\n// Role Interface 2\nclass IScanner {\npublic:\n    virtual ~IScanner() = default;\n    virtual void scanDocument() = 0;\n};\n\n// Simple Printer implements ONLY IPrinter\nclass SimpleOfficePrinter : public IPrinter {\npublic:\n    void printDocument() override {\n        std::cout << \"[SimplePrinter] Printing black & white document.\\n\";\n    }\n};\n\n// High-end All-in-One Machine implements BOTH role interfaces!\nclass AllInOneSuperMachine : public IPrinter, public IScanner {\npublic:\n    void printDocument() override {\n        std::cout << \"[SuperMachine] High-speed laser printing.\\n\";\n    }\n    void scanDocument() override {\n        std::cout << \"[SuperMachine] 1200 DPI optical scanning.\\n\";\n    }\n};\n\n// Client needing ONLY printing functionality\nvoid executePrintJob(IPrinter& printer) {\n    printer.printDocument();\n}\n\nint main() {\n    SimpleOfficePrinter simple;\n    AllInOneSuperMachine fancy;\n\n    executePrintJob(simple); // Works!\n    executePrintJob(fancy);  // Works seamlessly!\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 4 & 11:</strong> Fine-grained role interfaces.<br><strong>Line 34:</strong> <code>executePrintJob(IPrinter&)</code> requires ONLY printing capabilities, accepting both simple and multi-function hardware.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>C++ standard streams (<code>std::istream</code> for reading, <code>std::ostream</code> for writing, <code>std::iostream</code> combining both).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Always break large interfaces into focused role interfaces.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not create single-method interfaces for operations that are intrinsically coupled and always used together.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Eliminates dummy stub implementations and reduces recompilation cascades.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Increases the number of interface class definitions.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Role Interfaces, Header Interface segregation.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Adding new specialized methods to a general-purpose interface instead of creating a new role interface.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does ISP prevent unnecessary recompilation in C++?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> In C++, if a large header <code>IFatInterface.hpp</code> changes, every translation unit that includes that header must be recompiled. By segregating into small headers (<code>IPrinter.hpp</code>, <code>IScanner.hpp</code>), clients including only <code>IPrinter.hpp</code> are immune to changes in <code>IScanner.hpp</code>, preventing compilation cascades.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Segregate a <code>Worker</code> interface with <code>work()</code> and <code>eat()</code> so that <code>RobotWorker</code> is not forced to implement <code>eat()</code>.</p>",
+          "practice": {
+            "title": "Worker Interface Segregation",
+            "problemStatement": "Segregate Worker into IWorkable and IFeedable.",
+            "requirements": [
+              "IWorkable interface",
+              "IFeedable interface",
+              "RobotWorker implements IWorkable only"
+            ],
+            "constraints": [
+              "Zero dummy methods"
+            ],
+            "hint": "HumanWorker implements both; RobotWorker implements only IWorkable.",
+            "expectedEntities": [
+              {
+                "name": "RobotWorker",
+                "responsibility": "Automated worker."
+              }
+            ],
+            "referenceCode": {
+              "filename": "isp_worker.cpp",
+              "code": "class IWorkable { public: virtual ~IWorkable() = default; virtual void work() = 0; };\nclass IFeedable { public: virtual ~IFeedable() = default; virtual void eat() = 0; };\nclass RobotWorker : public IWorkable { public: void work() override {} };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>ISP keeps interfaces minimal, client-specific, and decoupled.</p>"
+        }
+      ]
+    },
+    {
+      "id": "dip",
+      "title": "Dependency Inversion Principle (DIP)",
+      "description": "High-level modules should not depend upon low-level modules; both should depend upon abstractions. Abstractions should not depend upon details.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Dependency Inversion Principle (DIP)</strong> states:<br>1. High-level modules should not depend upon low-level modules. Both should depend upon abstractions.<br>2. Abstractions should not depend upon details. Details should depend upon abstractions.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Directly binding high-level business rules to low-level hardware or third-party SDKs makes the core business domain brittle, untestable, and impossible to migrate.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Invert the dependency arrow using pure abstract interfaces. High-level policy owns the interface contract; low-level infrastructure implements it.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>High-level <code>PaymentService</code> defines <code>IPaymentGateway</code>. Low-level <code>StripeSDKAdapter</code> implements <code>IPaymentGateway</code>. <code>PaymentService</code> depends only on <code>IPaymentGateway</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Dependency Inversion Diagram:</p>",
+          "diagram": {
+            "title": "Dependency Inversion Architecture",
+            "classes": [
+              {
+                "name": "OrderCheckoutService (High-Level)",
+                "attributes": [
+                  {
+                    "visibility": "-",
+                    "name": "gateway",
+                    "type": "std::shared_ptr<IPaymentGateway>"
+                  }
+                ]
+              },
+              {
+                "name": "IPaymentGateway (Abstract Contract)",
+                "stereotype": "interface",
+                "isInterface": true,
+                "attributes": [],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "charge",
+                    "params": "amount: double",
+                    "returnType": "bool"
+                  }
+                ]
+              },
+              {
+                "name": "StripeGateway (Low-Level Detail)",
+                "attributes": [],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "charge",
+                    "params": "amount: double",
+                    "returnType": "bool override"
+                  }
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "from": "OrderCheckoutService (High-Level)",
+                "to": "IPaymentGateway (Abstract Contract)",
+                "type": "dependency",
+                "label": "depends on abstraction"
+              },
+              {
+                "from": "StripeGateway (Low-Level Detail)",
+                "to": "IPaymentGateway (Abstract Contract)",
+                "type": "inheritance",
+                "label": "implements"
+              }
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Production C++ Dependency Inversion Architecture:</p>",
+          "code_example": {
+            "filename": "dip_checkout_engine.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\n// 1. Abstraction (Owned by High-Level Domain Policy)\nclass IPaymentProcessor {\npublic:\n    virtual ~IPaymentProcessor() = default;\n    virtual bool processTransaction(double amount) = 0;\n};\n\n// 2. High-Level Module: Depends ONLY upon IPaymentProcessor abstraction\nclass CheckoutService {\nprivate:\n    std::shared_ptr<IPaymentProcessor> paymentProcessor;\n\npublic:\n    explicit CheckoutService(std::shared_ptr<IPaymentProcessor> processor)\n        : paymentProcessor(std::move(processor)) {}\n\n    void completePurchase(double total) {\n        std::cout << \"[CheckoutService] Processing purchase of $\" << total << \"...\\n\";\n        if (paymentProcessor->processTransaction(total)) {\n            std::cout << \"[CheckoutService] Purchase successfully completed!\\n\";\n        }\n    }\n};\n\n// 3. Low-Level Detail: Implements abstraction\nclass StripeProcessor : public IPaymentProcessor {\npublic:\n    bool processTransaction(double amount) override {\n        std::cout << \"  [Stripe API v3] Executed credit card charge for $\" << amount << \"\\n\";\n        return true;\n    }\n};\n\nint main() {\n    auto stripe = std::make_shared<StripeProcessor>();\n    CheckoutService checkout(stripe);\n    checkout.completePurchase(199.95);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 6-10:</strong> <code>IPaymentProcessor</code> decouples high-level policy.<br><strong>Line 15:</strong> <code>CheckoutService</code> holds an interface pointer, allowing Stripe, PayPal, or unit test Mocks to be swapped effortlessly.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Clean Architecture / Hexagonal Architecture (Ports and Adapters) in fintech and enterprise trading.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Always apply DIP between high-level business domains and low-level I/O, database, and network services.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not invert dependencies for stable standard library data structures (like <code>std::string</code> or <code>std::vector</code>).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Extreme testability, modularity, and freedom to swap infrastructure technologies.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Adds interface indirection.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Constructor Dependency Inversion, Template-based Static Dependency Inversion.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Instantiating concrete classes with <code>new</code> directly inside high-level service constructors.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between Dependency Inversion Principle (DIP), Dependency Injection (DI), and Inversion of Control (IoC)?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong><br>\u2022 <strong>DIP:</strong> High-level architectural design principle (depend upon abstractions, not details).<br>\u2022 <strong>DI:</strong> Specific implementation pattern for fulfilling DIP (passing dependencies via constructor/setter).<br>\u2022 <strong>IoC:</strong> Broader architectural framework principle where the framework controls execution flow (Hollywood Principle: <em>'Don't call us, we'll call you'</em>).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Apply DIP to decouple a <code>WeatherDashboard</code> from a concrete <code>OpenWeatherMapApi</code> client using an <code>IWeatherDataSource</code> interface.</p>",
+          "practice": {
+            "title": "Weather Dashboard DIP Refactoring",
+            "problemStatement": "Decouple dashboard using IWeatherDataSource.",
+            "requirements": [
+              "IWeatherDataSource interface",
+              "WeatherDashboard depends on interface"
+            ],
+            "constraints": [
+              "Constructor injection"
+            ],
+            "hint": "Pass shared_ptr<IWeatherDataSource> to dashboard.",
+            "expectedEntities": [
+              {
+                "name": "WeatherDashboard",
+                "responsibility": "Displays weather metrics."
+              }
+            ],
+            "referenceCode": {
+              "filename": "weather_dip.cpp",
+              "code": "#include <memory>\nclass IWeatherDataSource { public: virtual ~IWeatherDataSource() = default; virtual double getTemperature() = 0; };\nclass WeatherDashboard {\n    std::shared_ptr<IWeatherDataSource> source;\npublic:\n    explicit WeatherDashboard(std::shared_ptr<IWeatherDataSource> src) : source(std::move(src)) {}\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>DIP creates resilient software architectures where business policy remains independent of volatile infrastructure details.</p>"
+        }
+      ]
+    }
+  ]
+}

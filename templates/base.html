@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ app_title }}{% endblock %}</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/layout.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+  <link rel="stylesheet" href="/static/css/code-editor.css">
+  <link rel="stylesheet" href="/static/css/diagrams.css">
+  <link rel="stylesheet" href="/static/css/animations.css">
+
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="bg-mesh-gradient"></div>
+
+  <div class="app-wrapper">
+    <!-- Collapsible Sidebar -->
+    {% include "components/sidebar.html" %}
+
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      {% include "components/topbar.html" %}
+
+      <!-- Main Content Viewport -->
+      <main class="content-viewport">
+        {% block content %}{% endblock %}
+        {% include "components/footer.html" %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Search Modal Overlay -->
+  {% include "components/search_modal.html" %}
+
+  <!-- Core JavaScript Libraries & Components -->
+  <script src="/static/js/progress.js"></script>
+  <script src="/static/js/search.js"></script>
+  <script src="/static/js/components/code-block.js"></script>
+  <script src="/static/js/components/class-diagram.js"></script>
+  <script src="/static/js/components/animation-player.js"></script>
+  <script src="/static/js/components/comparison-table.js"></script>
+  <script src="/static/js/components/refactor-mode.js"></script>
+  <script src="/static/js/components/practice-mode.js"></script>
+  <script src="/static/js/app.js"></script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

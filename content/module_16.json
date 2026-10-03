@@ -1,0 +1,393 @@
+{
+  "module_id": "16",
+  "title": "API & Interface Design",
+  "level": "Advanced",
+  "category": "Architecture",
+  "description": "Designing intuitive, foolproof, and stable C++ public interfaces, contracts, preconditions, and ABI evolution.",
+  "topics": [
+    {
+      "id": "stable-public-interfaces",
+      "title": "Designing Intuitive & Hard-to-Misuse Interfaces",
+      "description": "Scott Meyers' rule: 'Make interfaces easy to use correctly and hard to use incorrectly.'",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A well-designed public interface uses strong typing, <code>[[nodiscard]]</code>, explicit constructors, and const-correctness to prevent caller misuse at compile time.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Stringly-typed APIs (e.g. <code>setTime(int, int, int)</code> where caller mixes up hours, minutes, and seconds) cause catastrophic production bugs.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Use Strong Types (e.g. <code>Seconds</code>, <code>Milliseconds</code>) instead of raw integers.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Design APIs where invalid states fail to compile.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Strong Typing Defense",
+            "text": "Before: setDuration(1000); // Is it seconds or milliseconds?\\nAfter: setDuration(std::chrono::milliseconds(1000)); // Completely unambiguous!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "strong_type_api.cpp",
+            "code": "#include <iostream>\n#include <chrono>\n\nstruct UserId { explicit UserId(int id) : value(id) {} int value; };\nstruct OrderId { explicit OrderId(int id) : value(id) {} int value; };\n\nclass OrderService {\npublic:\n    // Strong Types prevent passing OrderId where UserId is expected!\n    void cancelOrder(UserId user, OrderId order) {\n        std::cout << \"User #\" << user.value << \" cancelled Order #\" << order.value << \"\\n\";\n    }\n};\n\nint main() {\n    OrderService service;\n    UserId user{42};\n    OrderId order{999};\n\n    service.cancelOrder(user, order);\n    // service.cancelOrder(order, user); // COMPILE ERROR! Cannot mix up arguments!\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Strong types UserId and OrderId prevent parameter ordering bugs at compile time.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Chrono duration types, Financial currency APIs, Embedded GPIO pin configurations.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use strong types whenever an interface accepts multiple parameters of the same primitive type.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not create wrappers for trivial single-argument helper functions.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Eliminates subtle parameter swapping bugs at compile time.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Small amount of boilerplate wrapper struct definitions.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Strong Typedefs, Enum Classes, Chrono Durations, Named Parameters.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Accepting boolean flags (e.g. <code>initialize(true, false, true)</code>) instead of explicit enum options.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is <code>setMode(bool isFast, bool isEncrypted)</code> a bad interface design?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because call sites look like <code>setMode(true, false)</code>, which is completely unreadable and prone to swapping argument order. An enum class (<code>setMode(Speed::FAST, Security::ENCRYPTED)</code>) is self-documenting and foolproof.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Create strong types Latitude and Longitude to prevent coordinate swapping.</p>",
+          "practice": {
+            "title": "Strong Type Coordinates",
+            "problemStatement": "Create strong types Latitude and Longitude to prevent coordinate swapping.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Strong Type Coordinates",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "struct Latitude { double val; }; struct Longitude { double val; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Designing Intuitive & Hard-to-Misuse Interfaces is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "design-by-contract",
+      "title": "Design by Contract (Preconditions, Postconditions, Invariants)",
+      "description": "Formalizing software correctness through preconditions, postconditions, and class invariants.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Design by Contract (DbC)</strong> views software components as collaborating parties fulfilling mutual obligations:<br>\u2022 <strong>Preconditions:</strong> What must be true before calling a method.<br>\u2022 <strong>Postconditions:</strong> What the method guarantees upon return.<br>\u2022 <strong>Invariants:</strong> What must remain true throughout object lifetime.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Unclear contracts lead to defensive code duplication where every function re-validates the same inputs.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>If the caller violates preconditions, the method fails fast (assert / throw). The method guarantees postconditions.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Use <code>assert()</code> for programming bugs and exceptions for runtime environment failures.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Contract Triad",
+            "text": "Precondition: balance >= amount\\nAction: balance -= amount\\nPostcondition: balance == old_balance - amount\\nInvariant: balance >= overdraft_limit"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "design_by_contract.cpp",
+            "code": "#include <iostream>\n#include <cassert>\n\nclass BoundedBuffer {\nprivate:\n    int count{0};\n    const int capacity{10};\n\n    void checkClassInvariants() const {\n        assert(count >= 0 && count <= capacity && \"Invariant Broken: Count out of bounds!\");\n    }\n\npublic:\n    void push() {\n        // Precondition\n        assert(count < capacity && \"Precondition Broken: Buffer is full!\");\n\n        int oldCount = count;\n        ++count; // Action\n\n        // Postcondition & Invariant\n        assert(count == oldCount + 1 && \"Postcondition Broken!\");\n        checkClassInvariants();\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>BoundedBuffer validates preconditions, postconditions, and class invariants.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Mission-critical avionics (Eiffel, Ada), safety-critical automotive systems (AUTOSAR C++).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use DbC thinking in all domain classes to clarify caller vs callee obligations.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not disable precondition checks in production without verified static analysis.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Self-documenting, mathematically verifiable system integrity.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Adds assertion overhead during debug builds.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>C++20/26 Contracts, Assertions, Static Analysis annotations.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Treating precondition bugs as catchable runtime exceptions instead of fixing the caller bug.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between a Precondition violation and a Runtime Exception?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> A <strong>Precondition violation</strong> is a <em>bug in the calling code</em> (should never happen in correct software). A <strong>Runtime Exception</strong> is an <em>unpredictable environmental failure</em> (e.g. disk full, network lost).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement pop() verifying precondition !empty() and postcondition size == old - 1.</p>",
+          "practice": {
+            "title": "Stack Contract Verification",
+            "problemStatement": "Implement pop() verifying precondition !empty() and postcondition size == old - 1.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Stack Contract Verification",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "void pop() { assert(!empty()); --size; }"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Design by Contract (Preconditions, Postconditions, Invariants) is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "backward-compatibility-versioning",
+      "title": "API Evolution, Versioning & Extensibility",
+      "description": "Evolving C++ APIs without breaking existing clients or binary ABI compatibility.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>Techniques for evolving C++ libraries gracefully: Deprecation attributes (<code>[[deprecated]]</code>), default arguments, versioned inline namespaces, and PImpl ABI preservation.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Breaking changes in public APIs force all dependent client projects to rewrite code and recompile.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Never remove or change existing function signatures in minor versions; add overloaded extensions and mark old methods deprecated.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Use <code>inline namespace v2</code> to version APIs seamlessly.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Inline Namespace Versioning",
+            "text": "namespace Lib { inline namespace v2 { class Engine; } namespace v1 { class Engine; } }"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "api_versioning_demo.cpp",
+            "code": "#include <iostream>\n\nnamespace DatabaseLib {\n    // Legacy Version 1\n    namespace v1 {\n        class Connector {\n        public:\n            [[deprecated(\"Use v2::Connector with connection timeout support\")]]\n            void connect() { std::cout << \"[v1] Connected without timeout\\n\"; }\n        };\n    }\n\n    // Modern Version 2 (Default via inline namespace!)\n    inline namespace v2 {\n        class Connector {\n        public:\n            void connect(int timeoutMs = 5000) {\n                std::cout << \"[v2] Connected with timeout: \" << timeoutMs << \"ms\\n\";\n            }\n        };\n    }\n}\n\nint main() {\n    DatabaseLib::Connector modern; // Automatically resolves to v2\n    modern.connect(3000);\n\n    DatabaseLib::v1::Connector legacy; // Explicit v1 access\n    legacy.connect();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Demonstrates seamless API evolution using inline namespace v2 and [[deprecated]] attributes.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Boost C++ libraries, Standard Library versioning, Game engine SDKs.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when publishing reusable libraries used by other development teams.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not over-engineer versioning for internal single-team applications.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Smooth deprecation cycles without abrupt breaking changes.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Maintaining legacy version code increases library footprint.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Inline Namespaces, SemVer, Deprecation Warnings, PImpl ABI firewalls.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Modifying the memory layout of exported classes in minor version library updates (breaking ABI).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How do inline namespaces enable library versioning in C++11?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> An <code>inline namespace</code> makes its members accessible in the enclosing namespace without qualification by default, allowing new versions to be default while keeping older version namespaces explicitly available.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Mark old login() method [[deprecated]] while providing modern login(token).</p>",
+          "practice": {
+            "title": "Deprecated Method Migration",
+            "problemStatement": "Mark old login() method [[deprecated]] while providing modern login(token).",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Deprecated Method Migration",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Auth { public: [[deprecated]] void login(string u, string p); void login(Token t); };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering API Evolution, Versioning & Extensibility is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    }
+  ]
+}

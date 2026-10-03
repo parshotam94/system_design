@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}14-Step LLD Interview Framework - C++ LLD Mastery{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 2.5rem; margin-bottom: 2.5rem;">
+  <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+    <span class="badge badge-interview">Interview Strategy</span>
+    <span class="badge badge-cpp">Battle-Tested Methodology</span>
+  </div>
+  <h1 style="font-size: 2.4rem; color: #fff; margin-bottom: 0.75rem;">The 14-Step LLD Interview Roadmap</h1>
+  <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 850px;">
+    Never get stuck or jump straight into messy code. Follow this structured 45-minute interview roadmap to systematically architect any complex system in C++.
+  </p>
+</div>
+
+<div class="glass-panel" style="padding: 2rem;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+    
+    <div class="glass-panel" style="padding: 1.5rem; border-color: rgba(56, 189, 248, 0.3);">
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.5rem;">PHASE 1: SCOPING (MINUTES 0 - 10)</div>
+      <h4 style="color: #fff; margin-bottom: 0.75rem;">1. Clarify Requirements & Actors</h4>
+      <ul style="margin-left: 1.25rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;">
+        <li><strong>Step 1:</strong> Clarify scope (Core vs Out-of-scope).</li>
+        <li><strong>Step 2:</strong> Identify actors (Admin, Customer, System).</li>
+        <li><strong>Step 3:</strong> List non-functional constraints (Latency, Concurrency, Memory).</li>
+      </ul>
+    </div>
+
+    <div class="glass-panel" style="padding: 1.5rem; border-color: rgba(168, 85, 247, 0.3);">
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-purple); font-weight: 700; margin-bottom: 0.5rem;">PHASE 2: DOMAIN MODELING (MINUTES 10 - 20)</div>
+      <h4 style="color: #fff; margin-bottom: 0.75rem;">2. Entities, Responsibilities & Relationships</h4>
+      <ul style="margin-left: 1.25rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;">
+        <li><strong>Step 4:</strong> Identify tangible domain entities & value objects.</li>
+        <li><strong>Step 5:</strong> Assign single responsibilities (CRC method).</li>
+        <li><strong>Step 6:</strong> Define relationships (Composition vs Aggregation vs Association).</li>
+        <li><strong>Step 7:</strong> Draw live UML Class Diagram.</li>
+      </ul>
+    </div>
+
+    <div class="glass-panel" style="padding: 1.5rem; border-color: rgba(16, 185, 129, 0.3);">
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-emerald); font-weight: 700; margin-bottom: 0.5rem;">PHASE 3: DESIGN PATTERNS & INTERFACES (MINUTES 20 - 30)</div>
+      <h4 style="color: #fff; margin-bottom: 0.75rem;">3. SOLID & Pattern Integration</h4>
+      <ul style="margin-left: 1.25rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;">
+        <li><strong>Step 8:</strong> Design abstract base interfaces (pure virtual = 0).</li>
+        <li><strong>Step 9:</strong> Apply SOLID principles (DIP, OCP, LSP).</li>
+        <li><strong>Step 10:</strong> Select patterns (Strategy for algorithms, Factory for creation, Observer for events).</li>
+      </ul>
+    </div>
+
+    <div class="glass-panel" style="padding: 1.5rem; border-color: rgba(245, 158, 11, 0.3);">
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-amber); font-weight: 700; margin-bottom: 0.5rem;">PHASE 4: C++ CODING & TRADEOFFS (MINUTES 30 - 45)</div>
+      <h4 style="color: #fff; margin-bottom: 0.75rem;">4. Idiomatic C++ & Deep Defense</h4>
+      <ul style="margin-left: 1.25rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;">
+        <li><strong>Step 11:</strong> Implement core classes with smart pointers (`unique_ptr`, `shared_ptr`).</li>
+        <li><strong>Step 12:</strong> Handle edge cases and invalid states (exceptions vs optional).</li>
+        <li><strong>Step 13:</strong> Address concurrency (`std::mutex`, `std::lock_guard`, race prevention).</li>
+        <li><strong>Step 14:</strong> Discuss trade-offs and future extensibility.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,590 @@
+{
+  "module_id": "22",
+  "module_title": "Interactive LLD Practice Sandbox",
+  "description": "Design-This-Yourself interactive challenges with hidden entity checklists, diagrams, and reference C++ solutions.",
+  "topics": [
+    {
+      "id": "practice-tic-tac-toe",
+      "title": "Practice 1: Tic-Tac-Toe Game Engine",
+      "definition": "An interactive $N \\times N$ multiplayer Tic-Tac-Toe game engine supporting customizable board sizes, arbitrary winning streak rules ($K$ in a row), Undo/Redo moves via Command Pattern, and AI bot players.",
+      "why_it_matters": "Frequent warm-up LLD question at Microsoft and Amazon. Tests grid representations, win-checking algorithms in $O(1)$ time, and extensible player strategies.",
+      "real_world_analogy": "Classic paper-and-pencil game generalized to an $N$-dimensional tournament board with move replay logs.",
+      "conceptual_breakdown": [
+        "<strong>Board Entity:</strong> $N \\times N$ grid with row, column, and diagonal counter arrays for $O(1)$ win checking.",
+        "<strong>Player Hierarchy:</strong> <code>HumanPlayer</code> vs <code>BotPlayer</code> (Strategy Pattern).",
+        "<strong>Game State Machine:</strong> <code>IN_PROGRESS</code>, <code>WON</code>, <code>DRAW</code>.",
+        "<strong>Move History:</strong> Command Pattern with <code>makeMove()</code> and <code>undoMove()</code>."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Tic-Tac-Toe Class Diagram",
+        "classes": [
+          {
+            "name": "Board",
+            "is_abstract": false,
+            "attributes": [
+              "- size: int",
+              "- grid: vector<vector<char>>",
+              "- rowCounts: vector<int>",
+              "- colCounts: vector<int>",
+              "- diag: int",
+              "- antiDiag: int"
+            ],
+            "methods": [
+              "+ makeMove(r: int, c: int, piece: char): bool",
+              "+ checkWin(r: int, c: int, piece: char): bool"
+            ]
+          },
+          {
+            "name": "Player",
+            "is_abstract": false,
+            "attributes": [
+              "- name: string",
+              "- piece: char"
+            ],
+            "methods": [
+              "+ getPiece(): char",
+              "+ getName(): string"
+            ]
+          },
+          {
+            "name": "TicTacToeGame",
+            "is_abstract": false,
+            "attributes": [
+              "- board: Board",
+              "- players: deque<Player>",
+              "- status: GameStatus"
+            ],
+            "methods": [
+              "+ playTurn(r: int, c: int): bool"
+            ]
+          }
+        ],
+        "relationships": [
+          {
+            "from": "TicTacToeGame",
+            "to": "Board",
+            "type": "composition",
+            "label": "owns"
+          },
+          {
+            "from": "TicTacToeGame",
+            "to": "Player",
+            "type": "composition",
+            "label": "manages queue"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "Tic-Tac-Toe O(1) Move & Win Check",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Player X places piece at (0, 0). rowCounts[0]++, diag++.",
+            "active_nodes": [
+              "Board",
+              "Player X"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Player O places piece at (1, 1). rowCounts[1]--, diag--.",
+            "active_nodes": [
+              "Board",
+              "Player O"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Player X places at (0, 1) and (0, 2). rowCounts[0] reaches +3 == N.",
+            "active_nodes": [
+              "Win Evaluator"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Game transitions to WON. Player X wins in O(1) check time!",
+            "active_nodes": [
+              "Game Status: WON"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <vector>\n#include <deque>\n#include <string>\n\nenum class Piece { EMPTY, X, O };\n\nclass Board {\nprivate:\n    int n;\n    std::vector<std::vector<Piece>> grid;\n    std::vector<int> rowSum;\n    std::vector<int> colSum;\n    int diagSum{0};\n    int antiDiagSum{0};\n    int movesCount{0};\n\npublic:\n    explicit Board(int size) : n(size), grid(size, std::vector<Piece>(size, Piece::EMPTY)),\n                               rowSum(size, 0), colSum(size, 0) {}\n\n    [[nodiscard]] int getSize() const noexcept { return n; }\n    [[nodiscard]] bool isFull() const noexcept { return movesCount == (n * n); }\n\n    // O(1) Move execution and Win Check\n    bool makeMove(int r, int c, Piece p, bool& outHasWon) {\n        if (r < 0 || r >= n || c < 0 || c >= n || grid[r][c] != Piece::EMPTY) {\n            return false;\n        }\n\n        grid[r][c] = p;\n        movesCount++;\n        int val = (p == Piece::X) ? 1 : -1;\n\n        rowSum[r] += val;\n        colSum[c] += val;\n        if (r == c) diagSum += val;\n        if (r + c == n - 1) antiDiagSum += val;\n\n        int target = (p == Piece::X) ? n : -n;\n        if (rowSum[r] == target || colSum[c] == target || diagSum == target || antiDiagSum == target) {\n            outHasWon = true;\n        } else {\n            outHasWon = false;\n        }\n\n        return true;\n    }\n\n    void display() const {\n        for (int r = 0; r < n; ++r) {\n            for (int c = 0; c < n; ++c) {\n                char ch = (grid[r][c] == Piece::X) ? 'X' : (grid[r][c] == Piece::O) ? 'O' : '.';\n                std::cout << ch << \" \";\n            }\n            std::cout << \"\\n\";\n        }\n    }\n};\n\nstruct Player {\n    std::string name;\n    Piece piece;\n};\n\nclass TicTacToeGame {\nprivate:\n    Board board;\n    std::deque<Player> players;\n    bool isGameOver{false};\n\npublic:\n    TicTacToeGame(int size, Player p1, Player p2) : board(size) {\n        players.push_back(std::move(p1));\n        players.push_back(std::move(p2));\n    }\n\n    void playMove(int r, int c) {\n        if (isGameOver) {\n            std::cout << \"[ERROR] Game is already finished!\\n\";\n            return;\n        }\n\n        Player current = players.front();\n        bool hasWon = false;\n\n        if (!board.makeMove(r, c, current.piece, hasWon)) {\n            std::cout << \"[INVALID MOVE] Spot (\" << r << \", \" << c << \") is invalid or occupied!\\n\";\n            return;\n        }\n\n        std::cout << current.name << \" placed \" << (current.piece == Piece::X ? \"X\" : \"O\") \n                  << \" at (\" << r << \", \" << c << \")\\n\";\n        board.display();\n\n        if (hasWon) {\n            std::cout << \"*** \" << current.name << \" WINS THE GAME! ***\\n\";\n            isGameOver = true;\n            return;\n        }\n\n        if (board.isFull()) {\n            std::cout << \"*** GAME ENDED IN A DRAW! ***\\n\";\n            isGameOver = true;\n            return;\n        }\n\n        // Rotate turn\n        players.pop_front();\n        players.push_back(current);\n    }\n};\n\nint main() {\n    TicTacToeGame game(3, {\"Alice\", Piece::X}, {\"Bob\", Piece::O});\n\n    game.playMove(0, 0); // Alice X\n    game.playMove(1, 0); // Bob O\n    game.playMove(0, 1); // Alice X\n    game.playMove(1, 1); // Bob O\n    game.playMove(0, 2); // Alice X -> Completes Row 0 -> WINS!\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. O(1) Win Checking Algorithm:</strong> By maintaining row, column, and diagonal counters ($+1$ for X, $-1$ for O), checking if a move won takes $O(1)$ time rather than $O(N)$ row/column scans.",
+        "<strong>2. Player Rotation Queue:</strong> A <code>std::deque<Player></code> handles multiplayer turns cleanly via <code>pop_front()</code> and <code>push_back()</code>.",
+        "<strong>3. Clean Encapsulation:</strong> The <code>Board</code> manages grid boundaries and move validation, while <code>TicTacToeGame</code> orchestrates turns."
+      ],
+      "comparison_matrix": {
+        "title": "Win Checking Algorithms",
+        "headers": [
+          "Method",
+          "Time Complexity",
+          "Space Overhead",
+          "Scales to N=1000"
+        ],
+        "rows": [
+          [
+            "Naive Scan Entire Board",
+            "O(N^2)",
+            "O(1)",
+            "Very Slow"
+          ],
+          [
+            "Scan Current Row/Col/Diag",
+            "O(N)",
+            "O(1)",
+            "Acceptable"
+          ],
+          [
+            "Row/Col Accumulator Arrays",
+            "O(1)",
+            "O(N) integers",
+            "Optimal"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Running full O(N^2) board scans after every turn",
+          "correction": "Use O(1) row/col counters."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'How would you support an N*N board where winning requires only K in a row (e.g. 5-in-a-row on 19x19 Go board)?'</strong><br><em>Answer:</em> Accumulator counters only work for $K=N$. For $K < N$, use directional ray casting sliding window checking $K$ steps in 4 axes from the placed coordinate."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor hardcoded 2-player turn logic into an arbitrary N-player queue.",
+        "bad_code": "if (turn == 1) turn = 2; else turn = 1;",
+        "good_code": "players.push_back(players.front()); players.pop_front();"
+      },
+      "practice_problem": {
+        "title": "Add Move Undo/Redo via Command Pattern",
+        "description": "Implement `undo()` and `redo()` on `TicTacToeGame` using a `std::vector<MoveCommand>` stack.",
+        "hint": "Each MoveCommand stores `(r, c, piece)`. Undo resets grid spot and decrements accumulators."
+      }
+    },
+    {
+      "id": "practice-snake-and-ladder",
+      "title": "Practice 2: Snake & Ladder Multiplayer Game",
+      "definition": "A complete multiplayer board game simulation featuring variable board sizes, snake and ladder jump mappings, multi-dice rolling strategies, and winner ranking.",
+      "why_it_matters": "Tests composition, Strategy Pattern for dice rolling, and graph/lookup jump resolution.",
+      "real_world_analogy": "Classic board game with 100 tiles where landing on tile 14 slides you down to 7 (Snake) or tile 9 shoots you up to 31 (Ladder).",
+      "conceptual_breakdown": [
+        "<strong>Board Entity:</strong> Array of cells or Jump Map <code>unordered_map<int, int></code> mapping start tile to destination tile.",
+        "<strong>Dice Rolling Strategy:</strong> <code>IDiceStrategy</code> (e.g. Standard 1-6 Dice, Loaded Dice, 2-Dice sum).",
+        "<strong>Player Entity:</strong> <code>id</code>, <code>name</code>, <code>currentPosition</code>.",
+        "<strong>Game Engine Loop:</strong> Roll dice $\\to$ advance position $\\to$ apply jump $\\to$ check win ($position == totalCells$)."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Snake & Ladder Class Diagram",
+        "classes": [
+          {
+            "name": "IDiceStrategy",
+            "is_abstract": true,
+            "attributes": [],
+            "methods": [
+              "+ roll(): int"
+            ]
+          },
+          {
+            "name": "SnakeAndLadderGame",
+            "is_abstract": false,
+            "attributes": [
+              "- boardSize: int",
+              "- jumps: unordered_map<int, int>",
+              "- players: deque<Player>",
+              "- dice: unique_ptr<IDiceStrategy>"
+            ],
+            "methods": [
+              "+ playTurn(): bool"
+            ]
+          }
+        ],
+        "relationships": [
+          {
+            "from": "SnakeAndLadderGame",
+            "to": "IDiceStrategy",
+            "type": "composition",
+            "label": "uses dice"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "Snake & Ladder Turn Resolution",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Player 1 at tile 12 rolls a 4 -> moves to tile 16.",
+            "active_nodes": [
+              "Player 1",
+              "Dice"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Tile 16 has a Ladder to 35 -> Player climbs to tile 35.",
+            "active_nodes": [
+              "Ladder Jump"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Player 2 at tile 48 rolls a 5 -> moves to tile 53 (Snake to 10). Slides down to 10.",
+            "active_nodes": [
+              "Snake Jump"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <unordered_map>\n#include <deque>\n#include <string>\n#include <memory>\n#include <random>\n\nclass IDiceStrategy {\npublic:\n    virtual ~IDiceStrategy() = default;\n    virtual int roll() = 0;\n};\n\nclass StandardDice : public IDiceStrategy {\nprivate:\n    std::mt19937 rng{std::random_device{}()};\n    std::uniform_int_distribution<int> dist{1, 6};\npublic:\n    int roll() override { return dist(rng); }\n};\n\nstruct Player {\n    std::string name;\n    int position{1};\n};\n\nclass SnakeAndLadderGame {\nprivate:\n    int targetCell;\n    std::unordered_map<int, int> jumps; // start -> end (Snakes and Ladders)\n    std::deque<Player> players;\n    std::unique_ptr<IDiceStrategy> dice;\n\npublic:\n    SnakeAndLadderGame(int cells, std::unique_ptr<IDiceStrategy> d)\n        : targetCell(cells), dice(std::move(d)) {}\n\n    void addJump(int from, int to) {\n        jumps[from] = to;\n    }\n\n    void addPlayer(Player p) {\n        players.push_back(std::move(p));\n    }\n\n    bool playTurn() {\n        if (players.empty()) return false;\n\n        Player current = players.front();\n        players.pop_front();\n\n        int roll = dice->roll();\n        int nextPos = current.position + roll;\n\n        std::cout << \"[\" << current.name << \"] Rolled \" << roll << \" (from \" << current.position << \" -> \" << nextPos << \")\\n\";\n\n        if (nextPos > targetCell) {\n            std::cout << \"  -> Needs exact roll to reach \" << targetCell << \". Stays at \" << current.position << \"\\n\";\n            players.push_back(current);\n            return false;\n        }\n\n        // Apply Snake or Ladder jump\n        if (jumps.find(nextPos) != jumps.end()) {\n            int jumpDest = jumps[nextPos];\n            if (jumpDest > nextPos) {\n                std::cout << \"  *** CLIMBED LADDER from \" << nextPos << \" to \" << jumpDest << \"! ***\\n\";\n            } else {\n                std::cout << \"  *** BITTEN BY SNAKE from \" << nextPos << \" down to \" << jumpDest << \"! ***\\n\";\n            }\n            nextPos = jumpDest;\n        }\n\n        current.position = nextPos;\n\n        if (current.position == targetCell) {\n            std::cout << \"\ud83c\udf89\ud83c\udf89\ud83c\udf89 \" << current.name << \" REACHED \" << targetCell << \" AND WON THE GAME! \ud83c\udf89\ud83c\udf89\ud83c\udf89\\n\";\n            return true;\n        }\n\n        players.push_back(current);\n        return false;\n    }\n};\n\nint main() {\n    auto game = std::make_unique<SnakeAndLadderGame>(100, std::make_unique<StandardDice>());\n\n    // Ladders\n    game->addJump(4, 25);\n    game->addJump(13, 46);\n    game->addJump(50, 69);\n    game->addJump(62, 81);\n\n    // Snakes\n    game->addJump(99, 5);\n    game->addJump(88, 24);\n    game->addJump(64, 18);\n\n    game->addPlayer({\"Alice\", 1});\n    game->addPlayer({\"Bob\", 1});\n\n    std::cout << \"--- Starting Snake & Ladder Match ---\\n\";\n    for (int i = 0; i < 20; ++i) {\n        if (game->playTurn()) break;\n    }\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Unified Jump Representation:</strong> Storing both snakes and ladders in a single <code>unordered_map<int, int></code> simplifies jump logic without requiring distinct classes.",
+        "<strong>2. Strategy Pattern for Dice:</strong> <code>IDiceStrategy</code> makes testing deterministic with mocked dice rolls.",
+        "<strong>3. Exact Finish Rule:</strong> Handles boundary over-rolls ($pos + roll > target$) cleanly."
+      ],
+      "comparison_matrix": {
+        "title": "Board Storage Approaches",
+        "headers": [
+          "Approach",
+          "Memory",
+          "Lookup Time",
+          "Cycles Detection"
+        ],
+        "rows": [
+          [
+            "Array of 100 Cell Objects",
+            "100 structs in memory",
+            "O(1)",
+            "Harder to validate"
+          ],
+          [
+            "Sparse Hash Map Jumps",
+            "Only entries for jumps (10-20)",
+            "O(1) average",
+            "Trivial graph cycle check"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Infinite jump cycles (Snake at 20 -> 10, Ladder at 10 -> 20)",
+          "correction": "Validate acyclic DAG graph invariants when inserting jumps."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Can a player land on a snake that drops them into another ladder in the same turn?'</strong><br><em>Answer:</em> Clarify whether jump chaining is allowed. If yes, replace `if (jump)` with `while (jump)` guarded by an iteration depth limit."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor hardcoded `rand() % 6 + 1` dice rolls into an injectable IDiceStrategy interface.",
+        "bad_code": "int roll = rand() % 6 + 1;",
+        "good_code": "int roll = diceStrategy->roll();"
+      },
+      "practice_problem": {
+        "title": "Design Minimum Dice Rolls BFS Solver",
+        "description": "Add a method `int findShortestPathToWin()` that uses BFS to find the minimum number of dice rolls needed to win from tile 1.",
+        "hint": "Model the 100 tiles as an unweighted directed graph and run standard BFS."
+      }
+    },
+    {
+      "id": "practice-coffee-machine",
+      "title": "Practice 3: Multi-recipe Coffee Machine",
+      "definition": "An interactive smart coffee brewing system managing raw ingredient inventory (water, milk, coffee beans), recipe customization, dynamic price calculation, and parallel brewing dispensers.",
+      "why_it_matters": "Demonstrates the Decorator Pattern (condiments like Extra Foam, Caramel drizzle), Factory Pattern (Espresso, Latte, Cappuccino), and Inventory Invariant validation.",
+      "real_world_analogy": "A Starbucks automated barista kiosk that tracks milliliter levels of steamed milk and grams of ground espresso, warning staff when milk is depleted.",
+      "conceptual_breakdown": [
+        "<strong>Ingredient & Inventory:</strong> <code>Inventory</code> managing thread-safe counts of Water, Milk, Beans, Sugar.",
+        "<strong>Beverage Decorator Pattern:</strong> <code>Beverage</code> base with <code>Espresso</code>, wrapped by <code>MochaDecorator</code>, <code>WhipDecorator</code>.",
+        "<strong>Recipe Engine:</strong> Defines required ingredients per drink.",
+        "<strong>Brewing Execution:</strong> Validates and deducts stock atomically before dispensing."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Coffee Machine Decorator UML",
+        "classes": [
+          {
+            "name": "Beverage",
+            "is_abstract": true,
+            "attributes": [
+              "# description: string"
+            ],
+            "methods": [
+              "+ getDescription(): string",
+              "+ getCost(): double"
+            ]
+          },
+          {
+            "name": "Espresso",
+            "is_abstract": false,
+            "attributes": [],
+            "methods": [
+              "+ getCost(): double = $2.50"
+            ]
+          },
+          {
+            "name": "CondimentDecorator",
+            "is_abstract": true,
+            "attributes": [
+              "# baseBeverage: unique_ptr<Beverage>"
+            ],
+            "methods": []
+          },
+          {
+            "name": "MochaDecorator",
+            "is_abstract": false,
+            "attributes": [],
+            "methods": [
+              "+ getCost(): double = base + $0.75"
+            ]
+          }
+        ],
+        "relationships": [
+          {
+            "from": "Espresso",
+            "to": "Beverage",
+            "type": "inheritance",
+            "label": "is a"
+          },
+          {
+            "from": "CondimentDecorator",
+            "to": "Beverage",
+            "type": "inheritance",
+            "label": "is a"
+          },
+          {
+            "from": "CondimentDecorator",
+            "to": "Beverage",
+            "type": "composition",
+            "label": "wraps"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "Beverage Decorator Composition & Dispensing",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Base Beverage: Espresso ($2.50).",
+            "active_nodes": [
+              "Espresso"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Decorate with Milk (+$0.50) -> $3.00.",
+            "active_nodes": [
+              "Milk Decorator"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Decorate with Caramel (+$0.60) -> $3.60.",
+            "active_nodes": [
+              "Caramel Decorator"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "CoffeeMachine deducts 50ml Water, 30g Beans, 50ml Milk and dispenses.",
+            "active_nodes": [
+              "Inventory",
+              "Dispenser"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <string>\n#include <memory>\n#include <unordered_map>\n#include <mutex>\n#include <iomanip>\n\n// 1. Decorator Pattern for Beverages\nclass Beverage {\npublic:\n    virtual ~Beverage() = default;\n    [[nodiscard]] virtual std::string getDescription() const = 0;\n    [[nodiscard]] virtual double getCost() const = 0;\n};\n\nclass Espresso : public Beverage {\npublic:\n    [[nodiscard]] std::string getDescription() const override { return \"Espresso\"; }\n    [[nodiscard]] double getCost() const override { return 2.50; }\n};\n\nclass HouseBlend : public Beverage {\npublic:\n    [[nodiscard]] std::string getDescription() const override { return \"House Blend Coffee\"; }\n    [[nodiscard]] double getCost() const override { return 2.00; }\n};\n\n// Abstract Condiment Decorator\nclass CondimentDecorator : public Beverage {\nprotected:\n    std::unique_ptr<Beverage> beverage;\npublic:\n    explicit CondimentDecorator(std::unique_ptr<Beverage> bev) : beverage(std::move(bev)) {}\n};\n\nclass Mocha : public CondimentDecorator {\npublic:\n    using CondimentDecorator::CondimentDecorator;\n    [[nodiscard]] std::string getDescription() const override {\n        return beverage->getDescription() + \", Mocha\";\n    }\n    [[nodiscard]] double getCost() const override {\n        return beverage->getCost() + 0.60;\n    }\n};\n\nclass SteamedMilk : public CondimentDecorator {\npublic:\n    using CondimentDecorator::CondimentDecorator;\n    [[nodiscard]] std::string getDescription() const override {\n        return beverage->getDescription() + \", Steamed Milk\";\n    }\n    [[nodiscard]] double getCost() const override {\n        return beverage->getCost() + 0.40;\n    }\n};\n\n// 2. Thread-safe Coffee Machine Inventory\nclass CoffeeMachineInventory {\nprivate:\n    std::unordered_map<std::string, int> stock; // Ingredient -> quantity in ml/g\n    std::mutex mtx;\n\npublic:\n    void addStock(const std::string& ingredient, int qty) {\n        std::lock_guard<std::mutex> lock(mtx);\n        stock[ingredient] += qty;\n    }\n\n    bool consumeIngredients(const std::unordered_map<std::string, int>& required) {\n        std::lock_guard<std::mutex> lock(mtx);\n        \n        // 1. Verify sufficiency\n        for (const auto& [item, amount] : required) {\n            if (stock[item] < amount) {\n                std::cout << \"[OUT OF STOCK] Insufficient \" << item << \" (Need \" << amount << \", Have \" << stock[item] << \")\\n\";\n                return false;\n            }\n        }\n\n        // 2. Deduct atomically\n        for (const auto& [item, amount] : required) {\n            stock[item] -= amount;\n        }\n\n        return true;\n    }\n};\n\nint main() {\n    CoffeeMachineInventory inventory;\n    inventory.addStock(\"Water\", 500);\n    inventory.addStock(\"Beans\", 200);\n    inventory.addStock(\"Milk\", 300);\n\n    // Build Custom Decorated Beverage: House Blend + Milk + Mocha + Mocha (Double Mocha Latte)\n    std::unique_ptr<Beverage> myCoffee = std::make_unique<HouseBlend>();\n    myCoffee = std::make_unique<SteamedMilk>(std::move(myCoffee));\n    myCoffee = std::make_unique<Mocha>(std::move(myCoffee));\n    myCoffee = std::make_unique<Mocha>(std::move(myCoffee));\n\n    std::cout << \"--- Ordered Custom Drink ---\\n\";\n    std::cout << \"Description: \" << myCoffee->getDescription() << \"\\n\";\n    std::cout << \"Total Cost:  $\" << std::fixed << std::setprecision(2) << myCoffee->getCost() << \"\\n\";\n\n    if (inventory.consumeIngredients({{\"Water\", 100}, {\"Beans\", 20}, {\"Milk\", 100}})) {\n        std::cout << \"\u2615 Dispensing your handcrafted drink! Enjoy!\\n\";\n    }\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Dynamic Composition via Decorator:</strong> Allows combining arbitrary condiments (Mocha, Milk, Caramel) at runtime without creating $2^N$ subclass permutations.",
+        "<strong>2. Recursive Cost Calculation:</strong> Calling <code>getCost()</code> delegates down the decorated chain, summing base beverage and all condiment prices cleanly.",
+        "<strong>3. Atomic Inventory Deduction:</strong> Verification and deduction happen under a single mutex lock to avoid partial ingredient consumption."
+      ],
+      "comparison_matrix": {
+        "title": "Beverage Modeling Approaches",
+        "headers": [
+          "Approach",
+          "Class Explosion Risk",
+          "Dynamic Customization",
+          "Adheres to OCP"
+        ],
+        "rows": [
+          [
+            "Subclass per Combination (e.g. EspressoWithMilkAndMocha)",
+            "Extreme (O(2^N))",
+            "No (Compile-time fixed)",
+            "Violated"
+          ],
+          [
+            "Boolean Flags in Base Beverage",
+            "Low",
+            "Moderate",
+            "Violated (must edit base class for new condiments)"
+          ],
+          [
+            "Decorator Pattern",
+            "Zero (O(N) classes)",
+            "100% Dynamic at runtime",
+            "Fully Adhered"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Deducting water first, failing on beans, and leaving water deducted (Dirty State)",
+          "correction": "Verify ALL required ingredients exist before deducting any of them."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'How do you handle multiple cups brewing simultaneously on a 3-spout machine?'</strong><br><em>Answer:</em> Introduce a thread pool of SpoutWorkers with a semaphore(3) guarding concurrent dispenser spouts."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor a beverage class using 15 boolean condiment flags into a clean Decorator hierarchy.",
+        "bad_code": "class Coffee { bool hasMilk, hasMocha, hasCaramel; double getCost() { ... } };",
+        "good_code": "Use CondimentDecorator wrapping Beverage base."
+      },
+      "practice_problem": {
+        "title": "Design Low-Inventory Alert System",
+        "description": "Implement an Observer pattern that sends an alert to the Barista when any ingredient drops below 10% capacity.",
+        "hint": "Attach `IInventoryListener` to `CoffeeMachineInventory`."
+      }
+    },
+    {
+      "id": "practice-logging-framework",
+      "title": "Practice 4: Asynchronous Logging Framework",
+      "definition": "A high-throughput non-blocking asynchronous logging framework buffering log events in memory and flushing to multiple sinks (Console, File, Socket) via a dedicated background worker thread.",
+      "why_it_matters": "One of the most practical systems design questions. Tests Producer-Consumer concurrency, Chain of Responsibility (Log Level filtering), and Observer/Strategy for Log Appenders.",
+      "real_world_analogy": "Log4j / Spdlog: application worker threads push log strings into an in-memory queue in nanoseconds, while a background disk I/O thread flushes batches to disk without slowing down user transactions.",
+      "conceptual_breakdown": [
+        "<strong>Log Levels:</strong> <code>DEBUG</code>, <code>INFO</code>, <code>WARN</code>, <code>ERROR</code>, <code>FATAL</code>.",
+        "<strong>Log Appenders / Sinks:</strong> <code>IAppender</code> interface with <code>ConsoleAppender</code>, <code>FileAppender</code>.",
+        "<strong>Asynchronous Ring Buffer:</strong> Thread-safe blocking queue decoupling caller threads from slow disk writes.",
+        "<strong>Graceful Shutdown:</strong> Flushes all pending log entries during application termination."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Async Logger Architecture",
+        "classes": [
+          {
+            "name": "IAppender",
+            "is_abstract": true,
+            "attributes": [],
+            "methods": [
+              "+ append(msg: string): void"
+            ]
+          },
+          {
+            "name": "AsyncLogger",
+            "is_abstract": false,
+            "attributes": [
+              "- queue: deque<string>",
+              "- appenders: vector<shared_ptr<IAppender>>",
+              "- workerThread: thread",
+              "- running: atomic<bool>",
+              "- cv: condition_variable",
+              "- mtx: mutex"
+            ],
+            "methods": [
+              "+ log(level: LogLevel, msg: string): void",
+              "- workerLoop(): void"
+            ]
+          }
+        ],
+        "relationships": [
+          {
+            "from": "AsyncLogger",
+            "to": "IAppender",
+            "type": "composition",
+            "label": "dispatches to sinks"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "Async Logger Batch Flush Cycle",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Worker threads push LogEvent('Order Created') into Ring Buffer in 15ns.",
+            "active_nodes": [
+              "Worker Threads",
+              "Ring Buffer"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Background Flush Thread wakes up on condition variable notification.",
+            "active_nodes": [
+              "Flush Thread"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Swaps active queue with empty queue in O(1) pointer swap, minimizing lock hold time.",
+            "active_nodes": [
+              "Queue Swap"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Writes batch to Disk File and Network Sinks without holding the incoming queue lock.",
+            "active_nodes": [
+              "Disk Sink",
+              "Network Sink"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <string>\n#include <vector>\n#include <deque>\n#include <memory>\n#include <thread>\n#include <mutex>\n#include <condition_variable>\n#include <atomic>\n#include <chrono>\n\nenum class LogLevel { DEBUG, INFO, WARN, ERROR };\n\nclass ILogAppender {\npublic:\n    virtual ~ILogAppender() = default;\n    virtual void append(const std::string& formattedMsg) = 0;\n};\n\nclass ConsoleAppender : public ILogAppender {\npublic:\n    void append(const std::string& formattedMsg) override {\n        std::cout << formattedMsg << \"\\n\";\n    }\n};\n\nclass AsyncLogger {\nprivate:\n    std::vector<std::shared_ptr<ILogAppender>> appenders;\n    std::deque<std::string> queue;\n    std::mutex mtx;\n    std::condition_variable cv;\n    std::atomic<bool> isRunning{true};\n    std::thread backgroundWorker;\n\n    void workerLoop() {\n        while (isRunning || !queue.empty()) {\n            std::deque<std::string> localBatch;\n            {\n                std::unique_lock<std::mutex> lock(mtx);\n                cv.wait(lock, [this]() {\n                    return !queue.empty() || !isRunning;\n                });\n\n                if (queue.empty() && !isRunning) break;\n\n                // Double buffering / queue swap: O(1) swap to release lock immediately!\n                localBatch.swap(queue);\n            }\n\n            // Flush batch to all appenders without holding the mutex\n            for (const auto& msg : localBatch) {\n                for (const auto& appender : appenders) {\n                    appender->append(msg);\n                }\n            }\n        }\n    }\n\npublic:\n    AsyncLogger() : backgroundWorker(&AsyncLogger::workerLoop, this) {}\n\n    ~AsyncLogger() {\n        stop();\n    }\n\n    void addAppender(std::shared_ptr<ILogAppender> appender) {\n        appenders.push_back(std::move(appender));\n    }\n\n    void log(LogLevel level, const std::string& message) {\n        std::string levelStr = (level == LogLevel::INFO) ? \"[INFO] \" :\n                               (level == LogLevel::WARN) ? \"[WARN] \" :\n                               (level == LogLevel::ERROR) ? \"[ERROR] \" : \"[DEBUG] \";\n\n        std::string fullMsg = levelStr + message;\n\n        {\n            std::lock_guard<std::mutex> lock(mtx);\n            queue.push_back(std::move(fullMsg));\n        }\n        cv.notify_one();\n    }\n\n    void stop() {\n        if (isRunning) {\n            isRunning = false;\n            cv.notify_all();\n            if (backgroundWorker.joinable()) {\n                backgroundWorker.join();\n            }\n        }\n    }\n};\n\nint main() {\n    AsyncLogger logger;\n    logger.addAppender(std::make_shared<ConsoleAppender>());\n\n    std::cout << \"--- Firing Fast Non-blocking Async Log Events ---\\n\";\n    logger.log(LogLevel::INFO, \"Application Server Started on port 8080\");\n    logger.log(LogLevel::WARN, \"Database connection pool reached 85% capacity\");\n    logger.log(LogLevel::ERROR, \"Payment Gateway timeout for Order #4492\");\n\n    std::this_thread::sleep_for(std::chrono::milliseconds(50));\n    logger.stop();\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Double-Buffering Queue Swap:</strong> <code>localBatch.swap(queue)</code> extracts all pending log items in $O(1)$ time and releases the mutex immediately so application threads are never blocked by slow disk I/O.",
+        "<strong>2. Observer / Strategy Pattern for Sinks:</strong> <code>ILogAppender</code> allows dynamically attaching file sinks, console printers, and syslog network forwarders.",
+        "<strong>3. Graceful Shutdown Guarantee:</strong> The destructor signals <code>isRunning = false</code>, notifies the condition variable, and joins the worker thread after draining remaining queued entries."
+      ],
+      "comparison_matrix": {
+        "title": "Synchronous vs Asynchronous Logging",
+        "headers": [
+          "Metric",
+          "Synchronous File Logging",
+          "Asynchronous Double-Buffered Logging"
+        ],
+        "rows": [
+          [
+            "Caller Latency",
+            "50 - 5,000 microseconds (Disk I/O)",
+            "15 - 50 nanoseconds (Memory push)"
+          ],
+          [
+            "Disk Contention",
+            "High (every thread locks file)",
+            "Zero (1 dedicated background writer)"
+          ],
+          [
+            "Crash Risk",
+            "Logs committed immediately to disk",
+            "Unflushed memory buffer may be lost if process SIGKILLs"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Performing disk write `file << msg` while holding the queue lock",
+          "correction": "Swap the queue into a local batch and write to disk outside the critical section."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'What happens if application threads generate 1,000,000 logs/sec and the disk can only write 100,000/sec?'</strong><br><em>Answer:</em> Discuss backpressure policies: Bounded Queue with either Drop Oldest Logs, Drop Debug Logs, or Block Application Caller Thread."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor a synchronous logging class that opens a file on every log call into an asynchronous queue.",
+        "bad_code": "ofstream file(\"app.log\", ios::app); file << msg; // Opens file every time",
+        "good_code": "AsyncLogger with background worker and persistent open file stream."
+      },
+      "practice_problem": {
+        "title": "Design Log File Rolling by Size & Date",
+        "description": "Implement a `RollingFileAppender` that automatically renames and compresses `app.log` to `app.2026-10-03.1.gz` when file size exceeds 100 MB.",
+        "hint": "Check `std::filesystem::file_size` before write; rotate file handle when threshold reached."
+      }
+    }
+  ]
+}

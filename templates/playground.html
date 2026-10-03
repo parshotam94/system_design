@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Design Pattern & UML Playground - C++ LLD Mastery{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 2.5rem; margin-bottom: 2.5rem;">
+  <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+    <span class="badge badge-cpp">Interactive Simulator</span>
+    <span class="badge badge-advanced">Pattern Sandbox</span>
+  </div>
+  <h1 style="font-size: 2.4rem; color: #fff; margin-bottom: 0.75rem;">Design Pattern Decision & Simulation Playground</h1>
+  <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 850px;">
+    Experiment interactively with object lifecycles, polymorphism lookups, Creational, Structural, and Behavioral patterns, and live UML class interactions.
+  </p>
+</div>
+
+<!-- Interactive Pattern Decision Selector -->
+<section style="margin-bottom: 3rem;">
+  <div class="glass-panel" style="padding: 2rem;">
+    <h3 style="color: #fff; margin-bottom: 1rem; font-size: 1.3rem;">🎯 Interactive Pattern Decision Tool</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Select your low-level architectural requirement to discover the optimal design pattern:</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+      <button class="btn btn-secondary pattern-decision-btn" data-pattern="factory" style="text-align: left; padding: 1rem; justify-content: flex-start; height: auto;">
+        <div>
+          <div style="font-weight: 700; color: #fff;">Need Object Creation?</div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">Decouple instantiation from caller logic</div>
+        </div>
+      </button>
+
+      <button class="btn btn-secondary pattern-decision-btn" data-pattern="strategy" style="text-align: left; padding: 1rem; justify-content: flex-start; height: auto;">
+        <div>
+          <div style="font-weight: 700; color: #fff;">Interchangeable Algorithms?</div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">Swap pricing/sorting rules at runtime</div>
+        </div>
+      </button>
+
+      <button class="btn btn-secondary pattern-decision-btn" data-pattern="observer" style="text-align: left; padding: 1rem; justify-content: flex-start; height: auto;">
+        <div>
+          <div style="font-weight: 700; color: #fff;">Need Event Notifications?</div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">One-to-many broadcast publish/subscribe</div>
+        </div>
+      </button>
+
+      <button class="btn btn-secondary pattern-decision-btn" data-pattern="decorator" style="text-align: left; padding: 1rem; justify-content: flex-start; height: auto;">
+        <div>
+          <div style="font-weight: 700; color: #fff;">Dynamic Behavior Wrapper?</div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">Extend object behavior without subclassing</div>
+        </div>
+      </button>
+    </div>
+
+    <div id="pattern-decision-output" class="glass-panel" style="padding: 1.5rem; border-color: var(--accent-blue); background: var(--bg-primary);">
+      <!-- Dynamic pattern info populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- Live Interactive Simulation Demo -->
+<section style="margin-bottom: 3rem;">
+  <h3 style="color: #fff; margin-bottom: 1rem; font-size: 1.3rem;">🔄 Live Interactive Simulation Engine</h3>
+  <div id="live-sim-target"></div>
+</section>
+
+<!-- Live Interactive UML Class Diagram Demo -->
+<section style="margin-bottom: 3rem;">
+  <h3 style="color: #fff; margin-bottom: 1rem; font-size: 1.3rem;">📊 Live Interactive UML Diagram Component</h3>
+  <div id="live-diagram-target"></div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Decision Tool
+    const decisionData = {
+      factory: {
+        pattern: "Factory Method Pattern",
+        category: "Creational",
+        summary: "Defines an interface for creating objects, delegating instantiation logic to subclasses or dedicated factory classes.",
+        code: `// Modern C++ Factory Method\nclass VehicleFactory {\npublic:\n    static std::unique_ptr<IVehicle> createVehicle(VehicleType type) {\n        switch(type) {\n            case VehicleType::Car: return std::make_unique<Car>();\n            case VehicleType::Bike: return std::make_unique<Bike>();\n            default: throw std::invalid_argument("Unknown vehicle type");\n        }\n    }\n};`
+      },
+      strategy: {
+        pattern: "Strategy Pattern",
+        category: "Behavioral",
+        summary: "Encapsulates a family of algorithms into separate classes, making them interchangeable inside a Context without modifying the Context.",
+        code: `// Modern C++ Strategy Interface\nclass IPricingStrategy {\npublic:\n    virtual ~IPricingStrategy() = default;\n    virtual double calculate(double baseFare) const = 0;\n};\n\nclass SurgePricing : public IPricingStrategy {\npublic:\n    double calculate(double baseFare) const override { return baseFare * 1.5; }\n};`
+      },
+      observer: {
+        pattern: "Observer Pattern",
+        category: "Behavioral",
+        summary: "Maintains a list of dependents and notifies them automatically of any state changes via polymorphic update() calls.",
+        code: `// Modern C++ Observer\nclass IObserver {\npublic:\n    virtual ~IObserver() = default;\n    virtual void update(int newScore) = 0;\n};\n\nclass ScorePublisher {\n    std::vector<std::shared_ptr<IObserver>> observers;\npublic:\n    void notify(int score) {\n        for(auto& obs : observers) obs->update(score);\n    }\n};`
+      },
+      decorator: {
+        pattern: "Decorator Pattern",
+        category: "Structural",
+        summary: "Wraps an existing component to attach new responsibilities transparently while conforming to the exact same interface.",
+        code: `// Modern C++ Decorator\nclass MilkDecorator : public ICoffee {\n    std::unique_ptr<ICoffee> baseCoffee;\npublic:\n    MilkDecorator(std::unique_ptr<ICoffee> coffee) : baseCoffee(std::move(coffee)) {}\n    double getCost() const override { return baseCoffee->getCost() + 0.50; }\n};`
+      }
+    };
+
+    const outputEl = document.getElementById('pattern-decision-output');
+    function showPattern(key) {
+      const data = decisionData[key] || decisionData.factory;
+      outputEl.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+          <h4 style="color: var(--accent-cyan); font-size: 1.2rem;">${data.pattern}</h4>
+          <span class="badge badge-intermediate">${data.category}</span>
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">${data.summary}</p>
+        <div id="decision-code-box"></div>
+      `;
+      if (window.CodeBlock) {
+        window.CodeBlock.render(document.getElementById('decision-code-box'), `${key}_pattern.cpp`, data.code);
+      }
+    }
+
+    document.querySelectorAll('.pattern-decision-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pattern-decision-btn').forEach(b => b.classList.remove('btn-primary'));
+        btn.classList.add('btn-primary');
+        showPattern(btn.getAttribute('data-pattern'));
+      });
+    });
+
+    showPattern('factory');
+
+    // 2. Render Live Animation Demo
+    const simTarget = document.getElementById('live-sim-target');
+    if (simTarget && window.AnimationPlayer) {
+      new AnimationPlayer(simTarget, {
+        title: "Composition Lifetime Simulation (Car & Engine)",
+        steps: [
+          {
+            narrative: "Car object is instantiated on the stack or heap.",
+            renderStage(stage) {
+              stage.innerHTML = `
+                <div class="sim-node active-state" style="border-color: #38bdf8;">
+                  <div style="font-weight: 700; color: #fff;">Car Instance</div>
+                  <div style="font-size: 0.75rem; color: #38bdf8;">Allocated</div>
+                </div>
+              `;
+            }
+          },
+          {
+            narrative: "Car constructor executes and instantiates the internal Engine (Composition: Car owns Engine lifetime).",
+            renderStage(stage) {
+              stage.innerHTML = `
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                  <div class="sim-node active-state" style="border-color: #38bdf8;">
+                    <div style="font-weight: 700; color: #fff;">Car Instance</div>
+                    <div style="font-size: 0.75rem; color: #38bdf8;">Constructing</div>
+                  </div>
+                  <div style="font-size: 1.2rem; color: var(--accent-cyan);">&bull; Owns &bull;</div>
+                  <div class="sim-node active-state" style="border-color: #10b981;">
+                    <div style="font-weight: 700; color: #fff;">Engine Instance</div>
+                    <div style="font-size: 0.75rem; color: #10b981;">Constructed</div>
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            narrative: "Car goes out of scope. ~Car() destructor begins execution.",
+            renderStage(stage) {
+              stage.innerHTML = `
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                  <div class="sim-node destroy-state" style="border-color: #f43f5e;">
+                    <div style="font-weight: 700; color: #fff;">~Car() Destructor</div>
+                    <div style="font-size: 0.75rem; color: #f43f5e;">Executing</div>
+                  </div>
+                  <div style="font-size: 1.2rem; color: var(--accent-rose);">&rarr; Triggers &rarr;</div>
+                  <div class="sim-node active-state" style="border-color: #f59e0b;">
+                    <div style="font-weight: 700; color: #fff;">Engine Member</div>
+                    <div style="font-size: 0.75rem; color: #f59e0b;">Pending Cleanup</div>
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            narrative: "Engine destructor executes automatically. Both objects safely destroyed with zero memory leaks.",
+            renderStage(stage) {
+              stage.innerHTML = `
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                  <div class="sim-node destroy-state">
+                    <div style="font-weight: 700; color: #64748b;">Car Destroyed</div>
+                    <div style="font-size: 0.75rem; color: #64748b;">Memory freed</div>
+                  </div>
+                  <div class="sim-node destroy-state">
+                    <div style="font-weight: 700; color: #64748b;">Engine Destroyed</div>
+                    <div style="font-size: 0.75rem; color: #64748b;">Memory freed</div>
+                  </div>
+                </div>
+              `;
+            }
+          }
+        ]
+      });
+    }
+
+    // 3. Render Live UML Class Diagram Demo
+    const diagTarget = document.getElementById('live-diagram-target');
+    if (diagTarget && window.ClassDiagram) {
+      window.ClassDiagram.render(diagTarget, {
+        title: "Car System Composition & Aggregation UML",
+        classes: [
+          {
+            name: "Car",
+            attributes: [
+              { visibility: "-", name: "engine", type: "Engine (Composition)" },
+              { visibility: "-", name: "driver", type: "Driver* (Aggregation)" }
+            ],
+            methods: [
+              { visibility: "+", name: "start", params: "", returnType: "void" },
+              { visibility: "+", name: "assignDriver", params: "Driver* d", returnType: "void" }
+            ]
+          },
+          {
+            name: "Engine",
+            attributes: [
+              { visibility: "-", name: "horsepower", type: "int" }
+            ],
+            methods: [
+              { visibility: "+", name: "ignite", params: "", returnType: "void" }
+            ]
+          }
+        ],
+        relationships: [
+          {
+            from: "Car",
+            to: "Engine",
+            type: "composition",
+            label: "owns",
+            ownership: "Strong (Car owns Engine)",
+            lifetime: "Bound (Engine dies with Car)",
+            coupling: "High",
+            cppSyntax: "class Car { Engine engine; };"
+          }
+        ]
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,925 @@
+{
+  "module_id": "13",
+  "title": "Concurrency & Thread Safety in LLD",
+  "level": "Advanced",
+  "category": "Systems",
+  "description": "Threads, mutexes, lock_guard, unique_lock, shared_mutex, deadlocks, condition variables, atomic operations, and lock-free design in C++.",
+  "topics": [
+    {
+      "id": "threads-and-race-conditions",
+      "title": "Threads, Data Races & Memory Safety",
+      "description": "Understanding multi-threaded execution, data races, race conditions, and memory visibility in modern C++.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>Data Race</strong> occurs when two concurrent threads access the same memory location simultaneously, at least one access is a write, and there is no synchronization. A data race is <strong>Undefined Behavior (UB)</strong> in C++.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Multi-core CPUs execute threads concurrently; unsynchronized writes cause corrupted state, silent calculation bugs, and memory crashes.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Coordinate access to shared mutable state using synchronization primitives (Mutex, Atomics, Lock Guards).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>std::jthread</code> (C++20) provides RAII thread joining on scope exit.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "trap",
+            "title": "Data Race = Undefined Behavior",
+            "text": "Two threads executing counter++ without synchronization causes lost increments and hardware cache inconsistency. In C++, data race is strict UB!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "threads_race_demo.cpp",
+            "code": "#include <iostream>\n#include <thread>\n#include <vector>\n#include <mutex>\n\nclass ThreadSafeCounter {\nprivate:\n    int count{0};\n    mutable std::mutex mtx; // Protects count from data races\n\npublic:\n    void increment() {\n        std::lock_guard<std::mutex> lock(mtx); // RAII Lock\n        ++count;\n    }\n\n    [[nodiscard]] int get() const {\n        std::lock_guard<std::mutex> lock(mtx);\n        return count;\n    }\n};\n\nint main() {\n    ThreadSafeCounter counter;\n    std::vector<std::thread> threads;\n\n    for (int i = 0; i < 10; ++i) {\n        threads.emplace_back([&counter]() {\n            for (int j = 0; j < 1000; ++j) counter.increment();\n        });\n    }\n\n    for (auto& t : threads) t.join();\n    std::cout << \"Final Safe Count: \" << counter.get() << \" (Expected: 10000)\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>std::lock_guard guarantees mutual exclusion across 10 threads incrementing count.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Thread pools, concurrent order books, real-time gaming state sync.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use synchronization whenever mutable state is shared across threads.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not share mutable state if message passing (actor model) or thread-local storage suffices.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Thread-safe predictable execution.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Lock contention overhead.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>std::thread (C++11), std::jthread with auto-join (C++20).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Forgetting to join or detach a std::thread before destruction, triggering std::terminate().</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between a Data Race and a Race Condition?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> A <strong>Data Race</strong> is unsynchronized concurrent memory access (strictly Undefined Behavior in C++). A <strong>Race Condition</strong> is a semantic timing flaw where output depends on non-deterministic thread execution order.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build an accumulator summing numbers from 4 worker threads.</p>",
+          "practice": {
+            "title": "Thread Safe Accumulator",
+            "problemStatement": "Build an accumulator summing numbers from 4 worker threads.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Thread Safe Accumulator",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Accumulator { double total{0}; mutex m; public: void add(double v) { lock_guard<mutex> l(m); total += v; } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Threads, Data Races & Memory Safety is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "mutexes-and-lock-guards",
+      "title": "std::mutex, std::lock_guard & std::unique_lock",
+      "description": "RAII-based mutual exclusion locking in C++.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><code>std::mutex</code> provides mutual exclusion. <code>std::lock_guard</code> is an immovable RAII wrapper. <code>std::unique_lock</code> is a movable, flexible lock supporting manual unlock and condition variables.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Manually calling <code>mtx.lock()</code> and <code>mtx.unlock()</code> leaks locks when exceptions or early returns occur, causing permanent deadlocks.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Always wrap mutexes in RAII lock objects on the stack.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>std::lock_guard&lt;std::mutex&gt; lock(mtx);</code> locks on creation and unlocks on destruction automatically.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "lock_guard vs unique_lock",
+            "text": "Default to std::lock_guard (or std::scoped_lock in C++17). Use std::unique_lock ONLY when you need deferred locking, manual unlocking, or std::condition_variable!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "mutex_raii_demo.cpp",
+            "code": "#include <iostream>\n#include <mutex>\n#include <stdexcept>\n\nclass BankVault {\nprivate:\n    double goldReserves{1000.0};\n    mutable std::mutex vaultMutex;\n\npublic:\n    void transferGold(double amount) {\n        std::lock_guard<std::mutex> lock(vaultMutex); // Locks mutex via RAII\n        if (amount > goldReserves) {\n            throw std::runtime_error(\"Insufficient reserves\"); // Unlocks automatically during stack unwinding!\n        }\n        goldReserves -= amount;\n        std::cout << \"Transferred \" << amount << \" gold. Remaining: \" << goldReserves << \"\\n\";\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>std::lock_guard automatically releases vaultMutex even if an exception is thrown.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Banking ledgers, hardware controllers, memory allocators.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use lock_guard for standard critical sections. Use unique_lock with condition variables.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not hold locks during slow I/O or network requests.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Exception-safe locking; zero deadlock risk from forgotten unlocks.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Coarse locking reduces concurrency throughput.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>std::lock_guard, std::unique_lock, std::scoped_lock (C++17).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Calling mtx.lock() without RAII wrapper.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is std::lock_guard preferred over manual mutex.lock()?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because std::lock_guard is an RAII class that guarantees the mutex will be unlocked when exiting scope, even in the presence of early returns or thrown exceptions.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement transfer between two accounts using std::scoped_lock.</p>",
+          "practice": {
+            "title": "Thread-Safe Bank Transfer",
+            "problemStatement": "Implement transfer between two accounts using std::scoped_lock.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Thread-Safe Bank Transfer",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "void transfer(Account& from, Account& to, double amt) { std::scoped_lock lock(from.m, to.m); from.bal -= amt; to.bal += amt; }"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering std::mutex, std::lock_guard & std::unique_lock is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "read-write-locks",
+      "title": "Read-Write Locks (std::shared_mutex)",
+      "description": "Optimizing read-heavy workloads with multiple concurrent readers and exclusive single writers.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><code>std::shared_mutex</code> (C++17) allows multiple threads to acquire shared read access simultaneously (<code>std::shared_lock</code>) while granting exclusive access to a single writer (<code>std::unique_lock</code>).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>In read-heavy systems (e.g. 99% reads, 1% writes like DNS lookups or product catalog queries), standard mutexes serialize all readers, killing throughput.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Readers acquire <code>std::shared_lock</code> concurrently. Writers acquire <code>std::unique_lock</code> exclusively.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Multiple reader threads execute in parallel; writer thread blocks until all active readers finish.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "comparison": {
+            "title": "std::mutex vs std::shared_mutex",
+            "columns": [
+              "Feature",
+              "std::mutex",
+              "std::shared_mutex"
+            ],
+            "rows": [
+              [
+                "Concurrent Readers",
+                "1 reader at a time",
+                "Unlimited parallel readers (shared_lock)"
+              ],
+              [
+                "Writer",
+                "Exclusive (lock_guard)",
+                "Exclusive (unique_lock)"
+              ],
+              [
+                "Best For",
+                "Balanced Read/Write",
+                "Read-Heavy Workloads (>90% reads)"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "shared_mutex_cache.cpp",
+            "code": "#include <iostream>\n#include <unordered_map>\n#include <string>\n#include <shared_mutex>\n#include <mutex>\n\nclass ThreadSafeCache {\nprivate:\n    std::unordered_map<std::string, std::string> cache;\n    mutable std::shared_mutex rwMutex; // C++17 Read-Write Mutex\n\npublic:\n    // READ: Multiple threads can read concurrently!\n    std::string get(const std::string& key) const {\n        std::shared_lock<std::shared_mutex> readLock(rwMutex);\n        auto it = cache.find(key);\n        return (it != cache.end()) ? it->second : \"\";\n    }\n\n    // WRITE: Exclusive access; blocks all readers & writers\n    void set(const std::string& key, std::string value) {\n        std::unique_lock<std::shared_mutex> writeLock(rwMutex);\n        cache[key] = std::move(value);\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>ThreadSafeCache enables concurrent read locks while guarding exclusive writes with unique_lock.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>DNS resolver cache, Stock symbol metadata lookup, Web server routing tables.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when read operations vastly outnumber write operations (>10:1 ratio).</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if writes are frequent (shared_mutex has higher atomic overhead than standard mutex).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Massive throughput scaling for read-heavy workloads.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Risk of writer starvation if readers continuously hold shared locks.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>std::shared_mutex, std::shared_timed_mutex.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Acquiring unique_lock inside getter methods.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> When should you choose std::shared_mutex over std::mutex?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> When the workload is read-heavy (>90% reads). Multiple readers acquire shared_lock simultaneously without blocking each other.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement UserRegistry with concurrent get() and exclusive registerUser().</p>",
+          "practice": {
+            "title": "Read-Heavy User Registry",
+            "problemStatement": "Implement UserRegistry with concurrent get() and exclusive registerUser().",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Read-Heavy User Registry",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Registry { std::shared_mutex rw; public: void read() { std::shared_lock l(rw); } void write() { std::unique_lock l(rw); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Read-Write Locks (std::shared_mutex) is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "deadlock-prevention",
+      "title": "Deadlock Prevention & std::scoped_lock",
+      "description": "Preventing deadly mutual exclusion deadlocks using lock ordering, lock hierarchies, and std::scoped_lock.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>Deadlock</strong> occurs when two or more threads are permanently blocked, each holding a lock the other thread needs (Circular Wait: Thread 1 holds Mutex A and waits for B; Thread 2 holds Mutex B and waits for A).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Deadlocks freeze production systems, causing complete service outages requiring process restarts.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Coffman conditions: Eliminate Circular Wait by acquiring multiple mutexes in a globally consistent order.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>C++17 <code>std::scoped_lock lock(mutexA, mutexB);</code> uses a deadlock-avoidance algorithm (via <code>std::lock</code>) to lock all mutexes safely.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "important",
+            "title": "C++17 scoped_lock Deadlock Defense",
+            "text": "Always use std::scoped_lock lock(accountA.mtx, accountB.mtx); when acquiring multiple mutexes. It uses a deadlock-avoidance algorithm automatically!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "deadlock_scoped_lock.cpp",
+            "code": "#include <iostream>\n#include <mutex>\n#include <thread>\n\nclass Account {\npublic:\n    int id;\n    double balance;\n    mutable std::mutex mtx;\n\n    Account(int accId, double bal) : id(accId), balance(bal) {}\n};\n\nvoid transferFundsSafe(Account& from, Account& to, double amount) {\n    // std::scoped_lock acquires BOTH mutexes without any deadlock risk!\n    std::scoped_lock lock(from.mtx, to.mtx);\n    if (from.balance >= amount) {\n        from.balance -= amount;\n        to.balance += amount;\n        std::cout << \"Transferred $\" << amount << \" from \" << from.id << \" to \" << to.id << \"\\n\";\n    }\n}\n\nint main() {\n    Account acc1{1, 1000.0};\n    Account acc2{2, 1000.0};\n\n    // Thread 1: 1 -> 2 | Thread 2: 2 -> 1 (Classic Deadlock scenario solved by scoped_lock!)\n    std::thread t1(transferFundsSafe, std::ref(acc1), std::ref(acc2), 100.0);\n    std::thread t2(transferFundsSafe, std::ref(acc2), std::ref(acc1), 200.0);\n\n    t1.join();\n    t2.join();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>std::scoped_lock locks both accounts atomically using deadlock-avoidance.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Bank account transfers, Dining Philosophers problem, Multi-resource transaction coordinators.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use std::scoped_lock whenever a function needs to lock 2 or more mutexes simultaneously.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not acquire locks in arbitrary order across different functions.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>100% immune to circular wait deadlocks.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Slightly higher lock acquisition latency than single mutex.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Hierarchical Locking, Lock Ordering by pointer address, Deadlock Detection Graphs.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Acquiring Mutex A then Mutex B in Function 1, and Mutex B then Mutex A in Function 2.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What are the 4 Coffman conditions required for a deadlock to occur?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> 1. Mutual Exclusion, 2. Hold and Wait, 3. No Preemption, 4. Circular Wait. Breaking ANY ONE condition prevents deadlocks.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement pickForks() for philosopher using std::scoped_lock on left and right forks.</p>",
+          "practice": {
+            "title": "Dining Philosophers Deadlock Fix",
+            "problemStatement": "Implement pickForks() for philosopher using std::scoped_lock on left and right forks.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Dining Philosophers Deadlock Fix",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "void eat(Fork& left, Fork& right) { std::scoped_lock l(left.m, right.m); }"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Deadlock Prevention & std::scoped_lock is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "condition-variables",
+      "title": "Condition Variables & Producer-Consumer Queues",
+      "description": "Signaling and thread synchronization using std::condition_variable for blocking concurrent task queues.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><code>std::condition_variable</code> is a synchronization primitive that allows threads to sleep (block) without consuming CPU cycles until notified by another thread that a condition is met.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Busy-waiting in a <code>while(!ready) {}</code> loop consumes 100% CPU on a core. Condition variables put threads to sleep efficiently.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Consumer calls <code>cv.wait(lock, []{ return !queue.empty(); });</code>. Producer pushes item and calls <code>cv.notify_one()</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>cv.wait</code> atomically unlocks the mutex and puts thread to sleep; when awakened, it reacquires the lock and checks predicate (defends against Spurious Wakeups).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "important",
+            "title": "Spurious Wakeup Defense",
+            "text": "ALWAYS pass a predicate lambda to cv.wait(lock, [&]{ return !queue.empty(); }); to protect against spurious wakeups (waking up without a signal)!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "producer_consumer_queue.cpp",
+            "code": "#include <iostream>\n#include <queue>\n#include <mutex>\n#include <condition_variable>\n#include <thread>\n\ntemplate <typename T>\nclass ThreadSafeQueue {\nprivate:\n    std::queue<T> queue;\n    mutable std::mutex mtx;\n    std::condition_variable cv;\n    bool isFinished{false};\n\npublic:\n    void push(T item) {\n        {\n            std::lock_guard<std::mutex> lock(mtx);\n            queue.push(std::move(item));\n        }\n        cv.notify_one(); // Wake up one sleeping consumer thread!\n    }\n\n    bool pop(T& item) {\n        std::unique_lock<std::mutex> lock(mtx);\n        // Wait until queue is non-empty OR shutdown signaled (handles spurious wakeups!)\n        cv.wait(lock, [this]() { return !queue.empty() || isFinished; });\n\n        if (queue.empty() && isFinished) return false;\n\n        item = std::move(queue.front());\n        queue.pop();\n        return true;\n    }\n\n    void shutdown() {\n        {\n            std::lock_guard<std::mutex> lock(mtx);\n            isFinished = true;\n        }\n        cv.notify_all(); // Wake all consumers to exit cleanly\n    }\n};\n\nint main() {\n    ThreadSafeQueue<int> taskQueue;\n    std::thread consumer([&taskQueue]() {\n        int val;\n        while (taskQueue.pop(val)) {\n            std::cout << \"[Consumer] Processed task #\" << val << \"\\n\";\n        }\n        std::cout << \"[Consumer] Exited cleanly.\\n\";\n    });\n\n    for (int i = 1; i <= 3; ++i) {\n        taskQueue.push(i);\n        std::this_thread::sleep_for(std::chrono::milliseconds(50));\n    }\n    taskQueue.shutdown();\n    consumer.join();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>ThreadSafeQueue implements blocking pop() and notify_one() with condition variable.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Thread pool work-stealing queues, message brokers, logging background flushers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use for producer-consumer pipelines, thread pools, and event dispatch queues.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not call cv.wait() without a predicate lambda (spurious wakeup bug).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Zero CPU usage while waiting; instant wakeup on data arrival.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires careful shutdown signaling.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>std::condition_variable (requires unique_lock<mutex>), std::condition_variable_any.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Calling cv.wait without a lock or without a predicate loop.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is a Spurious Wakeup in multi-threading?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> A condition where a sleeping thread awakens from <code>wait()</code> even though no thread called <code>notify()</code>. Passing a predicate loop (<code>cv.wait(lock, []{ return ready; })</code>) ensures the thread re-checks the invariant before proceeding.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a bounded blocking queue with max capacity that blocks producers when full.</p>",
+          "practice": {
+            "title": "Blocking Work Queue",
+            "problemStatement": "Implement a bounded blocking queue with max capacity that blocks producers when full.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Blocking Work Queue",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class BoundedQueue { condition_variable not_full, not_empty; /* ... */ };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Condition Variables & Producer-Consumer Queues is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "atomics-lock-free-basics",
+      "title": "std::atomic & Lock-Free Design Concepts",
+      "description": "Lock-free atomic primitives, memory orderings, and hardware CPU cache line synchronization in C++20.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><code>std::atomic&lt;T&gt;</code> provides lock-free, race-free operations on primitive types using CPU hardware instructions (e.g. <code>LOCK CMPXCHG</code> on x86) without operating system mutex locks.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Mutex locks incur kernel context-switch overhead (microsecond scale). Atomics execute in hardware nanosecond cycles.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Hardware atomic instructions guarantee that read-modify-write operations (<code>fetch_add</code>, <code>compare_exchange_strong</code>) are indivisible.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Use <code>std::atomic&lt;int&gt;</code> for high-speed counters, sequence generators, and lock-free ring buffers.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "CAS (Compare-And-Swap)",
+            "text": "expected = 10; bool ok = atomicVal.compare_exchange_strong(expected, 20); // If atomicVal == 10, sets to 20 atomically. If not, updates expected with actual value!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "atomic_lock_free_demo.cpp",
+            "code": "#include <iostream>\n#include <atomic>\n#include <thread>\n#include <vector>\n\nclass LockFreeCounter {\nprivate:\n    std::atomic<uint64_t> counter{0}; // Hardware atomic\npublic:\n    void increment() {\n        // Atomic fetch_add executes in hardware without mutex!\n        counter.fetch_add(1, std::memory_order_relaxed);\n    }\n\n    [[nodiscard]] uint64_t get() const {\n        return counter.load(std::memory_order_relaxed);\n    }\n};\n\nint main() {\n    LockFreeCounter counter;\n    std::vector<std::thread> workers;\n\n    for (int i = 0; i < 4; ++i) {\n        workers.emplace_back([&counter]() {\n            for (int j = 0; j < 250000; ++j) counter.increment();\n        });\n    }\n\n    for (auto& w : workers) w.join();\n    std::cout << \"Final Atomic Count: \" << counter.get() << \" (Expected: 1000000)\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>std::atomic<uint64_t> handles 1,000,000 increments across 4 threads lock-free.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>High-frequency trading order matching, lock-free SPSC queues, real-time audio mixers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use for simple counters, flags, and lock-free state machines.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not build complex lock-free data structures without expert knowledge of ABA problem and memory orderings.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Blazing fast performance; immune to deadlocks and priority inversion.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Difficult to write and debug complex lock-free data structures.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>std::atomic, std::atomic_flag, Memory orderings (relaxed, acquire, release, seq_cst).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Assuming non-primitive large structs are lock-free (check <code>atomic.is_lock_free()</code>).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the ABA problem in lock-free programming?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> A condition where Thread 1 reads value A, Thread 2 changes A -> B -> A, and Thread 1's Compare-And-Swap succeeds thinking the value never changed, causing memory corruption. Solved using tagged pointers or hazard pointers.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a simple Spinlock using std::atomic_flag.</p>",
+          "practice": {
+            "title": "Atomic Spinlock Mutex",
+            "problemStatement": "Implement a simple Spinlock using std::atomic_flag.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Atomic Spinlock Mutex",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Spinlock { std::atomic_flag flag = ATOMIC_FLAG_INIT; public: void lock() { while(flag.test_and_set(std::memory_order_acquire)) {} } void unlock() { flag.clear(std::memory_order_release); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering std::atomic & Lock-Free Design Concepts is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "thread-safe-singleton",
+      "title": "Thread-safe Singleton & Double-Checked Locking Trap",
+      "description": "Why naive double-checked locking was broken in C++98, and why Meyers Singleton is the optimal modern C++ solution.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>Thread-Safe Singleton</strong> guarantees exactly one instance is initialized safely under multi-threaded concurrency.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Naive singletons create race conditions where two threads simultaneously execute <code>if (instance == nullptr)</code> and instantiate two duplicate singletons.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>C++11 Meyers Singleton guarantees thread-safe initialization via static local variables.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>The compiler generates internal guards ensuring that only the first thread executes initialization while other threads wait.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "trap",
+            "title": "The Double-Checked Locking Anti-Pattern",
+            "text": "In C++98, DCLP (if (!inst) { lock; if (!inst) inst = new T(); }) was broken due to CPU out-of-order execution allocating memory before constructor finishes! In modern C++, always use Meyers Singleton!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "thread_safe_singleton.cpp",
+            "code": "#include <iostream>\n#include <thread>\n#include <vector>\n\nclass ThreadSafeDatabase {\nprivate:\n    ThreadSafeDatabase() {\n        std::cout << \"[Database Engine] Initialized strictly ONCE by thread id: \" \n                  << std::this_thread::get_id() << \"\\n\";\n    }\n\npublic:\n    ThreadSafeDatabase(const ThreadSafeDatabase&) = delete;\n    ThreadSafeDatabase& operator=(const ThreadSafeDatabase&) = delete;\n\n    // C++11 Meyers Singleton: Guaranteed Thread-Safe by Language Standard!\n    static ThreadSafeDatabase& getInstance() {\n        static ThreadSafeDatabase instance; // Magic static\n        return instance;\n    }\n\n    void executeQuery(const std::string& sql) {\n        std::cout << \"Executing SQL: \" << sql << \"\\n\";\n    }\n};\n\nint main() {\n    std::vector<std::thread> threads;\n    for (int i = 0; i < 5; ++i) {\n        threads.emplace_back([]() {\n            // Concurrent access to Singleton\n            ThreadSafeDatabase::getInstance().executeQuery(\"SELECT 1\");\n        });\n    }\n    for (auto& t : threads) t.join();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Meyers Singleton executes constructor exactly once across 5 concurrent threads.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Logging engines, Configuration registries, Hardware drivers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when an application strictly requires a single shared instance.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not write manual Double-Checked Locking with mutexes in modern C++.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Clean, zero manual locks, compiler-enforced thread safety.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Global state makes unit testing with mocks difficult.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Meyers Singleton, std::call_once with std::once_flag.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Implementing raw pointer DCLP without atomic acquire/release fences.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why was Double-Checked Locking broken before C++11?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because CPU instruction reordering could reorder pointer assignment before the object constructor finished executing, allowing another thread to observe a non-null pointer to an uninitialized object.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a thread-safe singleton using std::call_once and std::once_flag.</p>",
+          "practice": {
+            "title": "std::call_once Singleton",
+            "problemStatement": "Implement a thread-safe singleton using std::call_once and std::once_flag.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "std::call_once Singleton",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class S { static void init() {} public: static void get() { static std::once_flag f; std::call_once(f, init); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Thread-safe Singleton & Double-Checked Locking Trap is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    }
+  ]
+}

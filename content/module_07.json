@@ -1,0 +1,564 @@
+{
+  "module_id": "07",
+  "title": "Object Modeling & Domain Discovery",
+  "level": "Intermediate",
+  "category": "Modeling",
+  "description": "Techniques for mapping ambiguous problem statements into tangible domain entities, immutable value objects, CRC responsibility cards, and low coupling.",
+  "topics": [
+    {
+      "id": "entities-vs-value-objects",
+      "title": "Entities vs Value Objects",
+      "description": "Differentiating between stateful entities with distinct identities and immutable value objects.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>An <strong>Entity</strong> is an object defined by its unique identity that runs through time (e.g. User ID, Bank Account Number). A <strong>Value Object</strong> is defined purely by its attributes and has no identity (e.g. Money, DateRange, Address).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Treating everything as an entity creates complex mutable state graphs. Value objects simplify reasoning because they are completely immutable.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>If two objects have identical attributes and are interchangeable, they are Value Objects (e.g. two $10 bills). If they have the same attributes but represent different real-world items, they are Entities (e.g. two twins with different SSNs).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Entities maintain mutable state protected by invariants. Value objects are initialized in the constructor, have all members marked const, and return new instances upon modification.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "comparison": {
+            "title": "Entities vs Value Objects Matrix",
+            "columns": [
+              "Dimension",
+              "Entity",
+              "Value Object"
+            ],
+            "rows": [
+              [
+                "Identity",
+                "Unique ID (UUID / Int)",
+                "No identity (Equality by all fields)"
+              ],
+              [
+                "Mutability",
+                "Mutable via domain methods",
+                "100% Immutable"
+              ],
+              [
+                "Lifecycle",
+                "Long-lived across system state",
+                "Transient, easily created/discarded"
+              ],
+              [
+                "C++ Representation",
+                "class User with private ID",
+                "class Money { const double amt; const string curr; };"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "entity_vs_value_obj.cpp",
+            "code": "#include <iostream>\n#include <string>\n\n// Value Object: Immutable Address\nclass Address {\npublic:\n    const std::string street;\n    const std::string city;\n    const std::string zipCode;\n\n    Address(std::string s, std::string c, std::string z)\n        : street(std::move(s)), city(std::move(c)), zipCode(std::move(z)) {}\n\n    bool operator==(const Address& other) const noexcept {\n        return street == other.street && city == other.city && zipCode == other.zipCode;\n    }\n};\n\n// Domain Entity: User with unique ID\nclass User {\nprivate:\n    const std::string userId; // Unique Identity\n    std::string name;\n    Address homeAddress;      // Value Object\n\npublic:\n    User(std::string id, std::string n, Address addr)\n        : userId(std::move(id)), name(std::move(n)), homeAddress(std::move(addr)) {}\n\n    void relocate(Address newAddress) {\n        homeAddress = std::move(newAddress);\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Address is immutable with value-based equality; User maintains unique identity.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>E-commerce order shipping addresses vs User account entities.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use Value Objects for measurements, coordinates, and currencies. Use Entities for users, orders, and products.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not make Entities immutable if their state naturally evolves over time.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Eliminates concurrency race conditions on value objects; clarifies domain boundaries.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires creating new instances when updating value objects.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>DDD Aggregates, Identity vs Attribute comparison.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Giving value objects mutable setter methods.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between entity equality and value object equality?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Entity equality compares unique IDs (e.g. user1.id == user2.id). Value object equality compares all internal attributes (e.g. addr1.street == addr2.street && addr1.zip == addr2.zip).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement an immutable GeoCoordinate value object validating latitude (-90 to +90) and longitude (-180 to +180).</p>",
+          "practice": {
+            "title": "GeoCoordinate Value Object",
+            "problemStatement": "Implement an immutable GeoCoordinate value object validating latitude (-90 to +90) and longitude (-180 to +180).",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design principles"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Focus on separation of responsibilities.",
+            "expectedEntities": [
+              {
+                "name": "GeoCoordinate Value Object",
+                "responsibility": "Encapsulates problem domain."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class GeoCoordinate { public: const double lat, lon; GeoCoordinate(double la, double lo): lat(la), lon(lo) {} };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Entities vs Value Objects is essential for robust Low-Level System Design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "identifying-responsibilities",
+      "title": "CRC Cards & Identifying Responsibilities",
+      "description": "Class-Responsibility-Collaboration (CRC) technique to identify domain boundaries.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>CRC Cards</strong> (Class, Responsibility, Collaborators) are an index-card brainstorming technique to map classes, their obligations, and their helper partners.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Prevents giant God classes by bounding the responsibilities of each class before writing a single line of code.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Every class answers two questions: What do I know? (State) and What do I do? (Behavior).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Write candidate classes on 3x5 cards. List responsibilities on the left, collaborating classes on the right.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "CRC Structure",
+            "text": "Class: ParkingLot\\nResponsibilities: Manage spot allocation, Calculate total revenue\\nCollaborators: ParkingFloor, ParkingSpot, PricingStrategy"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "crc_parking_lot.cpp",
+            "code": "#include <vector>\n#include <memory>\nclass ParkingSpot {};\nclass PricingStrategy {};\nclass ParkingLot {\n    std::vector<std::unique_ptr<ParkingSpot>> spots; // Collaborator\n    std::shared_ptr<PricingStrategy> pricing;         // Collaborator\npublic:\n    void parkVehicle();\n    double calculateFee();\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Shows state knowledge and behavioral responsibilities decoupled into collaborators.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>System design interviews for Parking Lot, Elevator, and Ride Sharing.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use during the first 10 minutes of an interview to decompose requirements.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not skip directly to code without bounding responsibilities.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>High cohesion and clear division of labor.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Informal; requires translation to formal UML.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>CRC Brainstorming, Responsibility-Driven Design (RDD).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Assigning 20+ responsibilities to a single class.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the goal of CRC cards in an LLD interview?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> To quickly identify the core noun entities, their verbs (responsibilities), and how they pass messages to collaborating classes.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Model Library, Book, and Member responsibilities.</p>",
+          "practice": {
+            "title": "Library Management CRC",
+            "problemStatement": "Model Library, Book, and Member responsibilities.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design principles"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Focus on separation of responsibilities.",
+            "expectedEntities": [
+              {
+                "name": "Library Management CRC",
+                "responsibility": "Encapsulates problem domain."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Book {}; class Member {}; class Library { std::vector<Book> books; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering CRC Cards & Identifying Responsibilities is essential for robust Low-Level System Design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "domain-invariants-boundaries",
+      "title": "Domain Invariants & Boundary Design",
+      "description": "Enforcing business invariants and defining Aggregate Roots in domain modeling.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Domain Invariants</strong> are business rules that must ALWAYS hold true throughout the lifetime of an object (e.g. Account balance cannot drop below -$500 overdraft limit).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Guarantees that database records and memory state are never corrupted by invalid concurrent operations.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>An <strong>Aggregate Root</strong> is the single gateway entity responsible for defending invariants for an entire cluster of child objects (e.g. Order defends OrderItems).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Constructor verifies invariants upon creation; public mutating methods verify invariants before changing state.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "important",
+            "title": "Aggregate Boundary",
+            "text": "External code must NEVER mutate OrderItem directly. External code asks Order: order.addItem(item), and Order verifies max order limits!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "aggregate_order_boundary.cpp",
+            "code": "#include <vector>\n#include <string>\n#include <stdexcept>\n\nclass OrderItem {\npublic:\n    std::string productId;\n    int quantity;\n    double price;\n    OrderItem(std::string id, int qty, double p) : productId(std::move(id)), quantity(qty), price(p) {}\n};\n\n// Order is the Aggregate Root guarding invariants!\nclass OrderAggregate {\nprivate:\n    std::vector<OrderItem> items;\n    double totalAmount{0.0};\n    static constexpr int MAX_ITEMS = 50;\n\npublic:\n    void addItem(const std::string& prodId, int qty, double price) {\n        if (items.size() >= MAX_ITEMS) {\n            throw std::runtime_error(\"Invariant Violation: Max items per order exceeded!\");\n        }\n        if (qty <= 0 || price < 0.0) {\n            throw std::invalid_argument(\"Invalid quantity or price\");\n        }\n        items.emplace_back(prodId, qty, price);\n        totalAmount += qty * price;\n    }\n\n    [[nodiscard]] double getTotal() const noexcept { return totalAmount; }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>OrderAggregate strictly guards item count and non-negative pricing invariants.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>E-commerce carts, banking ledger aggregates, flight seat reservation boundaries.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use Aggregate Roots whenever multiple objects have interdependent invariants.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not bypass aggregate roots with direct child setters.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Bulletproof consistency and transactional integrity.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Slight overhead routing calls through the aggregate root.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>DDD Aggregates, Invariant Guards, Preconditions/Postconditions.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Exposing internal mutable collections to callers.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is an Aggregate Root in Low-Level Design?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> An Aggregate Root is a master domain entity that external objects interact with. It encapsulates a cluster of associated objects and strictly defends all internal business invariants.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a BankAccount that enforces a strict $500 overdraft limit invariant.</p>",
+          "practice": {
+            "title": "Bank Account Overdraft Guard",
+            "problemStatement": "Implement a BankAccount that enforces a strict $500 overdraft limit invariant.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design principles"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Focus on separation of responsibilities.",
+            "expectedEntities": [
+              {
+                "name": "Bank Account Overdraft Guard",
+                "responsibility": "Encapsulates problem domain."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class BankAccount { double bal{0}; public: void withdraw(double a) { if(bal - a < -500) throw std::runtime_error('Overdraft'); bal -= a; } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Domain Invariants & Boundary Design is essential for robust Low-Level System Design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "cohesion-and-coupling",
+      "title": "High Cohesion & Low Coupling",
+      "description": "The twin metrics of software quality: maximizing internal focus and minimizing inter-module dependencies.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Cohesion</strong> measures how focused and related the responsibilities of a single module are. <strong>Coupling</strong> measures how tightly dependent different modules are on each other.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>High Cohesion + Low Coupling = Maintainable, reusable, easily testable architecture.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Goal: <strong>High Cohesion</strong> (a class does one thing exceptionally well) and <strong>Low Coupling</strong> (classes communicate through abstract interfaces with minimal direct knowledge).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Reduce coupling using Dependency Injection and interfaces. Increase cohesion by splitting disparate responsibilities into separate classes.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "comparison": {
+            "title": "Cohesion vs Coupling Spectrum",
+            "columns": [
+              "Property",
+              "Ideal State",
+              "Bad State",
+              "Remedy"
+            ],
+            "rows": [
+              [
+                "Cohesion",
+                "High (Focused, single purpose)",
+                "Low (God class, scattered features)",
+                "Split class using SRP"
+              ],
+              [
+                "Coupling",
+                "Low (Decoupled via interfaces)",
+                "High (Direct concrete dependencies)",
+                "Use Dependency Injection (DIP)"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "cohesion_coupling_demo.cpp",
+            "code": "#include <iostream>\n#include <memory>\n// High Cohesion: Focused solely on calculation\nclass InvoiceCalculator {\npublic:\n    double computeTotal(double subtotal, double taxRate) const noexcept {\n        return subtotal * (1.0 + taxRate);\n    }\n};\n\n// Low Coupling: Communicates via abstract interface\nclass IPaymentService { public: virtual ~IPaymentService() = default; virtual void pay(double) = 0; };\nclass CheckoutCoordinator {\n    InvoiceCalculator calc; // High Cohesion helper\n    std::shared_ptr<IPaymentService> payment; // Low Coupling dependency\npublic:\n    CheckoutCoordinator(std::shared_ptr<IPaymentService> p) : payment(std::move(p)) {}\n    void complete(double amount) {\n        double finalPrice = calc.computeTotal(amount, 0.08);\n        payment->pay(finalPrice);\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Combines high internal calculation cohesion with low interface payment coupling.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>High-scale distributed systems and enterprise microservices.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Evaluate every new class against cohesion and coupling metrics.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not over-decouple into thousands of 1-line classes (extremes cause complexity).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Maximum maintainability, testability, and parallel team development.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires careful interface design up front.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Content coupling, Common coupling, Control coupling, Stamp coupling, Data coupling.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Tight coupling to concrete third-party SDKs.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How do Dependency Injection and Interfaces achieve low coupling?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> They replace concrete type dependencies with abstract contracts, allowing modules to be developed, tested, and replaced without modifying dependent code.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Decouple Order from direct SMTP email using an INotifier interface.</p>",
+          "practice": {
+            "title": "Decouple Order and Email",
+            "problemStatement": "Decouple Order from direct SMTP email using an INotifier interface.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design principles"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Focus on separation of responsibilities.",
+            "expectedEntities": [
+              {
+                "name": "Decouple Order and Email",
+                "responsibility": "Encapsulates problem domain."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class INotifier { public: virtual ~INotifier() = default; virtual void send(std::string) = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering High Cohesion & Low Coupling is essential for robust Low-Level System Design.</p>"
+        }
+      ]
+    }
+  ]
+}

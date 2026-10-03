@@ -1,0 +1,688 @@
+{
+  "module_id": "09",
+  "title": "Creational Design Patterns",
+  "level": "Intermediate",
+  "category": "Design Patterns",
+  "description": "Singleton (Meyers & Thread-safe), Factory Method, Abstract Factory, Builder, and Prototype in modern C++.",
+  "topics": [
+    {
+      "id": "singleton-pattern",
+      "title": "Singleton (Meyers Singleton & Concurrency)",
+      "description": "Ensuring a class has exactly one instance and providing a global point of access.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Singleton Pattern</strong> guarantees that a class has only one instance and provides a global access point to that instance.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Useful for shared physical resources: Logger instance, Thread Pool coordinator, Hardware Device Controller.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Private constructor + Deleted copy/move operations + Static instance method (Meyers Singleton).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>In C++11 and later, static local variable initialization in a function is guaranteed by the language standard to be <strong>thread-safe without manual mutex locks</strong> (Meyers Singleton).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "important",
+            "title": "Meyers Singleton Thread Safety",
+            "text": "C++11 Standard [\u00a76.7]: Static local variables are initialized exactly once, even when accessed simultaneously by multiple threads. Zero manual mutex locking required!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "meyers_singleton.cpp",
+            "code": "#include <iostream>\n#include <string>\n\nclass Logger {\nprivate:\n    Logger() { std::cout << \"[Logger] Initialized singleton instance.\\n\"; }\n    ~Logger() = default;\n\npublic:\n    // Delete copy and move constructors/assignments\n    Logger(const Logger&) = delete;\n    Logger& operator=(const Logger&) = delete;\n    Logger(Logger&&) = delete;\n    Logger& operator=(Logger&&) = delete;\n\n    // Meyers Singleton: Thread-safe static local instance!\n    static Logger& getInstance() {\n        static Logger instance; // Initialized thread-safely on first call\n        return instance;\n    }\n\n    void log(const std::string& msg) {\n        std::cout << \"[LOG] \" << msg << \"\\n\";\n    }\n};\n\nint main() {\n    Logger::getInstance().log(\"System booted\");\n    Logger::getInstance().log(\"Processing transaction\");\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Meyers Singleton using static local variable, deleted copy/move, thread-safe access.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Application Configuration Managers, Database Connection Pools, Hardware Serial Ports.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when exactly one coordinating instance must exist across the entire process lifetime.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use as a glorified global variable bag; harms testability.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Guaranteed single instance, lazy initialization, zero manual mutex overhead.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Hidden dependencies; difficult to unit test with mock replacements.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Meyers Singleton, Eager Singleton, Double-Checked Locking Pattern (legacy).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Writing complex manual Double-Checked Locking with mutexes when Meyers Singleton is 10x cleaner.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is Meyers Singleton thread-safe in C++11?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> The C++11 standard mandates that local static variables are initialized concurrently safe by the runtime during first function entry (magic statics).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build a thread-safe ConfigurationManager singleton.</p>",
+          "practice": {
+            "title": "ConfigurationManager Singleton",
+            "problemStatement": "Build a thread-safe ConfigurationManager singleton.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "ConfigurationManager Singleton",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class Config { Config() = default; public: Config(const Config&) = delete; static Config& get() { static Config inst; return inst; } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Singleton (Meyers Singleton & Concurrency) is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "factory-method-pattern",
+      "title": "Factory Method Pattern",
+      "description": "Defining an interface for creating an object, but letting subclasses decide which class to instantiate.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Factory Method</strong> defines an interface for creating objects, but lets derived subclasses or static factory routines decide which concrete class to instantiate.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Decouples client creation code from concrete derived class constructors.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Call a creation method instead of calling <code>new ConcreteClass()</code> directly.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Client calls <code>VehicleFactory::createVehicle(type)</code> returning a <code>std::unique_ptr&lt;IVehicle&gt;</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Factory Method Flow",
+            "text": "Client -> Factory::create(type) -> returns std::unique_ptr<IVehicle> -> Client uses interface"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "factory_method.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\nenum class VehicleType { CAR, BIKE, TRUCK };\n\nclass IVehicle { public: virtual ~IVehicle() = default; virtual void drive() = 0; };\nclass Car : public IVehicle { public: void drive() override { std::cout << \"Driving Car\\n\"; } };\nclass Bike : public IVehicle { public: void drive() override { std::cout << \"Riding Bike\\n\"; } };\nclass Truck : public IVehicle { public: void drive() override { std::cout << \"Hauling Truck\\n\"; } };\n\nclass VehicleFactory {\npublic:\n    static std::unique_ptr<IVehicle> createVehicle(VehicleType type) {\n        switch (type) {\n            case VehicleType::CAR: return std::make_unique<Car>();\n            case VehicleType::BIKE: return std::make_unique<Bike>();\n            case VehicleType::TRUCK: return std::make_unique<Truck>();\n        }\n        throw std::invalid_argument(\"Unknown vehicle type\");\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>VehicleFactory centralizes construction and returns unique_ptr interface.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Document parsing (PDF vs Word vs JSON), payment gateway selection.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when creation logic involves complex decisions or varies based on parameters.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use for trivial classes that only have a single constructor.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Adheres to Single Responsibility & Open/Closed principles.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires creating factory abstractions.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Static Factory Method, Polymorphic Factory Method (Virtual Creator).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Returning raw pointers instead of std::unique_ptr.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why should Factory Methods return std::unique_ptr in modern C++?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because std::unique_ptr explicitly expresses exclusive ownership transfer from the factory to the caller with zero memory leak risk.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build a DocumentParser factory for JSON and XML.</p>",
+          "practice": {
+            "title": "Document Parser Factory",
+            "problemStatement": "Build a DocumentParser factory for JSON and XML.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Document Parser Factory",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class Parser { public: virtual ~Parser() = default; }; class Factory { public: static std::unique_ptr<Parser> create(int); };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Factory Method Pattern is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "abstract-factory-pattern",
+      "title": "Abstract Factory Pattern",
+      "description": "Creating families of related or dependent objects without specifying their concrete classes.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Abstract Factory</strong> provides an interface for creating families of related or dependent objects (e.g. Mac vs Windows UI buttons and scrollbars).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Ensures that products from the same family are always used together without mixing incompatible UI components.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>A factory of factories: <code>IGUIFactory</code> creates both <code>IButton</code> and <code>IScrollBar</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Client receives an <code>IGUIFactory</code> (e.g. <code>MacFactory</code>) and creates all UI components from it consistently.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "diagram": {
+            "title": "Abstract Factory Structure",
+            "classes": [
+              {
+                "name": "IGUIFactory",
+                "stereotype": "interface",
+                "isInterface": true,
+                "attributes": [],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "createButton",
+                    "params": "",
+                    "returnType": "IButton*"
+                  },
+                  {
+                    "visibility": "+",
+                    "name": "createScrollbar",
+                    "params": "",
+                    "returnType": "IScrollbar*"
+                  }
+                ]
+              },
+              {
+                "name": "MacFactory",
+                "attributes": [],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "createButton",
+                    "params": "",
+                    "returnType": "MacButton*"
+                  },
+                  {
+                    "visibility": "+",
+                    "name": "createScrollbar",
+                    "params": "",
+                    "returnType": "MacScrollbar*"
+                  }
+                ]
+              }
+            ],
+            "relationships": []
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "abstract_factory_ui.cpp",
+            "code": "#include <iostream>\n#include <memory>\n\nclass IButton { public: virtual ~IButton() = default; virtual void render() = 0; };\nclass IScrollbar { public: virtual ~IScrollbar() = default; virtual void scroll() = 0; };\n\nclass WindowsButton : public IButton { public: void render() override { std::cout << \"Windows Style Button\\n\"; } };\nclass WindowsScrollbar : public IScrollbar { public: void scroll() override { std::cout << \"Windows Scroll\\n\"; } };\n\nclass MacButton : public IButton { public: void render() override { std::cout << \"Mac Glassmorphism Button\\n\"; } };\nclass MacScrollbar : public IScrollbar { public: void scroll() override { std::cout << \"Mac Smooth Scroll\\n\"; } };\n\n// Abstract Factory\nclass IUIFactory {\npublic:\n    virtual ~IUIFactory() = default;\n    virtual std::unique_ptr<IButton> createButton() = 0;\n    virtual std::unique_ptr<IScrollbar> createScrollbar() = 0;\n};\n\nclass WindowsFactory : public IUIFactory {\npublic:\n    std::unique_ptr<IButton> createButton() override { return std::make_unique<WindowsButton>(); }\n    std::unique_ptr<IScrollbar> createScrollbar() override { return std::make_unique<WindowsScrollbar>(); }\n};\n\nclass MacFactory : public IUIFactory {\npublic:\n    std::unique_ptr<IButton> createButton() override { return std::make_unique<MacButton>(); }\n    std::unique_ptr<IScrollbar> createScrollbar() override { return std::make_unique<MacScrollbar>(); }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>MacFactory and WindowsFactory create matching UI component suites.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Cross-platform OS rendering engines (Qt, Flutter), Database driver suites (Postgres vs Oracle connection+command+transaction).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when an application needs to configure full product families consistently.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when you only need to instantiate single unrelated objects (use Factory Method).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Guarantees product compatibility across a family.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Adding a new product type requires modifying the abstract factory interface.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Cross-platform Theme Factories, Database Driver Suites.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Mixing components from different concrete factories.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between Factory Method and Abstract Factory?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Factory Method creates ONE product using inheritance/delegation. Abstract Factory creates FAMILIES of related products using object composition.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a Theme factory producing Panels and Buttons.</p>",
+          "practice": {
+            "title": "Dark/Light Theme Factory",
+            "problemStatement": "Implement a Theme factory producing Panels and Buttons.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Dark/Light Theme Factory",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class ITheme { public: virtual ~ITheme() = default; virtual std::unique_ptr<IButton> btn() = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Abstract Factory Pattern is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "builder-pattern",
+      "title": "Builder Pattern & Fluent Interfaces",
+      "description": "Separating the construction of a complex object from its representation.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Builder Pattern</strong> constructs complex objects step-by-step, allowing the same construction process to create different representations.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Constructors with 10+ parameters (Telescoping Constructor anti-pattern) are error-prone.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Step-by-step configuration via fluent method chaining returning <code>*this</code> or dedicated Director.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>HttpRequest::Builder().setUrl(\"...\").setMethod(\"POST\").build()</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Telescoping Constructor Solution",
+            "text": "Before: Pizza(size, cheese, pepperoni, bacon, olives, onions, mushrooms...) -> Horrible!\\nAfter: Pizza::Builder().setSize(12).addCheese().addPepperoni().build();"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "builder_pattern.cpp",
+            "code": "#include <iostream>\n#include <string>\n\nclass UserProfile {\npublic:\n    std::string username;\n    std::string email;\n    int age{0};\n    std::string bio;\n\n    class Builder {\n    private:\n        UserProfile profile;\n    public:\n        Builder& setUsername(std::string u) { profile.username = std::move(u); return *this; }\n        Builder& setEmail(std::string e) { profile.email = std::move(e); return *this; }\n        Builder& setAge(int a) { profile.age = a; return *this; }\n        Builder& setBio(std::string b) { profile.bio = std::move(b); return *this; }\n        UserProfile build() { return std::move(profile); }\n    };\n};\n\nint main() {\n    UserProfile user = UserProfile::Builder()\n                        .setUsername(\"prshobhit\")\n                        .setEmail(\"prshobhit@example.com\")\n                        .setAge(25)\n                        .setBio(\"C++ System Architect\")\n                        .build();\n    std::cout << \"User: \" << user.username << \" (\" << user.email << \")\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Nested Builder class constructing UserProfile step-by-step with clean fluent syntax.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>SQL Query Builders, HTTP Request Builders, Game Character Customizers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when constructing objects with multiple optional configuration parameters.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use for simple objects with 1-3 mandatory fields.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Readable, self-documenting code; avoids telescoping constructors.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires creating a separate Builder class.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Fluent Builder, Director-driven Builder, Inner Static Builder.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Forgetting to validate required fields inside build().</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What problem does the Builder pattern solve?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> It eliminates Telescoping Constructors (constructors with dozens of confusing parameters) and supports step-by-step immutable object creation.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build a Computer configuration builder (CPU, RAM, GPU, Storage).</p>",
+          "practice": {
+            "title": "Computer Hardware Builder",
+            "problemStatement": "Build a Computer configuration builder (CPU, RAM, GPU, Storage).",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Computer Hardware Builder",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class Computer { public: class Builder { /* fluent methods */ }; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Builder Pattern & Fluent Interfaces is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "prototype-pattern",
+      "title": "Prototype Pattern & Virtual Clone Idiom",
+      "description": "Creating new objects by copying an existing instance using virtual clone methods.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Prototype Pattern</strong> creates new objects by duplicating existing instances (cloning) rather than going through fresh constructor initialization.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>When creating an object from scratch is computationally expensive (e.g. Loading 3D mesh files or database lookups).</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Virtual copy constructor: <code>virtual std::unique_ptr&lt;IShape&gt; clone() const = 0;</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Subclasses implement <code>clone()</code> by calling their copy constructor and returning a new <code>std::unique_ptr</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Virtual Copy Idiom",
+            "text": "C++ has no virtual copy constructor by default. The Prototype Pattern solves this by adding virtual clone() const = 0!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "prototype_pattern.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\nclass IPrototype {\npublic:\n    virtual ~IPrototype() = default;\n    virtual std::unique_ptr<IPrototype> clone() const = 0;\n    virtual void render() const = 0;\n};\n\nclass Monster : public IPrototype {\nprivate:\n    std::string type;\n    int health;\npublic:\n    Monster(std::string t, int hp) : type(std::move(t)), health(hp) {}\n\n    // Virtual clone implementation\n    std::unique_ptr<IPrototype> clone() const override {\n        return std::make_unique<Monster>(*this); // Uses copy constructor\n    }\n\n    void render() const override {\n        std::cout << \"[Monster: \" << type << \"] HP: \" << health << \"\\n\";\n    }\n};\n\nint main() {\n    auto originalOrc = std::make_unique<Monster>(\"Orc Warrior\", 100);\n    // Clone prototype instantly without re-reading assets\n    auto clonedOrc = originalOrc->clone();\n    clonedOrc->render();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Virtual clone method returning unique_ptr copy of Monster instance.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Game NPC spawning, Graphic shape stamping tools, Network packet template duplicating.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when object creation cost is high or when cloning objects of unknown runtime types.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when objects hold non-copyable unique handles.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Fast $O(1)$ object spawning; polymorphic copy capability.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Deep copying complex circular reference graphs can be challenging.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Shallow Prototype, Deep Prototype with custom copy-and-swap.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Performing shallow copies on internal heap pointers.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How do you implement a Virtual Copy Constructor in C++?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> By declaring a pure virtual clone method (e.g. virtual unique_ptr<Base> clone() const = 0;) and implementing it in derived classes using return make_unique<Derived>(*this);.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement Bullet prototype with clone() for high-speed particle spawning.</p>",
+          "practice": {
+            "title": "Game Bullet Prototype",
+            "problemStatement": "Implement Bullet prototype with clone() for high-speed particle spawning.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Game Bullet Prototype",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class Bullet { public: virtual std::unique_ptr<Bullet> clone() const { return std::make_unique<Bullet>(*this); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Prototype Pattern & Virtual Clone Idiom is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    }
+  ]
+}

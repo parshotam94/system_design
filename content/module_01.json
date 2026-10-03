@@ -1,0 +1,1587 @@
+{
+  "module_id": "01",
+  "title": "Programming Foundations for LLD",
+  "level": "Beginner",
+  "category": "Foundations",
+  "description": "Master essential C++ concepts required for object-oriented system design: Classes, Objects, Constructors, RAII, Rule of 0/3/5, Move Semantics, and Smart Pointers.",
+  "topics": [
+    {
+      "id": "classes-and-objects",
+      "title": "Classes & Objects in C++",
+      "description": "Fundamental building blocks of object-oriented design in C++, memory layout, and stack vs heap object lifetimes.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>Class</strong> is a user-defined blueprint or data type that encapsulates data members (state) and member functions (behavior) into a cohesive unit. An <strong>Object</strong> is a concrete, tangible instance of that class instantiated in memory.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Without classes, procedural programming relies on disconnected primitive variables and scattered functions. Low-Level Design demands cohesive domain models where business invariants (e.g., a bank account balance cannot be negative without an overdraft limit) are tightly protected and coupled to their mutating behaviors.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Bind state and behavior together under strict access control. The object guarantees that it is always in a valid state from the moment its constructor finishes until its destructor runs.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>In C++, a class definition does not allocate memory for data. When an object is instantiated on the <strong>stack</strong> (<code>Car myCar;</code>) or on the <strong>heap</strong> (<code>auto carPtr = std::make_unique&lt;Car&gt;();</code>), memory is laid out for all non-static member variables according to compiler alignment and padding rules. Member functions exist once in the code/text segment and receive an implicit pointer <code>this</code> pointing to the invoking instance.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>UML Class representation and memory layout representation of a Car object with its encapsulated state and behavior:</p>",
+          "diagram": {
+            "title": "Car Class & Object Layout",
+            "classes": [
+              {
+                "name": "Car",
+                "attributes": [
+                  {
+                    "visibility": "-",
+                    "name": "vin",
+                    "type": "std::string"
+                  },
+                  {
+                    "visibility": "-",
+                    "name": "speed",
+                    "type": "double"
+                  },
+                  {
+                    "visibility": "-",
+                    "name": "isRunning",
+                    "type": "bool"
+                  }
+                ],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "start",
+                    "params": "",
+                    "returnType": "void"
+                  },
+                  {
+                    "visibility": "+",
+                    "name": "accelerate",
+                    "params": "double amount",
+                    "returnType": "void"
+                  },
+                  {
+                    "visibility": "+",
+                    "name": "getSpeed",
+                    "params": "",
+                    "returnType": "double"
+                  }
+                ]
+              }
+            ],
+            "relationships": []
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Here is the complete, robust C++20 implementation of a domain <code>Car</code> entity with invariant enforcement:</p>",
+          "code_example": {
+            "filename": "car_entity.cpp",
+            "code": "#include <iostream>\n#include <string>\n#include <stdexcept>\n\nclass Car {\nprivate:\n    std::string vin;\n    double speed{0.0};\n    bool isRunning{false};\n\npublic:\n    // Parameterized constructor enforcing domain invariant\n    explicit Car(std::string vehicleId) : vin(std::move(vehicleId)) {\n        if (vin.empty()) {\n            throw std::invalid_argument(\"VIN cannot be empty\");\n        }\n    }\n\n    void start() {\n        if (isRunning) {\n            std::cout << \"[Car \" << vin << \"] Engine is already running.\\n\";\n            return;\n        }\n        isRunning = true;\n        std::cout << \"[Car \" << vin << \"] Engine ignited.\\n\";\n    }\n\n    void accelerate(double amount) {\n        if (!isRunning) {\n            throw std::logic_error(\"Cannot accelerate while engine is off\");\n        }\n        if (amount < 0.0) {\n            throw std::invalid_argument(\"Acceleration delta must be positive\");\n        }\n        speed += amount;\n        std::cout << \"[Car \" << vin << \"] Accelerating to \" << speed << \" km/h.\\n\";\n    }\n\n    [[nodiscard]] double getSpeed() const noexcept {\n        return speed;\n    }\n\n    [[nodiscard]] bool getIsRunning() const noexcept {\n        return isRunning;\n    }\n};\n\nint main() {\n    Car sedan{\"1HGCR2F83HA000000\"};\n    sedan.start();\n    sedan.accelerate(45.5);\n    std::cout << \"Current Speed: \" << sedan.getSpeed() << \" km/h\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Line 11 (explicit constructor):</strong> Marking single-argument constructors <code>explicit</code> prevents accidental implicit conversions from string literals.<br><strong>Lines 24-34 (accelerate):</strong> Enforces domain logic preconditions: an engine must be running before speed changes occur.<br><strong>Line 37 ([[nodiscard]] & const):</strong> Ensures getters never mutate object state and warns if return values are discarded.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>In an automotive telematics system or ride-sharing fleet manager (Uber/Lyft), every vehicle is represented as a stateful <code>Vehicle</code> object tracking GPS coordinates, occupancy, engine diagnostics, and operational status.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use classes whenever you need to model domain entities that have identity, internal state, and strict business invariants that must be guarded from external corruption.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use full classes with private getters/setters for simple Passive Data Objects (Plain Old Data / DTOs). Use <code>struct</code> with public members when data has no invariants (e.g., a simple 2D Coordinate <code>struct Point { double x; double y; };</code>).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<ul style='margin-left: 1.25rem; line-height: 1.7;'><li><strong>Encapsulation:</strong> Internal representation can change without breaking client code.</li><li><strong>Invariant Safety:</strong> Constructor guarantees valid state; methods protect valid state.</li><li><strong>Polymorphism Readiness:</strong> Can be extended into hierarchies or interface contracts.</li></ul>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<ul style='margin-left: 1.25rem; line-height: 1.7;'><li>Small memory overhead due to alignment and padding.</li><li>Can lead to over-engineering if applied to trivial POD data transfer objects.</li></ul>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<ul style='margin-left: 1.25rem; line-height: 1.7;'><li><strong>Entity Classes:</strong> Defined by a unique identifier (e.g. <code>User</code>, <code>Car</code>, <code>Order</code>).</li><li><strong>Value Objects:</strong> Defined solely by their attributes (e.g. <code>Money</code>, <code>Address</code>, <code>DateRange</code>).</li><li><strong>Service Classes:</strong> Stateless operation coordinators (e.g. <code>PaymentGatewayClient</code>).</li></ul>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Creating <strong>'Anemic Domain Models'</strong> (classes that are just public getters and setters with zero logic) while business logic is scattered across giant controller procedures. This completely defeats object-oriented encapsulation.</p>",
+          "callout": {
+            "type": "trap",
+            "title": "Interview Trap: Class vs Struct in C++",
+            "text": "In C++, the ONLY technical difference between class and struct is default visibility: class members are private by default, struct members are public by default. Conventionally, use struct for data bundles with no invariants and class for domain entities."
+          }
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q1:</strong> What happens to object layout in memory if a class adds a virtual function?<br><strong>Q2:</strong> Why should single-parameter constructors almost always be marked <code>explicit</code>?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Adding a virtual function introduces a hidden Virtual Table Pointer (<code>vptr</code>) at the beginning of the object layout (typically 8 bytes on a 64-bit architecture), increasing <code>sizeof(Object)</code>. Marking constructors <code>explicit</code> prevents hazardous implicit type conversions (e.g. passing a string to a function expecting a <code>Car</code> implicitly calling <code>Car(string)</code> without warning).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Design an immutable <code>Money</code> Value Object representing an amount and 3-letter currency code (e.g., 'USD', 'EUR') that enforces non-negative amounts, validates currency codes, and prevents arithmetic between mismatched currencies.</p>",
+          "practice": {
+            "title": "Immutable Money Value Object",
+            "problemStatement": "Implement a C++ Money class that enforces strict invariant validation, supports safe addition with matching currency, and prevents accidental currency mismatch bugs.",
+            "requirements": [
+              "Amount must be non-negative (>= 0.0)",
+              "Currency code must be exactly 3 uppercase letters (ISO 4217)",
+              "Adding two Money objects with different currencies must throw std::invalid_argument",
+              "Money objects must be completely immutable once constructed"
+            ],
+            "constraints": [
+              "No raw heap pointers",
+              "Must be const-correct"
+            ],
+            "hint": "Make member variables const, validate in constructor, and return a new Money instance from the add() method.",
+            "expectedEntities": [
+              {
+                "name": "Money",
+                "responsibility": "Encapsulates immutable currency amount and currency validation logic."
+              }
+            ],
+            "referenceCode": {
+              "filename": "money_solution.cpp",
+              "code": "#include <iostream>\n#include <string>\n#include <stdexcept>\n\nclass Money {\nprivate:\n    const double amount;\n    const std::string currency;\n\n    static bool isValidCurrency(const std::string& curr) {\n        if (curr.length() != 3) return false;\n        for (char c : curr) {\n            if (c < 'A' || c > 'Z') return false;\n        }\n        return true;\n    }\n\npublic:\n    Money(double amt, std::string curr) : amount(amt), currency(std::move(curr)) {\n        if (amount < 0.0) throw std::invalid_argument(\"Amount cannot be negative\");\n        if (!isValidCurrency(currency)) throw std::invalid_argument(\"Invalid 3-letter ISO currency\");\n    }\n\n    [[nodiscard]] double getAmount() const noexcept { return amount; }\n    [[nodiscard]] const std::string& getCurrency() const noexcept { return currency; }\n\n    [[nodiscard]] Money add(const Money& other) const {\n        if (this->currency != other.currency) {\n            throw std::invalid_argument(\"Cannot add different currencies: \" + currency + \" vs \" + other.currency);\n        }\n        return Money(this->amount + other.amount, this->currency);\n    }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Classes are the core encapsulation mechanism in C++. By combining state with behavior, enforcing preconditions in constructors, and maintaining const-correctness, you lay the foundation for robust Low-Level System Design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "constructors-destructors",
+      "title": "Constructors & Destructors",
+      "description": "Object initialization lifecycles, member initializer lists, delegating constructors, explicit specifiers, and deterministic destruction.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>Constructor</strong> is a special member function invoked automatically when an object is instantiated to initialize its state. A <strong>Destructor</strong> is invoked automatically when the object goes out of scope or is deleted, releasing any acquired system resources.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>In languages without deterministic destructors (like Java or Python), resource cleanup relies on garbage collection or explicit <code>close()</code> calls that programmers easily forget. In C++, constructors guarantee valid initialization, and destructors guarantee leak-free, deterministic resource reclamation.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Guarantee that an object never exists in an uninitialized or corrupt state, and guarantee that resources (files, sockets, mutex locks, heap memory) are released automatically when the object's lifetime ends.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Constructors initialize base classes first, then member variables in the <strong>exact order of declaration in the class definition</strong> (regardless of the order in the initializer list), and finally execute the constructor body. Destructors run in the <strong>exact reverse order</strong>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Construction vs Destruction Order Lifecycle:</p>",
+          "callout": {
+            "type": "important",
+            "title": "Construction vs Destruction Order",
+            "text": "Construction: Base Class -> Member 1 -> Member 2 -> Constructor Body.\\nDestruction: Destructor Body -> Member 2 -> Member 1 -> Base Class."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Demonstrating Member Initializer Lists, Delegating Constructors, and Destructors:</p>",
+          "code_example": {
+            "filename": "constructors_demo.cpp",
+            "code": "#include <iostream>\n#include <string>\n\nclass DatabaseConnection {\nprivate:\n    std::string host;\n    int port;\n    bool isConnected{false};\n\npublic:\n    // Primary Parameterized Constructor with Member Initializer List\n    DatabaseConnection(std::string dbHost, int dbPort)\n        : host(std::move(dbHost)), port(dbPort) {\n        connect();\n    }\n\n    // Delegating Constructor: reuses primary constructor with default port\n    explicit DatabaseConnection(std::string dbHost)\n        : DatabaseConnection(std::move(dbHost), 5432) {\n        std::cout << \"[DatabaseConnection] Delegated to default port 5432\\n\";\n    }\n\n    // Destructor: guarantees clean disconnection\n    ~DatabaseConnection() {\n        disconnect();\n    }\n\nprivate:\n    void connect() {\n        isConnected = true;\n        std::cout << \"[Connected] to \" << host << \":\" << port << \"\\n\";\n    }\n\n    void disconnect() {\n        if (isConnected) {\n            isConnected = false;\n            std::cout << \"[Disconnected] from \" << host << \":\" << port << \"\\n\";\n        }\n    }\n};\n\nint main() {\n    {\n        std::cout << \"--- Entering Scope ---\\n\";\n        DatabaseConnection db{\"postgres-primary.cluster.internal\"};\n        std::cout << \"--- Doing work with DB ---\\n\";\n    } // <-- Destructor automatically runs here!\n    std::cout << \"--- Exited Scope ---\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 11-14 (Initializer List):</strong> Directly initializes <code>host</code> and <code>port</code> before entering constructor body, avoiding default construction followed by assignment.<br><strong>Lines 17-20 (Delegating Constructor):</strong> C++11 delegating constructor prevents duplicated initialization logic.<br><strong>Lines 23-25 (Destructor):</strong> Guaranteed to run when exiting scope, ensuring connection cleanup even if an exception occurs.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Connection pools, file streams (<code>std::ifstream</code>), mutex guards (<code>std::lock_guard</code>), and OS graphics device contexts rely entirely on constructor acquisition and destructor reclamation.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Always use member initializer lists for all member fields, and write a custom destructor whenever a class directly manages a native resource (file descriptor, raw pointer, mutex lock).</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not write manual destructors if your class only holds standard library types and smart pointers. Rely on the <strong>Rule of Zero</strong> where the compiler-generated destructor cleans up members automatically.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<ul style='margin-left: 1.25rem; line-height: 1.7;'><li>Guaranteed initialization without uninitialized memory garbage.</li><li>Zero risk of resource leaks upon scope exit.</li><li>Exception safety: stack unwinding automatically calls destructors of all initialized sub-objects.</li></ul>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<ul style='margin-left: 1.25rem; line-height: 1.7;'><li>Throwing exceptions inside a destructor during stack unwinding will trigger <code>std::terminate()</code> and crash the process. Destructors must be <code>noexcept</code>.</li></ul>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<ul style='margin-left: 1.25rem; line-height: 1.7;'><li><strong>Default Constructor:</strong> <code>Car() = default;</code></li><li><strong>Parameterized Constructor:</strong> <code>Car(string id, int year);</code></li><li><strong>Copy Constructor:</strong> <code>Car(const Car& other);</code></li><li><strong>Move Constructor:</strong> <code>Car(Car&& other) noexcept;</code></li><li><strong>Delegating Constructor:</strong> Calls another constructor in the same class.</li></ul>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>1. Assigning members inside the constructor body instead of using the initializer list (causes double initialization).<br>2. Expecting members to initialize in the order written in the constructor initializer list rather than the order declared in the class header.</p>",
+          "callout": {
+            "type": "trap",
+            "title": "Critical C++ Trap: Member Initialization Order",
+            "text": "Members are ALWAYS initialized in the exact order they are declared in the class definition, NOT the order in the initializer list. Misordering can cause undefined behavior if member B depends on member A being initialized first."
+          }
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What happens if an exception is thrown in the middle of a constructor? Does the object's destructor execute?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> If an exception is thrown in a constructor, the object is considered to have never been fully constructed. Therefore, its destructor will <strong>NOT</strong> run. However, the destructors of all successfully constructed base classes and member variables will run in reverse order during stack unwinding.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Write a <code>ScopedTimer</code> class whose constructor accepts a string label and records the start time using <code>std::chrono::high_resolution_clock</code>, and whose destructor automatically computes and prints elapsed time in milliseconds when exiting scope.</p>",
+          "practice": {
+            "title": "Benchmarking ScopedTimer",
+            "problemStatement": "Build a RAII ScopedTimer utility that measures elapsed execution time between construction and destruction.",
+            "requirements": [
+              "Constructor records start timestamp and takes a string label",
+              "Destructor prints duration in milliseconds",
+              "Destructor must be marked noexcept"
+            ],
+            "constraints": [
+              "Use <chrono> header"
+            ],
+            "hint": "Store std::chrono::time_point in the constructor and calculate std::chrono::duration in the destructor.",
+            "expectedEntities": [
+              {
+                "name": "ScopedTimer",
+                "responsibility": "Measures scope lifetime execution duration."
+              }
+            ],
+            "referenceCode": {
+              "filename": "scoped_timer.cpp",
+              "code": "#include <iostream>\n#include <chrono>\n#include <string>\n\nclass ScopedTimer {\nprivate:\n    std::string label;\n    std::chrono::time_point<std::chrono::high_resolution_clock> start;\n\npublic:\n    explicit ScopedTimer(std::string timerLabel)\n        : label(std::move(timerLabel)), start(std::chrono::high_resolution_clock::now()) {}\n\n    ~ScopedTimer() noexcept {\n        auto end = std::chrono::high_resolution_clock::now();\n        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();\n        std::cout << \"[Timer: \" << label << \"] Elapsed: \" << duration << \" us\\n\";\n    }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Constructors and destructors are the twin pillars of C++ memory and resource management. Leveraging initializer lists and deterministic destructors ensures robust, leak-free object design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "access-modifiers",
+      "title": "Access Modifiers & Encapsulation",
+      "description": "Information hiding via public, private, protected access specifiers, friend classes, and encapsulation boundary defense.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Access Modifiers</strong> (<code>public</code>, <code>private</code>, <code>protected</code>) control the visibility and accessibility of class members from outside code and derived subclasses.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>If class members are publicly accessible, any external function can directly modify internal fields into illegal states (e.g. Setting a negative account balance or resetting a state machine illegally), breaking system invariants and tightly coupling caller code to internal implementation details.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Hide internal representation details behind a minimal, stable public interface. Keep all data members <code>private</code> and provide intent-revealing member functions.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Access specifiers are checked strictly at <strong>compile time</strong>. <code>public</code> members are accessible everywhere. <code>private</code> members are accessible only within the class itself and declared <code>friend</code> entities. <code>protected</code> members are accessible within the class and derived classes.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visibility matrix comparison in C++:</p>",
+          "comparison": {
+            "title": "Access Specifier Visibility Matrix",
+            "columns": [
+              "Specifier",
+              "Inside Class",
+              "Derived Subclass",
+              "External World",
+              "LLD Best Practice"
+            ],
+            "rows": [
+              [
+                "private",
+                "\u2713 Yes",
+                "\u2717 No",
+                "\u2717 No",
+                "Default for ALL data members"
+              ],
+              [
+                "protected",
+                "\u2713 Yes",
+                "\u2713 Yes",
+                "\u2717 No",
+                "Use sparingly for extension hooks"
+              ],
+              [
+                "public",
+                "\u2713 Yes",
+                "\u2713 Yes",
+                "\u2713 Yes",
+                "Strictly for clean interface methods"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Encapsulated Bank Account with Friend Auditing Service:</p>",
+          "code_example": {
+            "filename": "encapsulation_bank.cpp",
+            "code": "#include <iostream>\n#include <string>\n#include <stdexcept>\n\nclass BankAccount {\nprivate:\n    std::string accountNumber;\n    double balance{0.0};\n\n    // Declare external Auditor as a friend class\n    friend class AccountAuditor;\n\npublic:\n    BankAccount(std::string accNum, double initialDeposit)\n        : accountNumber(std::move(accNum)), balance(initialDeposit) {\n        if (balance < 0.0) throw std::invalid_argument(\"Initial balance cannot be negative\");\n    }\n\n    void deposit(double amount) {\n        if (amount <= 0.0) throw std::invalid_argument(\"Deposit must be positive\");\n        balance += amount;\n    }\n\n    void withdraw(double amount) {\n        if (amount <= 0.0) throw std::invalid_argument(\"Withdrawal must be positive\");\n        if (amount > balance) throw std::runtime_error(\"Insufficient funds\");\n        balance -= amount;\n    }\n\n    [[nodiscard]] double getBalance() const noexcept {\n        return balance;\n    }\n};\n\nclass AccountAuditor {\npublic:\n    void auditInternalLedger(const BankAccount& acc) {\n        // Friend class can directly inspect private state for high-speed compliance audits\n        std::cout << \"[AUDIT] Account: \" << acc.accountNumber << \" | Exact Balance: $\" << acc.balance << \"\\n\";\n    }\n};\n\nint main() {\n    BankAccount myAccount{\"ACC-9921\", 500.0};\n    myAccount.deposit(250.0);\n    myAccount.withdraw(100.0);\n    \n    AccountAuditor auditor;\n    auditor.auditInternalLedger(myAccount);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 7-8:</strong> <code>accountNumber</code> and <code>balance</code> are strictly <code>private</code>.<br><strong>Lines 11:</strong> <code>friend class AccountAuditor;</code> grants selective internal visibility without exposing members to the entire application.<br><strong>Lines 20-30:</strong> Business invariants (no negative deposits/withdrawals, no overdraft) are enforced inside the class.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>E-commerce checkout engines encapsulate shopping cart items and pricing logic so external UI components cannot alter item discounts directly.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Make all data members private by default. Expose public methods only when callers need to command an action.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Avoid making data members <code>protected</code>. Protected data breaks encapsulation because any derived class can corrupt base invariants without base class awareness.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<ul style='margin-left: 1.25rem;'><li>Prevents external corruption of state.</li><li>Decouples callers from internal memory representations.</li><li>Simplifies debugging by localizing state changes to member functions.</li></ul>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<ul style='margin-left: 1.25rem;'><li>Overusing <code>friend</code> can punch holes in encapsulation and create tight coupling.</li></ul>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Public inheritance (is-a), Protected inheritance (implementation detail), Private inheritance (composition alternative).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Providing boilerplate getters AND setters for every private variable. A setter is just public access with extra syntax!</p>",
+          "callout": {
+            "type": "trap",
+            "title": "The Getter/Setter Illusion",
+            "text": "If a class has `getBalance()` and `setBalance(double)`, it is NOT encapsulated. Prefer behavioral methods like `deposit(amount)` and `withdraw(amount)` that guard business rules."
+          }
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is <code>protected</code> data considered an architectural code smell in modern C++ Low-Level Design?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Protected data creates unbounded coupling across inheritance trees. If a base class invariant changes, every derived class in the codebase might break. Instead, keep data <code>private</code> and provide <code>protected</code> accessor/mutation helper functions if subclasses need extension points.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Refactor a flawed <code>UserAccount</code> class with public raw password and balance fields into a fully encapsulated domain model with password hashing validation.</p>",
+          "refactor": {
+            "title": "Encapsulating User Account Invariants",
+            "problemSummary": "The initial design leaves password strings and wallet balance open to direct public tampering.",
+            "violations": [
+              "Public raw balance can be set to negative values.",
+              "Public password string exposed in plain text."
+            ],
+            "badCode": {
+              "filename": "bad_user.cpp",
+              "code": "// Flawed: Zero encapsulation\nstruct BadUser {\n    std::string username;\n    std::string password;\n    double walletBalance;\n};"
+            },
+            "goodCode": {
+              "filename": "clean_user.cpp",
+              "code": "// Clean: Fully encapsulated\nclass CleanUser {\nprivate:\n    std::string username;\n    std::string passwordHash;\n    double walletBalance{0.0};\n\npublic:\n    CleanUser(std::string user, std::string pwdHash)\n        : username(std::move(user)), passwordHash(std::move(pwdHash)) {}\n\n    bool verifyPassword(const std::string& inputHash) const noexcept {\n        return passwordHash == inputHash;\n    }\n\n    void addFunds(double amount) {\n        if (amount <= 0.0) throw std::invalid_argument(\"Must add positive funds\");\n        walletBalance += amount;\n    }\n};"
+            },
+            "benefits": [
+              "Password hash cannot be overwritten directly.",
+              "Wallet balance changes are strictly audited and validated."
+            ]
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Encapsulation is not just about writing <code>private</code>; it is about guaranteeing domain invariants and hiding internal implementation details from caller dependencies.</p>"
+        }
+      ]
+    },
+    {
+      "id": "static-and-const",
+      "title": "Static Members & Const Correctness",
+      "description": "Static class-level shared state, utility factories, const member functions, mutable caching fields, and physical vs logical constness.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Static Members</strong> belong to the class itself rather than any individual object instance. <strong>Const Correctness</strong> is the practice of using <code>const</code> to prevent unintended mutations of variables, parameters, and class states.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>In multi-threaded and large-scale systems, const-correctness enables compiler optimization and guarantees read-only thread safety. Static members provide centralized counters, configuration registries, or factory instantiation methods without instantiating unnecessary dummy objects.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>If a member function does not modify the observable logical state of the object, it MUST be marked <code>const</code>. If data or a method belongs to the class concept as a whole (e.g. <code>IdGenerator::next()</code>), make it <code>static</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Inside a <code>const</code> member function, the implicit <code>this</code> pointer has type <code>const ClassName* const</code>. Attempting to modify non-static member variables causes a compile error, unless a member is explicitly declared <code>mutable</code> (used for internal caching or mutex locking that does not alter logical constness).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Const Correctness vs Mutable internal caching:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Physical vs Logical Constness",
+            "text": "Physical constness means not a single bit in the object's memory changes. Logical constness means the external observable state doesn't change, even if internal cache counters or mutexes change using the mutable keyword."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>High-Performance Product Cache with Static Counters and Mutable Thread Mutex:</p>",
+          "code_example": {
+            "filename": "const_static_cache.cpp",
+            "code": "#include <iostream>\n#include <string>\n#include <mutex>\n\nclass ProductCatalog {\nprivate:\n    std::string catalogId;\n    // static member: shared across all instances\n    static inline int totalCatalogsCreated{0};\n\n    // mutable member: allows thread-safe locking inside const query methods\n    mutable std::mutex cacheMutex;\n    mutable int accessCount{0};\n\npublic:\n    explicit ProductCatalog(std::string id) : catalogId(std::move(id)) {\n        ++totalCatalogsCreated;\n    }\n\n    // Static member function\n    static int getTotalCatalogs() noexcept {\n        return totalCatalogsCreated;\n    }\n\n    // Const member function with internal mutable tracking\n    std::string getCatalogDetails() const {\n        std::lock_guard<std::mutex> lock(cacheMutex);\n        ++accessCount; // Valid because accessCount is mutable\n        return \"Catalog ID: \" + catalogId + \" (Accessed \" + std::to_string(accessCount) + \" times)\";\n    }\n};\n\nint main() {\n    const ProductCatalog electronics{\"CAT-ELEC-01\"};\n    std::cout << electronics.getCatalogDetails() << \"\\n\";\n    std::cout << \"Total Catalogs: \" << ProductCatalog::getTotalCatalogs() << \"\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Line 8 (static inline int):</strong> C++17 <code>inline static</code> allows in-class initialization of non-const static variables.<br><strong>Lines 11-12 (mutable):</strong> <code>mutable std::mutex</code> allows <code>std::lock_guard</code> to be instantiated inside <code>getCatalogDetails() const</code> without violating constness.<br><strong>Line 23:</strong> <code>getCatalogDetails() const</code> guarantees read-only access for callers holding <code>const ProductCatalog&</code>.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Singleton instances, thread-safe object pools, shared database connection counters, and memoized calculation caches rely on static members and mutable synchronization primitives.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Mark every getter and non-mutating query function <code>const</code>. Use <code>static</code> methods for utility helper functions and factory creation methods.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use global static mutable variables as hidden shared state across unrelated components; this causes hidden coupling and multi-threading race conditions.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<ul style='margin-left: 1.25rem;'><li>Compile-time enforcement of immutability.</li><li>Enables callers to pass <code>const T&</code> safely, avoiding expensive object copies.</li><li>Static methods can be called without instantiating dummy objects.</li></ul>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<ul style='margin-left: 1.25rem;'><li>Static state introduces global lifecycle management issues and makes unit test mocking harder.</li></ul>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p><code>const</code> member functions, <code>const</code> return types, <code>constexpr</code> compile-time evaluations, <code>mutable</code> fields.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Forgetting <code>const</code> on a getter method, which prevents that method from being called on any <code>const T&</code> reference passed throughout the system.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Can a <code>static</code> member function access non-static class members or call <code>this</code>?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> No. Static member functions do not have an implicit <code>this</code> pointer because they are associated with the class, not an object instance. They can only access static data members and other static member functions.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Design a <code>TransactionIdGenerator</code> class with a private constructor and a static method <code>generateId(const std::string& prefix)</code> that increments an internal atomic static counter and returns formatted transaction IDs.</p>",
+          "practice": {
+            "title": "Thread-safe Static ID Generator",
+            "problemStatement": "Implement a static ID generator that formats prefix + sequential counter safely.",
+            "requirements": [
+              "Private constructor to prevent instantiation",
+              "Static method generateId(prefix)",
+              "Sequential counter increment"
+            ],
+            "constraints": [
+              "No object instances should ever be created"
+            ],
+            "hint": "Use static inline std::atomic<uint64_t> counter in C++17/20.",
+            "expectedEntities": [
+              {
+                "name": "TransactionIdGenerator",
+                "responsibility": "Generates unique sequential transaction ID strings."
+              }
+            ],
+            "referenceCode": {
+              "filename": "id_gen.cpp",
+              "code": "#include <iostream>\n#include <string>\n#include <atomic>\n\nclass TransactionIdGenerator {\nprivate:\n    static inline std::atomic<uint64_t> counter{1000};\n    TransactionIdGenerator() = delete; // Disallow instantiation\n\npublic:\n    static std::string generateId(const std::string& prefix) {\n        uint64_t current = counter.fetch_add(1, std::memory_order_relaxed);\n        return prefix + \"_\" + std::to_string(current);\n    }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Const correctness is a fundamental contract in C++ software engineering. Marking non-mutating functions const enables safe pass-by-const-reference and enhances compiler optimization.</p>"
+        }
+      ]
+    },
+    {
+      "id": "pointers-and-references",
+      "title": "Pointers, References & the 'this' Pointer",
+      "description": "Memory addresses, pointer arithmetic, references vs pointers, method chaining with *this, and nullability semantics in LLD.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>Pointer</strong> is a variable that stores the memory address of another object. A <strong>Reference</strong> is an alias for an existing object that cannot be null or reseated. The <strong><code>this</code></strong> pointer is an implicit pointer passed to non-static member functions pointing to the calling object instance.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Passing large objects by value causes expensive deep copies. References and pointers enable zero-copy parameter passing, polymorphic base-class access, and method chaining (Fluent Interfaces).</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Prefer <code>const T&</code> for non-null read-only inputs, <code>T&</code> for non-null mutating inputs, and smart pointers (or raw pointers for non-owning optional relationships) when nullability or lifetime transfer is needed.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>References must be initialized upon declaration and cannot be null. Pointers can be reassigned and can hold <code>nullptr</code>. In member functions, returning <code>*this</code> allows chaining multiple method calls sequentially on the same instance.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Pointer vs Reference comparison:</p>",
+          "comparison": {
+            "title": "Pointers vs References in C++",
+            "columns": [
+              "Feature",
+              "Reference (T&)",
+              "Raw Pointer (T*)",
+              "Best Practice"
+            ],
+            "rows": [
+              [
+                "Nullability",
+                "Cannot be null",
+                "Can be nullptr",
+                "Use Reference if object must exist"
+              ],
+              [
+                "Reassignment",
+                "Cannot be reseated",
+                "Can point to new address",
+                "Use Pointer if target changes"
+              ],
+              [
+                "Syntax",
+                "Direct object access (.)",
+                "Arrow operator (->) or (*ptr)",
+                "References are cleaner"
+              ],
+              [
+                "Memory Overhead",
+                "Zero overhead (compiler alias)",
+                "Holds 8-byte address",
+                "References are preferred for params"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Fluent Request Builder using <code>*this</code> Method Chaining:</p>",
+          "code_example": {
+            "filename": "fluent_builder_this.cpp",
+            "code": "#include <iostream>\n#include <string>\n\nclass HttpRequest {\nprivate:\n    std::string url;\n    std::string method{\"GET\"};\n    std::string body;\n    int timeoutMs{5000};\n\npublic:\n    HttpRequest& setUrl(std::string targetUrl) {\n        this->url = std::move(targetUrl);\n        return *this; // Return reference to current instance for chaining\n    }\n\n    HttpRequest& setMethod(std::string httpMethod) {\n        this->method = std::move(httpMethod);\n        return *this;\n    }\n\n    HttpRequest& setBody(std::string requestBody) {\n        this->body = std::move(requestBody);\n        return *this;\n    }\n\n    HttpRequest& setTimeout(int ms) {\n        this->timeoutMs = ms;\n        return *this;\n    }\n\n    void send() const {\n        std::cout << \"[HTTP SEND] \" << method << \" \" << url \n                  << \" | Timeout: \" << timeoutMs << \"ms\"\n                  << \" | Body: \" << body << \"\\n\";\n    }\n};\n\nint main() {\n    HttpRequest request;\n    // Method chaining enabled by returning *this\n    request.setUrl(\"https://api.payment.com/v1/charge\")\n           .setMethod(\"POST\")\n           .setBody(\"{\\\"amount\\\": 1500}\")\n           .setTimeout(3000)\n           .send();\n\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Line 12:</strong> <code>return *this;</code> dereferences the implicit <code>this</code> pointer, returning an lvalue reference <code>HttpRequest&</code> to allow continuous dot-chaining.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>The <strong>Builder Pattern</strong>, <code>std::cout &lt;&lt; a &lt;&lt; b</code> stream operators, and SQL Query DSLs (e.g. <code>Query().select().from().where()</code>) are driven by returning <code>*this</code>.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use references for function parameters whenever you want to avoid copies. Use pointers only when optionality (nullability) or dynamic reseating is necessary.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Never return references or pointers to local stack variables that go out of scope (dangling pointer/reference bug).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Zero runtime copy overhead; enables flexible method chaining and polymorphic dynamic dispatch.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Dangling pointers/references cause undefined behavior and memory corruption if object lifetimes are mismanaged.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Lvalue references (<code>T&</code>), Const lvalue references (<code>const T&</code>), Rvalue references (<code>T&&</code>), Raw pointers (<code>T*</code>), Smart pointers.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Returning a reference to a temporary local variable from a member function.</p>",
+          "callout": {
+            "type": "trap",
+            "title": "Dangling Reference Bug",
+            "text": "const std::string& getName() { std::string temp = 'abc'; return temp; } // FATAL: temp is destroyed when function returns, caller gets dangling reference!"
+          }
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Can you call <code>delete this;</code> in C++? If so, when is it legal and what are the catastrophic risks?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> <code>delete this;</code> is technically legal ONLY if the object was guaranteed to have been allocated on the heap via <code>new</code>, and no member functions or variables of <code>this</code> are accessed after the delete statement. Calling it on a stack-allocated object causes immediate fatal undefined behavior (double free / invalid heap pointer).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a <code>StringBuilder</code> class supporting <code>append(str)</code>, <code>appendLine(str)</code>, and <code>toString()</code> using fluent method chaining returning <code>*this</code>.</p>",
+          "practice": {
+            "title": "Fluent StringBuilder",
+            "problemStatement": "Create a fluent StringBuilder with method chaining.",
+            "requirements": [
+              "append(string)",
+              "appendLine(string)",
+              "toString() const",
+              "Chainable methods"
+            ],
+            "constraints": [
+              "Return StringBuilder& from mutating methods"
+            ],
+            "hint": "Maintain an internal std::string buffer and return *this from all append operations.",
+            "expectedEntities": [
+              {
+                "name": "StringBuilder",
+                "responsibility": "Accumulates string fragments efficiently."
+              }
+            ],
+            "referenceCode": {
+              "filename": "string_builder.cpp",
+              "code": "#include <iostream>\n#include <string>\n\nclass StringBuilder {\nprivate:\n    std::string buffer;\npublic:\n    StringBuilder& append(const std::string& str) {\n        buffer += str;\n        return *this;\n    }\n    StringBuilder& appendLine(const std::string& str) {\n        buffer += str + \"\\n\";\n        return *this;\n    }\n    [[nodiscard]] std::string toString() const {\n        return buffer;\n    }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>References provide safe, non-null aliasing for parameters, while <code>this</code> enables expressive fluent builders and self-referential member operations.</p>"
+        }
+      ]
+    },
+    {
+      "id": "friend-and-namespaces",
+      "title": "Namespaces & Header/Source Separation",
+      "description": "Organizing modular C++ architectures, header guards, forward declarations, and compilation firewall techniques.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Namespaces</strong> prevent symbol naming collisions across libraries. <strong>Header/Source Separation</strong> divides code into class declarations (<code>.hpp</code>/<code>.h</code>) and implementation definitions (<code>.cpp</code>).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>In massive production systems, having thousands of classes in headers causes circular compilation dependencies and exponential build times. Proper separation with forward declarations isolates translation units.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Declare interfaces in header files, define heavy implementations in <code>.cpp</code> files, group cohesive subsystems in nested namespaces, and use forward declarations (<code>class Engine;</code>) whenever only pointers or references are needed in the header.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>The C++ preprocessor replaces <code>#include</code> with the literal file contents. <code>#pragma once</code> prevents multiple inclusion in a single translation unit. Forward declarations tell the compiler a class exists so it can allocate pointer sizes without parsing the full class layout.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Compilation model and Forward Declarations:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Forward Declaration Rule of Thumb",
+            "text": "If a header only uses `Engine*` or `const Engine&`, do NOT `#include \"Engine.hpp\"`. Simply write `class Engine;` at the top of your header. This drastically reduces build times and breaks circular `#include` cycles."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Clean Header/Source layout with Namespaces:</p>",
+          "code_example": {
+            "filename": "order_service.hpp",
+            "code": "#pragma once\n#include <string>\n#include <memory>\n\n// Forward declarations to avoid heavy header includes\nnamespace Payment { class IPaymentGateway; }\nnamespace Notification { class INotificationService; }\n\nnamespace Core::Commerce {\n\n    class OrderService {\n    private:\n        std::shared_ptr<Payment::IPaymentGateway> paymentGateway;\n        std::shared_ptr<Notification::INotificationService> notifier;\n\n    public:\n        OrderService(std::shared_ptr<Payment::IPaymentGateway> gateway,\n                     std::shared_ptr<Notification::INotificationService> notificationService);\n\n        void processOrder(const std::string& orderId, double amount);\n    };\n\n} // namespace Core::Commerce"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Line 1 (<code>#pragma once</code>):</strong> Standard header guard.<br><strong>Lines 6-7 (Forward Declarations):</strong> Declares types without including full gateway/notification headers.<br><strong>Line 9 (<code>namespace Core::Commerce</code>):</strong> C++17 nested namespace syntax organizes system packages cleanly.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Enterprise game engines (Unreal Engine) and trading platforms (Bloomberg, Citadel) strictly enforce forward declarations and namespace modularity to keep multi-million-line compilation times under minutes.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Always separate declarations and definitions in production C++ projects, except for template classes which must remain in headers.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Never put <code>using namespace std;</code> in a header file, as it forces the entire std namespace into every file that includes that header (namespace pollution).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Eliminates symbol naming clashes, drastically reduces incremental compilation times, and prevents circular dependency errors.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires maintaining two files (<code>.hpp</code> and <code>.cpp</code>) per class.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Named namespaces, Nested namespaces (<code>namespace A::B</code>), Anonymous (unnamed) namespaces for internal linkage, Inline namespaces for ABI versioning.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Putting <code>using namespace ...</code> inside header files; causing circular dependency deadlock where Header A includes Header B which includes Header A.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the purpose of an unnamed (anonymous) namespace in a <code>.cpp</code> file?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> An anonymous namespace gives functions and variables <strong>internal linkage</strong>, meaning they are visible only within that single translation unit (<code>.cpp</code> file). It is the modern C++ replacement for the C-style <code>static</code> global function/variable specifier.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Structure a modular namespace hierarchy for a <code>TradingEngine</code> with <code>OrderBook</code>, <code>MatchingEngine</code>, and <code>RiskManager</code> components.</p>",
+          "practice": {
+            "title": "Modular Namespace Architecture",
+            "problemStatement": "Design clean namespaces for a trading engine subsystem.",
+            "requirements": [
+              "Nested namespaces",
+              "Proper header guards",
+              "Forward declarations"
+            ],
+            "constraints": [
+              "No using namespace in headers"
+            ],
+            "hint": "Use namespace Trading::Execution and namespace Trading::Risk.",
+            "expectedEntities": [
+              {
+                "name": "OrderBook",
+                "responsibility": "Maintains bids and asks."
+              },
+              {
+                "name": "RiskManager",
+                "responsibility": "Validates margin before execution."
+              }
+            ],
+            "referenceCode": {
+              "filename": "trading_ns.hpp",
+              "code": "#pragma once\nnamespace Trading::Risk { class RiskManager; }\nnamespace Trading::Execution {\n    class OrderBook {\n    public:\n        void addOrder(int id, double price);\n    };\n}"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Proper namespace scoping and forward declarations are essential for modular, clean, and fast-building C++ software architectures.</p>"
+        }
+      ]
+    },
+    {
+      "id": "header-source-separation",
+      "title": "Header & Source File Separation",
+      "description": "Mastering the compilation model: header files (.hpp), implementation files (.cpp), Include Guards (#pragma once), Forward Declarations, and the One Definition Rule (ODR).",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it",
+          "content": "<p>In C++, code is partitioned into <strong>Header Files</strong> (<code>.hpp</code> / <code>.h</code>) containing interface declarations, class layouts, and function prototypes, and <strong>Source Files</strong> (<code>.cpp</code>) containing compiled method definitions and executable logic.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why it exists",
+          "content": "<p>C++ uses a translation unit (TU) compilation model. Separating declarations from definitions allows independent compilation of separate <code>.cpp</code> files into <code>.o</code> / <code>.obj</code> object files, dramatically accelerating incremental build times and enabling clean interface distribution without exposing proprietary source code.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Real-world analogy",
+          "content": "<p>A restaurant menu (Header File): customers read the list of available dishes and ingredients (interfaces) without needing to stand inside the kitchen and watch the chef chop onions and cook (Source File implementation).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>The preprocessor replaces <code>#include \"file.hpp\"</code> with the raw text of the header. <strong>Include guards</strong> (<code>#pragma once</code>) prevent circular compilation errors. <strong>Forward declarations</strong> (<code>class Order;</code>) reduce compile-time header coupling by telling the compiler a type exists without needing to parse its full header.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Compilation pipeline: Preprocessor -> Compiler -> Assembler -> Linker:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Forward Declarations vs #include",
+            "text": "If a header file only holds a pointer or reference to Class B (e.g. B* or const B&), use a forward declaration 'class B;' instead of '#include \"B.hpp\"' to prevent massive recompilation cascades across your project."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Clean Header (.hpp) and Source (.cpp) separation with Forward Declaration:</p>",
+          "code_example": {
+            "filename": "CustomerService.hpp",
+            "code": "// CustomerService.hpp\n#pragma once\n#include <string>\n#include <memory>\n\n// Forward declaration: does NOT require #include \"Order.hpp\"\nclass Order;\n\nclass CustomerService {\nprivate:\n    std::string serviceRegion;\n\npublic:\n    explicit CustomerService(std::string region);\n    ~CustomerService();\n\n    // Takes reference to forward-declared type\n    [[nodiscard]] bool processOrder(const Order& order) const;\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>#pragma once:</strong> Directs the preprocessor to include this file only once per translation unit.<br><strong>class Order;:</strong> Forward declaration. Informs the compiler that <code>Order</code> is a class type without parsing <code>Order.hpp</code>.<br><strong>CustomerService.cpp:</strong> Includes <code>Order.hpp</code> internally to execute methods on the order.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>All major production C++ libraries (Boost, Qt, Unreal Engine, Chromium, LLVM) separate public API headers from private implementation details.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use for all non-template production C++ classes to minimize build times and decouple module dependencies.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>C++ template classes and <code>constexpr</code> functions must have their definitions available in header files because the compiler instantiates templates at compile-time.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<ul style='margin-left: 1.25rem;'><li>Fast incremental compilation.</li><li>Prevents circular dependency include deadlocks.</li><li>Enforces separation of interface from implementation.</li></ul>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<ul style='margin-left: 1.25rem;'><li>Requires maintaining two synchronized files (.hpp and .cpp) for each class.</li></ul>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Header-only libraries, PImpl (Pointer to Implementation) idiom, C++20 Modules (<code>import std;</code>).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Defining non-inline functions in header files, causing 'multiple definition' linker errors (ODR violation).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Refactoring / Anti-patterns",
+          "content": "<p>Refactoring <code>#include \"HeavyEngine.hpp\"</code> in headers to forward declarations cuts compile times by 80%.</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview questions",
+          "content": "<p><strong>Q: What is the One Definition Rule (ODR)?</strong><br><em>A:</em> A rule stating that any variable, function, class, or template can have only one definition across the entire program (or per translation unit for inline functions).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Edge cases",
+          "content": "<p>Inline functions and static template members require special handling to ensure single identical linkage across translation units.</p>"
+        },
+        {
+          "step_number": 18,
+          "title": "18. Practice exercise",
+          "content": "<p>Convert a circular include between Class A and Class B into a clean forward declaration design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "raii-and-resource-mgmt",
+      "title": "RAII (Resource Acquisition Is Initialization)",
+      "description": "The fundamental idiom of C++: binding resource acquisition to constructor initialization and resource release to destructor execution.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>RAII</strong> (Resource Acquisition Is Initialization) is a C++ programming idiom where acquiring a resource (heap memory, file handle, socket, database connection, mutex lock) is performed in the constructor, and releasing the resource is guaranteed in the destructor.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Manual resource management (e.g. <code>fclose(fp)</code>, <code>free(ptr)</code>, <code>mutex.unlock()</code>) is notorious for leaking resources whenever early returns or exceptions occur. RAII guarantees leak-free execution under all control flow branches.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Tie the lifetime of any system resource to the lifetime of a stack-allocated managing object. When the stack frame unwinds (normal return OR thrown exception), the destructor automatically releases the resource.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>C++ guarantees that local stack objects have their destructors called in reverse order of declaration when exiting scope. By wrapping raw resource handles in an RAII class, resource reclamation becomes 100% deterministic.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>RAII Exception Safety flow:</p>",
+          "callout": {
+            "type": "important",
+            "title": "RAII vs Manual Cleanup under Exceptions",
+            "text": "Manual code: Lock -> Do Work -> Exception Thrown! -> Unlock NEVER called (Deadlock!).\\nRAII code: lock_guard -> Do Work -> Exception Thrown! -> Stack unwinds -> Destructor automatically unlocks mutex!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Production-Grade RAII File Wrapper:</p>",
+          "code_example": {
+            "filename": "raii_file_guard.cpp",
+            "code": "#include <iostream>\n#include <cstdio>\n#include <stdexcept>\n#include <string>\n\nclass FileHandle {\nprivate:\n    FILE* file{nullptr};\n    std::string filename;\n\npublic:\n    FileHandle(const std::string& path, const std::string& mode)\n        : filename(path) {\n        file = std::fopen(path.c_str(), mode.c_str());\n        if (!file) {\n            throw std::runtime_error(\"Failed to open file: \" + path);\n        }\n        std::cout << \"[RAII] File '\" << filename << \"' acquired & opened.\\n\";\n    }\n\n    // Destructor guarantees file handle is closed\n    ~FileHandle() noexcept {\n        if (file) {\n            std::fclose(file);\n            std::cout << \"[RAII] File '\" << filename << \"' safely closed.\\n\";\n        }\n    }\n\n    // Prevent accidental copying (resource duplication)\n    FileHandle(const FileHandle&) = delete;\n    FileHandle& operator=(const FileHandle&) = delete;\n\n    // Allow move semantics\n    FileHandle(FileHandle&& other) noexcept\n        : file(other.file), filename(std::move(other.filename)) {\n        other.file = nullptr;\n    }\n\n    void writeLine(const std::string& text) {\n        if (!file || std::fputs((text + \"\\n\").c_str(), file) == EOF) {\n            throw std::runtime_error(\"Write failed to file: \" + filename);\n        }\n    }\n};\n\nint main() {\n    try {\n        FileHandle logFile{\"application.log\", \"w\"};\n        logFile.writeLine(\"Initializing system components...\");\n        logFile.writeLine(\"Processing payment batches...\");\n        // If an exception is thrown here, file still closes cleanly!\n    } catch (const std::exception& ex) {\n        std::cerr << \"Exception caught: \" << ex.what() << \"\\n\";\n    }\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 11-17 (Constructor):</strong> Opens the file and throws if invalid.<br><strong>Lines 20-25 (Destructor):</strong> Checks pointer and calls <code>fclose</code>, marked <code>noexcept</code>.<br><strong>Lines 28-29:</strong> Deletes copy constructor and assignment operator to prevent double-closing the same OS file handle.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p><code>std::unique_ptr</code>, <code>std::vector</code>, <code>std::fstream</code>, <code>std::lock_guard</code>, and Vulkan/OpenGL GPU texture wrappers are all pure RAII implementations.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use RAII for ANY resource that requires acquisition and release steps (memory, files, sockets, locks, database transactions).</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>RAII is the core idiom of C++; there is virtually no scenario in modern C++ where manual acquisition/cleanup is preferred over RAII.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<ul style='margin-left: 1.25rem;'><li>Zero resource leaks.</li><li>Complete exception safety during stack unwinding.</li><li>Eliminates boilerplate cleanup code.</li></ul>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires understanding move vs copy semantics to prevent accidental resource copying.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Scope Guards, Smart Pointers, Lock Wrappers, Custom Transaction Rollback guards.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Failing to disable copy operations on RAII wrappers, leading to two objects pointing to the same handle and causing a double-free crash.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does RAII guarantee exception safety in C++ when an exception is thrown inside a deeply nested function call?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> When an exception is thrown, the C++ runtime performs <strong>Stack Unwinding</strong>. It pops stack frames one by one until a matching <code>catch</code> block is found. As each stack frame is destroyed, all local objects in that frame have their destructors called in reverse order of construction, guaranteeing all acquired resources are freed.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build a <code>TransactionScope</code> RAII guard that begins a database transaction on construction, commits if <code>commit()</code> was explicitly called, and automatically rolls back in the destructor if commit was never called.</p>",
+          "practice": {
+            "title": "RAII Database Transaction Rollback Guard",
+            "problemStatement": "Build a TransactionScope RAII guard that rolls back on abnormal termination.",
+            "requirements": [
+              "Constructor logs [TX] BEGIN",
+              "commit() marks transaction as committed",
+              "Destructor checks isCommitted; if false, logs [TX] ROLLBACK; otherwise does nothing"
+            ],
+            "constraints": [
+              "Copy operations deleted"
+            ],
+            "hint": "Use a bool isCommitted flag.",
+            "expectedEntities": [
+              {
+                "name": "TransactionScope",
+                "responsibility": "Guarantees transaction commit or automatic rollback."
+              }
+            ],
+            "referenceCode": {
+              "filename": "tx_scope.cpp",
+              "code": "#include <iostream>\n\nclass TransactionScope {\nprivate:\n    bool isCommitted{false};\npublic:\n    TransactionScope() { std::cout << \"[TX] BEGIN\\n\"; }\n    ~TransactionScope() noexcept {\n        if (!isCommitted) {\n            std::cout << \"[TX] AUTO-ROLLBACK (Uncommitted changes aborted)\\n\";\n        }\n    }\n    void commit() {\n        isCommitted = true;\n        std::cout << \"[TX] COMMITTED\\n\";\n    }\n    TransactionScope(const TransactionScope&) = delete;\n    TransactionScope& operator=(const TransactionScope&) = delete;\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>RAII is the bedrock of modern C++. It turns manual, error-prone cleanup into automatic, compiler-enforced lifetime guarantees.</p>"
+        }
+      ]
+    },
+    {
+      "id": "rule-of-0-3-5",
+      "title": "Rule of 0, Rule of 3, and Rule of 5",
+      "description": "Managing special member functions: Destructor, Copy Constructor, Copy Assignment, Move Constructor, Move Assignment, and the Copy-and-Swap idiom.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Rule of 0/3/5</strong> defines C++ guidelines for implementing special member functions:<br><strong>Rule of 3 (C++98):</strong> If you implement a Destructor, Copy Constructor, or Copy Assignment, you must implement all three.<br><strong>Rule of 5 (C++11):</strong> In modern C++, adding Move Constructor and Move Assignment completes the set of 5.<br><strong>Rule of 0:</strong> Design classes that manage NO raw resources directly (use smart pointers/containers), so the compiler can generate all 5 correctly!</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>The compiler generates default copy constructors that perform a <strong>shallow member-wise copy</strong>. If your class holds a raw pointer or resource, shallow copying causes both objects to own the same pointer, resulting in double deletion and undefined behavior.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Aim for the <strong>Rule of Zero</strong> in 95% of domain classes. When writing low-level resource managers, implement the full <strong>Rule of Five</strong> with deep copying and efficient move semantics.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>The 5 special member functions are:<br>1. Destructor: <code>~Widget();</code><br>2. Copy Constructor: <code>Widget(const Widget&);</code><br>3. Copy Assignment: <code>Widget& operator=(const Widget&);</code><br>4. Move Constructor: <code>Widget(Widget&&) noexcept;</code><br>5. Move Assignment: <code>Widget& operator=(Widget&&) noexcept;</code></p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Comparison of Rule of 0 vs Rule of 3 vs Rule of 5:</p>",
+          "comparison": {
+            "title": "Rule of 0 vs Rule of 3 vs Rule of 5",
+            "columns": [
+              "Rule",
+              "When to Use",
+              "Special Member Functions Written",
+              "Risk Level"
+            ],
+            "rows": [
+              [
+                "Rule of 0",
+                "Standard domain classes holding string, vector, unique_ptr",
+                "None (let compiler generate)",
+                "Safest & Preferred"
+              ],
+              [
+                "Rule of 3",
+                "Legacy C++98 classes managing raw pointers/handles",
+                "Destructor, Copy Ctor, Copy Assign",
+                "High (No Move support)"
+              ],
+              [
+                "Rule of 5",
+                "Custom low-level memory/resource management classes",
+                "All 5 (Destructor, Copy/Move Ctors, Copy/Move Assign)",
+                "Requires precision"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Full Rule of 5 Dynamic Buffer with Copy-and-Swap Idiom:</p>",
+          "code_example": {
+            "filename": "rule_of_five_buffer.cpp",
+            "code": "#include <iostream>\n#include <algorithm>\n#include <utility>\n\nclass DynamicBuffer {\nprivate:\n    size_t size{0};\n    int* data{nullptr};\n\npublic:\n    // Default / Parameterized Constructor\n    explicit DynamicBuffer(size_t n = 0) : size(n), data(n ? new int[n]() : nullptr) {\n        std::cout << \"[Buffer] Allocated \" << size << \" ints.\\n\";\n    }\n\n    // 1. Destructor\n    ~DynamicBuffer() noexcept {\n        delete[] data;\n        std::cout << \"[Buffer] Deallocated size \" << size << \".\\n\";\n    }\n\n    // 2. Copy Constructor (Deep Copy)\n    DynamicBuffer(const DynamicBuffer& other)\n        : size(other.size), data(other.size ? new int[other.size] : nullptr) {\n        std::copy(other.data, other.data + other.size, data);\n        std::cout << \"[Buffer] Deep Copied size \" << size << \".\\n\";\n    }\n\n    // 3. Move Constructor (Resource Steal)\n    DynamicBuffer(DynamicBuffer&& other) noexcept\n        : size(other.size), data(other.data) {\n        other.size = 0;\n        other.data = nullptr; // Leave source in valid empty state\n        std::cout << \"[Buffer] Move Constructed.\\n\";\n    }\n\n    // Swap helper function for Copy-and-Swap idiom\n    friend void swap(DynamicBuffer& first, DynamicBuffer& second) noexcept {\n        using std::swap;\n        swap(first.size, second.size);\n        swap(first.data, second.data);\n    }\n\n    // 4 & 5. Unified Assignment Operator (Copy-and-Swap handles both copy & move)\n    DynamicBuffer& operator=(DynamicBuffer other) noexcept {\n        swap(*this, other);\n        return *this;\n    }\n};\n\nint main() {\n    DynamicBuffer buf1(100);\n    DynamicBuffer buf2 = buf1;              // Copy Constructor\n    DynamicBuffer buf3 = std::move(buf1);   // Move Constructor\n    buf2 = buf3;                            // Copy Assignment\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 20-24 (Copy Ctor):</strong> Performs deep allocation and memory copy.<br><strong>Lines 27-32 (Move Ctor):</strong> Steals pointer and sets <code>other.data = nullptr</code> in $O(1)$ time.<br><strong>Lines 41-44 (Unified operator=):</strong> Takes parameter by value (<code>DynamicBuffer other</code>); automatically handles both copy and move assignment using <code>swap</code> with strong exception safety!</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p><code>std::vector</code>, <code>std::string</code>, and audio PCM sound buffers implement the Rule of 5 to provide deep copies and blazing-fast moves.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Apply Rule of 5 when creating low-level data structures (e.g., custom Matrix, RingBuffer). Apply Rule of 0 everywhere else.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not write manual copy/move functions if all members are already standard library types (e.g. <code>std::string</code>, <code>std::vector</code>).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Eliminates double-free crashes, supports move performance optimizations, and provides strong exception safety.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires meticulous attention to detail to ensure self-assignment safety and <code>noexcept</code> move guarantees.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Rule of 0, Rule of 3 (C++98), Rule of 5 (C++11), Copy-and-Swap idiom.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Forgetting to nullify the source object's pointers in the Move Constructor, resulting in double deletion when the temporary source object destructs.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why should Move Constructors and Move Assignment operators almost always be marked <code>noexcept</code>?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Standard library containers like <code>std::vector</code> check <code>std::is_nothrow_move_constructible</code> when resizing. If your move constructor is NOT marked <code>noexcept</code>, <code>std::vector</code> will fall back to expensive deep copies during reallocation to guarantee strong exception safety.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Refactor a user profile class managing a raw string buffer to use the Rule of Zero with <code>std::string</code>.</p>",
+          "refactor": {
+            "title": "Refactor to Rule of Zero",
+            "problemSummary": "Legacy class uses raw char* and manually manages memory, violating Rule of Zero.",
+            "violations": [
+              "Manual new char[] and delete[] invites memory leaks.",
+              "Missing copy constructor causes double free on copy."
+            ],
+            "badCode": {
+              "filename": "bad_rule_profile.cpp",
+              "code": "// Flawed: Raw memory management without Rule of 5\nclass BadProfile {\n    char* name;\npublic:\n    BadProfile(const char* n) {\n        name = new char[strlen(n) + 1];\n        strcpy(name, n);\n    }\n    ~BadProfile() { delete[] name; }\n    // BUG: Missing copy constructor & assignment!\n};"
+            },
+            "goodCode": {
+              "filename": "clean_rule_zero.cpp",
+              "code": "// Clean: Rule of Zero using std::string\nclass CleanProfile {\nprivate:\n    std::string name;\npublic:\n    explicit CleanProfile(std::string n) : name(std::move(n)) {}\n    // Compiler automatically generates perfect copy, move, and destructor!\n};"
+            },
+            "benefits": [
+              "Zero manual memory management.",
+              "Automatic exception safety and no risk of double free."
+            ]
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>The Rule of 0/3/5 is essential for memory safety in C++. Default to Rule of 0; use Rule of 5 with Copy-and-Swap when building custom resource wrappers.</p>"
+        }
+      ]
+    },
+    {
+      "id": "copy-and-move-semantics",
+      "title": "Copy vs Move Semantics (rvalue references)",
+      "description": "Lvalues, Rvalues, std::move, std::forward, rvalue references (&&), and high-performance zero-copy resource transfers in C++20.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Copy Semantics</strong> duplicates the contents of an object into a new memory location. <strong>Move Semantics</strong> transfers ownership of internal resources from a temporary/expiring object (rvalue) to a target object without allocating new memory or copying bytes.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Before C++11, returning large objects (like a 10MB vector or string) from functions caused costly deep copies. Move semantics turns $O(N)$ deep copies into $O(1)$ pointer swaps.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>An <strong>Lvalue</strong> is an expression that has an identifiable memory address (e.g. named variables). An <strong>Rvalue</strong> is a temporary value that has no persistent memory location (e.g. literals, function return values). <code>std::move</code> unconditionally casts an lvalue to an rvalue reference (<code>T&&</code>), enabling move constructors to steal its resources.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>std::move(x)</code> does NOT move anything at runtime; it is a compile-time <code>static_cast&lt;T&&&gt;(x)</code> that allows overload resolution to select the move constructor instead of the copy constructor.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Copy vs Move Mechanism:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Copy vs Move in Memory",
+            "text": "Copy: Allocate New Buffer -> Copy 1,000,000 items -> Two separate memory blocks.\\nMove: Target.ptr = Source.ptr -> Source.ptr = nullptr -> Zero new memory allocated (Instant $O(1)$ pointer steal)!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Demonstrating Move vs Copy Performance with Custom Payload:</p>",
+          "code_example": {
+            "filename": "move_semantics_demo.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <string>\n#include <utility>\n\nclass HeavyPayload {\nprivate:\n    std::string name;\n    std::vector<int> numbers;\n\npublic:\n    HeavyPayload(std::string n, size_t count)\n        : name(std::move(n)), numbers(count, 42) {\n        std::cout << \"[Created] \" << name << \" with \" << numbers.size() << \" elements.\\n\";\n    }\n\n    // Copy Constructor\n    HeavyPayload(const HeavyPayload& other)\n        : name(other.name + \" (Copy)\"), numbers(other.numbers) {\n        std::cout << \"[COPIED] \" << name << \" - Deep copied \" << numbers.size() << \" elements.\\n\";\n    }\n\n    // Move Constructor\n    HeavyPayload(HeavyPayload&& other) noexcept\n        : name(std::move(other.name)), numbers(std::move(other.numbers)) {\n        std::cout << \"[MOVED] \" << name << \" - Stole vector buffer in O(1) time!\\n\";\n    }\n};\n\nint main() {\n    std::cout << \"--- 1. Testing Copy ---\\n\";\n    HeavyPayload original{\"DataSet-A\", 1000000};\n    HeavyPayload copyObj = original; // Deep copy\n\n    std::cout << \"\\n--- 2. Testing Move ---\\n\";\n    HeavyPayload movedObj = std::move(original); // Fast Move!\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Line 23:</strong> <code>HeavyPayload(HeavyPayload&& other) noexcept</code> accepts an rvalue reference <code>&&</code> and uses <code>std::move</code> on members to steal memory pointers without copying array elements.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Passing large request bodies into asynchronous thread queues in high-throughput network engines (e.g. NGINX C++ modules, Envoy proxy) without memory allocations.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use <code>std::move</code> when passing sinks (parameters that will be stored inside the object) and when transferring unique ownership (e.g. <code>std::unique_ptr</code>).</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Never access a variable after calling <code>std::move(var)</code> on it. It is left in a 'valid but unspecified state'.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Drastic performance boost; eliminates unnecessary allocations; enables move-only types like <code>std::unique_ptr</code> and <code>std::thread</code>.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Use-after-move bugs if developers touch moved-from variables.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Rvalue references (<code>&&</code>), Universal/Forwarding references (<code>auto&&</code>, <code>T&&</code> in templates), <code>std::forward</code>.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Calling <code>std::move</code> on local variables returned by value (which inhibits <strong>NRVO - Named Return Value Optimization</strong>).</p>",
+          "callout": {
+            "type": "trap",
+            "title": "Pessimizing std::move Trap",
+            "text": "Writing `return std::move(localVar);` prevents NRVO (copy elision) where the compiler constructs the object directly in the caller's stack frame with ZERO copies or moves. Simply write `return localVar;`!"
+          }
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between <code>std::move</code> and <code>std::forward</code>?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> <code>std::move</code> performs an <strong>unconditional cast</strong> to an rvalue reference (<code>T&&</code>). <code>std::forward&lt;T&gt;</code> performs a <strong>conditional cast</strong>, preserving the original value category (lvalue remains lvalue, rvalue remains rvalue) inside template functions (Perfect Forwarding).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a sink constructor for a <code>Document</code> class taking a <code>std::vector&lt;std::string&gt;</code> and storing it via move semantics.</p>",
+          "practice": {
+            "title": "Move-Optimized Sink Constructor",
+            "problemStatement": "Write a Document class that accepts a vector of lines by value and moves it into member storage.",
+            "requirements": [
+              "Constructor takes vector by value",
+              "Uses std::move in initializer list",
+              "Zero extra copies"
+            ],
+            "constraints": [
+              "Const-correct getters"
+            ],
+            "hint": "Pass by value and std::move into the member variable.",
+            "expectedEntities": [
+              {
+                "name": "Document",
+                "responsibility": "Stores document lines efficiently."
+              }
+            ],
+            "referenceCode": {
+              "filename": "document_sink.cpp",
+              "code": "#include <iostream>\n#include <vector>\n#include <string>\n\nclass Document {\nprivate:\n    std::string title;\n    std::vector<std::string> lines;\npublic:\n    Document(std::string t, std::vector<std::string> l)\n        : title(std::move(t)), lines(std::move(l)) {}\n\n    [[nodiscard]] size_t getLineCount() const noexcept { return lines.size(); }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Move semantics is the superpower of modern C++, allowing zero-cost resource transfers and enabling true exclusive ownership patterns.</p>"
+        }
+      ]
+    },
+    {
+      "id": "smart-pointers-ownership",
+      "title": "Smart Pointers (unique_ptr, shared_ptr, weak_ptr)",
+      "description": "Modern C++ memory ownership models: exclusive ownership with std::unique_ptr, reference-counted std::shared_ptr, circular dependency resolution with std::weak_ptr, and custom deleters.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Smart Pointers</strong> are RAII wrapper classes that manage the lifetime of heap-allocated objects:<br>\u2022 <code>std::unique_ptr&lt;T&gt;</code>: Exclusive, single-owner pointer.<br>\u2022 <code>std::shared_ptr&lt;T&gt;</code>: Shared ownership via reference-counted control block.<br>\u2022 <code>std::weak_ptr&lt;T&gt;</code>: Non-owning observer that does not prevent object destruction.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Raw pointers (<code>T*</code>) carry no ownership semantics: caller does not know whether to call <code>delete</code>, leading to memory leaks, dangling pointers, and double-free vulnerabilities. Smart pointers make ownership explicit in the type system.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Default to <code>std::unique_ptr</code> for 90% of Low-Level Design relationships (Composition, Factory returns). Use <code>std::shared_ptr</code> only when multiple components truly co-own an entity, and use <code>std::weak_ptr</code> to break cyclic dependency reference loops.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>std::unique_ptr</code> has zero runtime overhead (same size as raw pointer) and is move-only. <code>std::shared_ptr</code> stores a pointer to the object and a pointer to an atomic control block tracking <code>use_count</code> and <code>weak_count</code>. When <code>use_count</code> reaches 0, the object is destroyed.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Smart Pointer Ownership Models Comparison:</p>",
+          "comparison": {
+            "title": "Smart Pointers Ownership Comparison",
+            "columns": [
+              "Smart Pointer",
+              "Ownership Model",
+              "Memory Overhead",
+              "Copyable?",
+              "Use Case in LLD"
+            ],
+            "rows": [
+              [
+                "std::unique_ptr",
+                "Exclusive (Single Owner)",
+                "0 bytes (Same as raw pointer)",
+                "No (Move Only)",
+                "Factory returns, Composition, PImpl idiom"
+              ],
+              [
+                "std::shared_ptr",
+                "Shared (Co-owners)",
+                "16-24 bytes (Control Block + Pointers)",
+                "Yes (Increments use_count)",
+                "Thread pool tasks, Shared caches, Observer publishers"
+              ],
+              [
+                "std::weak_ptr",
+                "Non-owning Observer",
+                "16 bytes (Points to Control Block)",
+                "Yes (Does not increment use_count)",
+                "Breaking circular references, Cache observers"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Smart Pointer Showcase: Exclusive Ownership, Shared Ownership, and Circular Reference Resolution:</p>",
+          "code_example": {
+            "filename": "smart_pointers_lld.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n#include <vector>\n\nclass Node {\npublic:\n    std::string name;\n    // Circular Reference Prevention: Use weak_ptr for parent pointer!\n    std::weak_ptr<Node> parent;\n    std::vector<std::shared_ptr<Node>> children;\n\n    explicit Node(std::string nodeName) : name(std::move(nodeName)) {\n        std::cout << \"[Node \" << name << \"] Created.\\n\";\n    }\n\n    ~Node() {\n        std::cout << \"[Node \" << name << \"] Destroyed.\\n\";\n    }\n\n    void addChild(const std::shared_ptr<Node>& child) {\n        children.push_back(child);\n    }\n};\n\n// Factory producing unique_ptr\nstd::unique_ptr<Node> createRootNode(std::string name) {\n    return std::make_unique<Node>(std::move(name));\n}\n\nint main() {\n    std::cout << \"--- 1. Unique Pointer Exclusive Ownership ---\\n\";\n    {\n        std::unique_ptr<Node> root = createRootNode(\"RootNode\");\n        std::cout << \"Root node active: \" << root->name << \"\\n\";\n    } // root destroyed immediately here\n\n    std::cout << \"\\n--- 2. Shared & Weak Pointer Tree ---\\n\";\n    {\n        auto parent = std::make_shared<Node>(\"Parent\");\n        auto child = std::make_shared<Node>(\"Child\");\n\n        parent->addChild(child);\n        child->parent = parent; // weak_ptr avoids cyclic leak!\n\n        std::cout << \"Parent use_count: \" << parent.use_count() << \" (Weak pointer does NOT increment)\\n\";\n        std::cout << \"Child use_count: \" << child.use_count() << \"\\n\";\n    } // Both Parent and Child destroyed cleanly without memory leak!\n\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Line 10 (<code>std::weak_ptr&lt;Node&gt; parent</code>):</strong> If parent had been a <code>std::shared_ptr</code>, <code>parent</code> would point to <code>child</code> and <code>child</code> would point to <code>parent</code>, keeping <code>use_count == 1</code> forever (Memory Leak). <code>std::weak_ptr</code> breaks the cycle!</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>DOM Tree nodes, Observer subscriber lists, asynchronous event loop task delegates, and database connection pool lease tokens.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Always use <code>std::make_unique</code> and <code>std::make_shared</code> instead of raw <code>new</code>. Use <code>unique_ptr</code> by default.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not pass <code>const std::shared_ptr&lt;T&gt;&</code> to functions that only need to read the object (pass <code>const T&</code> instead).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Completely eliminates memory leaks, dangling pointers, and manual delete calls; expressive ownership in APIs.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p><code>std::shared_ptr</code> incurs minor atomic increment/decrement overhead on copies and requires heap allocation for the control block.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p><code>std::unique_ptr&lt;T[]&gt;</code> arrays, custom deleters (e.g. for C APIs like <code>SDL_DestroyWindow</code> or <code>SSL_free</code>).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Creating two separate <code>shared_ptr</code> instances from the same raw pointer (creates two distinct control blocks, causing a double-free crash).</p>",
+          "callout": {
+            "type": "trap",
+            "title": "The Double Control Block Disaster",
+            "text": "Node* raw = new Node(); std::shared_ptr<Node> p1(raw); std::shared_ptr<Node> p2(raw); // CRASH: Two independent control blocks both delete raw pointer! Always use std::make_shared."
+          }
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is <code>std::make_shared</code> faster and more cache-friendly than <code>std::shared_ptr&lt;T&gt;(new T())</code>?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> <code>std::make_shared</code> performs a <strong>single contiguous heap allocation</strong> for both the user object and the shared_ptr control block. <code>std::shared_ptr&lt;T&gt;(new T())</code> performs two separate allocations (one for the object via <code>new</code>, and another for the control block), doubling heap allocation overhead and degrading CPU cache locality.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Write a factory method using a custom deleter with <code>std::unique_ptr</code> to manage a legacy C-style <code>FILE*</code> handle automatically.</p>",
+          "practice": {
+            "title": "Custom Deleter with unique_ptr",
+            "problemStatement": "Create a unique_ptr wrapper for FILE* with fclose as custom deleter.",
+            "requirements": [
+              "Use std::unique_ptr<FILE, decltype(&fclose)>",
+              "Auto-closes file on destruction",
+              "No manual fclose in caller"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Pass &std::fclose as the second constructor argument.",
+            "expectedEntities": [
+              {
+                "name": "FileCloser",
+                "responsibility": "Custom deleter for C file handles."
+              }
+            ],
+            "referenceCode": {
+              "filename": "custom_deleter.cpp",
+              "code": "#include <iostream>\n#include <memory>\n#include <cstdio>\n\nusing UniqueFile = std::unique_ptr<FILE, decltype(&std::fclose)>;\n\nUniqueFile makeUniqueFile(const char* path, const char* mode) {\n    FILE* fp = std::fopen(path, mode);\n    return UniqueFile(fp, &std::fclose);\n}\n\nint main() {\n    auto file = makeUniqueFile(\"test.txt\", \"w\");\n    if (file) {\n        std::fputs(\"Testing custom deleter\\n\", file.get());\n    } // std::fclose called automatically!\n    return 0;\n}"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Smart pointers make memory ownership crystal clear. By following <code>unique_ptr</code> by default, <code>shared_ptr</code> for co-ownership, and <code>weak_ptr</code> for cycle breaking, modern C++ systems achieve bulletproof memory safety.</p>"
+        }
+      ]
+    }
+  ]
+}

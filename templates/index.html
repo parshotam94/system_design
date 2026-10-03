@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}C++ Low-Level Design Mastery - Full Educational & Interview Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-badge-container">
+    <span class="badge badge-cpp">Modern C++20</span>
+    <span class="badge badge-intermediate">Low-Level System Design</span>
+    <span class="badge badge-interview">FAANG / Top-Tier Prep</span>
+  </div>
+
+  <h1 class="hero-title">
+    C++ <span class="gradient-text-cyan">Low-Level Design</span> Mastery
+  </h1>
+
+  <p class="hero-subtitle">
+    Learn how to design maintainable, extensible and scalable object-oriented systems in C++. From core OOP foundations to real-world distributed architectures.
+  </p>
+
+  <!-- Progression Flow Indicator -->
+  <div class="progression-tracker">
+    <div class="prog-step">
+      <span class="badge badge-beginner">Beginner</span>
+    </div>
+    <span class="prog-arrow">&rarr;</span>
+    <div class="prog-step">
+      <span class="badge badge-intermediate">Intermediate</span>
+    </div>
+    <span class="prog-arrow">&rarr;</span>
+    <div class="prog-step">
+      <span class="badge badge-advanced">Advanced</span>
+    </div>
+    <span class="prog-arrow">&rarr;</span>
+    <div class="prog-step">
+      <span class="badge badge-interview">Interview Ready</span>
+    </div>
+  </div>
+
+  <div class="hero-cta-group">
+    <a href="/module/01" class="btn btn-primary btn-lg">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+      Start with Module 01
+    </a>
+    <a href="/interview-framework" class="btn btn-secondary btn-lg">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+      14-Step Interview Framework
+    </a>
+    <a href="/playground" class="btn btn-outline btn-lg">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      Pattern Playground
+    </a>
+  </div>
+</section>
+
+<!-- Core Pillar Cards -->
+<section style="margin: 2rem 0 3.5rem;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+    <div class="glass-panel" style="padding: 1.25rem 1rem; text-align: center; border-color: rgba(56, 189, 248, 0.2);">
+      <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">🏛️</div>
+      <div style="font-weight: 700; font-size: 0.9rem; color: #fff;">OOP Core</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">VTable & VPTR</div>
+    </div>
+    <div class="glass-panel" style="padding: 1.25rem 1rem; text-align: center; border-color: rgba(168, 85, 247, 0.2);">
+      <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">🛡️</div>
+      <div style="font-weight: 700; font-size: 0.9rem; color: #fff;">SOLID</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">5 Principles</div>
+    </div>
+    <div class="glass-panel" style="padding: 1.25rem 1rem; text-align: center; border-color: rgba(16, 185, 129, 0.2);">
+      <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">📊</div>
+      <div style="font-weight: 700; font-size: 0.9rem; color: #fff;">UML</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">Class & Sequence</div>
+    </div>
+    <div class="glass-panel" style="padding: 1.25rem 1rem; text-align: center; border-color: rgba(245, 158, 11, 0.2);">
+      <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">🧩</div>
+      <div style="font-weight: 700; font-size: 0.9rem; color: #fff;">Design Patterns</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">23 GoF Patterns</div>
+    </div>
+    <div class="glass-panel" style="padding: 1.25rem 1rem; text-align: center; border-color: rgba(0, 114, 206, 0.2);">
+      <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">⚡</div>
+      <div style="font-weight: 700; font-size: 0.9rem; color: #fff;">C++ Design</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">RAII & Smart Ptrs</div>
+    </div>
+    <div class="glass-panel" style="padding: 1.25rem 1rem; text-align: center; border-color: rgba(244, 63, 94, 0.2);">
+      <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">🔄</div>
+      <div style="font-weight: 700; font-size: 0.9rem; color: #fff;">Concurrency</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">Mutex & Thread Safety</div>
+    </div>
+    <div class="glass-panel" style="padding: 1.25rem 1rem; text-align: center; border-color: rgba(99, 102, 241, 0.2);">
+      <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">🏢</div>
+      <div style="font-weight: 700; font-size: 0.9rem; color: #fff;">Real Problems</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">30+ Systems</div>
+    </div>
+    <div class="glass-panel" style="padding: 1.25rem 1rem; text-align: center; border-color: rgba(236, 72, 153, 0.2);">
+      <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">🎯</div>
+      <div style="font-weight: 700; font-size: 0.9rem; color: #fff;">Interview Ready</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">14-Step Process</div>
+    </div>
+  </div>
+</section>
+
+<!-- Interactive Architecture Thought Process Pipeline -->
+<section class="pipeline-section">
+  <div class="section-header-centered">
+    <h2>The Low-Level Design <span class="gradient-text-cyan">Mental Pipeline</span></h2>
+    <p>How an expert software engineer systematically transforms ambiguous real-world requirements into production C++ code.</p>
+  </div>
+
+  <div class="thought-pipeline">
+    <div class="pipeline-node active" data-step="requirements">
+      <div class="node-step-num">STEP 01</div>
+      <div class="node-title">Requirements</div>
+    </div>
+    <span class="pipeline-connector">&rarr;</span>
+
+    <div class="pipeline-node" data-step="entities">
+      <div class="node-step-num">STEP 02</div>
+      <div class="node-title">Entities</div>
+    </div>
+    <span class="pipeline-connector">&rarr;</span>
+
+    <div class="pipeline-node" data-step="responsibilities">
+      <div class="node-step-num">STEP 03</div>
+      <div class="node-title">Responsibilities</div>
+    </div>
+    <span class="pipeline-connector">&rarr;</span>
+
+    <div class="pipeline-node" data-step="classes">
+      <div class="node-step-num">STEP 04</div>
+      <div class="node-title">Classes</div>
+    </div>
+    <span class="pipeline-connector">&rarr;</span>
+
+    <div class="pipeline-node" data-step="relationships">
+      <div class="node-step-num">STEP 05</div>
+      <div class="node-title">Relationships</div>
+    </div>
+    <span class="pipeline-connector">&rarr;</span>
+
+    <div class="pipeline-node" data-step="interfaces">
+      <div class="node-step-num">STEP 06</div>
+      <div class="node-title">Interfaces</div>
+    </div>
+    <span class="pipeline-connector">&rarr;</span>
+
+    <div class="pipeline-node" data-step="patterns">
+      <div class="node-step-num">STEP 07</div>
+      <div class="node-title">Design Patterns</div>
+    </div>
+    <span class="pipeline-connector">&rarr;</span>
+
+    <div class="pipeline-node" data-step="implementation">
+      <div class="node-step-num">STEP 08</div>
+      <div class="node-title">C++ Code</div>
+    </div>
+    <span class="pipeline-connector">&rarr;</span>
+
+    <div class="pipeline-node" data-step="tradeoffs">
+      <div class="node-step-num">STEP 09</div>
+      <div class="node-title">Trade-offs</div>
+    </div>
+  </div>
+
+  <!-- Detail Display Container -->
+  <div id="pipeline-detail-viewer">
+    <div class="pipeline-detail-card">
+      <div class="pipeline-detail-icon">📋</div>
+      <div class="pipeline-detail-body">
+        <h4>1. Clarify Requirements & Scope</h4>
+        <p>Dissect vague problem statements into strict Functional Requirements (e.g. multi-floor parking, dynamic pricing) and Non-Functional Goals (e.g. low latency, thread safety). Ask clarifying questions up front.</p>
+        <div class="pipeline-detail-example">💡 <strong>Applied Example:</strong> Parking Lot: How many entry gates? Support for EV vs Truck? Single-level or multi-story? Live occupancy display required?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 24-Module Roadmap Section -->
+<section style="margin: 4rem 0;">
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2 style="font-size: 2rem; margin-bottom: 0.35rem;">Curriculum <span class="gradient-text-purple">Roadmap</span></h2>
+      <p style="color: var(--text-secondary);">Complete 24-module journey from foundational C++ object mechanics to full distributed capstone design.</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <span class="badge badge-beginner">Beginner: 5 Modules</span>
+      <span class="badge badge-intermediate">Intermediate: 8 Modules</span>
+      <span class="badge badge-advanced">Advanced: 6 Modules</span>
+      <span class="badge badge-interview">Interview: 5 Modules</span>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    {% for mod in modules %}
+      <a href="/module/{{ mod.id }}" class="module-card">
+        <div class="module-card-top">
+          <span class="module-card-num">MODULE {{ mod.id }}</span>
+          <span class="badge {% if mod.level == 'Beginner' %}badge-beginner{% elif mod.level == 'Intermediate' %}badge-intermediate{% elif mod.level == 'Advanced' %}badge-advanced{% else %}badge-interview{% endif %}">
+            {{ mod.level }}
+          </span>
+        </div>
+        <h3>{{ mod.title }}</h3>
+        <p>{{ mod.description }}</p>
+        <div class="module-card-footer">
+          <div class="module-card-meta">
+            <span>{{ mod.topics | length }} Topics</span>
+            <span>&bull;</span>
+            <span>~{{ mod.estimated_hours }} Hours</span>
+          </div>
+          <span style="color: var(--accent-blue); font-weight: 600; display: flex; align-items: center; gap: 0.25rem;">
+            Explore &rarr;
+          </span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/pages/home.js"></script>
+{% endblock %}

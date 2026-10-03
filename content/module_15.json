@@ -1,0 +1,438 @@
+{
+  "module_id": "15",
+  "title": "Exception & Error Handling Design",
+  "level": "Intermediate",
+  "category": "Robustness",
+  "description": "Exception safety guarantees (Basic, Strong, Nothrow), std::optional, std::expected (C++23), and robust error propagation.",
+  "topics": [
+    {
+      "id": "exception-safety-guarantees",
+      "title": "Exception Safety Guarantees (Basic, Strong, Nothrow)",
+      "description": "Mastering the 3 levels of exception safety: Basic guarantee, Strong (Commit-or-Rollback), and Nothrow.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Exception Safety Guarantees</strong> define the state of an application if an exception is thrown during an operation:<br>\u2022 <strong>Basic Guarantee:</strong> No resources leaked; objects remain in valid states.<br>\u2022 <strong>Strong Guarantee:</strong> Commit-or-Rollback (if operation fails, state is rolled back to exactly what it was before).<br>\u2022 <strong>Nothrow Guarantee (<code>noexcept</code>):</strong> Operation is guaranteed never to fail or throw.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Without exception safety, partial failures leave objects corrupted, invariants broken, and resources leaked.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Use Copy-and-Swap idiom to achieve the Strong Exception Guarantee.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Perform all risky allocations in temporary objects. Once successful, swap state using <code>noexcept</code> swap.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "comparison": {
+            "title": "3 Exception Safety Guarantees",
+            "columns": [
+              "Guarantee",
+              "Behavior on Exception",
+              "Technique to Achieve"
+            ],
+            "rows": [
+              [
+                "Basic Guarantee",
+                "No memory leaks, valid invariants",
+                "RAII wrappers"
+              ],
+              [
+                "Strong Guarantee",
+                "Commit-or-Rollback (Zero state change)",
+                "Copy-and-Swap idiom"
+              ],
+              [
+                "Nothrow (noexcept)",
+                "Never throws under any condition",
+                "Primitive swaps, move constructors, destructors"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "strong_exception_safety.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <string>\n#include <utility>\n\nclass SafeDatabaseRecord {\nprivate:\n    std::string recordId;\n    std::vector<int> payload;\n\npublic:\n    SafeDatabaseRecord(std::string id, std::vector<int> data)\n        : recordId(std::move(id)), payload(std::move(data)) {}\n\n    // Strong Exception Guarantee via Copy-and-Swap!\n    void updatePayload(std::vector<int> newPayload) {\n        // Step 1: Work on temporary copy (can throw std::bad_alloc)\n        std::vector<int> temp = std::move(newPayload);\n\n        // Step 2: Commit changes using non-throwing swap!\n        payload.swap(temp); // noexcept swap\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>updatePayload provides Strong Exception Guarantee: if an exception occurs, original payload is unchanged.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Database transaction updates, container push_back reallocations.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Aim for Strong Exception Guarantee on all critical state mutations.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not mark functions noexcept if they can legitimately throw.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Predictable, resilient software that recovers from errors gracefully.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Copy-and-swap can require temporary allocations.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Basic, Strong, Nothrow, Destructor noexcept.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Throwing exceptions from inside destructors or swap functions.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why must destructors and move constructors be marked noexcept in C++?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because throwing an exception during stack unwinding (when another exception is already active) triggers immediate <code>std::terminate()</code> and crashes the process. Move constructors must be <code>noexcept</code> so standard containers like <code>std::vector</code> can move elements safely during reallocation.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a Stack::push() with Strong Exception Guarantee.</p>",
+          "practice": {
+            "title": "Strong Stack Push",
+            "problemStatement": "Implement a Stack::push() with Strong Exception Guarantee.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Strong Stack Push",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "void push(T val) { T* next = new T[size + 1]; /* copy */ std::swap(data, next); delete[] next; }"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Exception Safety Guarantees (Basic, Strong, Nothrow) is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "optional-and-expected-design",
+      "title": "std::optional & std::expected for Explicit Errors",
+      "description": "Modern error handling without exception overhead using std::optional (C++17) and std::expected (C++23).",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><code>std::optional&lt;T&gt;</code> represents a value that may or may not exist (eliminating magic sentinel return values like -1 or null). <code>std::expected&lt;T, E&gt;</code> represents either a valid value <code>T</code> or an error <code>E</code>.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Exceptions should be reserved for <em>exceptional</em> failures (e.g. disk failure, out of memory). Expected domain failures (e.g. invalid user input, item not found) are better modeled explicitly in return types.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Return <code>std::optional&lt;User&gt;</code> for queries that can be empty. Return <code>std::expected&lt;Token, AuthError&gt;</code> for operations that can fail with specific error reasons.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Caller checks <code>if (res.has_value())</code> or uses monadic operations (<code>and_then</code>, <code>transform</code>).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Exceptions vs Explicit Return Types",
+            "text": "Exceptional errors (Network down, Corrupt DB) -> Exceptions.\\nExpected domain outcomes (User not found, Invalid password) -> std::optional / std::expected."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "optional_expected_demo.cpp",
+            "code": "#include <iostream>\n#include <optional>\n#include <string>\n#include <unordered_map>\n\nclass UserRepository {\nprivate:\n    std::unordered_map<int, std::string> users{{1, \"Alice\"}, {2, \"Bob\"}};\n\npublic:\n    // Explicit return: Cleanly signals that a user might not exist without exceptions!\n    [[nodiscard]] std::optional<std::string> findUsernameById(int id) const {\n        auto it = users.find(id);\n        if (it != users.end()) return it->second;\n        return std::nullopt; // Empty\n    }\n};\n\nint main() {\n    UserRepository repo;\n    auto user = repo.findUsernameById(1);\n    if (user) {\n        std::cout << \"Found user: \" << *user << \"\\n\";\n    }\n\n    auto missing = repo.findUsernameById(99);\n    std::cout << \"User 99 exists? \" << (missing.has_value() ? \"Yes\" : \"No\") << \"\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>findUsernameById returns std::optional<std::string> avoiding null pointer traps.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Database repository lookups, configuration parsers, mathematical domain calculations.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use optional/expected for expected operational results (e.g. cache misses, validation failures).</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use optional for fatal system failures.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Expressive function signatures; zero runtime exception overhead.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires checking has_value() at call sites.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>std::optional (C++17), std::expected (C++23), Monadic operations.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Calling .value() on an empty optional without checking has_value() (throws std::bad_optional_access).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the advantage of std::expected over returning error codes or throwing exceptions?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> <code>std::expected</code> forces callers to handle both the success value and error type at compile time with zero heap allocation or stack unwinding overhead.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build a safeStringToInt() returning std::optional<int>.</p>",
+          "practice": {
+            "title": "Safe String to Int Parser",
+            "problemStatement": "Build a safeStringToInt() returning std::optional<int>.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Safe String to Int Parser",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "std::optional<int> safeToInt(const std::string& s) { try { return std::stoi(s); } catch(...) { return std::nullopt; } }"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering std::optional & std::expected for Explicit Errors is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "error-handling-tradeoffs",
+      "title": "Exceptions vs Error Codes in Low-Level Design",
+      "description": "Architectural evaluation: Performance, stack unwinding latency, binary size, and domain error strategies.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A structured evaluation of when to use C++ Exceptions vs Error Codes / Monadic Result types.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Low-latency systems (HFT, game engines) often disable C++ exceptions (<code>-fno-exceptions</code>) due to binary bloat and non-deterministic stack unwinding latency.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Use exceptions for rare, fatal system failures. Use error codes/expected for predictable domain logic branches.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Benchmark and align error handling with non-functional latency requirements.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "comparison": {
+            "title": "Exceptions vs Error Codes / std::expected",
+            "columns": [
+              "Dimension",
+              "C++ Exceptions",
+              "std::expected / Error Codes"
+            ],
+            "rows": [
+              [
+                "Happy Path Performance",
+                "Zero-cost (Zero overhead if no throw)",
+                "Small return value check overhead"
+              ],
+              [
+                "Error Path Performance",
+                "Slow (Stack unwinding, OS tables)",
+                "Fast ($O(1)$ value branch)"
+              ],
+              [
+                "API Clarity",
+                "Can be invisible (hidden throw)",
+                "Explicit in function signature"
+              ],
+              [
+                "Binary Size",
+                "Increases executable size (EH tables)",
+                "Compact binary"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "error_tradeoffs_demo.cpp",
+            "code": "#include <iostream>\n#include <string>\n\nenum class ParseError { INVALID_FORMAT, OUT_OF_RANGE };\n\nstruct ParseResult {\n    bool success;\n    int value;\n    ParseError error;\n};\n\nParseResult parsePort(const std::string& str) {\n    if (str.empty()) return {false, 0, ParseError::INVALID_FORMAT};\n    int p = std::stoi(str);\n    if (p < 1 || p > 65535) return {false, 0, ParseError::OUT_OF_RANGE};\n    return {true, p, ParseError::INVALID_FORMAT};\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Explicit ParseResult struct avoiding exception overhead in network parser.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Embedded microcontrollers, real-time operating systems, trading gateways.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Follow company/system coding standards (e.g. Google C++ Style Guide avoids exceptions).</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not mix unstructured error codes and exceptions randomly without architectural rules.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Clear error contracts and predictable runtime behavior.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Error codes can be ignored if not marked [[nodiscard]].</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Error Codes, [[nodiscard]], std::expected, C++ Exceptions.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Ignoring error code returns.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is the happy path faster with zero-cost exceptions, but the error path slower?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Zero-cost exceptions emit side tables (DWARF / SEH) that add zero instructions during normal execution. However, when an exception is thrown, the runtime must parse these tables and unwind the stack, which is orders of magnitude slower.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Declare a [[nodiscard]] function returning error status.</p>",
+          "practice": {
+            "title": "Nodiscard Error Code Function",
+            "problemStatement": "Declare a [[nodiscard]] function returning error status.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Nodiscard Error Code Function",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "[[nodiscard]] bool writePacket(const void* buf, size_t len);"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Exceptions vs Error Codes in Low-Level Design is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    }
+  ]
+}

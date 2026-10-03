@@ -1,0 +1,606 @@
+{
+  "module_id": "04",
+  "title": "UML for Low-Level Design",
+  "level": "Beginner",
+  "category": "Modeling",
+  "description": "Visual modeling for LLD interviews: Class diagrams with visibility symbols (+, -, #), relationship notations, Sequence diagrams with lifelines, State machines, and Activity diagrams.",
+  "topics": [
+    {
+      "id": "uml-class-diagrams",
+      "title": "UML Class Diagram Notations (+, -, #)",
+      "description": "Standard UML 3-box compartment notation: Class name, attributes, methods, and visibility specifiers.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>UML Class Diagram</strong> is a static structural diagram that describes the structure of a system by showing classes, attributes, operations, and relationships among objects.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>In Low-Level Design interviews and technical design documents, UML diagrams communicate architecture instantaneously without getting bogged down in syntax details.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Represent a class as a 3-compartment rectangle: Top = Class Name / Stereotype, Middle = Attributes, Bottom = Methods with visibility modifiers (+ public, - private, # protected, ~ package).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Attribute syntax: <code>[visibility] name : type [= default]</code>.<br>Method syntax: <code>[visibility] name(param: type) : returnType</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Standard UML Class Box:</p>",
+          "diagram": {
+            "title": "Account & Customer UML Representation",
+            "classes": [
+              {
+                "name": "BankAccount",
+                "attributes": [
+                  {
+                    "visibility": "-",
+                    "name": "accountNumber",
+                    "type": "std::string"
+                  },
+                  {
+                    "visibility": "-",
+                    "name": "balance",
+                    "type": "double"
+                  },
+                  {
+                    "visibility": "#",
+                    "name": "creationTimestamp",
+                    "type": "uint64_t"
+                  }
+                ],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "deposit",
+                    "params": "amount: double",
+                    "returnType": "void"
+                  },
+                  {
+                    "visibility": "+",
+                    "name": "withdraw",
+                    "params": "amount: double",
+                    "returnType": "bool"
+                  },
+                  {
+                    "visibility": "+",
+                    "name": "getBalance",
+                    "params": "",
+                    "returnType": "double"
+                  }
+                ]
+              }
+            ],
+            "relationships": []
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Exact C++ mapping of the BankAccount UML class diagram:</p>",
+          "code_example": {
+            "filename": "uml_bank_account.cpp",
+            "code": "#include <iostream>\n#include <string>\n#include <cstdint>\n\nclass BankAccount {\nprivate:\n    std::string accountNumber; // - accountNumber : std::string\n    double balance{0.0};        // - balance : double\n\nprotected:\n    uint64_t creationTimestamp; // # creationTimestamp : uint64_t\n\npublic:\n    BankAccount(std::string accNum, double initBal, uint64_t ts)\n        : accountNumber(std::move(accNum)), balance(initBal), creationTimestamp(ts) {}\n\n    void deposit(double amount) { // + deposit(amount: double) : void\n        balance += amount;\n    }\n\n    bool withdraw(double amount) { // + withdraw(amount: double) : bool\n        if (amount > balance) return false;\n        balance -= amount;\n        return true;\n    }\n\n    [[nodiscard]] double getBalance() const noexcept { // + getBalance() : double\n        return balance;\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Visibility translation:</strong> <code>+</code> translates to <code>public:</code>, <code>-</code> to <code>private:</code>, and <code>#</code> to <code>protected:</code>.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Technical architecture design documents for financial services, gaming engines, and cloud distributed microservices.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use class diagrams in Phase 2 of any LLD interview immediately after identifying domain entities.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not draw private utility helper functions or trivial variables that clutter the diagram during a timed interview.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Universal standard language understood by all software engineers worldwide.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Excessive detail can become outdated quickly if not synchronized with code.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Conceptual Class Diagrams, Specification Class Diagrams, Implementation Class Diagrams.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Writing C++ syntax inside UML boxes (e.g. Writing <code>double balance;</code> instead of the standard UML <code>- balance: double</code>).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What does an italicized class name or method name signify in UML?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> An italicized class name indicates an <strong>Abstract Class</strong>. An italicized method name indicates an <strong>Abstract / Pure Virtual Method</strong> (e.g. <code><em>+ draw() : void</em></code> signifies <code>virtual void draw() = 0;</code>).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Draw the UML notation for an abstract <code>IVehicle</code> with pure virtual <code>startEngine()</code> and derived <code>Motorcycle</code>.</p>",
+          "practice": {
+            "title": "UML Class Mapping Practice",
+            "problemStatement": "Map an IVehicle interface to clean C++20 code.",
+            "requirements": [
+              "Abstract IVehicle",
+              "Derived Motorcycle",
+              "Proper access specifiers"
+            ],
+            "constraints": [
+              "Const-correct"
+            ],
+            "hint": "Use interface stereotype in UML.",
+            "expectedEntities": [
+              {
+                "name": "IVehicle",
+                "responsibility": "Vehicle contract."
+              }
+            ],
+            "referenceCode": {
+              "filename": "uml_practice.cpp",
+              "code": "class IVehicle {\npublic:\n    virtual ~IVehicle() = default;\n    virtual void startEngine() = 0;\n};\nclass Motorcycle : public IVehicle {\npublic:\n    void startEngine() override {}\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>UML class diagrams are the standard visual shorthand for expressing object-oriented architecture in Low-Level Design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "uml-relationships-notation",
+      "title": "UML Relationship Arrows & Multiplicities",
+      "description": "Mastering UML connector symbols: Inheritance, Realization, Composition, Aggregation, Association, and Dependency.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>UML Relationships define the structural and behavioral links between classes: <strong>Inheritance (\u2500\u2500\u25b7)</strong>, <strong>Realization (..\u25b7)</strong>, <strong>Composition (\u2500\u2500\u25c6)</strong>, <strong>Aggregation (\u2500\u2500\u25c7)</strong>, <strong>Association (\u2500\u2500>)</strong>, and <strong>Dependency (..>)</strong>.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Accurately communicating ownership, lifecycle binding, and coupling is essential in design discussions.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Solid line with filled diamond = strong lifetime ownership (Composition). Solid line with hollow diamond = shared container (Aggregation). Dashed line with open arrow = temporary use (Dependency).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Multiplicities denote quantities (e.g. <code>1</code>, <code>0..1</code>, <code>*</code>, <code>1..*</code>). In C++, <code>1..*</code> maps to a container member like <code>std::vector&lt;T&gt;</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>UML Relationship Arrow Matrix:</p>",
+          "comparison": {
+            "title": "UML Relationship Arrow Symbols & C++ Mappings",
+            "columns": [
+              "Relationship",
+              "UML Symbol",
+              "Lifetime Dependency",
+              "C++ Implementation Mapping"
+            ],
+            "rows": [
+              [
+                "Inheritance",
+                "\u2500\u2500\u2500\u2500\u2500\u2500\u25b7 (Solid triangle)",
+                "Is-a subtype",
+                "class Dog : public Animal"
+              ],
+              [
+                "Realization",
+                " - - - \u25b7 (Dashed triangle)",
+                "Implements interface",
+                "class Service : public IService"
+              ],
+              [
+                "Composition",
+                "\u2500\u2500\u2500\u2500\u2500\u2500\u25c6 (Filled diamond)",
+                "Strong (Parent owns Child)",
+                "class Car { Engine engine; };"
+              ],
+              [
+                "Aggregation",
+                "\u2500\u2500\u2500\u2500\u2500\u2500\u25c7 (Hollow diamond)",
+                "Weak (Child outlives Parent)",
+                "class Dept { Teacher* t; };"
+              ],
+              [
+                "Association",
+                "\u2500\u2500\u2500\u2500\u2500\u2500> (Solid arrow)",
+                "Uses / Navigates to",
+                "class Order { Customer* c; };"
+              ],
+              [
+                "Dependency",
+                " - - - > (Dashed arrow)",
+                "Temporary parameter / local",
+                "void print(const Document& d);"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Code implementing all 6 UML relationship types in a single system:</p>",
+          "code_example": {
+            "filename": "all_uml_relationships.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <memory>\n#include <string>\n\n// 1. Realization: Interface contract\nclass IPrintable {\npublic:\n    virtual ~IPrintable() = default;\n    virtual void print() const = 0;\n};\n\n// 2. Composition Target: Engine owned by Car\nclass Engine {\npublic:\n    void run() const { std::cout << \"Engine purring\\n\"; }\n};\n\n// 3. Aggregation Target: Driver exists independently\nclass Driver {\npublic:\n    std::string name;\n    explicit Driver(std::string n) : name(std::move(n)) {}\n};\n\n// 4. Dependency Target: Temporary GPS coordinates\nclass GpsCoordinate {\npublic:\n    double lat, lon;\n};\n\n// Car integrates all relationships!\nclass Car : public IPrintable { // Realization (IPrintable)\nprivate:\n    Engine engine;            // Composition (\u2500\u2500\u25c6)\n    Driver* currentDriver;     // Aggregation (\u2500\u2500\u25c7)\n\npublic:\n    Car() : currentDriver(nullptr) {}\n\n    void assignDriver(Driver* d) { // Aggregation setup\n        currentDriver = d;\n    }\n\n    void navigateTo(const GpsCoordinate& target) { // Dependency (..>)\n        std::cout << \"[Car] Navigating to lat: \" << target.lat << \"\\n\";\n        engine.run();\n    }\n\n    void print() const override { // Realization override\n        std::cout << \"[Car System] Driver: \" << (currentDriver ? currentDriver->name : \"None\") << \"\\n\";\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Line 27 (Composition):</strong> <code>Engine engine;</code> is directly embedded.<br><strong>Line 28 (Aggregation):</strong> <code>Driver* currentDriver;</code> does not own Driver memory.<br><strong>Line 35 (Dependency):</strong> <code>navigateTo(const GpsCoordinate& target)</code> receives GPS as a temporary parameter without storing it.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Enterprise software architecture blueprints (e.g. AWS / Google Cloud reference architectures).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use precise relationship arrows on system architecture whiteboards to clarify object lifecycles.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not draw Dependency arrows for every standard library type (like <code>std::string</code>) to prevent diagram clutter.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Unambiguous specification of lifetime, ownership, and coupling.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Distinguishing Aggregation vs Association can be subjective in informal discussions.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Bidirectional Association, Unidirectional Association, Multiplicity bounds (<code>1..*</code>).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Confusing Composition (filled diamond) with Aggregation (hollow diamond).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between an Association and a Dependency in C++ code?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> An <strong>Association</strong> is a structural link where class A holds a persistent reference or pointer to class B as a <em>member variable</em>. A <strong>Dependency</strong> is a transient behavioral relationship where class A uses class B only as a <em>method parameter or local variable inside a function body</em>.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Model a <code>Hospital</code> that has Composition with <code>Room</code> and Aggregation with <code>Doctor*</code>.</p>",
+          "practice": {
+            "title": "Hospital Ownership Modeling",
+            "problemStatement": "Implement Hospital with owned Rooms and aggregated Doctors.",
+            "requirements": [
+              "Hospital owns std::vector<Room>",
+              "Hospital aggregates std::vector<Doctor*>"
+            ],
+            "constraints": [
+              "Clean destructors"
+            ],
+            "hint": "Use unique_ptr or value objects for Rooms and raw/weak pointers for Doctors.",
+            "expectedEntities": [
+              {
+                "name": "Hospital",
+                "responsibility": "Container for rooms and doctor affiliations."
+              }
+            ],
+            "referenceCode": {
+              "filename": "hospital_uml.cpp",
+              "code": "#include <vector>\n#include <string>\nclass Room { public: int number; };\nclass Doctor { public: std::string name; };\nclass Hospital {\n    std::vector<Room> rooms;      // Composition\n    std::vector<Doctor*> doctors; // Aggregation\npublic:\n    void addRoom(Room r) { rooms.push_back(r); }\n    void affiliateDoctor(Doctor* d) { doctors.push_back(d); }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering UML relationship symbols allows you to express object lifecycles and coupling with precision in system design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "uml-sequence-diagrams",
+      "title": "Sequence Diagrams & Lifelines",
+      "description": "Visualizing dynamic runtime message passing, synchronous calls, return messages, and object lifelines over time.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>UML Sequence Diagram</strong> is an interaction diagram that shows how objects collaborate over time by depicting message exchanges along vertical lifelines.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Class diagrams show static structure, but Sequence diagrams show dynamic runtime behavior (e.g. what happens when a user clicks 'Buy Now').</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Time flows downward. Vertical dashed lines represent object lifelines. Horizontal solid arrows represent synchronous method calls; dashed arrows represent return values.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Components: Lifelines (<code>Client</code>, <code>OrderService</code>, <code>PaymentGateway</code>), Activation Bars (execution period), Synchronous Messages (<code>\u2500\u2500></code>), Asynchronous Messages (<code>\u2500\u2500>></code>), and Self-Calls.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Order Checkout Sequence Flow:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Sequence Flow: Checkout Order",
+            "text": "1. Customer -> checkout(cartId) -> OrderService\\n2. OrderService -> calculateTotal(cartId) -> CartService\\n3. OrderService -> charge(amount) -> PaymentGateway\\n4. PaymentGateway --> [TX_SUCCESS] --> OrderService\\n5. OrderService -> sendReceipt(email) -> NotificationService\\n6. OrderService --> [OrderConfirmed] --> Customer"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>C++ implementation matching the Checkout Sequence Diagram:</p>",
+          "code_example": {
+            "filename": "checkout_sequence.cpp",
+            "code": "#include <iostream>\n#include <string>\n#include <memory>\n\nclass PaymentGateway {\npublic:\n    bool charge(double amount) {\n        std::cout << \"  [PaymentGateway] Charged $\" << amount << \"\\n\";\n        return true;\n    }\n};\n\nclass NotificationService {\npublic:\n    void sendConfirmation(const std::string& email) {\n        std::cout << \"  [NotificationService] Receipt emailed to \" << email << \"\\n\";\n    }\n};\n\nclass OrderService {\nprivate:\n    std::shared_ptr<PaymentGateway> payment;\n    std::shared_ptr<NotificationService> notifier;\npublic:\n    OrderService(std::shared_ptr<PaymentGateway> p, std::shared_ptr<NotificationService> n)\n        : payment(std::move(p)), notifier(std::move(n)) {}\n\n    void checkout(double amount, const std::string& email) {\n        std::cout << \"[OrderService] Initiating checkout...\\n\";\n        if (payment->charge(amount)) {\n            notifier->sendConfirmation(email);\n            std::cout << \"[OrderService] Checkout completed successfully!\\n\";\n        }\n    }\n};\n\nint main() {\n    auto p = std::make_shared<PaymentGateway>();\n    auto n = std::make_shared<NotificationService>();\n    OrderService orders(p, n);\n    orders.checkout(89.50, \"alice@example.com\");\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 26-31:</strong> <code>checkout()</code> orchestrates the exact sequential message-passing flow illustrated in the Sequence Diagram.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>OAuth2 3-way authorization flows, payment processing gateways, and database 2-phase commit protocols.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use sequence diagrams whenever explaining complex multi-object business workflows in an interview.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not draw sequence diagrams for trivial single-class CRUD operations.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Visually highlights bottlenecks, redundant round-trips, and order of execution.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Can become wide and difficult to read if more than 6 lifelines are involved.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Synchronous Sequence, Asynchronous Sequence with reply loops, Communication Diagrams.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Omitting return arrows or mixing up asynchronous message notation.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is an activation box in a UML sequence diagram?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> An <strong>Activation Box</strong> (or execution occurrence) is a thin vertical rectangle placed on an object's lifeline representing the exact time period during which that object is actively executing a method on the CPU or call stack.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a 3-step <code>ATMWithdrawal</code> workflow: <code>ATM -&gt; CardReader -&gt; BankBackend -&gt; CashDispenser</code>.</p>",
+          "practice": {
+            "title": "ATM Withdrawal Sequence Workflow",
+            "problemStatement": "Implement ATM sequence workflow coordinating reader, backend, and dispenser.",
+            "requirements": [
+              "Authenticate PIN",
+              "Deduct balance",
+              "Dispense cash"
+            ],
+            "constraints": [
+              "Sequential validation"
+            ],
+            "hint": "Return false early if PIN validation fails.",
+            "expectedEntities": [
+              {
+                "name": "ATM",
+                "responsibility": "Orchestrates withdrawal steps."
+              }
+            ],
+            "referenceCode": {
+              "filename": "atm_seq.cpp",
+              "code": "#include <iostream>\nclass BankBackend { public: bool verifyAndDeduct(int pin, double amt) { return pin == 1234; } };\nclass CashDispenser { public: void dispense(double amt) { std::cout << \"Dispensed $\" << amt << \"\\n\"; } };\nclass ATM {\n    BankBackend bank;\n    CashDispenser dispenser;\npublic:\n    bool withdraw(int pin, double amt) {\n        if (bank.verifyAndDeduct(pin, amt)) {\n            dispenser.dispense(amt);\n            return true;\n        }\n        return false;\n    }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Sequence diagrams provide a crystal-clear timeline of runtime interactions across collaborating system objects.</p>"
+        }
+      ]
+    },
+    {
+      "id": "uml-state-and-activity",
+      "title": "State Machines & Activity Diagrams",
+      "description": "Modeling object lifecycle state transitions, guard conditions, and algorithmic flowcharts in UML.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>UML State Machine Diagram</strong> models the lifecycle states of a single entity (e.g. <code>Order: CREATED -&gt; PAID -&gt; SHIPPED</code>). A <strong>UML Activity Diagram</strong> models business workflow algorithms and decision branches.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Complex real-world entities (Vending Machines, Orders, Hotel Bookings) have strict state-dependent behaviors. State diagrams visualize valid and invalid transitions.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>States are rounded rectangles. Transitions are arrows labeled with <code>Event [Guard] / Action</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>In C++, finite state machines are implemented using the <strong>State Design Pattern</strong> or an <code>enum class State</code> with guarded transition methods.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Vending Machine State Machine Flow:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Vending Machine State Lifecycle",
+            "text": "[IdleState] -- insertCoin() --> [HasCoinState] -- selectItem() --> [DispensingState] -- dispense() --> [IdleState]"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Guarded Finite State Machine in C++:</p>",
+          "code_example": {
+            "filename": "fsm_vending.cpp",
+            "code": "#include <iostream>\n#include <stdexcept>\n\nenum class VendingState { IDLE, HAS_MONEY, DISPENSING, SOLD_OUT };\n\nclass VendingMachineFSM {\nprivate:\n    VendingState currentState{VendingState::IDLE};\n    double balance{0.0};\n    int itemCount{5};\n\npublic:\n    void insertMoney(double amount) {\n        if (currentState != VendingState::IDLE && currentState != VendingState::HAS_MONEY) {\n            throw std::logic_error(\"Cannot insert money during current operation\");\n        }\n        balance += amount;\n        currentState = VendingState::HAS_MONEY;\n        std::cout << \"[FSM: HAS_MONEY] Current balance: $\" << balance << \"\\n\";\n    }\n\n    void selectItem(double price) {\n        if (currentState != VendingState::HAS_MONEY) {\n            throw std::logic_error(\"Please insert money first\");\n        }\n        if (balance < price) {\n            throw std::runtime_error(\"Insufficient balance\");\n        }\n        balance -= price;\n        currentState = VendingState::DISPENSING;\n        std::cout << \"[FSM: DISPENSING] Dispensing item...\\n\";\n        dispense();\n    }\n\nprivate:\n    void dispense() {\n        --itemCount;\n        std::cout << \"[FSM] Item ejected. Remaining inventory: \" << itemCount << \"\\n\";\n        currentState = (itemCount > 0) ? VendingState::IDLE : VendingState::SOLD_OUT;\n    }\n};\n\nint main() {\n    VendingMachineFSM vm;\n    vm.insertMoney(2.00);\n    vm.selectItem(1.50);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p><strong>Lines 13-35:</strong> Transitions between <code>IDLE -&gt; HAS_MONEY -&gt; DISPENSING -&gt; IDLE</code> enforce state invariants and throw on illegal transitions.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>TCP connection lifecycle (<code>LISTEN -&gt; SYN_SENT -&gt; ESTABLISHED -&gt; FIN_WAIT -&gt; CLOSED</code>).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use state diagrams when an entity's behavior changes fundamentally based on internal state.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not create state diagrams for stateless calculation utilities.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Prevents illegal state transitions and unhandled edge-case bugs.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>State transition tables can grow to $O(N^2)$ if there are many states.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Hierarchical State Machines (Statecharts), Activity Flowcharts.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Allowing transitions from terminal states (e.g. mutating an order after it has been <code>CANCELLED</code>).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What design pattern is best suited for complex state machines with dozens of transitions?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> The <strong>State Design Pattern</strong>, where each state is encapsulated as its own polymorphic class (e.g. <code>HasMoneyState</code>, <code>DispensingState</code>) implementing a common <code>IVendingState</code> interface, eliminating massive switch-case blocks.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement an <code>AudioPlayer</code> FSM supporting <code>PLAYING</code>, <code>PAUSED</code>, and <code>STOPPED</code> states.</p>",
+          "practice": {
+            "title": "Audio Player FSM",
+            "problemStatement": "Implement AudioPlayer state transitions for play, pause, and stop.",
+            "requirements": [
+              "States: STOPPED, PLAYING, PAUSED",
+              "Valid transitions only"
+            ],
+            "constraints": [
+              "Throw on invalid transitions"
+            ],
+            "hint": "Cannot pause when stopped.",
+            "expectedEntities": [
+              {
+                "name": "AudioPlayer",
+                "responsibility": "Controls playback states."
+              }
+            ],
+            "referenceCode": {
+              "filename": "audio_fsm.cpp",
+              "code": "#include <iostream>\n#include <stdexcept>\nenum class AudioState { STOPPED, PLAYING, PAUSED };\nclass AudioPlayer {\n    AudioState state{AudioState::STOPPED};\npublic:\n    void play() { state = AudioState::PLAYING; }\n    void pause() {\n        if (state != AudioState::PLAYING) throw std::logic_error(\"Cannot pause when not playing\");\n        state = AudioState::PAUSED;\n    }\n    void stop() { state = AudioState::STOPPED; }\n};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>State machine and activity diagrams model the dynamic lifecycle and algorithmic workflows of mission-critical systems.</p>"
+        }
+      ]
+    }
+  ]
+}

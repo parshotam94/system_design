@@ -1,0 +1,1289 @@
+{
+  "module_id": "11",
+  "title": "Behavioral Design Patterns",
+  "level": "Intermediate",
+  "category": "Design Patterns",
+  "description": "Observer, Strategy, Command, State, Chain of Responsibility, Template Method, Mediator, Iterator, Memento, and Visitor.",
+  "topics": [
+    {
+      "id": "observer-pattern",
+      "title": "Observer Pattern & Event Dispatchers",
+      "description": "Defining a one-to-many dependency so that when one object changes state, all dependents are notified automatically.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Observer Pattern</strong> (Publish-Subscribe) maintains a list of dependents and notifies them automatically of state changes by calling their update() method.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Decouples event producers from consumers; producers don't need to know concrete subscriber types.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Subject has <code>attach(observer)</code>, <code>detach(observer)</code>, and <code>notifyObservers()</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>When subject state changes, it iterates through its registered observer list calling <code>obs->update()</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Observer Publish Flow",
+            "text": "StockTicker::setPrice(150.0) -> notifyObservers() -> updates PhoneApp, WebDashboard, TradingBot"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "observer_pattern.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <memory>\n#include <string>\n#include <algorithm>\n\nclass IObserver {\npublic:\n    virtual ~IObserver() = default;\n    virtual void onUpdate(const std::string& symbol, double price) = 0;\n};\n\nclass StockTicker {\nprivate:\n    std::string symbol;\n    double price{0.0};\n    std::vector<std::shared_ptr<IObserver>> observers;\n\npublic:\n    explicit StockTicker(std::string s) : symbol(std::move(s)) {}\n\n    void registerObserver(std::shared_ptr<IObserver> obs) { observers.push_back(obs); }\n    void removeObserver(std::shared_ptr<IObserver> obs) {\n        observers.erase(std::remove(observers.begin(), observers.end(), obs), observers.end());\n    }\n\n    void setPrice(double newPrice) {\n        price = newPrice;\n        notifyAll();\n    }\n\nprivate:\n    void notifyAll() {\n        for (const auto& obs : observers) {\n            obs->onUpdate(symbol, price);\n        }\n    }\n};\n\nclass MobileAppObserver : public IObserver {\npublic:\n    void onUpdate(const std::string& symbol, double price) override {\n        std::cout << \"[Mobile Push] \" << symbol << \" updated: $\" << price << \"\\n\";\n    }\n};\n\nint main() {\n    StockTicker aapl{\"AAPL\"};\n    auto mobile = std::make_shared<MobileAppObserver>();\n    aapl.registerObserver(mobile);\n    aapl.setPrice(185.50);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>StockTicker notifies all registered IObserver instances automatically upon price mutation.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>GUI event listeners (button clicks), Message brokers (Kafka, RabbitMQ), Reactive Extensions (RxCpp).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use whenever changes in one object require updating an open-ended set of other objects.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when observer notification chains can create circular update loops.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Loose coupling between subject and observers; broadcast communication.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Subscribers can leak memory if not properly detached before destruction (Lapsed Listener problem).</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Push Model (Subject pushes data), Pull Model (Subject sends reference, observer pulls).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Forgetting to unsubscribe observers before destruction causing dangling callbacks.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How do you prevent the Lapsed Listener memory leak in C++ Observer implementations?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Store observers as <code>std::weak_ptr&lt;IObserver&gt;</code> in the subject's collection. If an observer is deleted, <code>lock()</code> returns null and the subject cleans it up automatically.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement WeatherStation notifying PhoneDisplay and StatsDisplay on temperature change.</p>",
+          "practice": {
+            "title": "Weather Station Observer",
+            "problemStatement": "Implement WeatherStation notifying PhoneDisplay and StatsDisplay on temperature change.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Weather Station Observer",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class WeatherStation { vector<shared_ptr<IObserver>> obs; public: void setTemp(double t) { for(auto& o: obs) o->update(t); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Observer Pattern & Event Dispatchers is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "strategy-pattern",
+      "title": "Strategy Pattern & Interchangeable Algorithms",
+      "description": "Defining a family of algorithms, encapsulating each one, and making them interchangeable at runtime.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Strategy Pattern</strong> lets the algorithm vary independently from clients that use it by encapsulating algorithms into distinct classes.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Eliminates giant if-else/switch blocks for payment calculations, routing algorithms, and compression formats.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Context class contains a pointer to <code>IStrategy</code> and delegates computation to it.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>navigator.setRouteStrategy(new FastestRoute())</code> switches algorithm dynamically at runtime.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Strategy Interchangeability",
+            "text": "PaymentProcessor -> executes strategy->pay() -> works with CreditCard, PayPal, UPI, Crypto"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "strategy_pattern.cpp",
+            "code": "#include <iostream>\n#include <memory>\n\nclass ISortStrategy {\npublic:\n    virtual ~ISortStrategy() = default;\n    virtual void sortData() const = 0;\n};\n\nclass QuickSortStrategy : public ISortStrategy {\npublic:\n    void sortData() const override { std::cout << \"[QuickSort] O(N log N) in-place sort\\n\"; }\n};\n\nclass MergeSortStrategy : public ISortStrategy {\npublic:\n    void sortData() const override { std::cout << \"[MergeSort] O(N log N) stable external sort\\n\"; }\n};\n\nclass DataContext {\nprivate:\n    std::unique_ptr<ISortStrategy> strategy;\npublic:\n    void setStrategy(std::unique_ptr<ISortStrategy> strat) { strategy = std::move(strat); }\n    void executeSort() const { if (strategy) strategy->sortData(); }\n};\n\nint main() {\n    DataContext ctx;\n    ctx.setStrategy(std::make_unique<QuickSortStrategy>());\n    ctx.executeSort();\n    ctx.setStrategy(std::make_unique<MergeSortStrategy>());\n    ctx.executeSort();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>DataContext swaps between QuickSortStrategy and MergeSortStrategy seamlessly.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Sorting algorithms, compression formats (GZIP vs ZSTD), routing path algorithms in GPS navigation.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when you have multiple variants of an algorithm that should be selectable at runtime.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if an algorithm never changes and only one implementation will ever exist.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Adheres to Open/Closed Principle; eliminates conditional switch logic.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Clients must be aware of differences between strategies to select the right one.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Object-Oriented Strategy, Modern C++ Functional Strategy (using <code>std::function</code>).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Passing large context state unnecessarily to simple stateless strategies.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How can the Strategy Pattern be implemented using modern C++ lambdas?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> By replacing the strategy interface hierarchy with <code>std::function&lt;double(double)&gt;</code>, allowing callers to pass inline lambdas directly without class boilerplate.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement FileArchiver using ZipCompression and RarCompression strategies.</p>",
+          "practice": {
+            "title": "Compression Strategy",
+            "problemStatement": "Implement FileArchiver using ZipCompression and RarCompression strategies.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Compression Strategy",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class ICompress { public: virtual ~ICompress() = default; virtual void compress() = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Strategy Pattern & Interchangeable Algorithms is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "command-pattern",
+      "title": "Command Pattern & Undo/Redo Architecture",
+      "description": "Encapsulating a request as an object, enabling parameterization with queues, logs, and undoable operations.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Command Pattern</strong> turns a request into a stand-alone object containing all information about the request (receiver, method, arguments), enabling undo/redo, queuing, and transaction logging.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Directly executing mutations makes undo/redo and background job queuing impossible.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p><code>ICommand</code> defines <code>execute()</code> and <code>undo()</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>An Invoker maintains a history stack of executed commands. Calling Undo pops the top command and executes <code>cmd->undo()</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Command Stack",
+            "text": "CommandHistory: [TypeCommand('A'), TypeCommand('B'), DeleteCommand()] -> Undo() -> calls DeleteCommand::undo()"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "command_undo_redo.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <memory>\n#include <string>\n\n// Receiver\nclass TextEditor {\npublic:\n    std::string text;\n    void append(const std::string& str) { text += str; }\n    void erase(size_t count) { text.erase(text.length() - count); }\n};\n\n// Command Interface\nclass ICommand {\npublic:\n    virtual ~ICommand() = default;\n    virtual void execute() = 0;\n    virtual void undo() = 0;\n};\n\n// Concrete Command: InsertText\nclass InsertTextCommand : public ICommand {\nprivate:\n    TextEditor& editor;\n    std::string addedText;\npublic:\n    InsertTextCommand(TextEditor& ed, std::string t) : editor(ed), addedText(std::move(t)) {}\n\n    void execute() override { editor.append(addedText); }\n    void undo() override { editor.erase(addedText.length()); }\n};\n\n// Invoker: Command History Manager\nclass CommandManager {\nprivate:\n    std::vector<std::unique_ptr<ICommand>> history;\npublic:\n    void executeCommand(std::unique_ptr<ICommand> cmd) {\n        cmd->execute();\n        history.push_back(std::move(cmd));\n    }\n\n    void undo() {\n        if (!history.empty()) {\n            history.back()->undo();\n            history.pop_back();\n        }\n    }\n};\n\nint main() {\n    TextEditor editor;\n    CommandManager mgr;\n\n    mgr.executeCommand(std::make_unique<InsertTextCommand>(editor, \"Hello \"));\n    mgr.executeCommand(std::make_unique<InsertTextCommand>(editor, \"World!\"));\n    std::cout << \"Text: \" << editor.text << \"\\n\";\n\n    mgr.undo();\n    std::cout << \"After Undo: \" << editor.text << \"\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>CommandManager tracks InsertTextCommand history stack supporting execute and undo.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Text editor undo/redo, GUI button action bindings, transactional rollback systems, thread pool task queues.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use for undo/redo, task scheduling, asynchronous job queues, and macro recording.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use for simple direct method invocations with no queuing or undo needs.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Decouples invoker from receiver; enables reversible operations.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Increases number of command classes.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Undoable Command, Macro Command (Composite Command), Asynchronous Task Command.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Failing to capture complete state required to accurately undo the operation.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How is Command pattern used to implement Transactional Rollbacks?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Each database mutation is wrapped in a Command object with execute() committing SQL and undo() issuing compensating rollback queries in reverse execution order.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement LightOnCommand and LightOffCommand for a remote control invoker.</p>",
+          "practice": {
+            "title": "Smart Home Remote Command",
+            "problemStatement": "Implement LightOnCommand and LightOffCommand for a remote control invoker.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Smart Home Remote Command",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class ICommand { public: virtual ~ICommand() = default; virtual void execute() = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Command Pattern & Undo/Redo Architecture is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "state-pattern",
+      "title": "State Pattern & Finite State Machines",
+      "description": "Allowing an object to alter its behavior when its internal state changes, appearing to change its class.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>State Pattern</strong> encapsulates state-specific behavior inside separate state classes, eliminating massive switch-case state machines.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>When an object's behavior depends heavily on its state, adding new states requires editing giant conditional blocks across every method.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Context contains a pointer to <code>IState</code> and delegates state-dependent actions to <code>state->handle()</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>State methods transition the Context to a new <code>IState</code> instance upon valid triggers.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "State Pattern Structure",
+            "text": "TCPConnection -> state->open() -> If ClosedState: transitions to SynSentState. If EstablishedState: throws error."
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "state_pattern.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\nclass DocumentContext;\n\n// State Interface\nclass IDocumentState {\npublic:\n    virtual ~IDocumentState() = default;\n    virtual void publish(DocumentContext& context) = 0;\n};\n\n// Forward declaration of states\nclass DraftState;\nclass ModerationState;\nclass PublishedState;\n\n// Context\nclass DocumentContext {\nprivate:\n    std::shared_ptr<IDocumentState> state;\npublic:\n    explicit DocumentContext(std::shared_ptr<IDocumentState> initState) : state(std::move(initState)) {}\n    void setState(std::shared_ptr<IDocumentState> s) { state = std::move(s); }\n    void publish() { state->publish(*this); }\n};\n\nclass PublishedState : public IDocumentState {\npublic:\n    void publish(DocumentContext&) override { std::cout << \"[Published] Document is already live!\\n\"; }\n};\n\nclass ModerationState : public IDocumentState {\npublic:\n    void publish(DocumentContext& context) override {\n        std::cout << \"[Moderation] Approved! Transitioning to Published.\\n\";\n        context.setState(std::make_shared<PublishedState>());\n    }\n};\n\nclass DraftState : public IDocumentState {\npublic:\n    void publish(DocumentContext& context) override {\n        std::cout << \"[Draft] Submitted for review. Transitioning to Moderation.\\n\";\n        context.setState(std::make_shared<ModerationState>());\n    }\n};\n\nint main() {\n    DocumentContext doc(std::make_shared<DraftState>());\n    doc.publish(); // Draft -> Moderation\n    doc.publish(); // Moderation -> Published\n    doc.publish(); // Already published!\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>DocumentContext delegates publish() to DraftState -> ModerationState -> PublishedState.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>TCP connection lifecycles, Order processing state machines, Vending machines, Game character states (Idle, Run, Jump, Attack).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when an object has complex state-dependent behaviors with many state transitions.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if the object only has 2 simple states with minimal logic.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Eliminates monolithic switch-cases; encapsulates state transitions cleanly.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Increases class count.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>State with Context back-reference, Stateless Shared States.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Allowing transitions from terminal states.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between State and Strategy patterns?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Structure is identical, but <strong>Intent</strong> differs: <strong>Strategy</strong> provides interchangeable algorithms chosen by the client. <strong>State</strong> manages dynamic lifecycle transitions controlled by internal events.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement NoCoinState, HasCoinState, and SoldState.</p>",
+          "practice": {
+            "title": "Vending Machine State Pattern",
+            "problemStatement": "Implement NoCoinState, HasCoinState, and SoldState.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Vending Machine State Pattern",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class IState { public: virtual ~IState() = default; virtual void insertCoin() = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering State Pattern & Finite State Machines is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "chain-of-responsibility",
+      "title": "Chain of Responsibility Pattern",
+      "description": "Passing requests along a chain of potential handlers until one of them handles it.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Chain of Responsibility</strong> decouples the sender of a request from its receivers by giving multiple objects a chance to handle the request sequentially.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Hardcoding request dispatchers creates tight coupling between callers and all possible handler classes.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Each handler holds a pointer to <code>nextHandler</code> in the chain.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>handle(request)</code> checks if it can process the request; if yes, it executes; if no, it forwards to <code>nextHandler->handle(request)</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Chain Flow",
+            "text": "AuthMiddleware -> LoggingMiddleware -> RateLimitMiddleware -> ControllerHandler"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "chain_of_responsibility.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\nenum class LogLevel { INFO, WARNING, ERROR };\n\nclass ILoggerHandler {\nprotected:\n    std::shared_ptr<ILoggerHandler> nextHandler;\npublic:\n    virtual ~ILoggerHandler() = default;\n    void setNext(std::shared_ptr<ILoggerHandler> next) { nextHandler = std::move(next); }\n\n    virtual void log(LogLevel level, const std::string& msg) {\n        if (nextHandler) nextHandler->log(level, msg);\n    }\n};\n\nclass ConsoleLoggerHandler : public ILoggerHandler {\npublic:\n    void log(LogLevel level, const std::string& msg) override {\n        if (level == LogLevel::INFO) {\n            std::cout << \"[CONSOLE INFO] \" << msg << \"\\n\";\n        } else {\n            ILoggerHandler::log(level, msg); // Pass down chain\n        }\n    }\n};\n\nclass ErrorFileLoggerHandler : public ILoggerHandler {\npublic:\n    void log(LogLevel level, const std::string& msg) override {\n        if (level == LogLevel::ERROR) {\n            std::cout << \"[ERROR LOG FILE] ALERT: \" << msg << \"\\n\";\n        } else {\n            ILoggerHandler::log(level, msg);\n        }\n    }\n};\n\nint main() {\n    auto console = std::make_shared<ConsoleLoggerHandler>();\n    auto errorLog = std::make_shared<ErrorFileLoggerHandler>();\n    console->setNext(errorLog); // Build Chain: Console -> ErrorFile\n\n    console->log(LogLevel::INFO, \"Server started.\");\n    console->log(LogLevel::ERROR, \"Database connection failed!\");\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>ConsoleLoggerHandler and ErrorFileLoggerHandler chain log processing sequentially.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>HTTP Request Middleware filters, Technical Support escalation tiers (L1 -> L2 -> L3), GUI event bubbling.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when multiple objects can handle a request and the exact handler isn't known up-front.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when every request must be handled by a single deterministic method.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Loose coupling between sender and receivers; dynamic chain configuration.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>A request can fall off the end of the chain unhandled.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Terminating Chain (first handler stops), Pass-Through Chain (all handlers process).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Creating circular chain references causing infinite loops.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How is Chain of Responsibility used in web server middleware?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Each middleware layer (Authentication -> Rate Limiting -> CORS -> Logging -> Handler) executes preprocessing, calls next.handle(), and executes postprocessing.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build L1Support, L2Support, and L3Support ticket handlers.</p>",
+          "practice": {
+            "title": "Support Ticket Escalation",
+            "problemStatement": "Build L1Support, L2Support, and L3Support ticket handlers.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Support Ticket Escalation",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class SupportHandler { shared_ptr<SupportHandler> next; public: virtual void handle(int level) {} };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Chain of Responsibility Pattern is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "template-method-pattern",
+      "title": "Template Method Pattern",
+      "description": "Defining the skeleton of an algorithm in a base class, letting subclasses override specific steps without changing structure.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Template Method</strong> defines the invariant skeleton of an algorithm in a base method, deferring some steps to subclasses.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Duplicating algorithm structure across subclasses while only 1 or 2 steps differ leads to code duplication.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Base class defines a <code>final</code> or non-virtual template method calling private/protected virtual step hooks.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Subclasses override the hook methods; the base template method coordinates the execution sequence.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Hollywood Principle",
+            "text": "'Don't call us, we'll call you.' The base class algorithm calls the derived class hooks, not the other way around!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "template_method.cpp",
+            "code": "#include <iostream>\n\nclass DataMiner {\npublic:\n    virtual ~DataMiner() = default;\n\n    // The Template Method (Defines immutable algorithm skeleton!)\n    void mineData() {\n        openFile();\n        extractData();\n        parseData();\n        closeFile();\n        std::cout << \"Data mining completed successfully.\\n\";\n    }\n\nprotected:\n    virtual void openFile() = 0;\n    virtual void extractData() = 0;\n    virtual void parseData() { std::cout << \"Default generic parsing\\n\"; }\n    virtual void closeFile() { std::cout << \"Closed file handle.\\n\"; }\n};\n\nclass PdfDataMiner : public DataMiner {\nprotected:\n    void openFile() override { std::cout << \"[PDF] Opened PDF stream.\\n\"; }\n    void extractData() override { std::cout << \"[PDF] Extracted raw PDF bytes.\\n\"; }\n};\n\nclass CsvDataMiner : public DataMiner {\nprotected:\n    void openFile() override { std::cout << \"[CSV] Opened CSV stream.\\n\"; }\n    void extractData() override { std::cout << \"[CSV] Extracted comma-delimited rows.\\n\"; }\n};\n\nint main() {\n    PdfDataMiner pdfMiner;\n    pdfMiner.mineData();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>DataMiner::mineData() coordinates the execution skeleton while PdfDataMiner overrides extraction steps.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Game loop update lifecycles, Data ETL pipelines, Build system build stages (compile -> test -> package).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when multiple classes share an identical multi-step workflow where only individual steps vary.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when the entire workflow structure varies between subclasses.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Eliminates code duplication; enforces standard workflow sequence.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Subclasses are tightly coupled to base class algorithm order.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Template Method with Hooks, Pure Virtual Template Steps.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Overriding the main template method in subclasses and breaking workflow invariants.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is the template method in the base class usually non-virtual or final?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> To prevent subclasses from overriding and corrupting the overarching execution sequence of the algorithm.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement GameTurn template method calling startTurn(), takeAction(), and endTurn().</p>",
+          "practice": {
+            "title": "Game Turn Template Method",
+            "problemStatement": "Implement GameTurn template method calling startTurn(), takeAction(), and endTurn().",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Game Turn Template Method",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class Turn { public: void play() { start(); act(); end(); } virtual void start() = 0; virtual void act() = 0; virtual void end() = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Template Method Pattern is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "mediator-pattern",
+      "title": "Mediator Pattern & Loose Coupling",
+      "description": "Reducing chaotic dependencies between objects by forcing them to communicate through a central mediator object.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Mediator Pattern</strong> encapsulates how a set of objects interact, preventing chaotic many-to-many direct references (all-to-all coupling).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>In an air traffic control network, 20 airplanes communicating directly with each other requires $O(N^2)$ communication links. A central control tower reduces links to $O(N)$.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Colleagues hold a reference to <code>IMediator</code> and send notifications through it.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>The Mediator receives events and orchestrates responses across other colleagues.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Many-to-Many vs Mediator",
+            "text": "Direct: 10 UI widgets talk directly to each other (100 coupling links!)\\nMediator: 10 UI widgets talk ONLY to DialogMediator (10 links!)"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "mediator_chat.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <string>\n#include <memory>\n\nclass IMediator;\n\nclass UserColleague {\nprotected:\n    IMediator* mediator;\n    std::string name;\npublic:\n    UserColleague(IMediator* med, std::string n) : mediator(med), name(std::move(n)) {}\n    virtual ~UserColleague() = default;\n    virtual void send(const std::string& msg) = 0;\n    virtual void receive(const std::string& msg) = 0;\n    [[nodiscard]] std::string getName() const { return name; }\n};\n\nclass IMediator {\npublic:\n    virtual ~IMediator() = default;\n    virtual void broadcast(const std::string& msg, UserColleague* sender) = 0;\n};\n\nclass ChatRoomMediator : public IMediator {\nprivate:\n    std::vector<UserColleague*> users;\npublic:\n    void addUser(UserColleague* u) { users.push_back(u); }\n\n    void broadcast(const std::string& msg, UserColleague* sender) override {\n        for (auto* u : users) {\n            if (u != sender) u->receive(sender->getName() + \": \" + msg);\n        }\n    }\n};\n\nclass ConcreteChatUser : public UserColleague {\npublic:\n    ConcreteChatUser(IMediator* med, std::string n) : UserColleague(med, std::move(n)) {}\n\n    void send(const std::string& msg) override {\n        std::cout << \"[\" << name << \" Sending] \" << msg << \"\\n\";\n        mediator->broadcast(msg, this);\n    }\n    void receive(const std::string& msg) override {\n        std::cout << \"  [\" << name << \" Received] \" << msg << \"\\n\";\n    }\n};\n\nint main() {\n    ChatRoomMediator chatRoom;\n    ConcreteChatUser u1(&chatRoom, \"Alice\");\n    ConcreteChatUser u2(&chatRoom, \"Bob\");\n    chatRoom.addUser(&u1);\n    chatRoom.addUser(&u2);\n\n    u1.send(\"Hello everyone!\");\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>ChatRoomMediator coordinates message delivery between Alice and Bob without direct coupling.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Air Traffic Control towers, Chat room servers, Complex UI Dialog forms.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when a group of objects communicate in complex, tightly coupled many-to-many ways.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when objects only have simple one-to-one communication.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Decouples colleagues; centralizes interaction control.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>The Mediator can turn into a complex God Object.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Event Aggregator, UI Dialog Mediator.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Putting business calculation logic inside the mediator instead of keeping it in colleagues.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between Mediator and Observer?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> <strong>Observer</strong> is <em>one-to-many unidirectional</em> communication. <strong>Mediator</strong> is <em>many-to-many bidirectional</em> communication coordinating complex interactions across multiple colleagues.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build AirTrafficControl tower mediating landing runway access for Airplane colleagues.</p>",
+          "practice": {
+            "title": "Air Traffic Control Mediator",
+            "problemStatement": "Build AirTrafficControl tower mediating landing runway access for Airplane colleagues.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Air Traffic Control Mediator",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class IATC { public: virtual void requestLanding(Airplane* a) = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Mediator Pattern & Loose Coupling is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "iterator-pattern",
+      "title": "Iterator Pattern & Custom Iterators",
+      "description": "Accessing elements of an aggregate object sequentially without exposing its underlying representation.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Iterator Pattern</strong> provides a standard way to traverse elements of a collection sequentially without exposing its internal data structure (array, linked list, tree, hash map).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Clients should not need to write different traversal algorithms depending on whether data is in a vector, binary tree, or linked list.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Iterator defines <code>hasNext()</code>, <code>next()</code>, or standard C++ <code>operator++</code> and <code>operator*</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>C++ Range-based for loops (<code>for (auto& item : container)</code>) work automatically by calling <code>begin()</code> and <code>end()</code> iterators.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "C++ Standard Iterators",
+            "text": "Implementing operator*, operator++, and operator!= allows your custom container to work seamlessly with C++ range-based for loops and std::sort algorithms!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "custom_iterator.cpp",
+            "code": "#include <iostream>\n#include <vector>\n\ntemplate <typename T>\nclass CustomList {\nprivate:\n    std::vector<T> elements;\npublic:\n    void add(T val) { elements.push_back(std::move(val)); }\n\n    // Custom Iterator\n    class Iterator {\n    private:\n        typename std::vector<T>::const_iterator iter;\n    public:\n        explicit Iterator(typename std::vector<T>::const_iterator it) : iter(it) {}\n        const T& operator*() const { return *iter; }\n        Iterator& operator++() { ++iter; return *this; }\n        bool operator!=(const Iterator& other) const { return iter != other.iter; }\n    };\n\n    Iterator begin() const { return Iterator(elements.cbegin()); }\n    Iterator end() const { return Iterator(elements.cend()); }\n};\n\nint main() {\n    CustomList<int> list;\n    list.add(10);\n    list.add(20);\n    list.add(30);\n\n    // Works with C++ range-based for loops!\n    for (int val : list) {\n        std::cout << \"Item: \" << val << \"\\n\";\n    }\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>CustomList implements standard begin() and end() iterators enabling C++ range-based for loops.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>All C++ STL containers (<code>std::vector</code>, <code>std::map</code>, <code>std::list</code>), database cursor query iterators.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when providing a clean, uniform traversal interface over complex internal collections.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if random index access (<code>operator[]</code>) is the only traversal pattern needed.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Decouples traversal algorithms from container data structures.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Writing bidirectional/random-access iterator boilerplate requires care.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Input, Output, Forward, Bidirectional, Random Access, and Contiguous Iterators.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Invalidating iterators by modifying the container during iteration without updating iterator pointers.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What methods must a C++ class implement to support range-based for loops?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> It must provide <code>begin()</code> and <code>end()</code> methods returning an iterator type that implements <code>operator*</code>, prefix <code>operator++</code>, and <code>operator!=</code>.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a forward iterator for an in-order binary tree traversal.</p>",
+          "practice": {
+            "title": "Binary Tree In-Order Iterator",
+            "problemStatement": "Implement a forward iterator for an in-order binary tree traversal.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Binary Tree In-Order Iterator",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class TreeIterator { public: int operator*() const; TreeIterator& operator++(); };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Iterator Pattern & Custom Iterators is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "memento-pattern",
+      "title": "Memento Pattern (State Snapshots)",
+      "description": "Capturing and externalizing an object's internal state so it can be restored later without violating encapsulation.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Memento Pattern</strong> captures and stores the internal state of an object so that the object can be restored to this exact state later (Undo / Checkpointing).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Exposing private fields to create backups violates encapsulation.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p><strong>Originator</strong> creates Memento snapshot. <strong>Caretaker</strong> stores snapshots. <strong>Memento</strong> stores immutable state.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>originator.restoreFromMemento(caretaker.popSnapshot())</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Memento Encapsulation",
+            "text": "The Memento object has private fields accessible ONLY by the Originator (via friend class), keeping internal state strictly hidden from the Caretaker!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "memento_pattern.cpp",
+            "code": "#include <iostream>\n#include <string>\n#include <vector>\n#include <memory>\n\n// 1. Memento: Stores state snapshot\nclass EditorMemento {\nprivate:\n    friend class CodeEditor; // Only CodeEditor can read/write Memento state\n    std::string textSnapshot;\n    explicit EditorMemento(std::string text) : textSnapshot(std::move(text)) {}\n};\n\n// 2. Originator: Creates and restores from Memento\nclass CodeEditor {\npublic:\n    std::string content;\n\n    std::unique_ptr<EditorMemento> saveSnapshot() const {\n        return std::unique_ptr<EditorMemento>(new EditorMemento(content));\n    }\n\n    void restore(const EditorMemento& memento) {\n        content = memento.textSnapshot;\n    }\n};\n\n// 3. Caretaker: Manages history stack\nclass HistoryCaretaker {\nprivate:\n    std::vector<std::unique_ptr<EditorMemento>> history;\npublic:\n    void push(std::unique_ptr<EditorMemento> m) { history.push_back(std::move(m)); }\n    std::unique_ptr<EditorMemento> pop() {\n        if (history.empty()) return nullptr;\n        auto m = std::move(history.back());\n        history.pop_back();\n        return m;\n    }\n};\n\nint main() {\n    CodeEditor editor;\n    HistoryCaretaker history;\n\n    editor.content = \"int main() {}\";\n    history.push(editor.saveSnapshot()); // Save state 1\n\n    editor.content = \"int main() { return 0; }\"; // Mutate state\n    std::cout << \"Current: \" << editor.content << \"\\n\";\n\n    auto prev = history.pop();\n    if (prev) editor.restore(*prev); // Restore state 1\n    std::cout << \"Restored: \" << editor.content << \"\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>CodeEditor creates and restores EditorMemento snapshots managed by HistoryCaretaker.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>IDE checkpoints, Game save files, Database transaction savepoints.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use for undo/redo and checkpoint rollback when state snapshotting is required.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if saving full object snapshots consumes excessive RAM (use command undo diffs instead).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Preserves encapsulation while providing robust state restoration.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>High memory consumption if snapshots are frequent and large.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Full Memento Snapshot, Incremental Diff Memento.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Making Memento state public so other classes can tamper with internal state.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does Memento protect encapsulation in C++?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> By declaring the Originator as a <code>friend class</code> of the Memento and making all Memento constructors and fields <code>private</code>.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement PlayerState memento for checkpoint save/load.</p>",
+          "practice": {
+            "title": "Game Checkpoint Memento",
+            "problemStatement": "Implement PlayerState memento for checkpoint save/load.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Game Checkpoint Memento",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class PlayerMemento { friend class Player; int hp; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Memento Pattern (State Snapshots) is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "visitor-pattern",
+      "title": "Visitor Pattern & Double Dispatch",
+      "description": "Representing an operation to be performed on elements of an object structure without changing their classes.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Visitor Pattern</strong> lets you define a new operation on a collection of polymorphic objects without modifying their classes (<strong>Double Dispatch</strong>).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Adding a new operation (e.g. ExportToXML, CalculateTaxes, RenderSVG) across 15 class types requires modifying all 15 classes.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Elements accept a visitor: <code>element->accept(visitor)</code>, which double-dispatches: <code>visitor->visit(this)</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>First dispatch: Virtual <code>accept()</code> on Element. Second dispatch: Overloaded <code>visit()</code> on Visitor.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Double Dispatch Flow",
+            "text": "Shape::accept(Visitor& v) { v.visit(*this); } -> Dynamic type of Shape + Overloaded type of Visitor resolved!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "visitor_pattern.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <memory>\n\nclass Circle;\nclass Rectangle;\n\n// Visitor Interface\nclass IShapeVisitor {\npublic:\n    virtual ~IShapeVisitor() = default;\n    virtual void visit(const Circle& c) = 0;\n    virtual void visit(const Rectangle& r) = 0;\n};\n\n// Element Interface\nclass IShapeElement {\npublic:\n    virtual ~IShapeElement() = default;\n    virtual void accept(IShapeVisitor& visitor) const = 0;\n};\n\nclass Circle : public IShapeElement {\npublic:\n    double radius{5.0};\n    void accept(IShapeVisitor& visitor) const override { visitor.visit(*this); }\n};\n\nclass Rectangle : public IShapeElement {\npublic:\n    double width{4.0}, height{6.0};\n    void accept(IShapeVisitor& visitor) const override { visitor.visit(*this); }\n};\n\n// Concrete Visitor: Area Calculator (Added without touching Circle or Rectangle code!)\nclass AreaCalculatorVisitor : public IShapeVisitor {\npublic:\n    double totalArea{0.0};\n    void visit(const Circle& c) override { totalArea += 3.14159 * c.radius * c.radius; }\n    void visit(const Rectangle& r) override { totalArea += r.width * r.height; }\n};\n\nint main() {\n    std::vector<std::unique_ptr<IShapeElement>> shapes;\n    shapes.push_back(std::make_unique<Circle>());\n    shapes.push_back(std::make_unique<Rectangle>());\n\n    AreaCalculatorVisitor areaCalc;\n    for (const auto& s : shapes) {\n        s->accept(areaCalc); // Double dispatch!\n    }\n    std::cout << \"Total Computed Area: \" << areaCalc.totalArea << \"\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>AreaCalculatorVisitor visits Circle and Rectangle polymorphically via double dispatch accept().</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Compiler Abstract Syntax Tree (AST) analyzers, Document format exporters (HTML, PDF, Markdown), Tax calculation engines.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when an object structure rarely changes but you frequently need to add new operations over it.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if the object class hierarchy changes frequently (every new class breaks the visitor interface).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Easy to add new operations; groups related operation logic together.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Extremely difficult to add new element classes to the hierarchy.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Classic Double-Dispatch Visitor, Acyclic Visitor, std::visit with std::variant (C++17).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Forgetting to implement double dispatch and calling static overloads directly.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is Double Dispatch in C++ and how does Visitor achieve it?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Double dispatch means the executed function depends on the runtime types of TWO objects. Visitor achieves it by first calling virtual <code>element->accept(visitor)</code> (first dispatch), which then calls <code>visitor->visit(*this)</code> (second dispatch).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a CodeGenVisitor traversing BinaryOpNode and NumberNode.</p>",
+          "practice": {
+            "title": "AST Code Generator Visitor",
+            "problemStatement": "Implement a CodeGenVisitor traversing BinaryOpNode and NumberNode.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "AST Code Generator Visitor",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class IVisitor { public: virtual void visit(const BinaryOp&) = 0; virtual void visit(const Number&) = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Visitor Pattern & Double Dispatch is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    }
+  ]
+}

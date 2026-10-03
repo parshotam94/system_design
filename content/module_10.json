@@ -1,0 +1,920 @@
+{
+  "module_id": "10",
+  "title": "Structural Design Patterns",
+  "level": "Intermediate",
+  "category": "Design Patterns",
+  "description": "Adapter, Bridge, Composite, Decorator, Facade, Flyweight, and Proxy with animated object graphs.",
+  "topics": [
+    {
+      "id": "adapter-pattern",
+      "title": "Adapter Pattern (Class & Object Adapter)",
+      "description": "Converting the interface of a class into another interface clients expect.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Adapter Pattern</strong> acts as a bridge between two incompatible interfaces, allowing classes with mismatched APIs to collaborate seamlessly.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Reusing legacy libraries or 3rd-party vendor SDKs without modifying their source code.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Wrap the incompatible adaptee inside an adapter class that implements the target interface.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Client calls <code>targetInterface->request()</code>, and Adapter translates it to <code>adaptee->legacySpecificRequest()</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Object Adapter Structure",
+            "text": "Client -> Target Interface <- [Adapter (has Adaptee)] -> calls Adaptee::legacyMethod()"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "adapter_pattern.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\n// Target Interface expected by modern client\nclass INewPaymentGateway {\npublic:\n    virtual ~INewPaymentGateway() = default;\n    virtual void processPayment(const std::string& customerId, double dollars) = 0;\n};\n\n// Incompatible 3rd Party Legacy Adaptee\nclass LegacyBankApi {\npublic:\n    void transferCents(long cents, const char* accountNum) {\n        std::cout << \"[LegacyBank] Transferred \" << cents << \" cents to \" << accountNum << \"\\n\";\n    }\n};\n\n// Object Adapter: Implements INewPaymentGateway using LegacyBankApi\nclass BankPaymentAdapter : public INewPaymentGateway {\nprivate:\n    std::shared_ptr<LegacyBankApi> legacyApi;\npublic:\n    explicit BankPaymentAdapter(std::shared_ptr<LegacyBankApi> api) : legacyApi(std::move(api)) {}\n\n    void processPayment(const std::string& customerId, double dollars) override {\n        long cents = static_cast<long>(dollars * 100.0);\n        legacyApi->transferCents(cents, customerId.c_str());\n    }\n};\n\nint main() {\n    auto legacy = std::make_shared<LegacyBankApi>();\n    std::unique_ptr<INewPaymentGateway> gateway = std::make_unique<BankPaymentAdapter>(legacy);\n    gateway->processPayment(\"CUST_9918\", 49.99);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>BankPaymentAdapter bridges modern dollars/string interface to legacy cents/char* API.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Payment gateway wrappers, UI graphics compatibility layers, file format converters.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when integrating third-party code whose interface cannot be changed.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when you have full control to refactor the original API directly.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Separation of concerns; satisfies Open/Closed Principle.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Introduces extra wrapper layer indirection.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Object Adapter (Composition - preferred), Class Adapter (Multiple Inheritance).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Leaking adaptee-specific exceptions through the adapter interface.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between Class Adapter and Object Adapter in C++?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Object Adapter uses <strong>Composition</strong> (Adapter contains a pointer to Adaptee). Class Adapter uses <strong>Multiple Inheritance</strong> (Adapter inherits publicly from Target and privately from Adaptee).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build an adapter that translates JSON logger calls to a legacy XML printer.</p>",
+          "practice": {
+            "title": "XML to JSON Adapter",
+            "problemStatement": "Build an adapter that translates JSON logger calls to a legacy XML printer.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "XML to JSON Adapter",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class XmlAdapter : public IJsonLogger { LegacyXml xml; public: void logJson(string j) override {} };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Adapter Pattern (Class & Object Adapter) is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "bridge-pattern",
+      "title": "Bridge Pattern",
+      "description": "Decoupling an abstraction from its implementation so that the two can vary independently.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Bridge Pattern</strong> splits a large class into two separate hierarchies: Abstraction (high-level logic) and Implementation (platform-specific execution).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Prevents a Cartesian product explosion of classes (e.g., WindowsCircle, LinuxCircle, WindowsSquare, LinuxSquare = $M \times N$ classes).</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Abstraction holds a pointer to <code>IImplementation</code>: $M + N$ classes instead of $M \times N$.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>Shape</code> (Abstraction) holds a pointer to <code>IRenderEngine</code> (Implementation).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "comparison": {
+            "title": "Class Explosion vs Bridge Solution",
+            "columns": [
+              "Design",
+              "2 Shapes + 3 Operating Systems",
+              "Total Classes Required"
+            ],
+            "rows": [
+              [
+                "Without Bridge",
+                "WinCircle, LinuxCircle, MacCircle, WinSquare, LinuxSquare, MacSquare",
+                "6 classes (M * N)"
+              ],
+              [
+                "With Bridge",
+                "2 Shapes (Circle, Square) + 3 Renderers (Win, Linux, Mac)",
+                "5 classes (M + N)"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "bridge_pattern.cpp",
+            "code": "#include <iostream>\n#include <memory>\n\n// Implementation Hierarchy Contract\nclass IRenderer {\npublic:\n    virtual ~IRenderer() = default;\n    virtual void renderCircle(double r) = 0;\n};\n\nclass DirectXRenderer : public IRenderer {\npublic:\n    void renderCircle(double r) override { std::cout << \"[DirectX] Rendered circle radius \" << r << \"\\n\"; }\n};\n\nclass OpenGLRenderer : public IRenderer {\npublic:\n    void renderCircle(double r) override { std::cout << \"[OpenGL] Rendered circle radius \" << r << \"\\n\"; }\n};\n\n// Abstraction Hierarchy\nclass Shape {\nprotected:\n    std::shared_ptr<IRenderer> renderer; // The Bridge!\npublic:\n    explicit Shape(std::shared_ptr<IRenderer> r) : renderer(std::move(r)) {}\n    virtual ~Shape() = default;\n    virtual void draw() = 0;\n};\n\nclass Circle : public Shape {\n    double radius;\npublic:\n    Circle(double r, std::shared_ptr<IRenderer> rend) : Shape(std::move(rend)), radius(r) {}\n    void draw() override { renderer->renderCircle(radius); }\n};\n\nint main() {\n    auto dx = std::make_shared<DirectXRenderer>();\n    auto ogl = std::make_shared<OpenGLRenderer>();\n\n    Circle c1{5.0, dx};\n    Circle c2{10.0, ogl};\n    c1.draw();\n    c2.draw();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Shape delegates rendering to IRenderer bridge pointer, decoupling geometry from graphics.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Cross-platform OS windowing (GUI window vs platform window handles), Database drivers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when you want to avoid compile-time binding between abstraction and implementation.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when there is only one fixed platform implementation.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Solves combinatorial class explosion; hides platform details.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Increases design complexity with dual hierarchies.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Bridge, PImpl Idiom (specific single-class bridge in C++).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Confusing Bridge with Adapter (Bridge is designed up-front; Adapter retrofits existing code).</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does the Bridge pattern prevent Cartesian product class explosion?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> By decoupling abstraction and implementation into two orthogonal hierarchies linked via composition, turning M * N subclasses into M + N independent classes.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build RemoteControl abstraction with TV and Radio device implementations.</p>",
+          "practice": {
+            "title": "Device and Remote Bridge",
+            "problemStatement": "Build RemoteControl abstraction with TV and Radio device implementations.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Device and Remote Bridge",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class IDevice {}; class Remote { std::shared_ptr<IDevice> dev; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Bridge Pattern is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "composite-pattern",
+      "title": "Composite Pattern (Tree Hierarchies)",
+      "description": "Composing objects into tree structures to represent part-whole hierarchies, treating individual objects and compositions uniformly.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Composite Pattern</strong> lets clients treat individual leaf objects and complex branch compositions uniformly through a shared interface.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Hierarchical tree structures (e.g. File systems with Files and Folders, or UI view hierarchies) need recursive operations without custom type checks.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Both Leaf (e.g. <code>File</code>) and Composite (e.g. <code>Directory</code>) implement <code>IFileSystemNode</code>.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>A composite contains a <code>std::vector&lt;std::shared_ptr&lt;Component&gt;&gt;</code> and delegates operations recursively to its children.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Composite Recursion",
+            "text": "Directory::getSize() -> loops through children -> sums child File::getSize() + nested Directory::getSize() recursively!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "composite_filesystem.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <memory>\n#include <string>\n\n// Component Base\nclass IFileSystemItem {\npublic:\n    virtual ~IFileSystemItem() = default;\n    virtual void display(int indent = 0) const = 0;\n    virtual size_t getSize() const = 0;\n};\n\n// Leaf Component\nclass File : public IFileSystemItem {\nprivate:\n    std::string name;\n    size_t sizeBytes;\npublic:\n    File(std::string n, size_t s) : name(std::move(n)), sizeBytes(s) {}\n\n    void display(int indent = 0) const override {\n        std::cout << std::string(indent, ' ') << \"- File: \" << name << \" (\" << sizeBytes << \" bytes)\\n\";\n    }\n    size_t getSize() const override { return sizeBytes; }\n};\n\n// Composite Component\nclass Directory : public IFileSystemItem {\nprivate:\n    std::string name;\n    std::vector<std::shared_ptr<IFileSystemItem>> children;\npublic:\n    explicit Directory(std::string n) : name(std::move(n)) {}\n\n    void add(std::shared_ptr<IFileSystemItem> item) { children.push_back(item); }\n\n    void display(int indent = 0) const override {\n        std::cout << std::string(indent, ' ') << \"+ Directory: \" << name << \"\\n\";\n        for (const auto& child : children) {\n            child->display(indent + 2); // Recursive tree traversal!\n        }\n    }\n\n    size_t getSize() const override {\n        size_t total = 0;\n        for (const auto& child : children) total += child->getSize();\n        return total;\n    }\n};\n\nint main() {\n    auto root = std::make_shared<Directory>(\"root\");\n    auto bin = std::make_shared<Directory>(\"bin\");\n    bin->add(std::make_shared<File>(\"sh\", 1024));\n    bin->add(std::make_shared<File>(\"bash\", 2048));\n\n    root->add(bin);\n    root->add(std::make_shared<File>(\"config.yaml\", 256));\n\n    root->display();\n    std::cout << \"Total Size: \" << root->getSize() << \" bytes\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>File (Leaf) and Directory (Composite) both implement IFileSystemItem with recursive size summation.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>DOM Trees in web browsers, UI Widget layouts, 3D Scene Graphs.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use whenever representing tree structures where leaves and branches share common operations.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if leaf and branch operations differ radically and cannot share an interface.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Simplifies client code; easy to add new component types.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Hard to restrict which children can be added to specific composites at compile time.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Safe Composite (add/remove on Composite only), Transparent Composite (add/remove on base).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Modifying children list during recursive iteration.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between Safe and Transparent Composite?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Transparent Composite defines child management (add/remove) in the base interface (leaves must throw). Safe Composite defines child management only in the Composite class (type safety).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement Composite for graphic shapes (Dot, Circle, and CompoundGraphic).</p>",
+          "practice": {
+            "title": "Graphic Shape Grouping",
+            "problemStatement": "Implement Composite for graphic shapes (Dot, Circle, and CompoundGraphic).",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Graphic Shape Grouping",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class Compound : public IShape { std::vector<std::shared_ptr<IShape>> children; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Composite Pattern (Tree Hierarchies) is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "decorator-pattern",
+      "title": "Decorator Pattern",
+      "description": "Attaching additional responsibilities to an object dynamically without subclassing.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Decorator Pattern</strong> wraps an existing object dynamically to add new behavior without altering the original class code or using class inheritance.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Inheritance is static and causes class explosion when combining features (e.g. SimpleCoffee, MilkCoffee, SugarCoffee, WhipCoffee, MilkSugarCoffee = $2^N$ classes!).</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>The Decorator implements the same interface as the wrapped object AND contains a pointer to it.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>Coffee* drink = new SugarDecorator(new MilkDecorator(new SimpleCoffee()))</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Decorator Stacking",
+            "text": "SugarDecorator -> wraps -> MilkDecorator -> wraps -> SimpleCoffee. Cost: $0.20 + $0.50 + $2.00 = $2.70"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "decorator_coffee.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\n// Component Interface\nclass ICoffee {\npublic:\n    virtual ~ICoffee() = default;\n    virtual double getCost() const = 0;\n    virtual std::string getDescription() const = 0;\n};\n\n// Concrete Base Component\nclass SimpleCoffee : public ICoffee {\npublic:\n    double getCost() const override { return 2.00; }\n    std::string getDescription() const override { return \"Simple Coffee\"; }\n};\n\n// Base Decorator\nclass CoffeeDecorator : public ICoffee {\nprotected:\n    std::unique_ptr<ICoffee> wrapped;\npublic:\n    explicit CoffeeDecorator(std::unique_ptr<ICoffee> coffee) : wrapped(std::move(coffee)) {}\n    double getCost() const override { return wrapped->getCost(); }\n    std::string getDescription() const override { return wrapped->getDescription(); }\n};\n\n// Concrete Decorator 1: Milk\nclass MilkDecorator : public CoffeeDecorator {\npublic:\n    explicit MilkDecorator(std::unique_ptr<ICoffee> c) : CoffeeDecorator(std::move(c)) {}\n    double getCost() const override { return wrapped->getCost() + 0.50; }\n    std::string getDescription() const override { return wrapped->getDescription() + \", Steamed Milk\"; }\n};\n\n// Concrete Decorator 2: Caramel\nclass CaramelDecorator : public CoffeeDecorator {\npublic:\n    explicit CaramelDecorator(std::unique_ptr<ICoffee> c) : CoffeeDecorator(std::move(c)) {}\n    double getCost() const override { return wrapped->getCost() + 0.75; }\n    std::string getDescription() const override { return wrapped->getDescription() + \", Caramel Drizzle\"; }\n};\n\nint main() {\n    // Dynamic runtime layering of behaviors!\n    std::unique_ptr<ICoffee> order = std::make_unique<SimpleCoffee>();\n    order = std::make_unique<MilkDecorator>(std::move(order));\n    order = std::make_unique<CaramelDecorator>(std::move(order));\n\n    std::cout << \"Order: \" << order->getDescription() << \"\\n\";\n    std::cout << \"Total: $\" << order->getCost() << \"\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>MilkDecorator and CaramelDecorator wrap ICoffee dynamically, summing descriptions and costs.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Java / C++ I/O streams (e.g. <code>BufferedInputStream(GZIPInputStream(FileInputStream))</code>), UI Scrollbars, HTTP Middleware.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when you want to add capabilities to individual objects at runtime without subclassing.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when the component interface is huge with dozens of methods.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Adheres to Open/Closed and Single Responsibility principles; dynamic composability.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Hard to remove a specific decorator from the middle of the wrapper stack.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Dynamic Decorator, Static Compile-Time Decorator (Templates).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Assuming object identity remains identical after wrapping.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is Decorator preferred over subclassing for multi-feature combinations?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Subclassing creates $2^N$ static classes for $N$ optional features. Decorator requires only $N$ decorator classes composed dynamically at runtime.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build an EncryptedLogDecorator wrapping a basic FileWriter.</p>",
+          "practice": {
+            "title": "Encrypted Log Decorator",
+            "problemStatement": "Build an EncryptedLogDecorator wrapping a basic FileWriter.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Encrypted Log Decorator",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class EncryptDecorator : public IWriter { std::unique_ptr<IWriter> w; public: void write(string s) override {} };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Decorator Pattern is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "facade-pattern",
+      "title": "Facade Pattern",
+      "description": "Providing a unified, simplified higher-level interface to a complex subsystem.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Facade Pattern</strong> provides a simple, clean interface to a complex subsystem of interacting classes, masking internal complexity.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Clients should not need to orchestrate 15 low-level audio, video, codec, and network classes just to play a video.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Create a single high-level Facade class that encapsulates calls to all subsystem objects.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>HomeTheaterFacade.watchMovie(\"Inception\")</code> turns on projector, dims lights, lowers screen, and starts audio amp.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Facade Boundary",
+            "text": "Client -> [HomeTheaterFacade] -> coordinates [Amplifier, Projector, Screen, DvdPlayer, Lights]"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "facade_pattern.cpp",
+            "code": "#include <iostream>\n\nclass Amplifier { public: void on() { std::cout << \"Amp On\\n\"; } };\nclass Projector { public: void on() { std::cout << \"Projector On\\n\"; } };\nclass Lights { public: void dim() { std::cout << \"Lights 10%\\n\"; } };\n\n// Facade: Unified Interface\nclass HomeTheaterFacade {\nprivate:\n    Amplifier amp;\n    Projector proj;\n    Lights lights;\npublic:\n    void watchMovie() {\n        std::cout << \"--- Initializing Movie Mode ---\\n\";\n        lights.dim();\n        proj.on();\n        amp.on();\n        std::cout << \"Movie is playing!\\n\";\n    }\n};\n\nint main() {\n    HomeTheaterFacade theater;\n    theater.watchMovie();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>HomeTheaterFacade orchestrates multiple low-level subsystems behind a single watchMovie() call.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Database connection pools, Compiler subsystems, OS SDK wrappers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when you want to provide a simple default entry point to a complex framework.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if client code needs fine-grained access to low-level subsystem internals.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Reduces client coupling and shields callers from subsystem refactorings.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Can turn into a God object if too many responsibilities are routed through it.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Opaque Facade, Transparent Facade (allows access to low-level subsystem if needed).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Forcing all access through the facade when advanced clients need low-level control.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between Facade and Adapter?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> <strong>Adapter</strong> makes two <em>existing incompatible interfaces</em> work together. <strong>Facade</strong> defines a <em>brand-new simplified interface</em> for an entire complex subsystem.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build a ComputerFacade coordinating CPU, Memory, and HardDrive boot sequence.</p>",
+          "practice": {
+            "title": "Computer Boot Facade",
+            "problemStatement": "Build a ComputerFacade coordinating CPU, Memory, and HardDrive boot sequence.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Computer Boot Facade",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class ComputerFacade { CPU cpu; RAM ram; public: void start() { cpu.boot(); ram.load(); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Facade Pattern is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "flyweight-pattern",
+      "title": "Flyweight Pattern",
+      "description": "Minimizing memory usage by sharing fine-grained intrinsic state among thousands of objects.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Flyweight Pattern</strong> reduces memory footprint by sharing common immutable state (<strong>Intrinsic State</strong>) across thousands of objects, passing dynamic context (<strong>Extrinsic State</strong>) as method parameters.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Rendering 1,000,000 trees in a forest game will crash RAM if each tree stores its own 50MB 3D mesh and texture.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Split state into Intrinsic (shared TreeType mesh/texture) and Extrinsic (unique x, y coordinates).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Flyweight Factory caches and shares <code>TreeType</code> instances.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "important",
+            "title": "Intrinsic vs Extrinsic State",
+            "text": "Intrinsic (Shared Flyweight): Tree Mesh, Texture, Bark Color (Stored ONCE in RAM)\\nExtrinsic (Context): X, Y Coordinates, Current Age (Passed as parameters)"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "flyweight_forest.cpp",
+            "code": "#include <iostream>\n#include <vector>\n#include <string>\n#include <unordered_map>\n#include <memory>\n\n// Flyweight: Shared Intrinsic State (Heavy mesh/texture data)\nclass TreeType {\npublic:\n    std::string name;\n    std::string textureData; // 50 MB texture\n    TreeType(std::string n, std::string t) : name(std::move(n)), textureData(std::move(t)) {}\n\n    void draw(int x, int y) const {\n        std::cout << \"Rendering \" << name << \" at (\" << x << \", \" << y << \")\\n\";\n    }\n};\n\n// Flyweight Factory: Manages pool of shared TreeTypes\nclass TreeFactory {\nprivate:\n    static inline std::unordered_map<std::string, std::shared_ptr<TreeType>> cache;\npublic:\n    static std::shared_ptr<TreeType> getTreeType(const std::string& name, const std::string& texture) {\n        if (cache.find(name) == cache.end()) {\n            cache[name] = std::make_shared<TreeType>(name, texture);\n            std::cout << \"[Flyweight Factory] Created new shared TreeType: \" << name << \"\\n\";\n        }\n        return cache[name];\n    }\n};\n\n// Context Object: Lightweight Extrinsic State\nclass Tree {\npublic:\n    int x, y;\n    std::shared_ptr<TreeType> type; // Pointer to shared flyweight!\n    Tree(int xPos, int yPos, std::shared_ptr<TreeType> t) : x(xPos), y(yPos), type(std::move(t)) {}\n    void draw() const { type->draw(x, y); }\n};\n\nint main() {\n    auto pineType = TreeFactory::getTreeType(\"Pine\", \"pine_50mb.png\");\n    \n    std::vector<Tree> forest;\n    for (int i = 0; i < 5; ++i) {\n        forest.emplace_back(i * 10, i * 20, pineType); // Shares 1 single texture!\n    }\n    forest[0].draw();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>TreeFactory shares a single 50MB TreeType flyweight across 5 tree instances.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Word processor text glyph formatters, game particle engines, CSS styling engines in browsers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when an application instantiates millions of objects and memory usage is a bottleneck.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if objects have completely unique, non-shareable state.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Massive RAM savings; improves CPU cache locality.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Increases CPU computation if extrinsic state must be recalculated on the fly.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Text Glyph Flyweights, Particle Flyweights.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Storing mutable extrinsic state inside the shared flyweight class.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What is the difference between Intrinsic and Extrinsic state in Flyweight?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> <strong>Intrinsic State</strong> is constant, immutable, and shared (stored in the Flyweight). <strong>Extrinsic State</strong> varies by context and is passed to the Flyweight by caller methods.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement BulletFlyweight sharing sprite texture across 10,000 bullets.</p>",
+          "practice": {
+            "title": "Game Bullet Particle Flyweight",
+            "problemStatement": "Implement BulletFlyweight sharing sprite texture across 10,000 bullets.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Game Bullet Particle Flyweight",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class BulletType { public: string sprite; }; class Bullet { int x, y; shared_ptr<BulletType> type; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Flyweight Pattern is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    },
+    {
+      "id": "proxy-pattern",
+      "title": "Proxy Pattern (Virtual, Remote, Protection)",
+      "description": "Providing a surrogate or placeholder for another object to control access to it.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Proxy Pattern</strong> provides a surrogate object that controls access to the original object, enabling lazy loading, caching, logging, or security access control.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Directly loading a 4K video or connecting to a remote server on startup wastes resources if never accessed.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>The Proxy implements the same interface as the RealSubject, intercepts requests, and delegates when authorized.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Virtual Proxy (Lazy Initialization), Protection Proxy (Auth check), Remote Proxy (Network RPC).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Virtual Proxy Lazy Loading",
+            "text": "Client -> ProxyImage::display() -> If realImage == null: new RealImage() -> realImage->display()"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "proxy_lazy_image.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\n// Subject Interface\nclass IImage {\npublic:\n    virtual ~IImage() = default;\n    virtual void display() = 0;\n};\n\n// Real Subject: Expensive to construct\nclass HighResImage : public IImage {\nprivate:\n    std::string filename;\n    void loadFromDisk() { std::cout << \"[DISK I/O] Loaded 500MB image: \" << filename << \"\\n\"; }\npublic:\n    explicit HighResImage(std::string fn) : filename(std::move(fn)) { loadFromDisk(); }\n    void display() override { std::cout << \"Displaying \" << filename << \" on screen.\\n\"; }\n};\n\n// Virtual Proxy: Lazy Loader\nclass ImageProxy : public IImage {\nprivate:\n    std::string filename;\n    std::unique_ptr<HighResImage> realImage{nullptr}; // Lazy initialized\npublic:\n    explicit ImageProxy(std::string fn) : filename(std::move(fn)) {}\n\n    void display() override {\n        if (!realImage) {\n            std::cout << \"[Proxy] Lazy-loading high resolution image on demand...\\n\";\n            realImage = std::make_unique<HighResImage>(filename);\n        }\n        realImage->display();\n    }\n};\n\nint main() {\n    std::unique_ptr<IImage> image = std::make_unique<ImageProxy>(\"satellite_map_4k.raw\");\n    std::cout << \"Application loaded (Image not loaded in RAM yet!)\\n\";\n    std::cout << \"\\nUser clicked open map:\\n\";\n    image->display(); // Triggers lazy load\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>ImageProxy postpones expensive 500MB disk read until display() is explicitly invoked.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Smart Pointers (C++ smart pointers are proxies!), gRPC client stubs, Spring security proxies.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use for lazy initialization, caching, access control, and remote RPC stubs.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use when direct access without interception is sufficient.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Saves system resources; provides transparent access control.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Adds latency on the initial intercept call.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Virtual Proxy, Remote Proxy, Protection Proxy, Smart Reference Proxy.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Infinite proxy loops when proxy intercepts calls to itself.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does a Proxy differ from a Decorator?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> <strong>Decorator</strong> adds <em>new dynamic behavior</em> without changing interface. <strong>Proxy</strong> <em>controls access</em>, lifecycle (lazy load), or security to the underlying object.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build an AccessProxy that blocks non-admin users from calling executeShutdown().</p>",
+          "practice": {
+            "title": "Protection Proxy Auth Check",
+            "problemStatement": "Build an AccessProxy that blocks non-admin users from calling executeShutdown().",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design pattern"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow GoF pattern structure.",
+            "expectedEntities": [
+              {
+                "name": "Protection Proxy Auth Check",
+                "responsibility": "Pattern implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "pattern_sol.cpp",
+              "code": "class AuthProxy : public IAdmin { string role; public: void shutdown() { if(role == 'admin') real->shutdown(); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Proxy Pattern (Virtual, Remote, Protection) is essential for advanced Low-Level Design interviews.</p>"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,389 @@
+{
+  "module_id": "20",
+  "module_title": "Advanced Low-Level Design & Scaling",
+  "description": "High-throughput memory alignment, zero-copy, lock-free ring buffers, cache locality, and latency optimization.",
+  "topics": [
+    {
+      "id": "cache-locality-data-oriented-design",
+      "title": "Cache Locality & Data-Oriented Design vs OOP",
+      "definition": "Data-Oriented Design (DOD) prioritizes the layout of data in hardware memory (L1/L2/L3 caches) to maximize cache hits, contrasting traditional OOP (Array of Structures - AoS) with Structure of Arrays (SoA).",
+      "why_it_matters": "A cache miss can cost 200+ CPU cycles while an L1 cache hit takes only 4 cycles. High-performance game engines, quant trading, and database engines organize data layout to eliminate pointer indirection cache misses.",
+      "real_world_analogy": "A grocery warehouse: if order pickers only need product weights, storing weights in one contiguous ledger allows fast scanning of 1,000 items in a single glance (SoA), rather than walking to 1,000 separate aisles to read each full product box (AoS).",
+      "conceptual_breakdown": [
+        "<strong>CPU Cache Lines:</strong> Memory is loaded in 64-byte chunks. Touching one byte loads the adjacent 63 bytes into L1 cache for free.",
+        "<strong>Array of Structures (AoS):</strong> Classic OOP layout: <code>struct Particle { float x, y, z; int id; string name; }; vector<Particle></code>. Iterating over positions wastes cache bandwidth fetching unused names and IDs.",
+        "<strong>Structure of Arrays (SoA):</strong> Data-Oriented layout: <code>struct ParticleSystem { vector<float> x, y, z; };</code>. SIMD auto-vectorization and pure contiguous cache line utilization.",
+        "<strong>Pointer Chasing Penalty:</strong> Classic polymorphic OOP (<code>vector<unique_ptr<Base>></code>) scatters objects across the heap, causing L1 cache misses on almost every dereference."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "AoS vs SoA Memory Layout",
+        "classes": [
+          {
+            "name": "ArrayOfStructures_AoS",
+            "is_abstract": false,
+            "attributes": [
+              "[x0, y0, mass0, name0]",
+              "[x1, y1, mass1, name1]",
+              "[x2, y2, mass2, name2]"
+            ],
+            "methods": [
+              "Low cache locality for position update (wastes bandwidth on names)"
+            ]
+          },
+          {
+            "name": "StructureOfArrays_SoA",
+            "is_abstract": false,
+            "attributes": [
+              "X: [x0, x1, x2, x3, ...]",
+              "Y: [y0, y1, y2, y3, ...]",
+              "Mass: [m0, m1, m2, m3, ...]"
+            ],
+            "methods": [
+              "100% Cache Line Utilization (Packed 64B SIMD ready)"
+            ]
+          }
+        ],
+        "relationships": []
+      },
+      "interactive_animation": {
+        "title": "L1 Cache Line Traversal Simulation",
+        "steps": [
+          {
+            "step": 1,
+            "description": "CPU fetches 64-byte Cache Line from RAM containing 16 contiguous float coordinates (SoA).",
+            "active_nodes": [
+              "RAM",
+              "L3 Cache",
+              "L1 Cache"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "SIMD AVX-512 register loads 16 floats in parallel and updates coordinates in 1 cycle.",
+            "active_nodes": [
+              "L1 Cache",
+              "CPU AVX Register"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "In contrast, AoS pointer dereference incurs 200ns RAM stall on every object jump.",
+            "active_nodes": [
+              "RAM Stall (Cache Miss)"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <vector>\n#include <chrono>\n#include <numeric>\n\n// 1. Traditional OOP (Array of Structures - AoS)\nstruct ParticleAoS {\n    float x, y, z;\n    float vx, vy, vz;\n    int id;\n    char name[32]; // Unused during physics update, clogs 64B cache line!\n};\n\n// 2. Data-Oriented Design (Structure of Arrays - SoA)\nstruct ParticleSystemSoA {\n    std::vector<float> x;\n    std::vector<float> y;\n    std::vector<float> z;\n    std::vector<float> vx;\n    std::vector<float> vy;\n    std::vector<float> vz;\n\n    void resize(size_t n) {\n        x.resize(n, 0.0f); y.resize(n, 0.0f); z.resize(n, 0.0f);\n        vx.resize(n, 1.0f); vy.resize(n, 1.0f); vz.resize(n, 1.0f);\n    }\n\n    void updatePhysics(float dt) {\n        // Contiguous memory access - compiler auto-vectorizes to AVX/SIMD!\n        const size_t n = x.size();\n        for (size_t i = 0; i < n; ++i) {\n            x[i] += vx[i] * dt;\n            y[i] += vy[i] * dt;\n            z[i] += vz[i] * dt;\n        }\n    }\n};\n\nint main() {\n    constexpr size_t N = 1'000'000;\n    \n    // SoA Benchmark\n    ParticleSystemSoA soa;\n    soa.resize(N);\n\n    auto start = std::chrono::high_resolution_clock::now();\n    for (int iter = 0; iter < 10; ++iter) {\n        soa.updatePhysics(0.016f);\n    }\n    auto end = std::chrono::high_resolution_clock::now();\n    \n    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();\n    std::cout << \"[SoA Benchmark] 1,000,000 particles 10 physics ticks: \" << duration << \" us\\n\";\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. 64-Byte Cache Line Saturation:</strong> By storing <code>float x[]</code> sequentially, a single 64B cache line fetch delivers 16 sequential coordinates with zero wasted bytes.",
+        "<strong>2. SIMD Auto-Vectorization:</strong> Modern compilers (GCC `-O3`, Clang, MSVC) transform the SoA loop into 512-bit vector registers processing 16 updates per clock.",
+        "<strong>3. Elimination of Pointer Dereferencing:</strong> Contiguous vectors eliminate heap fragmentation and translation lookaside buffer (TLB) thrashing."
+      ],
+      "comparison_matrix": {
+        "title": "AoS vs SoA Architectural Comparison",
+        "headers": [
+          "Metric",
+          "OOP / AoS",
+          "Data-Oriented / SoA"
+        ],
+        "rows": [
+          [
+            "Cache Line Density",
+            "Low (contains cold data)",
+            "100% Optimal (hot data packed)"
+          ],
+          [
+            "SIMD Vectorization",
+            "Difficult / Impossible",
+            "Trivial and automatic"
+          ],
+          [
+            "Ease of Domain Modeling",
+            "High (mental match with objects)",
+            "Moderate (tables of columns)"
+          ],
+          [
+            "Performance on Bulk Updates",
+            "Baseline (1x)",
+            "5x - 20x Faster"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Using `std::vector<std::unique_ptr<Base>>` in high-frequency loops",
+          "correction": "Use DOD data pools or contiguous arrays of concrete types to avoid pointer chasing."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Should we always rewrite all OOP systems into SoA?'</strong><br><em>Answer:</em> No. Apply DOD to hot batch-processing loops (physics, graphics, matching engines, analytics); keep traditional OOP for high-level business entities and complex state machines."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor a polymorphic game entity update loop into a cache-friendly component data array.",
+        "bad_code": "for (auto& entity : entities) entity->update(); // Virtual call + cache miss",
+        "good_code": "physicsComponentArray.updateAll(); renderComponentArray.renderAll();"
+      },
+      "practice_problem": {
+        "title": "Design Entity-Component-System (ECS) Storage",
+        "description": "Implement a sparse-set ECS storage mechanism that maps Entity IDs to contiguous Component arrays in O(1) time.",
+        "hint": "Use a sparse array `sparse[entityId] = denseIndex` and packed dense array `dense[denseIndex] = component`."
+      }
+    },
+    {
+      "id": "lock-free-spsc-queue",
+      "title": "Lock-free SPSC Ring Buffer Design",
+      "definition": "A Single-Producer Single-Consumer (SPSC) circular queue utilizing atomic head/tail indices and memory order fences (Acquire-Release) to achieve wait-free, zero-lock IPC and inter-thread messaging.",
+      "why_it_matters": "Standard mutex-based queues incur kernel context switches (1-5 microseconds) and priority inversions. SPSC queues deliver nanosecond latency (sub-20ns) essential for high-frequency trading and real-time audio.",
+      "real_world_analogy": "A conveyor belt sushi bar with 1 chef (Producer) placing dishes on empty rotating plates and 1 customer (Consumer) picking them up without ever stopping or speaking to each other.",
+      "conceptual_breakdown": [
+        "<strong>Circular Ring Buffer:</strong> Fixed-size array with power-of-two capacity for fast bitwise modulo: <code>index = pos & (capacity - 1)</code>.",
+        "<strong>Atomic Indices:</strong> <code>std::atomic<size_t> head</code> (written only by Consumer) and <code>std::atomic<size_t> tail</code> (written only by Producer).",
+        "<strong>Acquire-Release Memory Ordering:</strong> Producer uses <code>std::memory_order_release</code> on tail write; Consumer uses <code>std::memory_order_acquire</code> on tail read.",
+        "<strong>False Sharing Prevention:</strong> <code>alignas(hardware_destructive_interference_size)</code> to keep head and tail on separate 64-byte cache lines."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "SPSC Lock-Free Ring Buffer",
+        "classes": [
+          {
+            "name": "SPSCQueue<T, Capacity>",
+            "is_abstract": false,
+            "attributes": [
+              "- buffer: array<T, Capacity>",
+              "alignas(64) - tail: atomic<size_t>",
+              "alignas(64) - head: atomic<size_t>"
+            ],
+            "methods": [
+              "+ push(item: const T&): bool",
+              "+ pop(item: T&): bool",
+              "+ empty(): bool",
+              "+ full(): bool"
+            ]
+          }
+        ],
+        "relationships": []
+      },
+      "interactive_animation": {
+        "title": "Lock-Free SPSC Push & Pop Stepping",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Producer checks (tail - head < Capacity). Buffer has free slot.",
+            "active_nodes": [
+              "Producer",
+              "Tail"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Producer writes item into buffer[tail & mask] with no locks.",
+            "active_nodes": [
+              "Buffer Slot"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Producer increments tail with memory_order_release. Data is visible to Consumer.",
+            "active_nodes": [
+              "Tail Atomic"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Consumer loads tail with memory_order_acquire, reads item, and advances head.",
+            "active_nodes": [
+              "Consumer",
+              "Head Atomic"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <array>\n#include <atomic>\n#include <thread>\n#include <cassert>\n#include <new>\n\n// Cache line size constant to prevent false sharing\n#ifdef __cpp_lib_hardware_interference_size\n    using std::hardware_destructive_interference_size;\n#else\n    constexpr size_t hardware_destructive_interference_size = 64;\n#endif\n\ntemplate <typename T, size_t Capacity>\nclass LockFreeSPSCQueue {\n    static_assert((Capacity & (Capacity - 1)) == 0, \"Capacity must be a power of 2!\");\n\nprivate:\n    std::array<T, Capacity> buffer;\n    static constexpr size_t IndexMask = Capacity - 1;\n\n    // Align to distinct cache lines to prevent false sharing cache ping-pong\n    alignas(hardware_destructive_interference_size) std::atomic<size_t> tail{0}; // Written by Producer\n    alignas(hardware_destructive_interference_size) std::atomic<size_t> head{0}; // Written by Consumer\n\npublic:\n    LockFreeSPSCQueue() = default;\n\n    bool push(const T& item) {\n        const size_t currentTail = tail.load(std::memory_order_relaxed);\n        const size_t currentHead = head.load(std::memory_order_acquire);\n\n        if ((currentTail - currentHead) >= Capacity) {\n            return false; // Queue full\n        }\n\n        buffer[currentTail & IndexMask] = item;\n        tail.store(currentTail + 1, std::memory_order_release);\n        return true;\n    }\n\n    bool pop(T& item) {\n        const size_t currentHead = head.load(std::memory_order_relaxed);\n        const size_t currentTail = tail.load(std::memory_order_acquire);\n\n        if (currentHead == currentTail) {\n            return false; // Queue empty\n        }\n\n        item = buffer[currentHead & IndexMask];\n        head.store(currentHead + 1, std::memory_order_release);\n        return true;\n    }\n};\n\nint main() {\n    LockFreeSPSCQueue<int, 1024> queue;\n    constexpr int TotalMessages = 100'000;\n\n    std::thread producer([&]() {\n        for (int i = 0; i < TotalMessages; ++i) {\n            while (!queue.push(i)) {\n                std::this_thread::yield(); // Backoff when full\n            }\n        }\n    });\n\n    std::thread consumer([&]() {\n        int received = 0;\n        int val;\n        while (received < TotalMessages) {\n            if (queue.pop(val)) {\n                assert(val == received);\n                received++;\n            } else {\n                std::this_thread::yield(); // Backoff when empty\n            }\n        }\n    });\n\n    producer.join();\n    consumer.join();\n\n    std::cout << \"[SUCCESS] Processed \" << TotalMessages << \" messages through Lock-Free SPSC Ring Buffer with zero mutexes!\\n\";\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. False Sharing Elimination:</strong> <code>alignas(64)</code> places <code>head</code> and <code>tail</code> into separate cache lines, eliminating core-to-core cache line bouncing.",
+        "<strong>2. Acquire-Release Semantics:</strong> <code>std::memory_order_release</code> on tail publish guarantees all written item bytes in the array are committed before the index increment is observed by the consumer.",
+        "<strong>3. Bitwise Fast Modulo:</strong> Power of 2 constraint allows <code>tail & (Capacity - 1)</code> instead of expensive integer division instructions."
+      ],
+      "comparison_matrix": {
+        "title": "Queue Performance Comparison",
+        "headers": [
+          "Type",
+          "Latency per Operation",
+          "Contention Model",
+          "Thread Scaling"
+        ],
+        "rows": [
+          [
+            "std::mutex + std::queue",
+            "1,000 - 5,000 ns (Context switch)",
+            "Blocking / Lock contention",
+            "Degrades with cores"
+          ],
+          [
+            "Spinlock Queue",
+            "100 - 300 ns",
+            "Busy-wait CPU burning",
+            "High CPU load"
+          ],
+          [
+            "Lock-Free SPSC",
+            "5 - 15 ns",
+            "Wait-free / Lock-free",
+            "Zero contention (1P - 1C)"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Omitting `alignas(64)` on head and tail",
+          "correction": "Causes false sharing, degrading throughput by up to 80% due to cache line invalidation between CPU cores."
+        },
+        {
+          "mistake": "Using `std::memory_order_relaxed` for publication",
+          "correction": "Allows CPU out-of-order execution to publish the tail index BEFORE the array data is written, resulting in uninitialized data reads."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Can this SPSC queue be used safely with 2 Producers and 1 Consumer?'</strong><br><em>Answer:</em> Absolutely not. SPSC assumes single-writer per index. Multiple producers require MPMC queues using `atomic::compare_exchange_weak` and sequence numbers (e.g. Dmitry Vyukov's MPMC queue)."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor a mutex-guarded audio playback buffer into a lock-free SPSC ring buffer to prevent audio stutter glitches.",
+        "bad_code": "std::lock_guard<std::mutex> lock(audioMtx); queue.push(sample);",
+        "good_code": "spscQueue.push(sample); // Real-time safe, never blocks audio thread"
+      },
+      "practice_problem": {
+        "title": "Design Batch-Push SPSC Queue",
+        "description": "Implement `push_batch(const T* data, size_t count)` that writes multiple elements under a single atomic tail update.",
+        "hint": "Check available capacity once: `(Capacity - (tail - head)) >= count`, write range, then store `tail + count`."
+      }
+    },
+    {
+      "id": "zero-copy-buffer-abstractions",
+      "title": "Zero-Copy Buffer Abstractions",
+      "definition": "Designing network and file I/O abstractions (`std::string_view`, `std::span`, scatter-gather I/O) that inspect and slice data without copying bytes across user and kernel memory spaces.",
+      "why_it_matters": "Copying memory is CPU-intensive. At 100 Gbps network speeds, traditional `std::string` copies will saturate memory bus bandwidth. Zero-copy abstractions enable line-rate network packet processing.",
+      "real_world_analogy": "Highlighting a sentence in a physical library book and passing the page coordinates (Page 42, Line 10) to a colleague, rather than hand-copying the entire 500-page book onto new sheets of paper.",
+      "conceptual_breakdown": [
+        "<strong>std::string_view & std::span (C++20):</strong> Non-owning reference views over contiguous memory slices consisting of just a pointer and a size.",
+        "<strong>Scatter-Gather I/O (vectored I/O):</strong> <code>writev</code> and <code>readv</code> allow sending multiple non-contiguous memory buffers in a single system call.",
+        "<strong>Ring Buffer Slicing:</strong> Passing pointer offsets into existing packet receive buffers directly to parsers.",
+        "<strong>Ownership Boundaries:</strong> Ensuring source memory buffer lifetime outlives all referencing views."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Zero-Copy View vs Deep Copy",
+        "classes": [
+          {
+            "name": "DeepCopy_Approach",
+            "is_abstract": false,
+            "attributes": [
+              "Packet Buffer (1500B)",
+              "std::string header = substr(0, 20)",
+              "std::string payload = substr(20, 1480)"
+            ],
+            "methods": [
+              "2 Heap Allocations + 1500B memcpy"
+            ]
+          },
+          {
+            "name": "ZeroCopy_std_span_Approach",
+            "is_abstract": false,
+            "attributes": [
+              "Packet Buffer (1500B)",
+              "string_view header(&buf[0], 20)",
+              "span<uint8_t> payload(&buf[20], 1480)"
+            ],
+            "methods": [
+              "0 Allocations, 0 memcpy, O(1) slicing"
+            ]
+          }
+        ],
+        "relationships": []
+      },
+      "interactive_animation": {
+        "title": "Zero-Copy Network Packet Parsing",
+        "steps": [
+          {
+            "step": 1,
+            "description": "NIC transfers 1500B Ethernet frame directly into DMA Ring Buffer.",
+            "active_nodes": [
+              "NIC",
+              "DMA Buffer"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Parser creates zero-copy std::span views for IP Header and TCP Payload without copying.",
+            "active_nodes": [
+              "Parser",
+              "std::span View"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Application processes payload directly in DMA memory. Latency is minimized.",
+            "active_nodes": [
+              "Application Engine"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <span>\n#include <string_view>\n#include <vector>\n#include <cstdint>\n\n// Protocol Header (POD struct)\n#pragma pack(push, 1)\nstruct PacketHeader {\n    uint16_t magic;\n    uint16_t messageType;\n    uint32_t payloadLength;\n};\n#pragma pack(pop)\n\nclass ZeroCopyPacketParser {\npublic:\n    // Pure zero-copy parser taking contiguous byte span\n    static void processFrame(std::span<const uint8_t> rawFrame) {\n        if (rawFrame.size() < sizeof(PacketHeader)) {\n            std::cout << \"[ERROR] Corrupt frame: smaller than header size\\n\";\n            return;\n        }\n\n        // 1. Direct reinterpret view of header without copying\n        const auto* header = reinterpret_cast<const PacketHeader*>(rawFrame.data());\n        \n        std::cout << \"[ZERO-COPY PARSER] Header -> Magic: 0x\" << std::hex << header->magic \n                  << \", MsgType: \" << std::dec << header->messageType \n                  << \", PayloadLen: \" << header->payloadLength << \" bytes\\n\";\n\n        // 2. Create sub-span for payload (Zero-copy slice)\n        std::span<const uint8_t> payload = rawFrame.subspan(sizeof(PacketHeader), header->payloadLength);\n\n        // 3. Zero-copy string_view over ASCII payload section\n        std::string_view textPayload(reinterpret_cast<const char*>(payload.data()), payload.size());\n        std::cout << \"  Payload Content View: \\\"\" << textPayload << \"\\\" (Allocations: 0)\\n\";\n    }\n};\n\nint main() {\n    // Simulated Network Buffer received from OS socket / NIC ring\n    std::vector<uint8_t> networkBuffer;\n    \n    PacketHeader hdr{0xABCD, 42, 11}; // Magic, Type=42, 11 bytes \"Hello C++20\"\n    const uint8_t* hdrBytes = reinterpret_cast<const uint8_t*>(&hdr);\n    networkBuffer.insert(networkBuffer.end(), hdrBytes, hdrBytes + sizeof(PacketHeader));\n    \n    std::string_view msg = \"Hello C++20\";\n    networkBuffer.insert(networkBuffer.end(), msg.begin(), msg.end());\n\n    // Execute zero-copy parsing\n    ZeroCopyPacketParser::processFrame(networkBuffer);\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. std::span Contiguous Memory View:</strong> <code>std::span<const uint8_t></code> represents any contiguous buffer (vector, raw array, memory-mapped file) without owning or copying it.",
+        "<strong>2. Subspan Zero-Copy Slicing:</strong> <code>rawFrame.subspan()</code> performs an $O(1)$ offset calculation rather than copying bytes into a new container.",
+        "<strong>3. Reinterpretation of Network Structs:</strong> Uses `#pragma pack` and pointer reinterpretation to read binary headers directly from wire buffers."
+      ],
+      "comparison_matrix": {
+        "title": "Buffer Abstraction Trade-offs",
+        "headers": [
+          "Type",
+          "Ownership",
+          "Allocation Cost",
+          "Dangling Pointer Risk"
+        ],
+        "rows": [
+          [
+            "std::string / std::vector",
+            "Owns data (Deep copy)",
+            "Heap allocation (unless SSO)",
+            "None (Safe)"
+          ],
+          [
+            "std::string_view",
+            "Non-owning reference",
+            "Zero allocation (16 bytes)",
+            "Yes (if source is destroyed)"
+          ],
+          [
+            "std::span<T>",
+            "Non-owning mutable/const view",
+            "Zero allocation (16 bytes)",
+            "Yes (if buffer invalidated)"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Returning a `std::string_view` to a temporary local `std::string`",
+          "correction": "The temporary string is destroyed at the end of the statement, creating a catastrophic dangling pointer."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'What is the danger of `reinterpret_cast` for zero-copy parsing across different CPU architectures?'</strong><br><em>Answer:</em> Endianness differences (Big-endian network order vs Little-endian x86) and unaligned memory access faults on ARM architectures. Use `ntohs`/`ntohl` or `std::endian` checks."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor a function taking `const std::string&` that uses `s.substr()` inside a loop.",
+        "bad_code": "void parse(const string& s) { auto sub = s.substr(0, 10); } // Heap copy every slice",
+        "good_code": "void parse(string_view s) { auto sub = s.substr(0, 10); } // O(1) pointer slice"
+      },
+      "practice_problem": {
+        "title": "Design Scatter-Gather Chunk Buffer",
+        "description": "Implement a `ChunkedBuffer` that chains multiple 4KB zero-copy memory blocks and exposes a unified `read_view(offset, len)` interface.",
+        "hint": "Store a `std::vector<std::span<uint8_t>>`."
+      }
+    }
+  ]
+}

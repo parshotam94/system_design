@@ -1,0 +1,37 @@
+<!-- Topbar Component -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="mobile-menu-btn sidebar-toggle-btn" style="display: none;" title="Open Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <div class="breadcrumbs">
+      <a href="/">Home</a>
+      {% if active_page == 'module' and current_module %}
+        <span class="separator">/</span>
+        <span class="current">Module {{ current_module.id }}: {{ current_module.title }}</span>
+      {% elif active_page == 'playground' %}
+        <span class="separator">/</span>
+        <span class="current">Pattern Playground</span>
+      {% elif active_page == 'framework' %}
+        <span class="separator">/</span>
+        <span class="current">14-Step Interview Framework</span>
+      {% elif active_page == 'cheatsheets' %}
+        <span class="separator">/</span>
+        <span class="current">Cheat Sheets</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <nav class="topbar-nav-links">
+      <a href="/" class="{% if active_page == 'home' %}active{% endif %}">Roadmap</a>
+      <a href="/playground" class="{% if active_page == 'playground' %}active{% endif %}">Playground</a>
+      <a href="/interview-framework" class="{% if active_page == 'framework' %}active{% endif %}">Interview Framework</a>
+      <a href="/cheat-sheets" class="{% if active_page == 'cheatsheets' %}active{% endif %}">Cheat Sheets</a>
+    </nav>
+    <button class="topbar-search-btn btn btn-secondary btn-sm" title="Search (Ctrl+K)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      Search
+    </button>
+  </div>
+</header>

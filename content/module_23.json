@@ -1,0 +1,657 @@
+{
+  "module_id": "23",
+  "module_title": "Curated LLD Interview Question Bank",
+  "description": "100+ Top C++ LLD interview questions categorized by OOP, SOLID, Patterns, Concurrency, and Traps with interactive reveal.",
+  "topics": [
+    {
+      "id": "cpp-oop-interview-questions",
+      "title": "C++ OOP & Memory Interview Questions",
+      "definition": "High-yield interview questions probing object layout, virtual tables, dynamic casting, object slicing, RAII, and custom memory management in C++.",
+      "why_it_matters": "These technical questions test whether you understand what the C++ compiler actually produces at the assembly and memory level, separating senior engineers from casual programmers.",
+      "real_world_analogy": "A mechanic who doesn't just know how to drive a sports car, but understands internal combustion, transmission ratios, and ECU timing maps.",
+      "conceptual_breakdown": [
+        "<strong>VTable & VPTR:</strong> 8-byte pointer per polymorphic object pointing to class function table.",
+        "<strong>Virtual Destructor:</strong> Required in any base class with virtual methods to prevent partial destructor deletion leaks.",
+        "<strong>Object Slicing:</strong> Passing derived objects by value cuts off derived members.",
+        "<strong>Rule of 0 / 3 / 5:</strong> Deterministic resource lifecycle management."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "VTable Layout in Memory",
+        "classes": [
+          {
+            "name": "DerivedObjectInstance",
+            "is_abstract": false,
+            "attributes": [
+              "+ vptr (8 bytes) -> &Derived_VTable",
+              "+ baseData (4 bytes)",
+              "+ derivedData (4 bytes)"
+            ],
+            "methods": []
+          },
+          {
+            "name": "Derived_VTable",
+            "is_abstract": false,
+            "attributes": [
+              "&Derived::virtFunc1",
+              "&Derived::virtFunc2",
+              "&Derived::~Derived"
+            ],
+            "methods": []
+          }
+        ],
+        "relationships": [
+          {
+            "from": "DerivedObjectInstance",
+            "to": "Derived_VTable",
+            "type": "association",
+            "label": "points to"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "Virtual Dispatch Lookup Step-by-Step",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Base pointer `ptr->draw()` called on `Circle` instance.",
+            "active_nodes": [
+              "Base Pointer"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "CPU dereferences object's hidden `vptr` at offset 0.",
+            "active_nodes": [
+              "vptr Dereference"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Indexes slot 0 in `Circle_VTable` and jumps to `Circle::draw()` assembly.",
+            "active_nodes": [
+              "Circle::draw()"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <memory>\n\nclass Base {\npublic:\n    Base() { std::cout << \"Base Constructor\\n\"; }\n    // Critical: Virtual Destructor ensures Derived destructor is invoked via Base pointer!\n    virtual ~Base() { std::cout << \"Base Destructor\\n\"; }\n    virtual void show() const { std::cout << \"Base::show()\\n\"; }\n};\n\nclass Derived : public Base {\nprivate:\n    int* heapBuffer;\npublic:\n    Derived() : heapBuffer(new int[100]) { std::cout << \"Derived Constructor (Allocated 100 ints)\\n\"; }\n    ~Derived() override {\n        delete[] heapBuffer;\n        std::cout << \"Derived Destructor (Freed 100 ints)\\n\";\n    }\n    void show() const override { std::cout << \"Derived::show()\\n\"; }\n};\n\nint main() {\n    std::cout << \"--- Polymorphic Deletion via Base Pointer ---\\n\";\n    std::unique_ptr<Base> obj = std::make_unique<Derived>();\n    obj->show();\n    // Destructor runs cleanly: Derived Destructor -> Base Destructor!\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Virtual Destructor Dispatch:</strong> Because <code>~Base()</code> is virtual, deleting via <code>Base*</code> looks up <code>Derived::~Derived()</code> in the VTable, freeing <code>heapBuffer</code>.",
+        "<strong>2. Memory Leak Prevention:</strong> Without <code>virtual ~Base()</code>, only <code>Base::~Base()</code> executes, leaking the 100 ints.",
+        "<strong>3. Modern RAII:</strong> Wrapping with <code>std::unique_ptr<Base></code> ensures deletion happens automatically when going out of scope."
+      ],
+      "comparison_matrix": {
+        "title": "C++ Casting Mechanisms",
+        "headers": [
+          "Cast Type",
+          "Safety Check",
+          "Performance Cost",
+          "Typical Use Case"
+        ],
+        "rows": [
+          [
+            "static_cast",
+            "Compile-time type check",
+            "Zero (free)",
+            "Numeric conversions, related pointer up/downcast"
+          ],
+          [
+            "dynamic_cast",
+            "Runtime RTTI check",
+            "Moderate (traverses type info)",
+            "Safe downcasting with polymorphic classes"
+          ],
+          [
+            "reinterpret_cast",
+            "No checks (treats bits as type)",
+            "Zero (free)",
+            "Raw hardware buffers, packet byte serialization"
+          ],
+          [
+            "const_cast",
+            "Removes const qualifier",
+            "Zero (free)",
+            "Interfacing with legacy C APIs"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Calling virtual methods inside constructors or destructors",
+          "correction": "During base construction, the derived portion is not yet initialized; virtual calls resolve to the base class implementation, NOT the derived one."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Why does `sizeof(EmptyClass)` return 1 byte in C++ instead of 0?'</strong><br><em>Answer:</em> C++ requires every distinct object instance to have a unique memory address (`&a != &b`). In C++20, `[[no_unique_address]]` allows empty members to consume 0 bytes."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Fix a missing virtual destructor in a polymorphic abstract base class.",
+        "bad_code": "class Shape { public: virtual void draw() = 0; };",
+        "good_code": "class Shape { public: virtual ~Shape() = default; virtual void draw() = 0; };"
+      },
+      "practice_problem": {
+        "title": "Analyze Virtual Table Sizing",
+        "description": "Calculate the exact memory footprint of a class with 2 virtual functions, 1 int member, and 1 double member on a 64-bit architecture.",
+        "hint": "8 bytes (vptr) + 4 bytes (int) + 4 bytes (padding) + 8 bytes (double) = 24 bytes."
+      }
+    },
+    {
+      "id": "solid-interview-questions",
+      "title": "SOLID Principles Interview Questions",
+      "definition": "Curated questions and deep technical trade-off scenarios on Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion in C++.",
+      "why_it_matters": "Interviewers frequently present subtly flawed code snippets and ask candidates to identify which SOLID principle is violated and write the refactored C++ code.",
+      "real_world_analogy": "Building a modular modular stereo system: speakers, turntable, and amplifiers connect via standard RCA cables (DIP), allowing upgrading the turntable without rewiring the speakers (OCP).",
+      "conceptual_breakdown": [
+        "<strong>SRP:</strong> A class should have only one reason to change.",
+        "<strong>OCP:</strong> Open for extension, closed for modification (via interfaces/templates).",
+        "<strong>LSP:</strong> Subtypes must be substitutable for their base types without altering program correctness.",
+        "<strong>ISP:</strong> Clients should not be forced to depend on interfaces they do not use.",
+        "<strong>DIP:</strong> High-level modules should depend on abstractions, not concrete implementations."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "LSP Violation: Rectangle vs Square",
+        "classes": [
+          {
+            "name": "Rectangle",
+            "is_abstract": false,
+            "attributes": [
+              "# width: int",
+              "# height: int"
+            ],
+            "methods": [
+              "+ setWidth(w: int)",
+              "+ setHeight(h: int)",
+              "+ getArea(): int"
+            ]
+          },
+          {
+            "name": "Square_Violates_LSP",
+            "is_abstract": false,
+            "attributes": [],
+            "methods": [
+              "+ setWidth(w: int) { width = height = w; }"
+            ]
+          }
+        ],
+        "relationships": [
+          {
+            "from": "Square_Violates_LSP",
+            "to": "Rectangle",
+            "type": "inheritance",
+            "label": "violates LSP invariant"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "LSP Invariant Violation Detection",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Function testRectangle(Rectangle& r) assumes setWidth(5) and setHeight(4) gives area 20.",
+            "active_nodes": [
+              "Test Function"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Pass Square instance. setHeight(4) overrides width to 4. Area is 16 != 20! Invariant broken.",
+            "active_nodes": [
+              "Square",
+              "LSP Violation"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Refactor: Make Shape base with getArea(); separate Square and Rectangle hierarchies.",
+            "active_nodes": [
+              "Refactored Solution"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <memory>\n#include <cassert>\n\n// Clean LSP Hierarchy\nclass IShape {\npublic:\n    virtual ~IShape() = default;\n    [[nodiscard]] virtual int getArea() const = 0;\n};\n\nclass Rectangle : public IShape {\nprivate:\n    int width;\n    int height;\npublic:\n    Rectangle(int w, int h) : width(w), height(h) {}\n    [[nodiscard]] int getArea() const override { return width * height; }\n};\n\nclass Square : public IShape {\nprivate:\n    int side;\npublic:\n    explicit Square(int s) : side(s) {}\n    [[nodiscard]] int getArea() const override { return side * side; }\n};\n\nvoid printArea(const IShape& shape) {\n    std::cout << \"Shape Area: \" << shape.getArea() << \"\\n\";\n}\n\nint main() {\n    Rectangle rect(5, 4);\n    Square sq(5);\n\n    printArea(rect); // 20\n    printArea(sq);   // 25\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Preserving Invariants:</strong> Square is NOT a behavioral subtype of Rectangle if mutators (<code>setWidth</code>) allow altering independent dimensions.",
+        "<strong>2. Common Abstract Root:</strong> Both implement <code>IShape</code> with read-only contract <code>getArea()</code>.",
+        "<strong>3. Immutability Principle:</strong> Making shapes immutable value objects completely eliminates LSP mutation bugs."
+      ],
+      "comparison_matrix": {
+        "title": "SOLID Principles Summary",
+        "headers": [
+          "Principle",
+          "Core Question",
+          "Typical C++ Solution"
+        ],
+        "rows": [
+          [
+            "SRP",
+            "Does this class do 2 unrelated things?",
+            "Split into distinct focused classes"
+          ],
+          [
+            "OCP",
+            "Must I edit this file to add a new payment type?",
+            "Use Strategy or Factory Pattern"
+          ],
+          [
+            "LSP",
+            "Does deriving break caller assumptions?",
+            "Ensure derived classes strengthen preconditions"
+          ],
+          [
+            "ISP",
+            "Does class implement dummy no-op methods?",
+            "Split giant interface into smaller role interfaces"
+          ],
+          [
+            "DIP",
+            "Does high-level service call concrete MySQL?",
+            "Pass `IRepository` interface via constructor"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Creating a single God Interface `IEntity` with 50 methods",
+          "correction": "Apply Interface Segregation Principle (ISP) to split into small interfaces (`IPrintable`, `ISerializable`, `IComparable`)."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Is Dependency Inversion Principle the same as Dependency Injection?'</strong><br><em>Answer:</em> No. DIP is the high-level design principle (depend on abstractions). Dependency Injection (DI) is a specific design pattern / technique used to deliver dependencies to a class (e.g. constructor injection)."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor a NotificationService that directly instantiates SendGridAPI inside its constructor.",
+        "bad_code": "NotificationService() { api = new SendGridAPI(); }",
+        "good_code": "NotificationService(unique_ptr<IEmailSender> sender) : emailSender(move(sender)) {}"
+      },
+      "practice_problem": {
+        "title": "Identify SOLID Violations in Monolithic E-Commerce Cart",
+        "description": "Given a `ShoppingCart` class that calculates taxes, charges Stripe, updates MySQL, and sends emails, refactor it into 4 SRP-compliant components.",
+        "hint": "Create `TaxCalculator`, `PaymentService`, `OrderRepository`, and `EmailNotifier`."
+      }
+    },
+    {
+      "id": "design-patterns-interview-questions",
+      "title": "Design Patterns & Trade-offs Questions",
+      "definition": "Deep-dive questions comparing creational, structural, and behavioral patterns: Factory vs Abstract Factory, Strategy vs State, Observer vs Pub/Sub, and Decorator vs Adapter.",
+      "why_it_matters": "Interviewers test whether you understand the exact trade-offs of patterns rather than blindly applying them everywhere (Pattern Overuse / Anti-pattern).",
+      "real_world_analogy": "Choosing the right tool from a master mechanic's toolbox: knowing when to use a torque wrench versus an impact driver.",
+      "conceptual_breakdown": [
+        "<strong>Factory vs Abstract Factory:</strong> Factory creates 1 product family; Abstract Factory creates families of related products (e.g. DarkTheme Button + Checkbox).",
+        "<strong>Strategy vs State:</strong> Strategy is chosen by client to vary an algorithm; State transitions automatically internally based on object state.",
+        "<strong>Decorator vs Adapter:</strong> Decorator adds behavior without changing interface; Adapter converts an incompatible interface into another.",
+        "<strong>Proxy vs Decorator:</strong> Proxy controls access (caching, security, lazy loading); Decorator enhances functionality."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Strategy vs State Pattern",
+        "classes": [
+          {
+            "name": "StrategyPattern",
+            "is_abstract": false,
+            "attributes": [
+              "Client sets Strategy explicitly",
+              "Independent interchangeable algorithms"
+            ],
+            "methods": [
+              "+ sort(data)"
+            ]
+          },
+          {
+            "name": "StatePattern",
+            "is_abstract": false,
+            "attributes": [
+              "Object changes state automatically",
+              "Transitions governed by internal events"
+            ],
+            "methods": [
+              "+ handleRequest() -> nextState"
+            ]
+          }
+        ],
+        "relationships": []
+      },
+      "interactive_animation": {
+        "title": "Pattern Disambiguation Decision Flow",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Need to add responsibilities to an object dynamically without subclassing? -> Use DECORATOR.",
+            "active_nodes": [
+              "Decorator"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Need to match an incompatible legacy interface to a new client? -> Use ADAPTER.",
+            "active_nodes": [
+              "Adapter"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Need to control lazy loading or permissions to an expensive object? -> Use PROXY.",
+            "active_nodes": [
+              "Proxy"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <memory>\n\n// Demonstrating Strategy vs State in C++\n// Strategy: Client chooses algorithm\nclass ICompressionStrategy {\npublic:\n    virtual ~ICompressionStrategy() = default;\n    virtual void compress(const std::string& file) = 0;\n};\n\nclass ZipCompression : public ICompressionStrategy {\npublic:\n    void compress(const std::string& file) override { std::cout << \"Compressing \" << file << \" using ZIP\\n\"; }\n};\n\nclass RarCompression : public ICompressionStrategy {\npublic:\n    void compress(const std::string& file) override { std::cout << \"Compressing \" << file << \" using RAR\\n\"; }\n};\n\nclass CompressionContext {\nprivate:\n    std::unique_ptr<ICompressionStrategy> strategy;\npublic:\n    void setStrategy(std::unique_ptr<ICompressionStrategy> s) { strategy = std::move(s); }\n    void execute(const std::string& file) { if (strategy) strategy->compress(file); }\n};\n\nint main() {\n    CompressionContext ctx;\n    ctx.setStrategy(std::make_unique<ZipCompression>());\n    ctx.execute(\"dataset.csv\");\n\n    ctx.setStrategy(std::make_unique<RarCompression>());\n    ctx.execute(\"dataset.csv\");\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Client-Driven Polymorphism:</strong> Strategy lets the caller dynamically swap algorithms at runtime.",
+        "<strong>2. Zero Code Duplication:</strong> Eliminates nested switch statements for format types.",
+        "<strong>3. Open for New Algorithms:</strong> Adding <code>TarGzCompression</code> requires zero edits to <code>CompressionContext</code>."
+      ],
+      "comparison_matrix": {
+        "title": "Pattern Nuances Comparison",
+        "headers": [
+          "Pattern Pair",
+          "Key Difference",
+          "Interface Impact"
+        ],
+        "rows": [
+          [
+            "Adapter vs Facade",
+            "Adapter wraps 1 class to fix interface; Facade simplifies a whole subsystem",
+            "Adapter matches target interface; Facade creates new simple interface"
+          ],
+          [
+            "Decorator vs Proxy",
+            "Decorator adds new behavior; Proxy controls access/lifecycle",
+            "Both preserve the original interface identical to target"
+          ],
+          [
+            "Observer vs Mediator",
+            "Observer is 1-to-many broadcast; Mediator encapsulates complex many-to-many communications",
+            "Mediator centralizes coordination; Observer distributes notifications"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Overusing Singleton for things that are not genuinely unique (e.g. User, Configuration)",
+          "correction": "Singleton creates hidden global state; prefer Dependency Injection."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Why is the Visitor Pattern difficult to maintain if you frequently add new ConcreteElement classes?'</strong><br><em>Answer:</em> Adding a new element requires modifying the `IVisitor` interface and EVERY concrete visitor class, violating the Open-Closed Principle for the element dimension."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor a hardcoded switch statement selecting sorting algorithms into the Strategy Pattern.",
+        "bad_code": "if (type == 1) quickSort(); else if (type == 2) mergeSort();",
+        "good_code": "sortStrategy->sort(data);"
+      },
+      "practice_problem": {
+        "title": "Select the Right Pattern for a Banking Pipeline",
+        "description": "Which patterns would you use to design a Transaction processing pipeline with fraud scoring, fee calculation, ledger recording, and SMS alerts?",
+        "hint": "Chain of Responsibility (pipeline) + Strategy (fee) + Observer (SMS alert)."
+      }
+    },
+    {
+      "id": "concurrency-interview-questions",
+      "title": "Concurrency & Multi-threading LLD Questions",
+      "definition": "Advanced questions on deadlocks, race conditions, memory models, reader-writer locking, double-checked locking, and thread pool starvation in C++.",
+      "why_it_matters": "Multi-threading is the ultimate filter in senior C++ LLD interviews. Demonstrating precise locking disciplines and lock-free awareness is essential.",
+      "real_world_analogy": "A 4-way traffic intersection: without traffic lights (locks) or roundabouts (lock-free), cars crash (data races) or create gridlock where nobody moves (deadlock).",
+      "conceptual_breakdown": [
+        "<strong>4 Conditions for Deadlock (Coffman):</strong> Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait.",
+        "<strong>std::scoped_lock (C++17):</strong> Acquires multiple mutexes simultaneously using deadlock-avoidance algorithms (std::lock).",
+        "<strong>Thread-Safe Meyer's Singleton:</strong> Guaranteed thread-safe in C++11 with zero locking overhead after initialization.",
+        "<strong>False Sharing:</strong> Two threads writing to distinct variables on the same 64-byte cache line destroying performance."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Deadlock Circular Wait Condition",
+        "classes": [
+          {
+            "name": "Thread_A",
+            "is_abstract": false,
+            "attributes": [
+              "Holds: Mutex 1",
+              "Waiting for: Mutex 2"
+            ],
+            "methods": []
+          },
+          {
+            "name": "Thread_B",
+            "is_abstract": false,
+            "attributes": [
+              "Holds: Mutex 2",
+              "Waiting for: Mutex 1"
+            ],
+            "methods": []
+          }
+        ],
+        "relationships": [
+          {
+            "from": "Thread_A",
+            "to": "Thread_B",
+            "type": "association",
+            "label": "Circular Dependency Deadlock"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "Deadlock Resolution via std::scoped_lock",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Thread 1 wants to transfer from Account A to Account B.",
+            "active_nodes": [
+              "Thread 1"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Thread 2 wants to transfer from Account B to Account A simultaneously.",
+            "active_nodes": [
+              "Thread 2"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Both use `std::scoped_lock(mtxA, mtxB)`. Deadlock avoidance algorithm acquires both without circular wait.",
+            "active_nodes": [
+              "std::scoped_lock"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Transfers complete safely with zero deadlock risk!",
+            "active_nodes": [
+              "Safe Completion"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <mutex>\n#include <thread>\n\nclass BankAccount {\npublic:\n    int id;\n    double balance;\n    mutable std::mutex mtx;\n\n    BankAccount(int accId, double bal) : id(accId), balance(bal) {}\n};\n\n// Deadlock-Free Transfer using std::scoped_lock (C++17)\nvoid transferMoney(BankAccount& from, BankAccount& to, double amount) {\n    if (&from == &to) return; // Prevent self-locking\n\n    // Atomically locks both mutexes with deadlock avoidance algorithm\n    std::scoped_lock lock(from.mtx, to.mtx);\n\n    if (from.balance >= amount) {\n        from.balance -= amount;\n        to.balance += amount;\n        std::cout << \"[TRANSFER SUCCESS] $\" << amount << \" transferred from Account \" \n                  << from.id << \" to Account \" << to.id << \"\\n\";\n    }\n}\n\nint main() {\n    BankAccount acc1(101, 1000.0);\n    BankAccount acc2(102, 500.0);\n\n    std::thread t1(transferMoney, std::ref(acc1), std::ref(acc2), 200.0);\n    std::thread t2(transferMoney, std::ref(acc2), std::ref(acc1), 100.0);\n\n    t1.join();\n    t2.join();\n\n    std::cout << \"Final Acc1: $\" << acc1.balance << \", Acc2: $\" << acc2.balance << \"\\n\";\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. std::scoped_lock Deadlock Immunity:</strong> Eliminates lock-ordering bugs by acquiring all mutexes using a deadlock-avoidance algorithm.",
+        "<strong>2. Self-Transfer Guard:</strong> <code>&from == &to</code> check prevents trying to lock the same non-recursive mutex twice.",
+        "<strong>3. RAII Automatic Unlock:</strong> Mutexes are guaranteed unlocked upon function exit or exception throw."
+      ],
+      "comparison_matrix": {
+        "title": "C++ Mutex Locking Wrappers",
+        "headers": [
+          "Wrapper",
+          "Number of Mutexes",
+          "Manual Unlock",
+          "Condition Variable Support"
+        ],
+        "rows": [
+          [
+            "std::lock_guard",
+            "1",
+            "No (Strict scope)",
+            "No"
+          ],
+          [
+            "std::unique_lock",
+            "1",
+            "Yes (unlock/relock)",
+            "Yes (required for cv.wait)"
+          ],
+          [
+            "std::shared_lock",
+            "1 (shared_mutex)",
+            "Yes",
+            "No"
+          ],
+          [
+            "std::scoped_lock (C++17)",
+            "1 to N",
+            "No (Strict scope)",
+            "No (Deadlock-free multi-lock)"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Acquiring mutexes in random order across different threads",
+          "correction": "Always use `std::scoped_lock` or enforce a global hierarchical acquisition order based on object memory addresses."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Is Double-Checked Locking safe in C++?'</strong><br><em>Answer:</em> In legacy C++98, it was broken due to CPU instruction reordering. In modern C++11+, Meyer's Singleton (`static Instance inst; return inst;`) is guaranteed thread-safe by the standard and should always be preferred over manual double-checked locking."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Fix a deadlock bug in an account transfer function acquiring locks sequentially.",
+        "bad_code": "lock_guard l1(from.mtx); lock_guard l2(to.mtx);",
+        "good_code": "std::scoped_lock lock(from.mtx, to.mtx);"
+      },
+      "practice_problem": {
+        "title": "Design Read-Write Thread-Safe Cache",
+        "description": "Implement a key-value store using `std::shared_mutex` allowing unlimited concurrent readers but exclusive single-thread writers.",
+        "hint": "Use `std::shared_lock` in `get()` and `std::unique_lock` in `put()`."
+      }
+    },
+    {
+      "id": "top-interview-traps",
+      "title": "Top 20 Critical C++ Interview Traps",
+      "definition": "The definitive compilation of subtle C++ traps, undefined behaviors, and design anti-patterns that frequently catch candidates off-guard in technical rounds.",
+      "why_it_matters": "Knowing these traps prevents unforced errors that lead to immediate disqualification by senior interviewers.",
+      "real_world_analogy": "A pilot's pre-flight checklist: checking pitot tubes, fuel contamination, and rudder locks before takeoff to eliminate fatal surprises.",
+      "conceptual_breakdown": [
+        "<strong>Trap 1:</strong> Returning references/views to temporary local variables (Dangling References).",
+        "<strong>Trap 2:</strong> Iterator Invalidation when mutating vectors inside loops.",
+        "<strong>Trap 3:</strong> Slicing polymorphic objects by passing them by value.",
+        "<strong>Trap 4:</strong> Memory order relaxed races in custom lock-free queues.",
+        "<strong>Trap 5:</strong> Throwing exceptions from destructors (triggers `std::terminate`)."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Iterator Invalidation Trap",
+        "classes": [
+          {
+            "name": "Vector_Reallocation_Trap",
+            "is_abstract": false,
+            "attributes": [
+              "Vector at capacity 4",
+              "push_back triggers reallocation to new heap address",
+              "Old iterators still point to freed memory -> CRASH!"
+            ],
+            "methods": []
+          }
+        ],
+        "relationships": []
+      },
+      "interactive_animation": {
+        "title": "Vector Iterator Invalidation Visualizer",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Vector capacity is full (4/4 elements at 0x1000).",
+            "active_nodes": [
+              "Vector @ 0x1000"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Iterator holds pointer to element 2 (0x1008).",
+            "active_nodes": [
+              "Iterator @ 0x1008"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "push_back allocates new 8-element block at 0x5000 and frees 0x1000.",
+            "active_nodes": [
+              "New Vector @ 0x5000",
+              "0x1000 FREED"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Dereferencing old iterator reads deallocated memory (Undefined Behavior / Crash).",
+            "active_nodes": [
+              "Crash / UAF"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "#include <iostream>\n#include <vector>\n#include <string_view>\n\n// Trap 1: Returning string_view to temporary\nstd::string_view dangerousGetGreeting() {\n    std::string s = \"Hello World\";\n    return s; // BUG: s is destroyed at return; returns dangling string_view!\n}\n\n// Trap 2: Safe Vector Mutation during iteration\nvoid safeVectorErase(std::vector<int>& vec) {\n    // Correct C++20 idiom: std::erase_if (Erase-Remove Idiom)\n    std::erase_if(vec, [](int x) { return x % 2 == 0; });\n}\n\nint main() {\n    std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7, 8};\n    safeVectorErase(nums);\n\n    std::cout << \"Filtered Odd Numbers: \";\n    for (int n : nums) std::cout << n << \" \";\n    std::cout << \"\\n\";\n\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Dangling View Prevention:</strong> Never return <code>std::string_view</code> or <code>std::span</code> pointing to local stack variables.",
+        "<strong>2. Safe Container Modification:</strong> In C++20, use <code>std::erase_if(vec, predicate)</code> instead of manually calling <code>vec.erase(it)</code> inside a raw loop.",
+        "<strong>3. Lifetime Vigilance:</strong> Always track the lifetime owner of heap buffers when using non-owning pointer views."
+      ],
+      "comparison_matrix": {
+        "title": "Top 5 Critical Interview Pitfalls",
+        "headers": [
+          "Trap Name",
+          "Flawed Code",
+          "Correct Modern C++ Fix"
+        ],
+        "rows": [
+          [
+            "Object Slicing",
+            "`void func(Base b)`",
+            "`void func(const Base& b)` or `unique_ptr<Base>`"
+          ],
+          [
+            "Destructor Exception",
+            "`~MyClass() { throw Error(); }`",
+            "Mark `noexcept`, catch all internal exceptions"
+          ],
+          [
+            "Raw Mutex Unlock",
+            "`mtx.lock(); work(); mtx.unlock();`",
+            "`std::lock_guard<std::mutex> lock(mtx);`"
+          ],
+          [
+            "Dangling String View",
+            "`string_view s = getTempString();`",
+            "Store in `std::string` or ensure owner outlives view"
+          ],
+          [
+            "Implicit Conversions",
+            "`class Box { Box(int size); };`",
+            "`explicit Box(int size);` to prevent accidental casts"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Leaving single-argument constructors without `explicit`",
+          "correction": "Mark single-argument constructors `explicit` to prevent unintended implicit type conversions."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Can a smart pointer circular reference occur with `std::unique_ptr`?'</strong><br><em>Answer:</em> No. `std::unique_ptr` enforces strict single exclusive ownership. Circular ownership cycles can only happen with `std::shared_ptr`, and are resolved using `std::weak_ptr`."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Fix an implicit constructor conversion bug.",
+        "bad_code": "class Buffer { public: Buffer(int size); }; void process(Buffer b); process(42); // Converts 42 to Buffer silently!",
+        "good_code": "class Buffer { public: explicit Buffer(int size); };"
+      },
+      "practice_problem": {
+        "title": "Debug 3 Hidden Bugs in a Thread-Safe Singleton",
+        "description": "Analyze a flawed double-checked locking Singleton with raw pointer allocations and fix it using modern C++11 Meyer's Singleton.",
+        "hint": "Replace raw pointer and mutex with a static local variable."
+      }
+    }
+  ]
+}

@@ -1,0 +1,417 @@
+{
+  "modules": [
+    {
+      "id": "01",
+      "slug": "01-programming-foundations",
+      "title": "Programming Foundations for LLD",
+      "level": "Beginner",
+      "category": "Foundations",
+      "icon": "code",
+      "description": "Master essential C++ concepts required for object-oriented system design: Classes, RAII, Rule of 0/3/5, Move Semantics, and Smart Pointers.",
+      "estimated_hours": 4,
+      "topics": [
+        {"id": "classes-and-objects", "title": "Classes & Objects in C++", "status": "not_started"},
+        {"id": "constructors-destructors", "title": "Constructors & Destructors", "status": "not_started"},
+        {"id": "access-modifiers", "title": "Access Modifiers (public, private, protected)", "status": "not_started"},
+        {"id": "static-and-const", "title": "Static Members & Const Correctness", "status": "not_started"},
+        {"id": "pointers-and-references", "title": "Pointers, References & the 'this' Pointer", "status": "not_started"},
+        {"id": "friend-and-namespaces", "title": "Friend Functions/Classes & Namespaces", "status": "not_started"},
+        {"id": "header-source-separation", "title": "Header & Source File Separation", "status": "not_started"},
+        {"id": "raii-and-resource-mgmt", "title": "RAII (Resource Acquisition Is Initialization)", "status": "not_started"},
+        {"id": "rule-of-0-3-5", "title": "Rule of 0, Rule of 3, and Rule of 5", "status": "not_started"},
+        {"id": "copy-and-move-semantics", "title": "Copy vs Move Semantics (rvalue references)", "status": "not_started"},
+        {"id": "smart-pointers-ownership", "title": "Smart Pointers (unique_ptr, shared_ptr, weak_ptr)", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "02",
+      "slug": "02-oop-fundamentals",
+      "title": "OOP Fundamentals",
+      "level": "Beginner",
+      "category": "OOP Core",
+      "icon": "cube",
+      "description": "Encapsulation, Abstraction, Inheritance hierarchies, and Compile-time vs Runtime Polymorphism with VTable mechanics.",
+      "estimated_hours": 5,
+      "topics": [
+        {"id": "encapsulation", "title": "Encapsulation & Data Hiding", "status": "not_started"},
+        {"id": "abstraction", "title": "Abstraction & Information Hiding", "status": "not_started"},
+        {"id": "inheritance-types", "title": "Inheritance Types (Single, Multiple, Hierarchical, Hybrid)", "status": "not_started"},
+        {"id": "compile-time-polymorphism", "title": "Compile-time Polymorphism (Overloading & Templates)", "status": "not_started"},
+        {"id": "runtime-polymorphism", "title": "Runtime Polymorphism (Virtual Functions & Overriding)", "status": "not_started"},
+        {"id": "vtable-and-vptr", "title": "Virtual Table (VTable) & VPTR Mechanism", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "03",
+      "slug": "03-cpp-oop-deep-dive",
+      "title": "C++ OOP Deep Dive",
+      "level": "Intermediate",
+      "category": "OOP Core",
+      "icon": "cpu",
+      "description": "Pure virtual functions, virtual destructors, object slicing, diamond problem, and composition vs inheritance.",
+      "estimated_hours": 4,
+      "topics": [
+        {"id": "abstract-classes-interfaces", "title": "Abstract Classes & Pure Virtual Functions", "status": "not_started"},
+        {"id": "virtual-destructors", "title": "Virtual Destructors & Polymorphic Deletion", "status": "not_started"},
+        {"id": "object-slicing", "title": "Object Slicing & Value Semantics Trap", "status": "not_started"},
+        {"id": "diamond-problem-virtual-inheritance", "title": "Diamond Problem & Virtual Inheritance", "status": "not_started"},
+        {"id": "composition-vs-inheritance", "title": "Composition vs Inheritance in C++", "status": "not_started"},
+        {"id": "dependency-injection-delegation", "title": "Dependency Injection & Delegation Idioms", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "04",
+      "slug": "04-uml",
+      "title": "UML for Low-Level Design",
+      "level": "Beginner",
+      "category": "Modeling",
+      "icon": "git-commit",
+      "description": "Learn standard UML notation: Class Diagrams, Object Diagrams, Sequence Diagrams, State & Activity Diagrams.",
+      "estimated_hours": 3,
+      "topics": [
+        {"id": "uml-class-diagrams", "title": "UML Class Diagram Notations (+, -, #)", "status": "not_started"},
+        {"id": "uml-relationships-notation", "title": "UML Relationship Arrows & Multiplicities", "status": "not_started"},
+        {"id": "uml-sequence-diagrams", "title": "Sequence Diagrams & Lifelines", "status": "not_started"},
+        {"id": "uml-state-and-activity", "title": "State Machines & Activity Diagrams", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "05",
+      "slug": "05-class-relationships",
+      "title": "Class Relationships & Coupling",
+      "level": "Beginner",
+      "category": "Modeling",
+      "icon": "git-merge",
+      "description": "Deep comparison of Association, Aggregation, Composition, Inheritance, Dependency, and Realization.",
+      "estimated_hours": 4,
+      "topics": [
+        {"id": "association", "title": "Association ('uses a')", "status": "not_started"},
+        {"id": "aggregation", "title": "Aggregation ('has a' - weak ownership)", "status": "not_started"},
+        {"id": "composition", "title": "Composition ('has a' - strong lifecycle ownership)", "status": "not_started"},
+        {"id": "inheritance-vs-realization", "title": "Inheritance ('is a') vs Realization ('implements')", "status": "not_started"},
+        {"id": "dependency", "title": "Dependency ('depends on')", "status": "not_started"},
+        {"id": "relationships-matrix", "title": "The Master Class Relationship Comparison Matrix", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "06",
+      "slug": "06-solid-principles",
+      "title": "SOLID Principles in C++",
+      "level": "Intermediate",
+      "category": "Principles",
+      "icon": "shield",
+      "description": "In-depth study of S.O.L.I.D. principles with interactive code smells, refactorings, and before-vs-after architecture.",
+      "estimated_hours": 6,
+      "topics": [
+        {"id": "srp", "title": "Single Responsibility Principle (SRP)", "status": "not_started"},
+        {"id": "ocp", "title": "Open/Closed Principle (OCP)", "status": "not_started"},
+        {"id": "lsp", "title": "Liskov Substitution Principle (LSP)", "status": "not_started"},
+        {"id": "isp", "title": "Interface Segregation Principle (ISP)", "status": "not_started"},
+        {"id": "dip", "title": "Dependency Inversion Principle (DIP)", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "07",
+      "slug": "07-object-modeling",
+      "title": "Object Modeling & Domain Discovery",
+      "level": "Intermediate",
+      "category": "Modeling",
+      "icon": "layers",
+      "description": "Techniques for mapping problem statements to entities, value objects, domain invariants, boundaries, and cohesion.",
+      "estimated_hours": 4,
+      "topics": [
+        {"id": "entities-vs-value-objects", "title": "Entities vs Value Objects", "status": "not_started"},
+        {"id": "identifying-responsibilities", "title": "CRC Cards & Identifying Responsibilities", "status": "not_started"},
+        {"id": "domain-invariants-boundaries", "title": "Domain Invariants & Boundary Design", "status": "not_started"},
+        {"id": "cohesion-and-coupling", "title": "High Cohesion & Low Coupling", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "08",
+      "slug": "08-design-principles",
+      "title": "Core Software Design Principles",
+      "level": "Intermediate",
+      "category": "Principles",
+      "icon": "compass",
+      "description": "DRY, KISS, YAGNI, Law of Demeter (Least Knowledge), Separation of Concerns, and Encapsulating What Varies.",
+      "estimated_hours": 3,
+      "topics": [
+        {"id": "dry-kiss-yagni", "title": "DRY, KISS, and YAGNI", "status": "not_started"},
+        {"id": "law-of-demeter", "title": "Law of Demeter (Principle of Least Knowledge)", "status": "not_started"},
+        {"id": "separation-of-concerns", "title": "Separation of Concerns & Modularity", "status": "not_started"},
+        {"id": "encapsulate-variation", "title": "Encapsulate What Varies & Favor Immutability", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "09",
+      "slug": "09-creational-patterns",
+      "title": "Creational Design Patterns",
+      "level": "Intermediate",
+      "category": "Design Patterns",
+      "icon": "plus-circle",
+      "description": "Singleton (Meyers & Thread-safe), Factory Method, Abstract Factory, Builder, and Prototype in modern C++.",
+      "estimated_hours": 6,
+      "topics": [
+        {"id": "singleton-pattern", "title": "Singleton (Meyers Singleton & Concurrency)", "status": "not_started"},
+        {"id": "factory-method-pattern", "title": "Factory Method Pattern", "status": "not_started"},
+        {"id": "abstract-factory-pattern", "title": "Abstract Factory Pattern", "status": "not_started"},
+        {"id": "builder-pattern", "title": "Builder Pattern & Fluent Interfaces", "status": "not_started"},
+        {"id": "prototype-pattern", "title": "Prototype Pattern & Virtual Clone Idiom", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "10",
+      "slug": "10-structural-patterns",
+      "title": "Structural Design Patterns",
+      "level": "Intermediate",
+      "category": "Design Patterns",
+      "icon": "grid",
+      "description": "Adapter, Bridge, Composite, Decorator, Facade, Flyweight, and Proxy with animated object graphs.",
+      "estimated_hours": 6,
+      "topics": [
+        {"id": "adapter-pattern", "title": "Adapter Pattern (Class & Object Adapter)", "status": "not_started"},
+        {"id": "bridge-pattern", "title": "Bridge Pattern (Decoupling Abstraction from Implementation)", "status": "not_started"},
+        {"id": "composite-pattern", "title": "Composite Pattern (Tree Hierarchies)", "status": "not_started"},
+        {"id": "decorator-pattern", "title": "Decorator Pattern (Dynamic Behavior Extension)", "status": "not_started"},
+        {"id": "facade-pattern", "title": "Facade Pattern (Simplified Subsystem Interface)", "status": "not_started"},
+        {"id": "flyweight-pattern", "title": "Flyweight Pattern (Shared Fine-grained State)", "status": "not_started"},
+        {"id": "proxy-pattern", "title": "Proxy Pattern (Virtual, Remote, & Protection)", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "11",
+      "slug": "11-behavioral-patterns",
+      "title": "Behavioral Design Patterns",
+      "level": "Intermediate",
+      "category": "Design Patterns",
+      "icon": "activity",
+      "description": "Chain of Responsibility, Command, Iterator, Mediator, Memento, Observer, State, Strategy, Template Method, Visitor.",
+      "estimated_hours": 7,
+      "topics": [
+        {"id": "observer-pattern", "title": "Observer Pattern & Event Dispatchers", "status": "not_started"},
+        {"id": "strategy-pattern", "title": "Strategy Pattern & Interchangeable Algorithms", "status": "not_started"},
+        {"id": "command-pattern", "title": "Command Pattern & Undo/Redo Architecture", "status": "not_started"},
+        {"id": "state-pattern", "title": "State Pattern & Finite State Machines", "status": "not_started"},
+        {"id": "chain-of-responsibility", "title": "Chain of Responsibility Pattern", "status": "not_started"},
+        {"id": "template-method-pattern", "title": "Template Method Pattern", "status": "not_started"},
+        {"id": "mediator-pattern", "title": "Mediator Pattern & Loose Coupling", "status": "not_started"},
+        {"id": "iterator-pattern", "title": "Iterator Pattern & Custom Iterators", "status": "not_started"},
+        {"id": "memento-pattern", "title": "Memento Pattern (State Snapshots)", "status": "not_started"},
+        {"id": "visitor-pattern", "title": "Visitor Pattern & Double Dispatch", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "12",
+      "slug": "12-cpp-design-techniques",
+      "title": "C++ Idioms & Advanced Design Techniques",
+      "level": "Advanced",
+      "category": "C++ Idioms",
+      "icon": "zap",
+      "description": "PImpl Idiom, CRTP, Type Erasure, std::function callbacks, and Generic Interface Design.",
+      "estimated_hours": 5,
+      "topics": [
+        {"id": "pimpl-idiom", "title": "PImpl Idiom (Pointer to Implementation / Compilation Firewalls)", "status": "not_started"},
+        {"id": "crtp-static-polymorphism", "title": "CRTP (Curiously Recurring Template Pattern)", "status": "not_started"},
+        {"id": "type-erasure", "title": "Type Erasure Idiom (std::function & custom erasures)", "status": "not_started"},
+        {"id": "function-objects-lambdas", "title": "Function Objects, Lambdas & Callback Architecture", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "13",
+      "slug": "13-concurrency-thread-safety",
+      "title": "Concurrency & Thread Safety in LLD",
+      "level": "Advanced",
+      "category": "Systems",
+      "icon": "refresh-cw",
+      "description": "Threads, mutexes, lock_guard, unique_lock, shared_mutex, deadlocks, condition variables, and thread-safe queues.",
+      "estimated_hours": 6,
+      "topics": [
+        {"id": "threads-and-race-conditions", "title": "Threads, Data Races & Memory Safety", "status": "not_started"},
+        {"id": "mutexes-and-lock-guards", "title": "std::mutex, std::lock_guard & std::unique_lock", "status": "not_started"},
+        {"id": "read-write-locks", "title": "Read-Write Locks (std::shared_mutex)", "status": "not_started"},
+        {"id": "deadlock-prevention", "title": "Deadlock Prevention & std::lock / scoped_lock", "status": "not_started"},
+        {"id": "condition-variables", "title": "Condition Variables & Producer-Consumer Queues", "status": "not_started"},
+        {"id": "atomics-lock-free-basics", "title": "std::atomic & Lock-Free Design Concepts", "status": "not_started"},
+        {"id": "thread-safe-singleton", "title": "Thread-safe Singleton & Double-Checked Locking Trap", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "14",
+      "slug": "14-memory-resource-management",
+      "title": "Memory & Resource Management",
+      "level": "Advanced",
+      "category": "Systems",
+      "icon": "hard-drive",
+      "description": "Stack vs heap, ownership transfer, circular references, custom deleters, and memory-safe LLD architectures.",
+      "estimated_hours": 4,
+      "topics": [
+        {"id": "stack-vs-heap-lifetime", "title": "Stack vs Heap Lifetime & Ownership Semantics", "status": "not_started"},
+        {"id": "smart-pointer-ownership-models", "title": "Smart Pointer Ownership Models & Custom Deleters", "status": "not_started"},
+        {"id": "circular-reference-weak-ptr", "title": "Circular Dependency Resolution with std::weak_ptr", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "15",
+      "slug": "15-exception-error-design",
+      "title": "Exception & Error Handling Design",
+      "level": "Intermediate",
+      "category": "Robustness",
+      "icon": "alert-triangle",
+      "description": "Exception safety guarantees (Basic, Strong, Nothrow), std::optional, std::expected, and error propagation.",
+      "estimated_hours": 3,
+      "topics": [
+        {"id": "exception-safety-guarantees", "title": "Exception Safety Guarantees (Basic, Strong, Nothrow)", "status": "not_started"},
+        {"id": "optional-and-expected-design", "title": "std::optional & std::expected for Explicit Errors", "status": "not_started"},
+        {"id": "error-handling-tradeoffs", "title": "Exceptions vs Error Codes in Low-Level Design", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "16",
+      "slug": "16-api-interface-design",
+      "title": "API & Interface Design",
+      "level": "Advanced",
+      "category": "Architecture",
+      "icon": "sliders",
+      "description": "Designing clean, foolproof C++ public interfaces, contracts, immutability, and ABI stability.",
+      "estimated_hours": 4,
+      "topics": [
+        {"id": "stable-public-interfaces", "title": "Designing Intuitive & Hard-to-Misuse Interfaces", "status": "not_started"},
+        {"id": "design-by-contract", "title": "Design by Contract (Preconditions, Postconditions, Invariants)", "status": "not_started"},
+        {"id": "backward-compatibility-versioning", "title": "API Evolution, Versioning & Extensibility", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "17",
+      "slug": "17-extensibility",
+      "title": "Extensibility & Open-Closed Architectures",
+      "level": "Advanced",
+      "category": "Architecture",
+      "icon": "maximize-2",
+      "description": "Refactoring massive if-else/switch state machines into polymorphic, plug-and-play extensible systems.",
+      "estimated_hours": 4,
+      "topics": [
+        {"id": "refactoring-switch-chains", "title": "Refactoring Giant Switch/If-Else Chains", "status": "not_started"},
+        {"id": "plugin-and-registry-architecture", "title": "Plugin & Registry Architectures in C++", "status": "not_started"},
+        {"id": "extensible-payment-system-case-study", "title": "Case Study: Multi-Gateway Extensible Payment Engine", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "18",
+      "slug": "18-common-lld-patterns",
+      "title": "Common LLD Composite Patterns",
+      "level": "Intermediate",
+      "category": "Design Patterns",
+      "icon": "tool",
+      "description": "Pattern combinations: Repository, DAO, Service Locator, Object Pool, and Specification Pattern.",
+      "estimated_hours": 4,
+      "topics": [
+        {"id": "object-pool-pattern", "title": "Object Pool Pattern for High-Performance C++", "status": "not_started"},
+        {"id": "repository-dao-pattern", "title": "Repository & Data Access Object (DAO) Patterns", "status": "not_started"},
+        {"id": "service-locator-di", "title": "Service Locator vs Dependency Injection", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "19",
+      "slug": "19-real-world-lld-problems",
+      "title": "Real-World LLD Problem Library",
+      "level": "Interview",
+      "category": "Problem Library",
+      "icon": "briefcase",
+      "description": "30+ end-to-end problems: Parking Lot, Elevator, Movie Booking, Splitwise, Vending Machine, Cache, Rate Limiter.",
+      "estimated_hours": 15,
+      "topics": [
+        {"id": "parking-lot-system", "title": "Parking Lot System (Beginner)", "status": "not_started"},
+        {"id": "elevator-system", "title": "Elevator System (Beginner)", "status": "not_started"},
+        {"id": "vending-machine-system", "title": "Vending Machine System (Beginner)", "status": "not_started"},
+        {"id": "splitwise-expense-manager", "title": "Splitwise / Expense Sharing App (Intermediate)", "status": "not_started"},
+        {"id": "movie-ticket-booking-bookmyshow", "title": "Movie Ticket Booking System (Intermediate)", "status": "not_started"},
+        {"id": "ride-sharing-uber-ola", "title": "Ride Sharing System (Intermediate)", "status": "not_started"},
+        {"id": "in-memory-lru-cache", "title": "Thread-safe LRU Cache (Advanced)", "status": "not_started"},
+        {"id": "rate-limiter-system", "title": "Rate Limiter System (Advanced)", "status": "not_started"},
+        {"id": "pub-sub-message-queue", "title": "Pub/Sub In-Memory Message Queue (Advanced)", "status": "not_started"},
+        {"id": "stock-order-book", "title": "Stock Trading Matching Order Book (Advanced)", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "20",
+      "slug": "20-advanced-lld",
+      "title": "Advanced Low-Level Design & Scaling",
+      "level": "Advanced",
+      "category": "Advanced",
+      "icon": "trending-up",
+      "description": "High-throughput memory alignment, zero-copy, lock-free ring buffers, cache locality, and latency optimization.",
+      "estimated_hours": 5,
+      "topics": [
+        {"id": "cache-locality-data-oriented-design", "title": "Cache Locality & Data-Oriented Design vs OOP", "status": "not_started"},
+        {"id": "lock-free-spsc-queue", "title": "Lock-free SPSC Ring Buffer Design", "status": "not_started"},
+        {"id": "zero-copy-buffer-abstractions", "title": "Zero-Copy Buffer Abstractions", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "21",
+      "slug": "21-interview-framework",
+      "title": "14-Step LLD Interview Framework",
+      "level": "Interview",
+      "category": "Interview Prep",
+      "icon": "check-circle",
+      "description": "Master the repeatable 14-step battle-tested interview roadmap from requirement gathering to clean C++ code.",
+      "estimated_hours": 3,
+      "topics": [
+        {"id": "the-14-step-interview-process", "title": "The 14-Step Systematic Interview Roadmap", "status": "not_started"},
+        {"id": "clarifying-functional-and-non-functional", "title": "Step 1-4: Clarification & Domain Decomposition", "status": "not_started"},
+        {"id": "designing-clean-diagrams-live", "title": "Step 5-9: Drawing Class & Sequence Diagrams Live", "status": "not_started"},
+        {"id": "writing-idiomatic-cpp-live", "title": "Step 10-14: Live C++ Coding & Concurrency Defense", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "22",
+      "slug": "22-lld-practice-problems",
+      "title": "Interactive LLD Practice Sandbox",
+      "level": "Interview",
+      "category": "Interactive",
+      "icon": "terminal",
+      "description": "Design-This-Yourself interactive challenges with hidden entity checklists, diagrams, and reference C++ solutions.",
+      "estimated_hours": 8,
+      "topics": [
+        {"id": "practice-tic-tac-toe", "title": "Practice 1: Tic-Tac-Toe Game Engine", "status": "not_started"},
+        {"id": "practice-snake-and-ladder", "title": "Practice 2: Snake & Ladder Multiplayer Game", "status": "not_started"},
+        {"id": "practice-coffee-machine", "title": "Practice 3: Multi-recipe Coffee Machine", "status": "not_started"},
+        {"id": "practice-logging-framework", "title": "Practice 4: Asynchronous Logging Framework", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "23",
+      "slug": "23-interview-questions",
+      "title": "Curated LLD Interview Question Bank",
+      "level": "Interview",
+      "category": "Interview Prep",
+      "icon": "help-circle",
+      "description": "100+ Top C++ LLD interview questions categorized by OOP, SOLID, Patterns, Concurrency, and Traps with interactive reveal.",
+      "estimated_hours": 6,
+      "topics": [
+        {"id": "cpp-oop-interview-questions", "title": "C++ OOP & Memory Interview Questions", "status": "not_started"},
+        {"id": "solid-interview-questions", "title": "SOLID Principles Interview Questions", "status": "not_started"},
+        {"id": "design-patterns-interview-questions", "title": "Design Patterns & Trade-offs Questions", "status": "not_started"},
+        {"id": "concurrency-interview-questions", "title": "Concurrency & Multi-threading LLD Questions", "status": "not_started"},
+        {"id": "top-interview-traps", "title": "Top 20 Critical C++ Interview Traps", "status": "not_started"}
+      ]
+    },
+    {
+      "id": "24",
+      "slug": "24-cheat-sheets",
+      "title": "Quick Revision Cheat Sheets",
+      "level": "Interview",
+      "category": "Cheat Sheets",
+      "icon": "file-text",
+      "description": "Compact, high-yield summary sheets for fast revision before tech interviews: SOLID, Patterns, UML, Pointers, and Mutexes.",
+      "estimated_hours": 2,
+      "topics": [
+        {"id": "solid-cheat-sheet", "title": "SOLID Quick Reference Matrix", "status": "not_started"},
+        {"id": "design-pattern-decision-tree", "title": "Design Pattern Selection Decision Tree", "status": "not_started"},
+        {"id": "uml-relationship-cheat-sheet", "title": "UML Relationships & C++ Code Mappings", "status": "not_started"},
+        {"id": "smart-pointer-lifecycle-cheat-sheet", "title": "Smart Pointers Ownership Cheat Sheet", "status": "not_started"},
+        {"id": "concurrency-safety-cheat-sheet", "title": "C++ Concurrency & Thread Safety Rules", "status": "not_started"}
+      ]
+    }
+  ]
+}

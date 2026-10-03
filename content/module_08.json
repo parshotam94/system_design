@@ -1,0 +1,521 @@
+{
+  "module_id": "08",
+  "title": "Core Software Design Principles",
+  "level": "Intermediate",
+  "category": "Principles",
+  "description": "Essential software design heuristics: DRY, KISS, YAGNI, Law of Demeter (Least Knowledge), Separation of Concerns, and Encapsulating What Varies.",
+  "topics": [
+    {
+      "id": "dry-kiss-yagni",
+      "title": "DRY, KISS, and YAGNI",
+      "description": "Don't Repeat Yourself, Keep It Simple Stupid, and You Aren't Gonna Need It.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>DRY</strong>: Every piece of knowledge must have a single authoritative representation. <strong>KISS</strong>: Simple designs are easier to maintain than clever complex designs. <strong>YAGNI</strong>: Do not implement features until they are actually needed.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Over-engineering and code duplication are the two primary causes of technical debt and maintenance nightmares.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Write the simplest code that solves today's requirements. Extract common logic to prevent copy-paste bugs.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Avoid speculative generality (e.g. building a multi-tenant plugin engine when only single-user support is required).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "YAGNI Rule",
+            "text": "Always implement things when you actually need them, never when you just foresee that you may need them!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "dry_kiss_yagni_demo.cpp",
+            "code": "#include <iostream>\n#include <string>\n#include <regex>\n\n// KISS & DRY: Single authoritative email validator\nclass ValidationUtils {\npublic:\n    static bool isValidEmail(const std::string& email) {\n        // Simple, readable regex check\n        const std::regex pattern(\"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\\\.[a-zA-Z0-9-.]+$\");\n        return std::regex_match(email, pattern);\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Reusable validation logic avoiding duplicate regexes across registration and profile updates.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Every production software development lifecycle.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Apply KISS and YAGNI constantly during system design interviews.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not over-apply DRY to coincidentally similar code that serves different domain purposes.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Clean, readable, concise code with minimal bugs.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Premature DRY can create artificial coupling between distinct business domains.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>DRY (Knowledge duplication vs accidental duplication).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Building complex generic abstractions for features that never get used.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> When should you violate DRY?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> When two pieces of code look identical today but belong to different business domains and will evolve for completely different reasons (accidental duplication).</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Refactor duplicated tax calculation into a shared helper.</p>",
+          "practice": {
+            "title": "DRY Pricing Calculation",
+            "problemStatement": "Refactor duplicated tax calculation into a shared helper.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design principles"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Focus on separation of responsibilities.",
+            "expectedEntities": [
+              {
+                "name": "DRY Pricing Calculation",
+                "responsibility": "Encapsulates problem domain."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Tax { public: static double withTax(double a) { return a * 1.08; } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering DRY, KISS, and YAGNI is essential for robust Low-Level System Design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "law-of-demeter",
+      "title": "Law of Demeter (Principle of Least Knowledge)",
+      "description": "A method should only talk to its immediate friends, avoiding long train-wreck call chains.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>The <strong>Law of Demeter (LoD)</strong> states that a method of an object may only call methods of: itself, its parameters, objects it creates, or its direct component members. Avoid <code>a.getB().getC().getD().doSomething()</code>.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Train-wreck calls create brittle coupling: changing class C breaks class A even though class A only wanted something from D.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p><em>'Tell, Don't Ask.'</em> Tell the immediate friend to perform the operation instead of navigating through its internal object graph.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Instead of <code>customer.getWallet().getCard().charge()</code>, write <code>customer.charge(amount)</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "trap",
+            "title": "Train-Wreck Anti-Pattern",
+            "text": "user.getProfile().getAddress().getGeo().getCoordinates(); // Violates Law of Demeter! Coupling to 4 nested classes!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "law_of_demeter_demo.cpp",
+            "code": "#include <iostream>\n\nclass Wallet {\n    double money{100.0};\npublic:\n    bool deduct(double amt) {\n        if (money >= amt) { money -= amt; return true; }\n        return false;\n    }\n};\n\nclass Customer {\n    Wallet wallet; // Private internal component\npublic:\n    // Follows Law of Demeter: Encapsulates wallet interaction\n    bool makePayment(double amount) {\n        return wallet.deduct(amount);\n    }\n};\n\nclass StoreRegister {\npublic:\n    void checkout(Customer& customer, double total) {\n        // Law of Demeter: Tells customer to pay, doesn't reach inside wallet!\n        if (customer.makePayment(total)) {\n            std::cout << \"Payment approved!\\n\";\n        }\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>StoreRegister communicates only with Customer, remaining ignorant of Wallet internals.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Microservice domain boundaries and object-oriented encapsulation.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use LoD to minimize ripple effects when internal object structures change.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not apply LoD to fluent builders (e.g. <code>QueryBuilder.select().from()</code> where each method returns *this).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Loose coupling and high maintainability.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>May require creating forwarding methods on container classes.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Tell Don't Ask, Method forwarding.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Reaching into nested getters across multiple layers.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is <code>a.getB().getC().doAction()</code> a violation of the Law of Demeter?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because class A now directly depends on the internal navigation structure of B and C. If B's internal representation changes, class A breaks.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Refactor PaperBoy taking money from Customer's Wallet into Customer.pay(amount).</p>",
+          "practice": {
+            "title": "Refactor PaperBoy LoD",
+            "problemStatement": "Refactor PaperBoy taking money from Customer's Wallet into Customer.pay(amount).",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design principles"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Focus on separation of responsibilities.",
+            "expectedEntities": [
+              {
+                "name": "Refactor PaperBoy LoD",
+                "responsibility": "Encapsulates problem domain."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Customer { Wallet w; public: bool pay(double a) { return w.deduct(a); } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Law of Demeter (Principle of Least Knowledge) is essential for robust Low-Level System Design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "separation-of-concerns",
+      "title": "Separation of Concerns & Modularity",
+      "description": "Dividing a software application into distinct features that overlap in functionality as little as possible.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Separation of Concerns (SoC)</strong> is the software design principle of breaking an architecture into distinct sections, where each section addresses a separate concern (e.g. Presentation, Business Logic, Persistence).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Mixing database queries, UI rendering, and business calculations in a single function makes code unmaintainable.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Each module has a dedicated role: Model represents business state, View renders UI, Controller coordinates user interaction.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Organize code into clear architectural tiers (MVC, Clean Architecture, Hexagonal Ports & Adapters).</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Architectural Tiers",
+            "text": "UI Layer -> Business Service Layer -> Data Access Layer -> Storage"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "soc_layered_arch.cpp",
+            "code": "#include <iostream>\n#include <string>\n\n// Tier 1: Domain Entity\nstruct Account { std::string id; double balance; };\n\n// Tier 2: Data Access Layer\nclass AccountDao {\npublic:\n    Account findAccount(const std::string& id) { return Account{id, 500.0}; }\n};\n\n// Tier 3: Business Logic Layer\nclass BankingService {\n    AccountDao dao;\npublic:\n    void transfer(const std::string& fromId, const std::string& toId, double amount) {\n        Account from = dao.findAccount(fromId);\n        std::cout << \"[Service] Validated transfer of $\" << amount << \" from \" << from.id << \"\\n\";\n    }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Clean separation between database retrieval and business transfer validation.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Enterprise web backends, financial trading systems, desktop applications.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use layered architecture in all non-trivial systems.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not create excessive tiers for simple CRUD utilities.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Independent team development, testability, and technology swap freedom.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires passing data transfer objects across layer boundaries.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>MVC, MVP, MVVM, Clean Architecture.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Writing raw SQL queries inside UI click event handlers.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does Separation of Concerns relate to Single Responsibility Principle?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> SoC is a high-level system architectural principle (separating UI, logic, data layers), while SRP is the class-level object-oriented realization of SoC.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Structure WeatherModel, WeatherFetcher, and WeatherDisplay classes.</p>",
+          "practice": {
+            "title": "Layered Weather Architecture",
+            "problemStatement": "Structure WeatherModel, WeatherFetcher, and WeatherDisplay classes.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design principles"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Focus on separation of responsibilities.",
+            "expectedEntities": [
+              {
+                "name": "Layered Weather Architecture",
+                "responsibility": "Encapsulates problem domain."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class WeatherModel {}; class WeatherFetcher {}; class WeatherDisplay {};"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Separation of Concerns & Modularity is essential for robust Low-Level System Design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "encapsulate-variation",
+      "title": "Encapsulate What Varies & Favor Immutability",
+      "description": "Identify the aspects of your application that vary and separate them from what stays the same.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Encapsulate What Varies</strong> is a core design heuristic: identify the parts of a system that change frequently and encapsulate them behind an interface to protect stable parts.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Prevents constant churn and regression testing across the entire system when business rules change.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Isolate the moving parts behind interfaces (Strategy / Factory patterns) and make static parts immutable.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Extract dynamic algorithms into polymorphic classes. Mark unchanged state <code>const</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Core Heuristic",
+            "text": "Take what varies and 'encapsulate' it so it won't affect the rest of your code!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "encapsulate_variation_pricing.cpp",
+            "code": "#include <iostream>\n#include <memory>\n\n// What varies: Pricing calculation algorithms\nclass IPricingRule { public: virtual ~IPricingRule() = default; virtual double calculate(double base) const = 0; };\nclass PeakHoursPricing : public IPricingRule { public: double calculate(double b) const override { return b * 1.5; } };\nclass OffPeakPricing : public IPricingRule { public: double calculate(double b) const override { return b * 0.9; } };\n\n// What stays the same: Ride dispatch workflow\nclass RideBooking {\n    std::unique_ptr<IPricingRule> pricingRule;\npublic:\n    explicit RideBooking(std::unique_ptr<IPricingRule> rule) : pricingRule(std::move(rule)) {}\n    double getFare(double base) const { return pricingRule->calculate(base); }\n};"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Pricing volatility is encapsulated in strategy classes; RideBooking workflow stays stable.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Ride-sharing surge pricing, airline ticketing, dynamic insurance underwriting.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use whenever business policies, algorithms, or integrations vary frequently.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not encapsulate aspects that are guaranteed never to change.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Protects core workflow stability; enables zero-risk runtime algorithm swapping.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Increases class count.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Strategy Pattern, Policy-based Design, Immutability.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Hardcoding varying calculation rules inside main business classes.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does 'Encapsulate What Varies' lead directly to the Strategy Design Pattern?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> When algorithm variations are extracted into separate classes implementing a common interface, that structure IS the Strategy Design Pattern.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Encapsulate state-by-state tax calculation variation.</p>",
+          "practice": {
+            "title": "Tax Rule Encapsulation",
+            "problemStatement": "Encapsulate state-by-state tax calculation variation.",
+            "requirements": [
+              "Production C++20 code",
+              "Adhere to design principles"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Focus on separation of responsibilities.",
+            "expectedEntities": [
+              {
+                "name": "Tax Rule Encapsulation",
+                "responsibility": "Encapsulates problem domain."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class ITaxRule { public: virtual ~ITaxRule() = default; virtual double tax(double) = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Encapsulate What Varies & Favor Immutability is essential for robust Low-Level System Design.</p>"
+        }
+      ]
+    }
+  ]
+}

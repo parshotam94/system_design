@@ -1,0 +1,455 @@
+{
+  "module_id": "17",
+  "title": "Extensibility & Open-Closed Architectures",
+  "level": "Advanced",
+  "category": "Architecture",
+  "description": "Refactoring massive if-else/switch state machines into polymorphic, plug-and-play extensible systems using plugin registries.",
+  "topics": [
+    {
+      "id": "refactoring-switch-chains",
+      "title": "Refactoring Giant Switch/If-Else Chains",
+      "description": "Techniques to replace hardcoded procedural switch-case chains with polymorphic strategy dispatch.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>Replacing monolithic <code>switch(type)</code> statements with polymorphic class hierarchies or strategy maps.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Switch chains violate the Open/Closed Principle: every new feature requires modifying every switch block across the entire project.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Extract each case block into a standalone class implementing a shared interface.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Use a factory or registry map to dispatch to the correct class polymorphically.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Before vs After",
+            "text": "Before: switch(type) { case PDF: ... case CSV: ... case JSON: ... } (Bloated)\\nAfter: exporterMap[type]->exportData() (Extensible!)"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "refactor_switch_to_poly.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <unordered_map>\n#include <string>\n\nclass IReportExporter {\npublic:\n    virtual ~IReportExporter() = default;\n    virtual void exportReport(const std::string& data) = 0;\n};\n\nclass PdfExporter : public IReportExporter {\npublic:\n    void exportReport(const std::string& data) override { std::cout << \"[PDF] Exported: \" << data << \"\\n\"; }\n};\n\nclass CsvExporter : public IReportExporter {\npublic:\n    void exportReport(const std::string& data) override { std::cout << \"[CSV] Exported: \" << data << \"\\n\"; }\n};\n\n// Extensible Registry replacing giant switch statement!\nclass ReportExportRegistry {\nprivate:\n    std::unordered_map<std::string, std::unique_ptr<IReportExporter>> registry;\npublic:\n    void registerExporter(const std::string& format, std::unique_ptr<IReportExporter> exporter) {\n        registry[format] = std::move(exporter);\n    }\n\n    void executeExport(const std::string& format, const std::string& data) {\n        auto it = registry.find(format);\n        if (it != registry.end()) {\n            it->second->exportReport(data);\n        } else {\n            std::cout << \"Unsupported format: \" << format << \"\\n\";\n        }\n    }\n};\n\nint main() {\n    ReportExportRegistry exporter;\n    exporter.registerExporter(\"pdf\", std::make_unique<PdfExporter>());\n    exporter.registerExporter(\"csv\", std::make_unique<CsvExporter>());\n\n    exporter.executeExport(\"pdf\", \"Financial Q3 Data\");\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>ReportExportRegistry replaces switch statements with dynamic hash map dispatch.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Payment processors, document exporters, game command handlers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use whenever you see duplicate switch(enum) statements scattered across multiple files.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not replace simple 2-case switches for static state.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Zero switch maintenance; new formats registered at runtime.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Small hash map lookup indirection.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Map of Strategies, Factory Pattern, Polymorphic Subclasses.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Leaving default switch cases that throw runtime errors when new enums are added.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is switch-case over an enum considered a code smell in object-oriented design?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because adding a new enum value requires searching and editing every switch block across the entire codebase, violating OCP and risking unhandled cases.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Refactor renderShape(ShapeType) switch to shape->render().</p>",
+          "practice": {
+            "title": "Refactor Shape Renderer Switch",
+            "problemStatement": "Refactor renderShape(ShapeType) switch to shape->render().",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Refactor Shape Renderer Switch",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class IShape { public: virtual void render() = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Refactoring Giant Switch/If-Else Chains is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "plugin-and-registry-architecture",
+      "title": "Plugin & Registry Architectures in C++",
+      "description": "Designing dynamic self-registering plugin architectures using static initialization and factory maps.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>Plugin Registry</strong> allows new classes to automatically register themselves with a central factory at startup without modifying the factory source code.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Adding a new plugin should not require modifying the central factory's <code>switch</code> statement.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Self-registering static proxies register creator functions into a central map during static initialization.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>REGISTER_PLUGIN(CsvExporter, \"csv\")</code> automatically registers the class before <code>main()</code> runs.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Self-Registration Macro",
+            "text": "static bool registered = PluginFactory::registerCreator(\"pdf\", []{ return make_unique<PdfPlugin>(); });"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "plugin_registry_demo.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <unordered_map>\n#include <functional>\n#include <string>\n\nclass IPlugin {\npublic:\n    virtual ~IPlugin() = default;\n    virtual void run() = 0;\n};\n\nclass PluginFactory {\npublic:\n    using Creator = std::function<std::unique_ptr<IPlugin>()>;\n\n    static std::unordered_map<std::string, Creator>& getRegistry() {\n        static std::unordered_map<std::string, Creator> registry;\n        return registry;\n    }\n\n    static bool registerPlugin(const std::string& name, Creator creator) {\n        getRegistry()[name] = std::move(creator);\n        return true;\n    }\n\n    static std::unique_ptr<IPlugin> create(const std::string& name) {\n        auto& reg = getRegistry();\n        auto it = reg.find(name);\n        return (it != reg.end()) ? it->second() : nullptr;\n    }\n};\n\n// Plugin A (Self-Registering!)\nclass AudioPlugin : public IPlugin {\npublic:\n    void run() override { std::cout << \"[AudioPlugin] Processing high-fidelity audio stream.\\n\"; }\n    static inline bool isRegistered = PluginFactory::registerPlugin(\"audio\", []() {\n        return std::make_unique<AudioPlugin>();\n    });\n};\n\nint main() {\n    auto plugin = PluginFactory::create(\"audio\");\n    if (plugin) plugin->run();\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>AudioPlugin self-registers into PluginFactory before main() executes.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Photoshop filters, Audio DAW VSTs, Database dialect plugins in ORMs.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use when building extensible software frameworks where 3rd parties can add new plugins.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not rely on static registration across static library (.a / .lib) boundaries without linker include flags.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>True 100% decoupling: adding a plugin requires zero edits to core engine files.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Static initialization order subtleties across shared libraries.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Dynamic DLL/so loading via dlopen/LoadLibrary, Static Registry.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Static initialization order fiasco when registry map is initialized after plugins.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does self-registration work during static initialization in C++?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> A static global or <code>static inline</code> boolean variable in the plugin's <code>.cpp</code> file initializes before <code>main()</code> runs, calling the central factory's registration method.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Build self-registering driver framework for Postgres and MySQL.</p>",
+          "practice": {
+            "title": "Self-Registering Database Driver",
+            "problemStatement": "Build self-registering driver framework for Postgres and MySQL.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Self-Registering Database Driver",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class DriverRegistry { public: static void reg(string n, Creator c); };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Plugin & Registry Architectures in C++ is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "extensible-payment-system-case-study",
+      "title": "Case Study: Multi-Gateway Extensible Payment Engine",
+      "description": "End-to-end architectural case study refactoring a monolithic payment engine into an open-closed extensible system.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A comprehensive case study applying SOLID, Strategy, Factory, and Dependency Injection to architect a multi-gateway payment engine.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Payment systems must support credit cards, PayPal, Apple Pay, Crypto, and regional gateways without modifying checkout workflows.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Decouple checkout orchestrator from payment execution strategies and gateway adapters.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Gateway Registry + Strategy Pattern + Invariant Validation.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "diagram": {
+            "title": "Extensible Payment System Architecture",
+            "classes": [
+              {
+                "name": "CheckoutCoordinator",
+                "attributes": [
+                  {
+                    "visibility": "-",
+                    "name": "factory",
+                    "type": "PaymentGatewayFactory"
+                  }
+                ]
+              },
+              {
+                "name": "IPaymentGateway",
+                "stereotype": "interface",
+                "isInterface": true,
+                "attributes": [],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "charge",
+                    "params": "amount: double",
+                    "returnType": "bool"
+                  }
+                ]
+              },
+              {
+                "name": "StripeGateway",
+                "attributes": [],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "charge",
+                    "params": "amount: double",
+                    "returnType": "bool override"
+                  }
+                ]
+              },
+              {
+                "name": "PayPalGateway",
+                "attributes": [],
+                "methods": [
+                  {
+                    "visibility": "+",
+                    "name": "charge",
+                    "params": "amount: double",
+                    "returnType": "bool override"
+                  }
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "from": "StripeGateway",
+                "to": "IPaymentGateway",
+                "type": "inheritance",
+                "label": "implements"
+              },
+              {
+                "from": "PayPalGateway",
+                "to": "IPaymentGateway",
+                "type": "inheritance",
+                "label": "implements"
+              }
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "extensible_payment_system.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n#include <unordered_map>\n\nclass IPaymentStrategy {\npublic:\n    virtual ~IPaymentStrategy() = default;\n    virtual bool pay(double amount) = 0;\n};\n\nclass CreditCardStrategy : public IPaymentStrategy {\npublic:\n    bool pay(double amount) override {\n        std::cout << \"[Stripe API] Processed Credit Card payment of $\" << amount << \"\\n\";\n        return true;\n    }\n};\n\nclass CryptoStrategy : public IPaymentStrategy {\npublic:\n    bool pay(double amount) override {\n        std::cout << \"[Web3 Gateway] Transferred $\" << amount << \" in USDC stablecoin\\n\";\n        return true;\n    }\n};\n\nclass PaymentEngine {\nprivate:\n    std::unordered_map<std::string, std::shared_ptr<IPaymentStrategy>> strategies;\npublic:\n    void registerStrategy(const std::string& name, std::shared_ptr<IPaymentStrategy> s) {\n        strategies[name] = std::move(s);\n    }\n\n    bool checkout(const std::string& method, double amount) {\n        auto it = strategies.find(method);\n        if (it == strategies.end()) {\n            std::cout << \"Error: Payment method '\" << method << \"' not supported.\\n\";\n            return false;\n        }\n        return it->second->pay(amount);\n    }\n};\n\nint main() {\n    PaymentEngine engine;\n    engine.registerStrategy(\"card\", std::make_shared<CreditCardStrategy>());\n    engine.registerStrategy(\"crypto\", std::make_shared<CryptoStrategy>());\n\n    engine.checkout(\"card\", 129.50);\n    engine.checkout(\"crypto\", 500.00);\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>PaymentEngine orchestrates payment strategies dynamically with zero hardcoded switch blocks.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>E-commerce platforms (Shopify, Amazon), SaaS subscription billing engines (Stripe Billing).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use in any multi-provider integration architecture.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use if only one fixed payment provider is supported.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>100% Open/Closed; seamless gateway onboarding.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires robust error translation from 3rd-party gateway error codes.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Synchronous Payment Engine, Asynchronous Webhook Payment Engine.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Hardcoding currency conversion logic inside individual gateway classes.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How do you handle gateway-specific configuration (e.g. API keys) in an extensible payment engine?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Pass gateway-specific configuration objects to concrete strategy constructors during initialization or factory assembly, keeping the shared IPaymentStrategy interface clean and generic.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Add refund() capability to payment engine without breaking pay().</p>",
+          "practice": {
+            "title": "Payment Refund Extension",
+            "problemStatement": "Add refund() capability to payment engine without breaking pay().",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Payment Refund Extension",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class IRefundable { public: virtual bool refund(string txId) = 0; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Case Study: Multi-Gateway Extensible Payment Engine is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    }
+  ]
+}

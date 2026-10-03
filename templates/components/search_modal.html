@@ -1,0 +1,15 @@
+<!-- Global Command Palette Search Modal -->
+<div class="search-modal-backdrop" id="search-modal-backdrop">
+  <div class="search-modal">
+    <div class="search-input-wrapper">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" class="search-input" id="global-search-input" placeholder="Search patterns, SOLID, UML, C++ idioms, concurrency..." autocomplete="off">
+      <span class="kbd-shortcut" style="padding: 0.2rem 0.5rem; background: var(--bg-card); border-radius: 4px; font-size: 0.75rem; color: var(--text-muted); border: 1px solid var(--glass-border);">ESC to close</span>
+    </div>
+    <div class="search-results-list" id="search-results-list"></div>
+    <div class="search-footer">
+      <span>Navigate with <kbd style="background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 3px;">↑</kbd> <kbd style="background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 3px;">↓</kbd></span>
+      <span>Select with <kbd style="background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 3px;">Enter</kbd></span>
+    </div>
+  </div>
+</div>

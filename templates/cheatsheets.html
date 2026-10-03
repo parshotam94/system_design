@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Quick Revision Cheat Sheets - C++ LLD Mastery{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 2.5rem; margin-bottom: 2.5rem;">
+  <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+    <span class="badge badge-interview">High-Yield Revision</span>
+    <span class="badge badge-cpp">Interview Cheat Sheets</span>
+  </div>
+  <h1 style="font-size: 2.4rem; color: #fff; margin-bottom: 0.75rem;">Fast-Revision Low-Level Design Cheat Sheets</h1>
+  <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 850px;">
+    Compact, high-yield summary sheets for last-minute revision before technical interview loops.
+  </p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+  
+  <!-- SOLID Cheat Sheet Card -->
+  <div class="glass-panel" style="padding: 1.75rem;">
+    <h3 style="color: var(--accent-cyan); margin-bottom: 1rem;">🛡️ SOLID Quick Reference</h3>
+    <ul style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.8; list-style: none;">
+      <li><strong>S - Single Responsibility:</strong> One reason to change. Separate business logic from logging/persistence.</li>
+      <li><strong>O - Open / Closed:</strong> Open for extension, closed for modification. Use interfaces & polymorphism.</li>
+      <li><strong>L - Liskov Substitution:</strong> Derived classes must be fully substitutable for base classes without breaking invariants.</li>
+      <li><strong>I - Interface Segregation:</strong> Many client-specific interfaces are better than one general-purpose interface.</li>
+      <li><strong>D - Dependency Inversion:</strong> Depend upon abstractions (pure virtual), not concrete details.</li>
+    </ul>
+  </div>
+
+  <!-- Smart Pointers & Ownership Cheat Sheet Card -->
+  <div class="glass-panel" style="padding: 1.75rem;">
+    <h3 style="color: var(--accent-purple); margin-bottom: 1rem;">⚡ Smart Pointers & Ownership</h3>
+    <ul style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.8; list-style: none;">
+      <li><code>std::unique_ptr&lt;T&gt;</code>: Exclusive ownership. Zero runtime overhead. Move-only (no copy). Default choice for LLD.</li>
+      <li><code>std::shared_ptr&lt;T&gt;</code>: Shared ownership via atomic control block reference counting. Use only when multiple owners truly exist.</li>
+      <li><code>std::weak_ptr&lt;T&gt;</code>: Non-owning observer. Breaks cyclic dependencies between <code>shared_ptr</code> instances.</li>
+    </ul>
+  </div>
+
+  <!-- Class Relationships Matrix Card -->
+  <div class="glass-panel" style="padding: 1.75rem;">
+    <h3 style="color: var(--accent-emerald); margin-bottom: 1rem;">🔗 Class Relationships Cheat Sheet</h3>
+    <ul style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.8; list-style: none;">
+      <li><strong>Composition (<code>──◆</code>):</strong> "Has-a" with strict lifetime ownership. Child dies when parent dies (e.g. <code>Car</code> has <code>Engine</code>).</li>
+      <li><strong>Aggregation (<code>──◇</code>):</strong> "Has-a" without lifetime ownership. Child outlives container (e.g. <code>Department</code> has <code>Professor*</code>).</li>
+      <li><strong>Inheritance (<code>──▷</code>):</strong> "Is-a" relationship for polymorphism and interface realization.</li>
+      <li><strong>Dependency (<code>..></code>):</strong> "Uses-a" transient parameter or local variable in a method.</li>
+    </ul>
+  </div>
+
+  <!-- Concurrency & Thread Safety Card -->
+  <div class="glass-panel" style="padding: 1.75rem;">
+    <h3 style="color: var(--accent-amber); margin-bottom: 1rem;">🔄 Concurrency Rules</h3>
+    <ul style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.8; list-style: none;">
+      <li>Always use RAII wrappers: <code>std::lock_guard&lt;std::mutex&gt;</code> or <code>std::unique_lock&lt;std::mutex&gt;</code>. Never call <code>mutex.lock()</code> / <code>unlock()</code> manually.</li>
+      <li>Use <code>std::scoped_lock</code> (C++17) to acquire multiple mutexes simultaneously without deadlock risks.</li>
+      <li>Use <code>std::shared_mutex</code> for Read-Heavy workloads (multiple concurrent readers, exclusive single writer).</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

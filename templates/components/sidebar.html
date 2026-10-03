@@ -1,0 +1,51 @@
+<!-- Sidebar Component -->
+<aside class="sidebar" id="main-sidebar">
+  <div class="sidebar-header">
+    <a href="/" class="brand-logo">
+      <div class="brand-icon">C++</div>
+      <div class="brand-text">
+        <h1>LLD Mastery</h1>
+        <span>C++ System Design</span>
+      </div>
+    </a>
+    <button class="sidebar-toggle-btn" title="Toggle Sidebar" aria-label="Toggle Sidebar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </div>
+
+  <div class="sidebar-search-container">
+    <button class="sidebar-search-btn">
+      <span style="display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Search concepts...
+      </span>
+      <span class="kbd-shortcut">Ctrl+K</span>
+    </button>
+  </div>
+
+  <!-- Overall Progress Tracker -->
+  <div class="sidebar-progress-summary">
+    <div class="progress-info-row">
+      <span class="progress-info-label">Roadmap Progress</span>
+      <span class="progress-info-pct">0%</span>
+    </div>
+    <div class="progress-track-mini">
+      <div class="progress-fill-mini"></div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav" id="sidebar-nav-list">
+    <div class="nav-section-title">24-Module LLD Roadmap</div>
+    {% for mod in modules %}
+      <a href="/module/{{ mod.id }}" 
+         class="module-nav-link {% if active_module_id == mod.id %}active{% endif %}"
+         data-module-id="{{ mod.id }}">
+        <div class="nav-link-left">
+          <span class="mod-id">{{ mod.id }}</span>
+          <span class="mod-title">{{ mod.title }}</span>
+        </div>
+        <div class="nav-status-indicator not_started" title="Status: Not Started"></div>
+      </a>
+    {% endfor %}
+  </nav>
+</aside>

@@ -1,0 +1,1364 @@
+import json
+from pathlib import Path
+
+content_dir = Path("content")
+content_dir.mkdir(exist_ok=True)
+
+module_02_data = {
+    "module_id": "02",
+    "title": "OOP Fundamentals",
+    "level": "Beginner",
+    "category": "OOP Core",
+    "description": "Deep exploration of the four pillars of Object-Oriented Programming in C++: Encapsulation, Abstraction, Inheritance hierarchies, and Compile-time vs Runtime Polymorphism with VTable & VPTR dynamic dispatch mechanics.",
+    "topics": [
+        # -------------------------------------------------------------
+        # 1. Encapsulation & Data Hiding
+        # -------------------------------------------------------------
+        {
+            "id": "encapsulation",
+            "title": "Encapsulation & Data Hiding",
+            "description": "Bundling data and operations into a single unit while strictly shielding internal state from external tampering.",
+            "sections": [
+                {
+                    "step_number": 1,
+                    "title": "1. What is it?",
+                    "content": "<p><strong>Encapsulation</strong> is the bundling of data attributes and the methods that operate on that data into a single unit (class), while restricting direct access to internal representation using private visibility (<strong>Data Hiding</strong>).</p>"
+                },
+                {
+                    "step_number": 2,
+                    "title": "2. Why do we need it?",
+                    "content": "<p>When state is exposed directly to the outside world, any caller can mutate variables into invalid combinations (e.g. Setting a negative account balance or setting an order state to 'Shipped' before payment). Encapsulation creates an authoritative security perimeter around state.</p>"
+                },
+                {
+                    "step_number": 3,
+                    "title": "3. Core idea",
+                    "content": "<p>An object is not a passive data bag; it is an active authority over its own domain invariants. Callers command the object to perform high-level business actions, and the object decides if and how to update its internal state.</p>"
+                },
+                {
+                    "step_number": 4,
+                    "title": "4. How it works",
+                    "content": "<p>In C++, member variables are marked <code>private</code>. The public interface exposes semantic methods (e.g., <code>authenticate()</code>, <code>transferFunds()</code>) rather than naked getters and setters. If internal data structures change (e.g. Switching from a <code>std::vector</code> to a <code>std::unordered_map</code>), client code remains completely unaffected.</p>"
+                },
+                {
+                    "step_number": 5,
+                    "title": "5. Visual explanation",
+                    "content": "<p>Encapsulation Perimeter protecting internal invariants:</p>",
+                    "diagram": {
+                        "title": "Encapsulation Boundary",
+                        "classes": [
+                            {
+                                "name": "PaymentOrder",
+                                "attributes": [
+                                    {"visibility": "-", "name": "orderId", "type": "std::string"},
+                                    {"visibility": "-", "name": "totalAmount", "type": "double"},
+                                    {"visibility": "-", "name": "status", "type": "OrderStatus"}
+                                ],
+                                "methods": [
+                                    {"visibility": "+", "name": "authorizePayment", "params": "PaymentToken token", "returnType": "bool"},
+                                    {"visibility": "+", "name": "cancelOrder", "params": "std::string reason", "returnType": "void"},
+                                    {"visibility": "+", "name": "getStatus", "params": "", "returnType": "OrderStatus"}
+                                ]
+                            }
+                        ],
+                        "relationships": []
+                    }
+                },
+                {
+                    "step_number": 6,
+                    "title": "6. C++ implementation",
+                    "content": "<p>Production-Grade Encapsulated Order State Machine:</p>",
+                    "code_example": {
+                        "filename": "encapsulation_order.cpp",
+                        "code": """#include <iostream>
+#include <string>
+#include <stdexcept>
+
+enum class OrderStatus { CREATED, PAID, SHIPPED, CANCELLED };
+
+class Order {
+private:
+    std::string orderId;
+    double amount{0.0};
+    OrderStatus status{OrderStatus::CREATED};
+
+public:
+    Order(std::string id, double total)
+        : orderId(std::move(id)), amount(total) {
+        if (orderId.empty()) throw std::invalid_argument("Order ID cannot be empty");
+        if (amount <= 0.0) throw std::invalid_argument("Order amount must be positive");
+    }
+
+    // Business action method (not a generic setter)
+    void markAsPaid(const std::string& paymentTransactionId) {
+        if (status != OrderStatus::CREATED) {
+            throw std::logic_error("Cannot pay for order in non-CREATED status");
+        }
+        if (paymentTransactionId.empty()) {
+            throw std::invalid_argument("Invalid payment transaction reference");
+        }
+        status = OrderStatus::PAID;
+        std::cout << "[Order " << orderId << "] Successfully marked PAID via TX: " << paymentTransactionId << "\\n";
+    }
+
+    void ship() {
+        if (status != OrderStatus::PAID) {
+            throw std::logic_error("Cannot ship an unpaid or cancelled order");
+        }
+        status = OrderStatus::SHIPPED;
+        std::cout << "[Order " << orderId << "] Dispatched to shipping carrier.\\n";
+    }
+
+    [[nodiscard]] OrderStatus getStatus() const noexcept { return status; }
+    [[nodiscard]] double getAmount() const noexcept { return amount; }
+};
+
+int main() {
+    Order order{"ORD-8819", 299.99};
+    order.markAsPaid("TX_PAYPAL_991823");
+    order.ship();
+    return 0;
+}"""
+                    }
+                },
+                {
+                    "step_number": 7,
+                    "title": "7. Code walkthrough",
+                    "content": "<p><strong>Lines 9-11 (Private State):</strong> <code>orderId</code>, <code>amount</code>, and <code>status</code> cannot be mutated directly by callers.<br><strong>Lines 21-30 (markAsPaid):</strong> Validates that the order is in the valid prerequisite state before transitioning to <code>PAID</code>.<br><strong>Lines 32-37 (ship):</strong> Protects business rules: illegal state transitions throw <code>std::logic_error</code>.</p>"
+                },
+                {
+                    "step_number": 8,
+                    "title": "8. Real-world example",
+                    "content": "<p>Payment gateways (Stripe, Adyen), ATM transaction processors, and aircraft avionics flight control computers enforce strict state transitions through encapsulated domain objects.</p>"
+                },
+                {
+                    "step_number": 9,
+                    "title": "9. When to use",
+                    "content": "<p>Always encapsulate any entity that maintains business invariants, state machine transitions, or validation constraints.</p>"
+                },
+                {
+                    "step_number": 10,
+                    "title": "10. When NOT to use",
+                    "content": "<p>Do not create heavy encapsulated classes for simple coordinate points, RGB colors, or flat Data Transfer Objects (DTOs) with no business rules (use <code>struct</code>).</p>"
+                },
+                {
+                    "step_number": 11,
+                    "title": "11. Advantages",
+                    "content": "<ul style='margin-left: 1.25rem;'><li><strong>Maintainability:</strong> State changes are audited in one place.</li><li><strong>Robustness:</strong> Impossible to construct or mutate objects into illegal states.</li><li><strong>Refactorability:</strong> Internal representations can be rewritten without touching client code.</li></ul>"
+                },
+                {
+                    "step_number": 12,
+                    "title": "12. Disadvantages",
+                    "content": "<p>Requires deliberate API design; over-encapsulating without clear domain methods can lead to cumbersome getter chains.</p>"
+                },
+                {
+                    "step_number": 13,
+                    "title": "13. Variations / Types",
+                    "content": "<p>Strict Encapsulation (all private data), Package/Friend Encapsulation (selective exposure for auditing/serialization), Immutability (const members).</p>"
+                },
+                {
+                    "step_number": 14,
+                    "title": "14. Common mistakes",
+                    "content": "<p>Returning non-const references or raw pointers to internal private data members, allowing external code to bypass class methods and mutate state directly.</p>",
+                    "callout": {
+                        "type": "trap",
+                        "title": "Leaking Internal State via Non-Const Reference",
+                        "text": "class Bank { std::vector<Account> accounts; public: std::vector<Account>& getAccounts() { return accounts; } }; // BUG: Callers can now clear() or corrupt accounts list without Bank knowing!"
+                    }
+                },
+                {
+                    "step_number": 15,
+                    "title": "15. Interview questions",
+                    "content": "<p><strong>Q:</strong> What is the difference between Encapsulation and Abstraction?</p>"
+                },
+                {
+                    "step_number": 16,
+                    "title": "16. Interview answer",
+                    "content": "<p><strong>Answer:</strong> <strong>Encapsulation</strong> is about <em>information hiding and containment</em> (bundling state and methods, keeping data private). <strong>Abstraction</strong> is about <em>hiding complexity and exposing high-level intent</em> (defining what an object does via abstract interfaces while hiding the underlying implementation details).</p>"
+                },
+                {
+                    "step_number": 17,
+                    "title": "17. Practice problem",
+                    "content": "<p>Implement an encapsulated <code>VendingMachineSlot</code> that tracks inventory count, item price, and capacity, preventing dispense operations when empty.</p>",
+                    "practice": {
+                        "title": "Encapsulated Vending Machine Slot",
+                        "problemStatement": "Design a VendingMachineSlot class that prevents over-dispensing and enforces capacity limits.",
+                        "requirements": [
+                            "Private capacity, count, and unit price",
+                            "restock(amount) cannot exceed capacity",
+                            "dispenseItem() decrements count and throws if empty"
+                        ],
+                        "constraints": ["Enforce const-correctness"],
+                        "hint": "Check count > 0 in dispenseItem() and count + amt <= capacity in restock().",
+                        "expectedEntities": [
+                            {"name": "VendingMachineSlot", "responsibility": "Encapsulates item inventory and dispensing logic."}
+                        ],
+                        "referenceCode": {
+                            "filename": "vending_slot.cpp",
+                            "code": """#include <iostream>
+#include <stdexcept>
+
+class VendingMachineSlot {
+private:
+    const int capacity;
+    int currentCount{0};
+    double price{0.0};
+
+public:
+    VendingMachineSlot(int maxCapacity, double itemPrice)
+        : capacity(maxCapacity), price(itemPrice) {
+        if (capacity <= 0 || price < 0.0) throw std::invalid_argument("Invalid slot configuration");
+    }
+
+    void restock(int amount) {
+        if (amount <= 0 || currentCount + amount > capacity) {
+            throw std::logic_error("Invalid restock amount or exceeds slot capacity");
+        }
+        currentCount += amount;
+    }
+
+    void dispenseItem() {
+        if (currentCount <= 0) {
+            throw std::runtime_error("Slot is empty; cannot dispense");
+        }
+        --currentCount;
+    }
+
+    [[nodiscard]] int getCount() const noexcept { return currentCount; }
+    [[nodiscard]] double getPrice() const noexcept { return price; }
+};"""
+                        }
+                    }
+                },
+                {
+                    "step_number": 18,
+                    "title": "18. Summary",
+                    "content": "<p>Encapsulation ensures data integrity by uniting state with domain validation logic and hiding internal implementation details behind stable public interfaces.</p>"
+                }
+            ]
+        },
+
+        # -------------------------------------------------------------
+        # 2. Abstraction & Information Hiding
+        # -------------------------------------------------------------
+        {
+            "id": "abstraction",
+            "title": "Abstraction & Information Hiding",
+            "description": "Hiding implementation complexity behind high-level interfaces, pure virtual functions, and abstract base contracts.",
+            "sections": [
+                {
+                    "step_number": 1,
+                    "title": "1. What is it?",
+                    "content": "<p><strong>Abstraction</strong> is the design technique of exposing only essential features of an entity while hiding the underlying mechanical complexity. In C++, abstraction is achieved through abstract classes with pure virtual functions (<code>= 0</code>).</p>"
+                },
+                {
+                    "step_number": 2,
+                    "title": "2. Why do we need it?",
+                    "content": "<p>Without abstraction, client code becomes tightly coupled to concrete implementation mechanics (e.g., hardcoding SQL queries or AWS S3 SDK calls directly inside order processing logic). Abstraction creates interchangeable contracts.</p>"
+                },
+                {
+                    "step_number": 3,
+                    "title": "3. Core idea",
+                    "content": "<p><em>'Program to an interface, not an implementation.'</em> High-level application logic should depend upon abstract contracts (e.g. <code>INotificationService</code>) rather than concrete implementations (e.g. <code>TwilioSmsService</code>).</p>"
+                },
+                {
+                    "step_number": 4,
+                    "title": "4. How it works",
+                    "content": "<p>An abstract class in C++ contains at least one <strong>pure virtual function</strong> (<code>virtual void send() = 0;</code>) and a <strong>virtual destructor</strong> (<code>virtual ~Interface() = default;</code>). The compiler prevents direct instantiation of abstract classes, guaranteeing that only complete derived classes can be instantiated.</p>"
+                },
+                {
+                    "step_number": 5,
+                    "title": "5. Visual explanation",
+                    "content": "<p>UML Interface Realization Diagram:</p>",
+                    "diagram": {
+                        "title": "Abstract Notification Service Interface",
+                        "classes": [
+                            {
+                                "name": "INotificationService",
+                                "stereotype": "interface",
+                                "isInterface": True,
+                                "attributes": [],
+                                "methods": [
+                                    {"visibility": "+", "name": "sendNotification", "params": "std::string recipient, std::string message", "returnType": "bool"}
+                                ]
+                            },
+                            {
+                                "name": "EmailNotificationService",
+                                "attributes": [
+                                    {"visibility": "-", "name": "smtpHost", "type": "std::string"}
+                                ],
+                                "methods": [
+                                    {"visibility": "+", "name": "sendNotification", "params": "std::string recipient, std::string message", "returnType": "bool"}
+                                ]
+                            },
+                            {
+                                "name": "SmsNotificationService",
+                                "attributes": [
+                                    {"visibility": "-", "name": "twilioApiKey", "type": "std::string"}
+                                ],
+                                "methods": [
+                                    {"visibility": "+", "name": "sendNotification", "params": "std::string recipient, std::string message", "returnType": "bool"}
+                                ]
+                            }
+                        ],
+                        "relationships": [
+                            {
+                                "from": "EmailNotificationService",
+                                "to": "INotificationService",
+                                "type": "inheritance",
+                                "label": "implements",
+                                "ownership": "None",
+                                "lifetime": "Polymorphic",
+                                "coupling": "Decoupled via Interface",
+                                "cppSyntax": "class EmailNotificationService : public INotificationService"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "step_number": 6,
+                    "title": "6. C++ implementation",
+                    "content": "<p>Abstract Storage Engine Contract with S3 and Local Disk Implementations:</p>",
+                    "code_example": {
+                        "filename": "abstraction_storage.cpp",
+                        "code": """#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
+
+// Abstract Interface (Contract)
+class IStorageService {
+public:
+    virtual ~IStorageService() = default; // Essential Virtual Destructor!
+    virtual void uploadFile(const std::string& path, const std::string& data) = 0;
+    virtual std::string downloadFile(const std::string& path) = 0;
+};
+
+// Concrete Implementation 1: Local Disk
+class LocalDiskStorage : public IStorageService {
+public:
+    void uploadFile(const std::string& path, const std::string& data) override {
+        std::cout << "[LocalDisk] Saved " << data.size() << " bytes to file: " << path << "\\n";
+    }
+    std::string downloadFile(const std::string& path) override {
+        return "[LocalDisk Content of " + path + "]";
+    }
+};
+
+// Concrete Implementation 2: AWS S3 Cloud Storage
+class S3CloudStorage : public IStorageService {
+private:
+    std::string bucketName;
+public:
+    explicit S3CloudStorage(std::string bucket) : bucketName(std::move(bucket)) {}
+
+    void uploadFile(const std::string& path, const std::string& data) override {
+        std::cout << "[AWS S3: " << bucketName << "] Uploaded object to s3://" << path << "\\n";
+    }
+    std::string downloadFile(const std::string& path) override {
+        return "[S3 Payload from " + bucketName + "/" + path + "]";
+    }
+};
+
+// High-Level Business Client: Completely decoupled from storage mechanics!
+class ReportGenerator {
+private:
+    std::shared_ptr<IStorageService> storage;
+public:
+    explicit ReportGenerator(std::shared_ptr<IStorageService> storageEngine)
+        : storage(std::move(storageEngine)) {}
+
+    void generateAndSaveReport(const std::string& reportName) {
+        std::string payload = "=== FINANCIAL QUARTERLY AUDIT DATA ===";
+        storage->uploadFile("/reports/2026_Q3.pdf", payload);
+    }
+};
+
+int main() {
+    auto cloudStorage = std::make_shared<S3CloudStorage>("production-analytics-bucket");
+    ReportGenerator generator(cloudStorage);
+    generator.generateAndSaveReport("Q3_Financials");
+    return 0;
+}"""
+                    }
+                },
+                {
+                    "step_number": 7,
+                    "title": "7. Code walkthrough",
+                    "content": "<p><strong>Lines 8-13 (Interface):</strong> <code>IStorageService</code> defines pure virtual functions <code>= 0</code> and a virtual destructor.<br><strong>Lines 40-45 (Dependency Injection):</strong> <code>ReportGenerator</code> accepts <code>std::shared_ptr&lt;IStorageService&gt;</code>, meaning it can work with LocalDisk, S3, Azure Blob, or Mock storage without modifying a single line of report generation code!</p>"
+                },
+                {
+                    "step_number": 8,
+                    "title": "8. Real-world example",
+                    "content": "<p>Database connection drivers (ODBC / JDBC), Logger abstractions (console vs file vs syslog), and Audio Engine outputs (DirectSound vs ALSA vs CoreAudio).</p>"
+                },
+                {
+                    "step_number": 9,
+                    "title": "9. When to use",
+                    "content": "<p>Use abstraction whenever you have multiple interchangeable implementations or want to decouple business domains from external I/O subsystems.</p>"
+                },
+                {
+                    "step_number": 10,
+                    "title": "10. When NOT to use",
+                    "content": "<p>Do not create speculative interfaces for classes that will only ever have one single implementation and no unit testing mock requirements (YAGNI principle).</p>"
+                },
+                {
+                    "step_number": 11,
+                    "title": "11. Advantages",
+                    "content": "<ul style='margin-left: 1.25rem;'><li>Enables mock-based unit testing (Testability).</li><li>Satisfies Open/Closed and Dependency Inversion principles.</li><li>Decouples high-level policy from low-level detail.</li></ul>"
+                },
+                {
+                    "step_number": 12,
+                    "title": "12. Disadvantages",
+                    "content": "<p>Virtual function dispatch has negligible indirect call overhead (VTable lookup) and increases indirection.</p>"
+                },
+                {
+                    "step_number": 13,
+                    "title": "13. Variations / Types",
+                    "content": "<p>Pure Abstract Interfaces (only pure virtual functions), Partial Abstract Classes (some default implementations), Static Abstraction (Templates & CRTP).</p>"
+                },
+                {
+                    "step_number": 14,
+                    "title": "14. Common mistakes",
+                    "content": "<p>Forgetting to declare the base class destructor <code>virtual</code>, resulting in partial destruction and memory leaks when deleting derived objects through base interface pointers.</p>"
+                },
+                {
+                    "step_number": 15,
+                    "title": "15. Interview questions",
+                    "content": "<p><strong>Q:</strong> Can an abstract class in C++ have concrete member variables and constructor implementations?</p>"
+                },
+                {
+                    "step_number": 16,
+                    "title": "16. Interview answer",
+                    "content": "<p><strong>Answer:</strong> Yes. An abstract class in C++ can have member variables, constructors, and non-virtual or concrete virtual functions. The constructor will be called by derived class constructors during initialization. A class is abstract solely if it contains at least one pure virtual function (<code>= 0</code>).</p>"
+                },
+                {
+                    "step_number": 17,
+                    "title": "17. Practice problem",
+                    "content": "<p>Design an abstract <code>IPaymentGateway</code> interface with <code>processPayment(amount)</code> and create two implementations: <code>StripeGateway</code> and <code>PayPalGateway</code>.</p>",
+                    "practice": {
+                        "title": "Payment Gateway Abstraction",
+                        "problemStatement": "Implement IPaymentGateway and concrete Stripe and PayPal implementations.",
+                        "requirements": [
+                            "IPaymentGateway with virtual ~IPaymentGateway() = default and pure virtual processPayment",
+                            "StripeGateway implementation",
+                            "PayPalGateway implementation"
+                        ],
+                        "constraints": ["Use override keyword"],
+                        "hint": "Return bool success from processPayment.",
+                        "expectedEntities": [
+                            {"name": "IPaymentGateway", "responsibility": "Abstract payment processing contract."}
+                        ],
+                        "referenceCode": {
+                            "filename": "payment_interface.cpp",
+                            "code": """#include <iostream>
+
+class IPaymentGateway {
+public:
+    virtual ~IPaymentGateway() = default;
+    virtual bool processPayment(double amount) = 0;
+};
+
+class StripeGateway : public IPaymentGateway {
+public:
+    bool processPayment(double amount) override {
+        std::cout << "[Stripe] Charged $" << amount << "\\n";
+        return true;
+    }
+};
+
+class PayPalGateway : public IPaymentGateway {
+public:
+    bool processPayment(double amount) override {
+        std::cout << "[PayPal] Charged $" << amount << "\\n";
+        return true;
+    }
+};"""
+                        }
+                    }
+                },
+                {
+                    "step_number": 18,
+                    "title": "18. Summary",
+                    "content": "<p>Abstraction hides implementation complexity behind pure virtual contracts, decoupling system layers and enabling extensible, testable Low-Level Design.</p>"
+                }
+            ]
+        },
+
+        # -------------------------------------------------------------
+        # 3. Inheritance Types (Single, Multiple, Hierarchical, Hybrid)
+        # -------------------------------------------------------------
+        {
+            "id": "inheritance-types",
+            "title": "Inheritance Types in C++",
+            "description": "Code reuse and hierarchy modeling: Single, Multilevel, Multiple, Hierarchical, and Hybrid inheritance with visibility modes.",
+            "sections": [
+                {
+                    "step_number": 1,
+                    "title": "1. What is it?",
+                    "content": "<p><strong>Inheritance</strong> is an object-oriented mechanism where a derived class inherits properties and behaviors from one or more base classes, establishing an <em>'is-a'</em> relationship.</p>"
+                },
+                {
+                    "step_number": 2,
+                    "title": "2. Why do we need it?",
+                    "content": "<p>Inheritance enables code reuse, domain taxonomy modeling (e.g., <code>Dog</code> is an <code>Animal</code>), and forms the foundation of runtime polymorphism.</p>"
+                },
+                {
+                    "step_number": 3,
+                    "title": "3. Core idea",
+                    "content": "<p>Model generalized common behavior in base classes and specialize unique behavior in derived subclasses.</p>"
+                },
+                {
+                    "step_number": 4,
+                    "title": "4. How it works",
+                    "content": "<p>C++ supports 5 inheritance types:<br>1. <strong>Single:</strong> Derived inherits from one Base.<br>2. <strong>Multilevel:</strong> Class C inherits from B, which inherits from A.<br>3. <strong>Multiple:</strong> Class C inherits from both Base A and Base B.<br>4. <strong>Hierarchical:</strong> Multiple derived classes inherit from the same Base.<br>5. <strong>Hybrid:</strong> Combination of two or more inheritance types.</p>"
+                },
+                {
+                    "step_number": 5,
+                    "title": "5. Visual explanation",
+                    "content": "<p>Comparison of all 5 Inheritance topologies:</p>",
+                    "comparison": {
+                        "title": "5 C++ Inheritance Topologies",
+                        "columns": ["Inheritance Type", "Structure", "C++ Syntax Example", "LLD Use Case"],
+                        "rows": [
+                            ["Single", "A -> B", "class Dog : public Animal", "Basic domain specialization"],
+                            ["Multilevel", "A -> B -> C", "class SportsCar : public Car (Car : Vehicle)", "Layered specialization"],
+                            ["Multiple", "A, B -> C", "class Smartphone : public Phone, public Camera", "Implementing multiple interfaces"],
+                            ["Hierarchical", "A -> B, A -> C", "class Car : Vehicle, class Bike : Vehicle", "Polymorphic families"],
+                            ["Hybrid", "Combines multiple + hierarchical", "Requires virtual inheritance to solve Diamond problem", "Complex subsystem interfaces"]
+                        ]
+                    }
+                },
+                {
+                    "step_number": 6,
+                    "title": "6. C++ implementation",
+                    "content": "<p>Complete demonstration of all 5 Inheritance Topologies:</p>",
+                    "code_example": {
+                        "filename": "all_inheritance_types.cpp",
+                        "code": """#include <iostream>
+#include <string>
+
+// 1. Base Class
+class Vehicle {
+protected:
+    std::string vin;
+public:
+    explicit Vehicle(std::string id) : vin(std::move(id)) {}
+    virtual ~Vehicle() = default;
+    virtual void describe() const {
+        std::cout << "[Vehicle VIN: " << vin << "]\\n";
+    }
+};
+
+// 2. Single Inheritance
+class LandVehicle : public Vehicle {
+public:
+    explicit LandVehicle(std::string id) : Vehicle(std::move(id)) {}
+};
+
+// 3. Multilevel Inheritance (Vehicle -> LandVehicle -> Car)
+class Car : public LandVehicle {
+public:
+    explicit Car(std::string id) : LandVehicle(std::move(id)) {}
+    void describe() const override {
+        std::cout << "[Car VIN: " << vin << "] (Multilevel)\\n";
+    }
+};
+
+// 4. Multiple Inheritance Interface Mixin
+class IElectricPowered {
+public:
+    virtual ~IElectricPowered() = default;
+    virtual void chargeBattery() = 0;
+};
+
+// Multiple Inheritance: Car + IElectricPowered
+class ElectricCar : public Car, public IElectricPowered {
+public:
+    explicit ElectricCar(std::string id) : Car(std::move(id)) {}
+    void chargeBattery() override {
+        std::cout << "[ElectricCar " << vin << "] Charging to 100% (Multiple Inheritance)\\n";
+    }
+};
+
+int main() {
+    ElectricCar tesla{"5YJSA1E28HF000000"};
+    tesla.describe();
+    tesla.chargeBattery();
+    return 0;
+}"""
+                    }
+                },
+                {
+                    "step_number": 7,
+                    "title": "7. Code walkthrough",
+                    "content": "<p><strong>Lines 18-20 (Single):</strong> <code>LandVehicle</code> inherits from <code>Vehicle</code>.<br><strong>Lines 23-28 (Multilevel):</strong> <code>Car</code> inherits from <code>LandVehicle</code>.<br><strong>Lines 39-45 (Multiple):</strong> <code>ElectricCar</code> inherits class state from <code>Car</code> and interface contract from <code>IElectricPowered</code>.</p>"
+                },
+                {
+                    "step_number": 8,
+                    "title": "8. Real-world example",
+                    "content": "<p>GUI Widget frameworks: <code>Object -&gt; Widget -&gt; Control -&gt; Button</code> (Multilevel) + <code>IClickable</code> (Multiple).</p>"
+                },
+                {
+                    "step_number": 9,
+                    "title": "9. When to use",
+                    "content": "<p>Use single inheritance for true 'is-a' relationships. Use multiple inheritance primarily for implementing multiple pure abstract interfaces.</p>"
+                },
+                {
+                    "step_number": 10,
+                    "title": "10. When NOT to use",
+                    "content": "<p>Do not use multiple inheritance with multiple concrete base classes with shared data (causes the <strong>Diamond Problem</strong> and memory duplication).</p>"
+                },
+                {
+                    "step_number": 11,
+                    "title": "11. Advantages",
+                    "content": "<p>Promotes code reuse, polymorphism, and standard class taxonomies.</p>"
+                },
+                {
+                    "step_number": 12,
+                    "title": "12. Disadvantages",
+                    "content": "<p>Brittle Base Class Problem: changing base classes can break derived classes unexpectedly; deep hierarchies increase cognitive load.</p>"
+                },
+                {
+                    "step_number": 13,
+                    "title": "13. Variations / Types",
+                    "content": "<p>Public inheritance (is-a), Protected inheritance (implementation detail), Private inheritance (has-a implemented in terms of).</p>"
+                },
+                {
+                    "step_number": 14,
+                    "title": "14. Common mistakes",
+                    "content": "<p>Overusing deep inheritance trees (5+ levels deep) instead of composition.</p>"
+                },
+                {
+                    "step_number": 15,
+                    "title": "15. Interview questions",
+                    "content": "<p><strong>Q:</strong> What is the difference between <code>public</code>, <code>protected</code>, and <code>private</code> inheritance in C++?</p>"
+                },
+                {
+                    "step_number": 16,
+                    "title": "16. Interview answer",
+                    "content": "<p><strong>Answer:</strong><br>• <strong>Public:</strong> Base public members stay public; base protected stay protected (is-a relationship).<br>• <strong>Protected:</strong> Base public and protected members become protected in derived class.<br>• <strong>Private:</strong> Base public and protected members become private in derived class (implemented-in-terms-of relationship).</p>"
+                },
+                {
+                    "step_number": 17,
+                    "title": "17. Practice problem",
+                    "content": "<p>Model a hierarchy where <code>Shape</code> is the base class, <code>TwoDimensionalShape</code> and <code>ThreeDimensionalShape</code> inherit from it (Hierarchical), and <code>Sphere</code> inherits from <code>ThreeDimensionalShape</code> (Multilevel).</p>",
+                    "practice": {
+                        "title": "Shape Hierarchy Modeling",
+                        "problemStatement": "Build a shape hierarchy calculating area and volume.",
+                        "requirements": [
+                            "Abstract Shape base class",
+                            "TwoDimensionalShape with getArea()",
+                            "ThreeDimensionalShape with getVolume()"
+                        ],
+                        "constraints": ["Use proper virtual destructors"],
+                        "hint": "Derive Circle from TwoDimensionalShape and Cube from ThreeDimensionalShape.",
+                        "expectedEntities": [
+                            {"name": "Shape", "responsibility": "Base class for all geometric objects."}
+                        ],
+                        "referenceCode": {
+                            "filename": "shape_hierarchy.cpp",
+                            "code": """#include <iostream>
+
+class Shape {
+public:
+    virtual ~Shape() = default;
+};
+
+class TwoDimensionalShape : public Shape {
+public:
+    virtual double getArea() const = 0;
+};
+
+class ThreeDimensionalShape : public Shape {
+public:
+    virtual double getVolume() const = 0;
+};"""
+                        }
+                    }
+                },
+                {
+                    "step_number": 18,
+                    "title": "18. Summary",
+                    "content": "<p>Inheritance models domain taxonomies and interface realization. Prefer shallow hierarchies and mixin interfaces.</p>"
+                }
+            ]
+        },
+
+        # -------------------------------------------------------------
+        # 4. Compile-time Polymorphism (Overloading & Templates)
+        # -------------------------------------------------------------
+        {
+            "id": "compile-time-polymorphism",
+            "title": "Compile-time Polymorphism (Overloading & Templates)",
+            "description": "Zero-overhead static dispatch: Function overloading, Operator overloading, and Generic Templates in C++20.",
+            "sections": [
+                {
+                    "step_number": 1,
+                    "title": "1. What is it?",
+                    "content": "<p><strong>Compile-time Polymorphism</strong> (Static Polymorphism) resolves method calls and type specializations at compile time through <strong>Function Overloading</strong>, <strong>Operator Overloading</strong>, and <strong>Templates</strong> with zero runtime performance cost.</p>"
+                },
+                {
+                    "step_number": 2,
+                    "title": "2. Why do we need it?",
+                    "content": "<p>In high-frequency trading, game engines, and low-latency systems, the indirect pointer lookup overhead of virtual functions is unacceptable. Compile-time polymorphism allows generic code with 100% inlining and zero indirect branch penalties.</p>"
+                },
+                {
+                    "step_number": 3,
+                    "title": "3. Core idea",
+                    "content": "<p>Let the compiler generate specialized, optimized machine code for each type during compilation (Static Dispatch) rather than resolving function addresses dynamically via a VTable at runtime (Dynamic Dispatch).</p>"
+                },
+                {
+                    "step_number": 4,
+                    "title": "4. How it works",
+                    "content": "<p>The compiler performs name mangling and signature matching for overloaded functions. For templates, the compiler generates a brand-new concrete class or function for each template argument (Template Instantiation).</p>"
+                },
+                {
+                    "step_number": 5,
+                    "title": "5. Visual explanation",
+                    "content": "<p>Static vs Dynamic Polymorphism Comparison:</p>",
+                    "comparison": {
+                        "title": "Compile-Time vs Runtime Polymorphism",
+                        "columns": ["Feature", "Compile-Time Polymorphism", "Runtime Polymorphism", "Performance Impact"],
+                        "rows": [
+                            ["Mechanism", "Overloading, Templates, Concepts", "Virtual Functions, VTable, VPTR", "Compile-time is faster (inlinable)"],
+                            ["Binding Time", "Compile time (Static Binding)", "Runtime (Dynamic Dispatch)", "Runtime has indirection penalty"],
+                            ["Flexibility", "Types must be known at compile time", "Can handle new types at runtime (plugins)", "Runtime allows heterogeneous lists"],
+                            ["Binary Size", "Template code bloat if overused", "Compact binary, small VTable per class", "Trade-off between size and speed"]
+                        ]
+                    }
+                },
+                {
+                    "step_number": 6,
+                    "title": "6. C++ implementation",
+                    "content": "<p>Generic High-Throughput RingBuffer with Operator Overloading & Templates:</p>",
+                    "code_example": {
+                        "filename": "compile_time_poly.cpp",
+                        "code": """#include <iostream>
+#include <vector>
+#include <string>
+
+// 1. Operator Overloading: Complex Number Value Object
+class ComplexNumber {
+public:
+    double real;
+    double imag;
+
+    ComplexNumber(double r, double i) : real(r), imag(i) {}
+
+    // Operator + Overloading
+    ComplexNumber operator+(const ComplexNumber& other) const noexcept {
+        return ComplexNumber(this->real + other.real, this->imag + other.imag);
+    }
+
+    // Stream Output << Overloading
+    friend std::ostream& operator<<(std::ostream& os, const ComplexNumber& c) {
+        return os << c.real << " + " << c.imag << "i";
+    }
+};
+
+// 2. Function Overloading
+class Logger {
+public:
+    void log(const std::string& msg) {
+        std::cout << "[LOG String] " << msg << "\\n";
+    }
+    void log(int errorCode) {
+        std::cout << "[LOG Code] Error #" << errorCode << "\\n";
+    }
+    void log(const ComplexNumber& c) {
+        std::cout << "[LOG Complex] " << c << "\\n";
+    }
+};
+
+// 3. Template Class (Compile-time Generic Container)
+template <typename T, size_t Capacity>
+class StaticRingBuffer {
+private:
+    T buffer[Capacity];
+    size_t count{0};
+public:
+    bool push(T item) {
+        if (count >= Capacity) return false;
+        buffer[count++] = std::move(item);
+        return true;
+    }
+    [[nodiscard]] size_t size() const noexcept { return count; }
+};
+
+int main() {
+    ComplexNumber c1{3.0, 4.0};
+    ComplexNumber c2{1.5, 2.5};
+    ComplexNumber c3 = c1 + c2; // Calls overloaded operator+
+
+    Logger logger;
+    logger.log("System operational");
+    logger.log(404);
+    logger.log(c3);
+
+    StaticRingBuffer<int, 64> fastIntQueue;
+    fastIntQueue.push(100);
+    return 0;
+}"""
+                    }
+                },
+                {
+                    "step_number": 7,
+                    "title": "7. Code walkthrough",
+                    "content": "<p><strong>Line 13:</strong> Overloads <code>operator+</code> allowing natural arithmetic syntax <code>c1 + c2</code>.<br><strong>Lines 24-34:</strong> <code>log()</code> is overloaded for three distinct types, resolved with zero overhead at compile time.<br><strong>Line 38:</strong> Non-type template parameter <code>size_t Capacity</code> allocates stack memory at compile time with zero heap overhead.</p>"
+                },
+                {
+                    "step_number": 8,
+                    "title": "8. Real-world example",
+                    "content": "<p><code>std::vector&lt;T&gt;</code>, <code>std::sort</code> with custom comparator lambdas, and standard math libraries (Eigen, GLM).</p>"
+                },
+                {
+                    "step_number": 9,
+                    "title": "9. When to use",
+                    "content": "<p>Use compile-time polymorphism for high-performance data structures, mathematical vectors, and generic algorithms where all types are known at compile time.</p>"
+                },
+                {
+                    "step_number": 10,
+                    "title": "10. When NOT to use",
+                    "content": "<p>Do not use templates if you need to store heterogeneous collections of objects in a single collection (e.g., a vector containing both Cars and Bikes requires runtime polymorphic base pointers: <code>std::vector&lt;std::unique_ptr&lt;IVehicle&gt;&gt;</code>).</p>"
+                },
+                {
+                    "step_number": 11,
+                    "title": "11. Advantages",
+                    "content": "<ul style='margin-left: 1.25rem;'><li>Zero runtime overhead; maximum execution speed.</li><li>Aggressive compiler optimizations and function inlining.</li><li>Strong compile-time type safety.</li></ul>"
+                },
+                {
+                    "step_number": 12,
+                    "title": "12. Disadvantages",
+                    "content": "<p>Template compilation errors can be verbose; template instantiation can increase executable binary size (Code Bloat).</p>"
+                },
+                {
+                    "step_number": 13,
+                    "title": "13. Variations / Types",
+                    "content": "<p>Function Overloading, Operator Overloading, Class Templates, Function Templates, C++20 Concepts/Constraints, CRTP.</p>"
+                },
+                {
+                    "step_number": 14,
+                    "title": "14. Common mistakes",
+                    "content": "<p>Overloading operators unintuitively (e.g. Overloading <code>operator+</code> to perform subtraction or logging). Always preserve the natural semantic meaning of operators!</p>"
+                },
+                {
+                    "step_number": 15,
+                    "title": "15. Interview questions",
+                    "content": "<p><strong>Q:</strong> Why can't a template function have its declaration in a <code>.hpp</code> and its definition in a <code>.cpp</code> file like regular functions?</p>"
+                },
+                {
+                    "step_number": 16,
+                    "title": "16. Interview answer",
+                    "content": "<p><strong>Answer:</strong> Templates are not executable code; they are code-generation recipes. The compiler needs to see the full template implementation at the call site to instantiate the specialized class/function for that type. If the definition is in a separate <code>.cpp</code>, the compiler cannot generate the concrete code, causing an unresolved external symbol linker error.</p>"
+                },
+                {
+                    "step_number": 17,
+                    "title": "17. Practice problem",
+                    "content": "<p>Implement a generic <code>MathUtils::clamp(value, low, high)</code> template function that works for <code>int</code>, <code>float</code>, <code>double</code>, and any type supporting <code>operator&lt;</code>.</p>",
+                    "practice": {
+                        "title": "Generic clamp() Template",
+                        "problemStatement": "Implement a generic clamp function.",
+                        "requirements": ["Template function clamp(T val, T min, T max)", "Const-correct", "Zero copies"],
+                        "constraints": ["Compile-time generic"],
+                        "hint": "if (val < min) return min; if (max < val) return max; return val;",
+                        "expectedEntities": [
+                            {"name": "MathUtils", "responsibility": "Generic mathematical helper routines."}
+                        ],
+                        "referenceCode": {
+                            "filename": "clamp_template.cpp",
+                            "code": """#include <iostream>
+
+namespace MathUtils {
+    template <typename T>
+    [[nodiscard]] constexpr const T& clamp(const T& val, const T& low, const T& high) {
+        return (val < low) ? low : ((high < val) ? high : val);
+    }
+}"""
+                        }
+                    }
+                },
+                {
+                    "step_number": 18,
+                    "title": "18. Summary",
+                    "content": "<p>Compile-time polymorphism delivers maximum performance and type safety by resolving functions and template types during compilation with zero runtime overhead.</p>"
+                }
+            ]
+        },
+
+        # -------------------------------------------------------------
+        # 5. Runtime Polymorphism (Virtual Functions & Overriding)
+        # -------------------------------------------------------------
+        {
+            "id": "runtime-polymorphism",
+            "title": "Runtime Polymorphism (Virtual Functions & Overriding)",
+            "description": "Dynamic method dispatch, virtual functions, method overriding, override and final keywords, and heterogeneous polymorphic collections.",
+            "sections": [
+                {
+                    "step_number": 1,
+                    "title": "1. What is it?",
+                    "content": "<p><strong>Runtime Polymorphism</strong> allows a base class pointer or reference to invoke the specialized behavior of a derived class object at runtime. It is powered by <strong>Virtual Functions</strong> and <strong>Method Overriding</strong>.</p>"
+                },
+                {
+                    "step_number": 2,
+                    "title": "2. Why do we need it?",
+                    "content": "<p>Without runtime polymorphism, adding a new payment method, vehicle type, or shape requires modifying massive <code>if-else</code> or <code>switch</code> statements everywhere in the codebase (violating the Open/Closed Principle).</p>"
+                },
+                {
+                    "step_number": 3,
+                    "title": "3. Core idea",
+                    "content": "<p>Treat derived objects uniformly through a common base pointer (<code>IVehicle*</code>). When calling <code>vehicle->start()</code>, the C++ runtime automatically dispatches to the correct derived implementation (e.g. <code>Car::start()</code> or <code>ElectricTruck::start()</code>).</p>"
+                },
+                {
+                    "step_number": 4,
+                    "title": "4. How it works",
+                    "content": "<p>Declare a base function with the <code>virtual</code> keyword. In derived classes, override it with the <code>override</code> keyword. Use the <code>final</code> keyword to prevent further overriding or class derivation.</p>"
+                },
+                {
+                    "step_number": 5,
+                    "title": "5. Visual explanation",
+                    "content": "<p>Dynamic Dispatch Workflow Diagram:</p>",
+                    "diagram": {
+                        "title": "Runtime Polymorphism Architecture",
+                        "classes": [
+                            {
+                                "name": "PaymentMethod",
+                                "attributes": [],
+                                "methods": [
+                                    {"visibility": "+", "name": "pay", "params": "double amount", "returnType": "virtual void"}
+                                ]
+                            },
+                            {
+                                "name": "CreditCardPayment",
+                                "attributes": [],
+                                "methods": [
+                                    {"visibility": "+", "name": "pay", "params": "double amount", "returnType": "void override"}
+                                ]
+                            },
+                            {
+                                "name": "CryptoPayment",
+                                "attributes": [],
+                                "methods": [
+                                    {"visibility": "+", "name": "pay", "params": "double amount", "returnType": "void override final"}
+                                ]
+                            }
+                        ],
+                        "relationships": [
+                            {
+                                "from": "CreditCardPayment",
+                                "to": "PaymentMethod",
+                                "type": "inheritance",
+                                "label": "overrides pay()",
+                                "ownership": "None",
+                                "lifetime": "Polymorphic",
+                                "coupling": "Decoupled via Base",
+                                "cppSyntax": "class CreditCardPayment : public PaymentMethod"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "step_number": 6,
+                    "title": "6. C++ implementation",
+                    "content": "<p>Heterogeneous Polymorphic Payment Processing Engine:</p>",
+                    "code_example": {
+                        "filename": "runtime_poly_engine.cpp",
+                        "code": """#include <iostream>
+#include <memory>
+#include <vector>
+#include <string>
+
+// Base Class with Virtual Interface
+class PaymentMethod {
+protected:
+    std::string payerName;
+public:
+    explicit PaymentMethod(std::string name) : payerName(std::move(name)) {}
+    virtual ~PaymentMethod() = default; // Essential Virtual Destructor!
+
+    // Virtual function to be overridden
+    virtual void processPayment(double amount) const {
+        std::cout << "[Base Payment] Processing default payment of $" << amount << " for " << payerName << "\\n";
+    }
+};
+
+// Derived Class 1
+class CreditCardPayment : public PaymentMethod {
+private:
+    std::string cardNumber;
+public:
+    CreditCardPayment(std::string name, std::string cardNum)
+        : PaymentMethod(std::move(name)), cardNumber(std::move(cardNum)) {}
+
+    void processPayment(double amount) const override {
+        std::cout << "[CreditCard " << cardNumber << "] Charged $" << amount << " for " << payerName << "\\n";
+    }
+};
+
+// Derived Class 2: Marked final to prevent further inheritance
+class CryptoPayment final : public PaymentMethod {
+private:
+    std::string walletAddress;
+public:
+    CryptoPayment(std::string name, std::string wallet)
+        : PaymentMethod(std::move(name)), walletAddress(std::move(wallet)) {}
+
+    void processPayment(double amount) const override final {
+        std::cout << "[Crypto " << walletAddress << "] Transferred $" << amount << " on Ethereum network.\\n";
+    }
+};
+
+int main() {
+    // Heterogeneous collection of polymorphic payment methods!
+    std::vector<std::unique_ptr<PaymentMethod>> paymentQueue;
+    paymentQueue.push_back(std::make_unique<CreditCardPayment>("Alice", "4111-XXXX-XXXX-1111"));
+    paymentQueue.push_back(std::make_unique<CryptoPayment>("Bob", "0x71C...B29"));
+
+    std::cout << "--- Processing Payment Batch Polymorphically ---\\n";
+    for (const auto& payment : paymentQueue) {
+        // Dynamic dispatch automatically routes to the correct derived method!
+        payment->processPayment(150.0);
+    }
+    return 0;
+}"""
+                    }
+                },
+                {
+                    "step_number": 7,
+                    "title": "7. Code walkthrough",
+                    "content": "<p><strong>Line 11:</strong> <code>virtual ~PaymentMethod() = default;</code> ensures correct derived destructor is called.<br><strong>Line 27:</strong> <code>override</code> keyword causes compiler to verify that the method signature matches the base virtual function exactly.<br><strong>Line 33:</strong> <code>final</code> specifier prevents accidental subclassing and enables devirtualization optimizations.<br><strong>Lines 52-54:</strong> Heterogeneous loop calls <code>processPayment()</code> polymorphically.</p>"
+                },
+                {
+                    "step_number": 8,
+                    "title": "8. Real-world example",
+                    "content": "<p>Game entity update loops (<code>for (auto& entity : world) entity-&gt;update();</code>), GUI rendering pipelines, and OS device driver dispatch tables.</p>"
+                },
+                {
+                    "step_number": 9,
+                    "title": "9. When to use",
+                    "content": "<p>Use runtime polymorphism whenever you need heterogeneous collections of objects or need to extend system behavior with new types without modifying existing caller loops.</p>"
+                },
+                {
+                    "step_number": 10,
+                    "title": "10. When NOT to use",
+                    "content": "<p>Do not use virtual functions in ultra-tight inner loops where millions of iterations occur per millisecond and branch prediction is critical.</p>"
+                },
+                {
+                    "step_number": 11,
+                    "title": "11. Advantages",
+                    "content": "<ul style='margin-left: 1.25rem;'><li>Enforces the Open/Closed Principle.</li><li>Allows dynamic plug-and-play architecture at runtime.</li><li>Clean, readable heterogeneous collection dispatch.</li></ul>"
+                },
+                {
+                    "step_number": 12,
+                    "title": "12. Disadvantages",
+                    "content": "<p>Small indirect pointer lookup overhead (VTable lookup); disables inline optimization across translation units unless devirtualized.</p>"
+                },
+                {
+                    "step_number": 13,
+                    "title": "13. Variations / Types",
+                    "content": "<p>Standard Virtual Functions, Pure Virtual Functions (<code>= 0</code>), Final Virtual Functions, Covariant Return Types.</p>"
+                },
+                {
+                    "step_number": 14,
+                    "title": "14. Common mistakes",
+                    "content": "<p>Forgetting the <code>override</code> keyword when overriding functions. If the base signature changes or has a const mismatch, the derived method becomes a brand-new function rather than an override without any compiler error!</p>",
+                    "callout": {
+                        "type": "trap",
+                        "title": "Missing override Bug",
+                        "text": "Base: virtual void draw(int scale) const; Derived: void draw(int scale); // Notice missing const! Without 'override', the compiler silently treats this as a brand-new function, and polymorphism fails silently!"
+                    }
+                },
+                {
+                    "step_number": 15,
+                    "title": "15. Interview questions",
+                    "content": "<p><strong>Q:</strong> What is the purpose of the <code>final</code> keyword in C++11?</p>"
+                },
+                {
+                    "step_number": 16,
+                    "title": "16. Interview answer",
+                    "content": "<p><strong>Answer:</strong> The <code>final</code> specifier has two uses:<br>1. On a virtual method (<code>virtual void foo() final;</code>): Prevents any further derived class from overriding that specific method.<br>2. On a class (<code>class Car final : public Vehicle</code>): Prevents the class from being inherited from. It also enables compiler <strong>Devirtualization</strong>, turning virtual calls into fast direct jumps.</p>"
+                },
+                {
+                    "step_number": 17,
+                    "title": "17. Practice problem",
+                    "content": "<p>Refactor an anti-pattern codebase with a giant <code>switch(shapeType)</code> into an open-closed polymorphic class hierarchy with a virtual <code>calculateArea()</code> method.</p>",
+                    "refactor": {
+                        "title": "Refactoring Switch Anti-Pattern to Polymorphism",
+                        "problemSummary": "The legacy code uses a giant switch-case block that must be modified every time a new shape is introduced.",
+                        "violations": [
+                            "Violates Open/Closed Principle (OCP).",
+                            "Adding a new shape requires modifying every switch statement in the application."
+                        ],
+                        "badCode": {
+                            "filename": "bad_switch_shapes.cpp",
+                            "code": """// Flawed: Hardcoded switch-case type switching
+enum class ShapeType { CIRCLE, RECTANGLE };
+struct BadShape {
+    ShapeType type;
+    double radius;
+    double width, height;
+};
+
+double calculateArea(const BadShape& s) {
+    switch (s.type) {
+        case ShapeType::CIRCLE: return 3.14159 * s.radius * s.radius;
+        case ShapeType::RECTANGLE: return s.width * s.height;
+        default: throw std::invalid_argument("Unknown shape");
+    }
+}"""
+                        },
+                        "goodCode": {
+                            "filename": "clean_poly_shapes.cpp",
+                            "code": """// Clean: Open/Closed Runtime Polymorphism
+class IShape {
+public:
+    virtual ~IShape() = default;
+    virtual double calculateArea() const = 0;
+};
+
+class Circle : public IShape {
+    double radius;
+public:
+    explicit Circle(double r) : radius(r) {}
+    double calculateArea() const override { return 3.14159 * radius * radius; }
+};
+
+class Rectangle : public IShape {
+    double width, height;
+public:
+    Rectangle(double w, double h) : width(w), height(h) {}
+    double calculateArea() const override { return width * height; }
+};"""
+                        },
+                        "benefits": [
+                            "Adding a Triangle requires creating a new Triangle class with ZERO changes to existing code.",
+                            "Fully adheres to SOLID Open/Closed Principle."
+                        ]
+                    }
+                },
+                {
+                    "step_number": 18,
+                    "title": "18. Summary",
+                    "content": "<p>Runtime polymorphism with virtual functions and the override/final specifiers enables clean, extensible, and open-for-extension object architectures.</p>"
+                }
+            ]
+        },
+
+        # -------------------------------------------------------------
+        # 6. Virtual Table (VTable) & VPTR Mechanism
+        # -------------------------------------------------------------
+        {
+            "id": "vtable-and-vptr",
+            "title": "Virtual Table (VTable) & VPTR Mechanism",
+            "description": "Under-the-hood dynamic dispatch internals: VTable structure, VPTR pointer injection, memory overhead, and step-by-step lookup animation.",
+            "sections": [
+                {
+                    "step_number": 1,
+                    "title": "1. What is it?",
+                    "content": "<p>The <strong>VTable</strong> (Virtual Method Table) is a compiler-generated static lookup table of function pointers created for every class with at least one virtual function. The <strong>VPTR</strong> (Virtual Pointer) is a hidden pointer injected by the compiler into every instance of that class pointing to its VTable.</p>"
+                },
+                {
+                    "step_number": 2,
+                    "title": "2. Why do we need it?",
+                    "content": "<p>At compile time, when code calls <code>basePtr-&gt;speak()</code>, the compiler does not know which concrete derived object <code>basePtr</code> will point to at runtime. The VTable mechanism enables dynamic runtime address resolution in $O(1)$ constant time.</p>"
+                },
+                {
+                    "step_number": 3,
+                    "title": "3. Core idea",
+                    "content": "<p>Each class with virtual functions has exactly <strong>ONE</strong> static VTable in read-only memory. Every object of that class has a hidden <code>vptr</code> member that points to its class's VTable. When calling a virtual function, the program follows: <code>object.vptr -&gt; VTable[slot_index] -&gt; function_address()</code>.</p>"
+                },
+                {
+                    "step_number": 4,
+                    "title": "4. How it works",
+                    "content": "<p>1. The compiler creates a static array of function pointers (VTable) for Base and Derived classes.<br>2. When constructing an object, the constructor initializes the hidden <code>vptr</code> to point to that class's VTable.<br>3. During a virtual call: <code>ptr-&gt;foo()</code> translates to <code>(*(ptr-&gt;vptr[0]))(ptr)</code>.</p>"
+                },
+                {
+                    "step_number": 5,
+                    "title": "5. Visual explanation",
+                    "content": "<p>Interactive step-by-step simulation of VTable lookup mechanics:</p>",
+                    "animation": {
+                        "title": "Interactive VTable & VPTR Dynamic Dispatch Simulation",
+                        "steps": [
+                            {
+                                "narrative": "1. Client code holds a base pointer: Animal* ptr = new Dog();",
+                                "stageHtml": "<div class='sim-node active-state' style='border-color: #38bdf8;'><div style='font-weight:700; color:#fff;'>Base Pointer: Animal*</div><div style='font-size:0.75rem; color:#38bdf8;'>Points to heap memory</div></div>"
+                            },
+                            {
+                                "narrative": "2. Memory inspection: Dog object on heap contains a hidden VPTR (8 bytes) at offset 0 + member variables.",
+                                "stageHtml": "<div style='display:flex; gap:1.5rem; align-items:center;'><div class='sim-node' style='border-color: #38bdf8;'><div style='font-weight:700; color:#fff;'>Animal* ptr</div></div><div style='color:var(--accent-cyan);'>&rarr; points to &rarr;</div><div class='sim-node active-state' style='border-color: #a855f7;'><div style='font-weight:700; color:#fff;'>Dog Instance</div><div style='font-size:0.75rem; color:#c084fc;'>[vptr: 0x7FFF10] [name: 'Rex']</div></div></div>"
+                            },
+                            {
+                                "narrative": "3. Virtual function call ptr->speak() triggers: CPU dereferences ptr->vptr to locate Dog's VTable in read-only memory.",
+                                "stageHtml": "<div style='display:flex; gap:1.5rem; align-items:center;'><div class='sim-node' style='border-color: #a855f7;'><div style='font-weight:700; color:#fff;'>Dog.vptr</div></div><div style='color:var(--accent-purple);'>&rarr; indexes &rarr;</div><div class='sim-node active-state' style='border-color: #10b981;'><div style='font-weight:700; color:#fff;'>Dog VTable (Static)</div><div style='font-size:0.75rem; color:#34d399;'>[0] &Dog::speak()</div><div style='font-size:0.75rem; color:#34d399;'>[1] &Dog::~Dog()</div></div></div>"
+                            },
+                            {
+                                "narrative": "4. Correct function pointer is resolved and invoked: Dog::speak() executes! Total lookup time: 2 memory dereferences ($O(1)$).",
+                                "stageHtml": "<div class='sim-node success-state'><div style='font-weight:700; color:#10b981; font-size:1.1rem;'>✓ Executing Dog::speak()</div><div style='font-size:0.8rem; color:#fff; margin-top:0.35rem;'>Output: 'Woof! Woof!'</div></div>"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "step_number": 6,
+                    "title": "6. C++ implementation",
+                    "content": "<p>Demonstrating VPTR Memory Size Overhead and Polymorphic VTable Resolution:</p>",
+                    "code_example": {
+                        "filename": "vtable_memory_inspection.cpp",
+                        "code": """#include <iostream>
+
+// Class WITHOUT virtual functions (No VPTR)
+class NonVirtualClass {
+    int data{0}; // 4 bytes (padded to 4)
+};
+
+// Class WITH virtual functions (Injects hidden 8-byte VPTR)
+class VirtualBase {
+    int data{0}; // 4 bytes
+public:
+    virtual ~VirtualBase() = default; // Injects VPTR!
+    virtual void execute() const {
+        std::cout << "[VirtualBase] Executing base\\n";
+    }
+};
+
+class VirtualDerived : public VirtualBase {
+public:
+    void execute() const override {
+        std::cout << "[VirtualDerived] Executing derived override!\\n";
+    }
+};
+
+int main() {
+    std::cout << "--- 1. Memory Size Inspection ---\\n";
+    std::cout << "sizeof(NonVirtualClass): " << sizeof(NonVirtualClass) << " bytes\\n";
+    std::cout << "sizeof(VirtualBase):      " << sizeof(VirtualBase) << " bytes (4 bytes data + 8 bytes VPTR + padding)\\n";
+
+    std::cout << "\\n--- 2. VTable Dynamic Dispatch ---\\n";
+    VirtualDerived derivedObj;
+    VirtualBase* basePtr = &derivedObj;
+
+    // Follows basePtr -> vptr -> VirtualDerived VTable -> VirtualDerived::execute()
+    basePtr->execute();
+    return 0;
+}"""
+                    }
+                },
+                {
+                    "step_number": 7,
+                    "title": "7. Code walkthrough",
+                    "content": "<p><strong>Line 4 (NonVirtualClass):</strong> <code>sizeof(NonVirtualClass)</code> is 4 bytes.<br><strong>Line 9 (VirtualBase):</strong> Adding <code>virtual</code> injects a hidden <code>vptr</code> (8 bytes on 64-bit systems), causing <code>sizeof(VirtualBase)</code> to become 16 bytes due to 8-byte alignment padding.<br><strong>Line 32:</strong> <code>basePtr-&gt;execute()</code> resolves at runtime through the VTable pointer.</p>"
+                },
+                {
+                    "step_number": 8,
+                    "title": "8. Real-world example",
+                    "content": "<p>C++ compiler ABI standards (Itanium C++ ABI used by GCC and Clang) define precise VTable layout rules for all cross-compiled shared libraries (<code>.so</code> / <code>.dll</code>).</p>"
+                },
+                {
+                    "step_number": 9,
+                    "title": "9. When to use",
+                    "content": "<p>Use virtual functions whenever polymorphism is required. The $O(1)$ VTable lookup overhead is negligible for 99.9% of application architectures.</p>"
+                },
+                {
+                    "step_number": 10,
+                    "title": "10. When NOT to use",
+                    "content": "<p>Do not add virtual functions to small low-level math structs (e.g. <code>Vector3D</code> with <code>float x, y, z;</code>) because adding a VPTR increases object size from 12 bytes to 24 bytes (100% memory bloat) and ruins SIMD vectorization.</p>"
+                },
+                {
+                    "step_number": 11,
+                    "title": "11. Advantages",
+                    "content": "<ul style='margin-left: 1.25rem;'><li>Deterministic $O(1)$ constant-time dynamic dispatch.</li><li>Zero memory overhead per method call (single table per class).</li><li>Decouples callers from concrete types.</li></ul>"
+                },
+                {
+                    "step_number": 12,
+                    "title": "12. Disadvantages",
+                    "content": "<ul style='margin-left: 1.25rem;'><li>8 bytes memory overhead per object instance due to VPTR.</li><li>Minor pipeline cache miss potential on cold function pointer dereference.</li></ul>"
+                },
+                {
+                    "step_number": 13,
+                    "title": "13. Variations / Types",
+                    "content": "<p>Single Inheritance VTable (single vptr), Multiple Inheritance VTables (multiple vptrs with offset adjustment / thunk functions), Virtual Base Class Table (VBTbl).</p>"
+                },
+                {
+                    "step_number": 14,
+                    "title": "14. Common mistakes",
+                    "content": "<p>Calling virtual functions inside constructors or destructors. During base construction, the derived portion of the object has not yet been initialized; therefore, the VPTR points to the <strong>Base VTable</strong>, and derived overrides will NOT execute!</p>",
+                    "callout": {
+                        "type": "trap",
+                        "title": "Never Call Virtual Functions in Constructors!",
+                        "text": "In C++, calling a virtual function inside a Base constructor invokes Base::func(), NOT Derived::func(), because the Derived sub-object does not exist yet! This is a classic C++ interview trap."
+                    }
+                },
+                {
+                    "step_number": 15,
+                    "title": "15. Interview questions",
+                    "content": "<p><strong>Q:</strong> What happens if you call a pure virtual function inside a Base class constructor?</p>"
+                },
+                {
+                    "step_number": 16,
+                    "title": "16. Interview answer",
+                    "content": "<p><strong>Answer:</strong> Inside the Base constructor, the object's <code>vptr</code> points to the Base class's VTable. Since the pure virtual function has no implementation in the Base VTable (or points to <code>__cxa_pure_virtual</code>), invoking it causes an immediate fatal crash: <strong>'pure virtual method called' (abort/terminate)</strong>.</p>"
+                },
+                {
+                    "step_number": 17,
+                    "title": "17. Practice problem",
+                    "content": "<p>Demonstrate that calling a virtual method inside a base class constructor resolves to the base class implementation rather than the derived class.</p>",
+                    "practice": {
+                        "title": "Constructor Virtual Call Trap Demonstration",
+                        "problemStatement": "Write a Base and Derived class to prove virtual dispatch behavior during construction.",
+                        "requirements": [
+                            "Base class constructor calls virtual setup()",
+                            "Derived overrides setup()",
+                            "Observe that Base::setup() is called during Base construction"
+                        ],
+                        "constraints": ["Demonstrate execution output"],
+                        "hint": "Put std::cout in both Base::setup and Derived::setup.",
+                        "expectedEntities": [
+                            {"name": "Base", "responsibility": "Demonstrates early constructor vptr state."}
+                        ],
+                        "referenceCode": {
+                            "filename": "ctor_virtual_trap.cpp",
+                            "code": """#include <iostream>
+
+class Base {
+public:
+    Base() {
+        std::cout << "[Base Constructor] Calling setup()...\\n";
+        setup(); // Calls Base::setup(), NOT Derived::setup()!
+    }
+    virtual ~Base() = default;
+    virtual void setup() {
+        std::cout << "-> Base::setup() executed (vptr points to Base VTable)\\n";
+    }
+};
+
+class Derived : public Base {
+public:
+    Derived() {
+        std::cout << "[Derived Constructor] Completed.\\n";
+    }
+    void setup() override {
+        std::cout << "-> Derived::setup() executed\\n";
+    }
+};
+
+int main() {
+    Derived d;
+    return 0;
+}"""
+                        }
+                    }
+                },
+                {
+                    "step_number": 18,
+                    "title": "18. Summary",
+                    "content": "<p>The VTable and VPTR mechanism is the mechanical engine behind C++ runtime polymorphism, providing constant-time dynamic dispatch while preserving strict memory control.</p>"
+                }
+            ]
+        }
+    ]
+}
+
+out_file = Path("content/module_02.json")
+with open(out_file, "w", encoding="utf-8") as f:
+    json.dump(module_02_data, f, indent=2)
+
+print(f"Successfully generated {out_file} with {len(module_02_data['topics'])} comprehensive topics!")

@@ -1,0 +1,557 @@
+{
+  "module_id": "21",
+  "module_title": "14-Step LLD Interview Framework",
+  "description": "Master the repeatable 14-step battle-tested interview roadmap from requirement gathering to clean C++ code.",
+  "topics": [
+    {
+      "id": "the-14-step-interview-process",
+      "title": "The 14-Step Systematic Interview Roadmap",
+      "definition": "A battle-tested, structured 45-minute execution blueprint designed to navigate any ambiguous Low-Level Design interview smoothly from problem definition to working modern C++ code.",
+      "why_it_matters": "80% of candidates fail LLD interviews not due to bad code, but due to jumping straight to coding before clarifying scope, missing edge cases, and producing rigid, untestable designs.",
+      "real_world_analogy": "An architectural construction process: no builder pours concrete without blueprints, client approval, load-bearing calculations, and plumbing schematics.",
+      "conceptual_breakdown": [
+        "<strong>Phase 1: Clarification & Scope (0-8 min):</strong> Steps 1-4: Functional, Non-Functional, Use Cases, Scale.",
+        "<strong>Phase 2: Domain Modeling & OOP Design (8-20 min):</strong> Steps 5-8: Core Entities, Relationships, UML Class & Sequence Diagrams.",
+        "<strong>Phase 3: Design Patterns & Architecture (20-28 min):</strong> Step 9: Pattern Selection (Strategy, Observer, State, Factory).",
+        "<strong>Phase 4: Idiomatic C++ Coding (28-40 min):</strong> Steps 10-12: Header definitions, Thread Safety, Error Handling.",
+        "<strong>Phase 5: Defense & Verification (40-45 min):</strong> Steps 13-14: Concurrency edge cases, Extensibility walkthrough."
+      ],
+      "visual_diagram": {
+        "type": "sequence_diagram",
+        "title": "45-Minute Interview Timeline",
+        "classes": [
+          {
+            "name": "Candidate",
+            "is_abstract": false,
+            "attributes": [],
+            "methods": []
+          },
+          {
+            "name": "Interviewer",
+            "is_abstract": false,
+            "attributes": [],
+            "methods": []
+          }
+        ],
+        "relationships": [
+          {
+            "from": "Candidate",
+            "to": "Interviewer",
+            "type": "association",
+            "label": "1. Clarify Scope & Constraints (0-8 min)"
+          },
+          {
+            "from": "Candidate",
+            "to": "Interviewer",
+            "type": "association",
+            "label": "2. Propose Entities & UML (8-20 min)"
+          },
+          {
+            "from": "Candidate",
+            "to": "Interviewer",
+            "type": "association",
+            "label": "3. Agree on Patterns & Concurrency (20-28 min)"
+          },
+          {
+            "from": "Candidate",
+            "to": "Interviewer",
+            "type": "association",
+            "label": "4. Write Modern C++ Code (28-40 min)"
+          },
+          {
+            "from": "Candidate",
+            "to": "Interviewer",
+            "type": "association",
+            "label": "5. Walkthrough Edge Cases & Tests (40-45 min)"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "14-Step Framework Progression",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Step 1-4: Gather requirements. Clarify constraints (e.g. multi-threading, scale, out of scope).",
+            "active_nodes": [
+              "Phase 1: Scope"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Step 5-8: Identify Entities. Draw UML Class Diagram with clear Association vs Composition.",
+            "active_nodes": [
+              "Phase 2: Modeling"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Step 9: Choose Design Patterns (e.g. Strategy for algorithms, State for lifecycles).",
+            "active_nodes": [
+              "Phase 3: Patterns"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Step 10-12: Write production-grade C++20 code with smart pointers and RAII.",
+            "active_nodes": [
+              "Phase 4: Coding"
+            ]
+          },
+          {
+            "step": 5,
+            "description": "Step 13-14: Walk through concurrency, exception safety, and unit testing.",
+            "active_nodes": [
+              "Phase 5: Defense"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "// Complete Interview Checklist Skeleton in C++\n#include <iostream>\n#include <string>\n#include <vector>\n#include <memory>\n#include <mutex>\n#include <optional>\n\n// Step 1-4: Clear Domain Entities with explicit contracts\nenum class OrderStatus { CREATED, PAID, FULFILLED, CANCELLED };\n\n// Step 5-8: Value Objects and Entities\nstruct Money {\n    int64_t cents{0};\n};\n\n// Step 9: Strategy Pattern for Extensibility\nclass IPaymentProcessor {\npublic:\n    virtual ~IPaymentProcessor() = default;\n    virtual bool process(Money amount) = 0;\n};\n\nclass StripeProcessor : public IPaymentProcessor {\npublic:\n    bool process(Money amount) override {\n        std::cout << \"[STRIPE] Processed $\" << (amount.cents / 100.0) << \"\\n\";\n        return true;\n    }\n};\n\n// Step 10-12: Thread-Safe Facade Service\nclass OrderService {\nprivate:\n    std::unique_ptr<IPaymentProcessor> paymentProcessor;\n    std::mutex serviceMtx;\n\npublic:\n    explicit OrderService(std::unique_ptr<IPaymentProcessor> processor)\n        : paymentProcessor(std::move(processor)) {}\n\n    bool checkoutOrder(int orderId, Money total) {\n        std::lock_guard<std::mutex> lock(serviceMtx);\n        std::cout << \"[ORDER \" << orderId << \"] Starting checkout...\\n\";\n        return paymentProcessor->process(total);\n    }\n};\n\nint main() {\n    auto orderService = std::make_unique<OrderService>(std::make_unique<StripeProcessor>());\n    orderService->checkoutOrder(101, Money{4999}); // $49.99\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Explicit Time Management:</strong> Dedicate no more than 8 minutes to scoping so at least 15 minutes remain for live coding.",
+        "<strong>2. Top-Down Verbal Alignment:</strong> Always validate entity choices and diagram relationships with the interviewer before writing code.",
+        "<strong>3. Modern C++ Best Practices:</strong> Demonstrate ownership semantics (`std::unique_ptr`, `std::shared_ptr`), RAII, and `std::mutex` discipline."
+      ],
+      "comparison_matrix": {
+        "title": "Interview Approaches",
+        "headers": [
+          "Aspect",
+          "Ad-Hoc Coding Candidate",
+          "14-Step Framework Candidate"
+        ],
+        "rows": [
+          [
+            "Requirement Scope",
+            "Starts coding immediately, misses key limits",
+            "Clarifies boundary, scale, and out-of-scope"
+          ],
+          [
+            "Extensibility",
+            "Tightly coupled classes with hardcoded switches",
+            "Modular Strategy & Factory pattern interfaces"
+          ],
+          [
+            "Thread Safety",
+            "Forgotten or added as crude global lock",
+            "Clean per-entity or lock-free concurrency design"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Silently thinking and coding for 20 minutes without speaking",
+          "correction": "Think out loud continuously. Treat the interview as a collaborative design review with a senior colleague."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'The candidate finishes coding in 15 minutes with a monolithic 300-line main() function.'</strong><br><em>Answer:</em> Instant rejection. LLD interviews evaluate modularity, encapsulation, interface segregation, and design patterns, not fast scripting."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Identify the missing steps in an interview submission that jumps directly from problem prompt to raw C++ structs.",
+        "bad_code": "struct ParkingLot { int spots[100]; }; // No interface, no strategies, no tests",
+        "good_code": "Establish IParkingStrategy, Vehicle hierarchies, and thread synchronization."
+      },
+      "practice_problem": {
+        "title": "Timeboxed 30-Minute Mock Interview",
+        "description": "Apply the 14-step framework to design an In-Memory File System within a strict 30-minute timer.",
+        "hint": "Spend: 5m Clarify, 8m UML, 12m Code, 5m Concurrency & Verification."
+      }
+    },
+    {
+      "id": "clarifying-functional-and-non-functional",
+      "title": "Step 1-4: Clarification & Domain Decomposition",
+      "definition": "Techniques for asking probing questions to define precise system boundaries, distinguish functional from non-functional requirements, and establish entity vocabularies.",
+      "why_it_matters": "Real-world engineering problems are inherently ambiguous. Demonstrating that you know which clarifying questions to ask proves senior-level engineering maturity.",
+      "real_world_analogy": "A doctor conducting patient intake: before prescribing surgery, they gather medical history, check allergies, and evaluate vital signs.",
+      "conceptual_breakdown": [
+        "<strong>Functional Requirements (FR):</strong> What the system MUST do (e.g. Park vehicle, dispense ticket, calculate fee).",
+        "<strong>Non-Functional Requirements (NFR):</strong> Performance, Concurrency, Latency, Extensibility, Thread-safety.",
+        "<strong>Out of Scope:</strong> Explicitly agreeing on features NOT to build (e.g. Physical hardware drivers, web UI, database migrations).",
+        "<strong>Scale & Constraints:</strong> Single machine in-memory vs distributed, QPS, memory footprint."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Requirements Clarification Matrix",
+        "classes": [
+          {
+            "name": "FunctionalRequirements_FR",
+            "is_abstract": false,
+            "attributes": [
+              "1. Park/Unpark Vehicle",
+              "2. Dynamic Spot Search",
+              "3. Multiple Vehicle Types",
+              "4. Hourly Billing Calculation"
+            ],
+            "methods": []
+          },
+          {
+            "name": "NonFunctionalRequirements_NFR",
+            "is_abstract": false,
+            "attributes": [
+              "1. Thread-safe entry/exit",
+              "2. Low Latency (< 10ms)",
+              "3. Extensible fee rules",
+              "4. In-Memory persistence"
+            ],
+            "methods": []
+          }
+        ],
+        "relationships": []
+      },
+      "interactive_animation": {
+        "title": "Clarification Dialog Flow",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Candidate asks: 'Should we support multiple entrance gates operating simultaneously?'",
+            "active_nodes": [
+              "Candidate"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Interviewer confirms: 'Yes, assume 4 gates concurrently parking cars.'",
+            "active_nodes": [
+              "Interviewer"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Candidate notes: 'Adding thread-safety (NFR) via fine-grained spot mutexes.'",
+            "active_nodes": [
+              "Candidate",
+              "NFR Board"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "// Demonstrating Domain Decomposition via C++ Strongly-Typed Domain Primitives\n#include <iostream>\n#include <string>\n#include <chrono>\n\n// Explicit Value Objects representing clarified constraints\nstruct VehicleDetails {\n    std::string licensePlate;\n    int weightKg;\n};\n\n// Strongly-typed ID to prevent primitive obsession\nstruct GateId {\n    int value;\n};\n\nstruct TicketId {\n    std::string value;\n};\n\nclass ClarifiedParkingDomain {\npublic:\n    static void printClarifiedScope() {\n        std::cout << \"=== Clarified Scope Summary ===\\n\"\n                  << \"1. Target: Multi-gate, in-memory thread-safe parking engine\\n\"\n                  << \"2. Vehicles: Motorcycle, Sedan, Electric SUV\\n\"\n                  << \"3. Constraints: Mutex-guarded spot reservation, O(1) spot lookup\\n\"\n                  << \"4. Out of Scope: Payment gateway network integration\\n\";\n    }\n};\n\nint main() {\n    ClarifiedParkingDomain::printClarifiedScope();\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Define What is IN and OUT of Scope:</strong> Prevents scope creep and ensures alignment within the first 5 minutes.",
+        "<strong>2. Identify Core Actions & Actors:</strong> Formulate use cases as: Actor -> Action -> System Result.",
+        "<strong>3. Establish Strong Domain Types:</strong> Use custom structs instead of raw `int` or `string` for IDs."
+      ],
+      "comparison_matrix": {
+        "title": "Requirement Scoping Techniques",
+        "headers": [
+          "Question Type",
+          "Weak Question",
+          "Strong Senior Question"
+        ],
+        "rows": [
+          [
+            "Concurrency",
+            "'Is it multi-threaded?'",
+            "'Will multiple entrance gates park vehicles concurrently, and what is the expected write contention rate?'"
+          ],
+          [
+            "Pricing",
+            "'How much does it cost?'",
+            "'Should pricing be extensible to support dynamic peak-hour surges or EV kilowatt-hour billing via a Strategy pattern?'"
+          ],
+          [
+            "Persistence",
+            "'Do we need a database?'",
+            "'Should we design this as a pure in-memory domain model with repository interfaces for future persistence?'"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Assuming single-threaded execution without asking the interviewer",
+          "correction": "Always clarify concurrency requirements upfront."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Candidate asks 25 questions and uses up 18 minutes of a 45-minute interview.'</strong><br><em>Answer:</em> Limit initial clarification to 4-5 high-impact questions; state reasonable assumptions for the rest and confirm them."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Convert ambiguous primitive arguments into explicit domain value objects.",
+        "bad_code": "void book(int a, string b, double c);",
+        "good_code": "void book(SeatId seat, UserId user, Price amount);"
+      },
+      "practice_problem": {
+        "title": "Formulate 5 Core Clarifying Questions for a Hotel Booking System",
+        "description": "Write down the 5 essential functional and non-functional questions you would ask before designing a Hotel Reservation engine.",
+        "hint": "Cover room types, multi-room party reservations, cancellation policies, overbooking tolerance, and concurrent booking locks."
+      }
+    },
+    {
+      "id": "designing-clean-diagrams-live",
+      "title": "Step 5-9: Drawing Class & Sequence Diagrams Live",
+      "definition": "Visualizing domain models rapidly using standard UML class notations (attributes, methods, visibility), relationships (Inheritance, Composition, Aggregation, Association), and interaction sequence diagrams.",
+      "why_it_matters": "A clear UML diagram allows the interviewer to spot architectural flaws in 30 seconds before a single line of C++ code is written, saving 20 minutes of costly code refactoring.",
+      "real_world_analogy": "An electrical schematic: symbols clearly indicate resistors, capacitors, and power lines before fabricating the physical circuit board.",
+      "conceptual_breakdown": [
+        "<strong>UML Class Notation:</strong> Class name, attributes with visibility (`-` private, `+` public, `#` protected), methods.",
+        "<strong>Relationship Symbols:</strong> Composition (filled diamond - lifetime bound), Aggregation (hollow diamond - shared pointer), Inheritance (hollow triangle).",
+        "<strong>Sequence Diagrams:</strong> Lifeline columns, synchronous calls, asynchronous events, return arrows.",
+        "<strong>Design Pattern Integration:</strong> Annotating interfaces with `<<interface>>` and strategy links."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Live UML Class Diagram Template",
+        "classes": [
+          {
+            "name": "IBillingStrategy",
+            "is_abstract": true,
+            "attributes": [],
+            "methods": [
+              "+ calculate(duration: int): double"
+            ]
+          },
+          {
+            "name": "HourlyBilling",
+            "is_abstract": false,
+            "attributes": [
+              "- ratePerHour: double"
+            ],
+            "methods": [
+              "+ calculate(duration: int): double"
+            ]
+          },
+          {
+            "name": "ParkingService",
+            "is_abstract": false,
+            "attributes": [
+              "- billing: unique_ptr<IBillingStrategy>",
+              "- spots: vector<shared_ptr<Spot>>"
+            ],
+            "methods": [
+              "+ park(): Ticket",
+              "+ unpark(t: Ticket): double"
+            ]
+          }
+        ],
+        "relationships": [
+          {
+            "from": "HourlyBilling",
+            "to": "IBillingStrategy",
+            "type": "inheritance",
+            "label": "implements"
+          },
+          {
+            "from": "ParkingService",
+            "to": "IBillingStrategy",
+            "type": "composition",
+            "label": "uses strategy"
+          }
+        ]
+      },
+      "interactive_animation": {
+        "title": "UML Synthesis Flow",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Candidate identifies entities: Room, Booking, Guest, PricingStrategy.",
+            "active_nodes": [
+              "Entities"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Draws Composition: Booking OWNS Guest details. Hotel OWNS Rooms.",
+            "active_nodes": [
+              "Composition Links"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Draws Strategy Interface for dynamic pricing.",
+            "active_nodes": [
+              "Strategy Interface"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Interviewer reviews and approves architecture. Candidate transitions to coding.",
+            "active_nodes": [
+              "Approval"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "// UML to C++ Code Translation Template\n#include <iostream>\n#include <memory>\n#include <vector>\n\n// <<interface>> IBillingStrategy\nclass IBillingStrategy {\npublic:\n    virtual ~IBillingStrategy() = default;\n    virtual double calculate(int hours) const = 0;\n};\n\n// Concrete Strategy\nclass HourlyBilling : public IBillingStrategy {\nprivate:\n    double rate;\npublic:\n    explicit HourlyBilling(double r) : rate(r) {}\n    double calculate(int hours) const override { return hours * rate; }\n};\n\n// Context Class with Composition\nclass ParkingService {\nprivate:\n    std::unique_ptr<IBillingStrategy> strategy;\n\npublic:\n    explicit ParkingService(std::unique_ptr<IBillingStrategy> s) : strategy(std::move(s)) {}\n\n    void process(int hours) {\n        std::cout << \"Computed Billing: $\" << strategy->calculate(hours) << \"\\n\";\n    }\n};\n\nint main() {\n    ParkingService service(std::make_unique<HourlyBilling>(10.0));\n    service.process(3); // $30.00\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Translating Composition to C++:</strong> Use <code>std::unique_ptr<T></code> or direct value member variables for strong lifecycle ownership.",
+        "<strong>2. Translating Aggregation to C++:</strong> Use <code>std::shared_ptr<T></code> or <code>std::weak_ptr<T></code> for shared or non-owning references.",
+        "<strong>3. Abstract Interfaces:</strong> Use pure virtual classes with <code>virtual ~Class() = default;</code>."
+      ],
+      "comparison_matrix": {
+        "title": "Diagramming Fidelity in Interviews",
+        "headers": [
+          "Format",
+          "Speed",
+          "Clarity",
+          "Interviewer Feedback"
+        ],
+        "rows": [
+          [
+            "ASCII / Text UML",
+            "Fastest",
+            "Good",
+            "Easy to review on web whiteboard"
+          ],
+          [
+            "Formal UML Tool",
+            "Slow",
+            "Very High",
+            "Can waste valuable coding time"
+          ],
+          [
+            "No Diagram (Direct to Code)",
+            "Risky",
+            "Low",
+            "High chance of major mid-interview rewrites"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Confusing Association, Aggregation, and Composition in UML",
+          "correction": "Composition = exclusive ownership (delete parent destroys child); Aggregation = shared reference (child can exist independently)."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Why did you choose an inheritance hierarchy for SpotType instead of an enum attribute?'</strong><br><em>Answer:</em> Explain polymorphism trade-offs: if spots have unique behavior (e.g. EV spots need metering telemetry), use inheritance; if they only differ by dimensions, an enum attribute is simpler and cleaner."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Convert a messy circular pointer dependency in UML into a clean mediator or observer design.",
+        "bad_code": "Class A owns B, Class B owns A (shared_ptr cycle)",
+        "good_code": "Class B holds weak_ptr to A or uses Observer callback."
+      },
+      "practice_problem": {
+        "title": "Draw UML Diagram for an Amazon Locker System",
+        "description": "Design the class diagram for Amazon Locker: LockerSize, LockerSlot, Package, DeliveryCode, and LockerHub.",
+        "hint": "LockerHub has Composition of LockerSlots; LockerSlot has Aggregation (0..1) of Package."
+      }
+    },
+    {
+      "id": "writing-idiomatic-cpp-live",
+      "title": "Step 10-14: Live C++ Coding & Concurrency Defense",
+      "definition": "Executing the live coding phase cleanly using modern C++20 idioms: RAII, smart pointer ownership, const-correctness, thread safety guarantees, and defending design choices against edge cases.",
+      "why_it_matters": "The final test of execution. Writing clean, compiling, idiomatic C++ with zero memory leaks and proper lock scopes differentiates top-tier candidates from average ones.",
+      "real_world_analogy": "A master craftsman assembling precision watch gears: every piece fits snugly, springs have exact tension, and lubrication ensures frictionless movement under high load.",
+      "conceptual_breakdown": [
+        "<strong>Modern C++20 Ownership:</strong> <code>unique_ptr</code> (sole ownership), <code>shared_ptr</code> (shared), <code>std::weak_ptr</code> (cache/observers).",
+        "<strong>RAII Concurrency:</strong> <code>std::lock_guard</code>, <code>std::unique_lock</code>, <code>std::shared_lock</code> (Reader-Writer).",
+        "<strong>Const-Correctness & nodiscard:</strong> Mark accessors <code>[[nodiscard]] const noexcept</code>.",
+        "<strong>Exception Safety:</strong> Strong vs Basic guarantee; avoid throwing in destructors.",
+        "<strong>Extensibility Defense:</strong> Walk the interviewer through how a new feature can be added with ZERO modifications to existing classes (OCP)."
+      ],
+      "visual_diagram": {
+        "type": "class_diagram",
+        "title": "Idiomatic C++20 Production Class Template",
+        "classes": [
+          {
+            "name": "ProductionClass",
+            "is_abstract": false,
+            "attributes": [
+              "- data: std::vector<std::string>",
+              "- mtx: mutable std::shared_mutex"
+            ],
+            "methods": [
+              "+ [[nodiscard]] std::optional<string> get(id: int) const",
+              "+ void insert(value: string)",
+              "+ ProductionClass(const ProductionClass&) = delete"
+            ]
+          }
+        ],
+        "relationships": []
+      },
+      "interactive_animation": {
+        "title": "Live Coding & Defense Step-Through",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Candidate writes clean header declarations with nodiscard and smart pointers.",
+            "active_nodes": [
+              "Header Declarations"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Applies std::lock_guard to critical sections protecting state invariants.",
+            "active_nodes": [
+              "Thread Safety RAII"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Interviewer asks: 'How do you add PayPal support tomorrow?' Candidate explains OCP via IPaymentProcessor.",
+            "active_nodes": [
+              "OCP Defense"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Interviewer asks: 'What happens during sudden thread cancellation?' Candidate highlights RAII lock unwinding.",
+            "active_nodes": [
+              "Exception Safety"
+            ]
+          }
+        ]
+      },
+      "cpp_implementation": "// Golden Production-Grade C++20 Reference Template for LLD Interviews\n#include <iostream>\n#include <string>\n#include <vector>\n#include <memory>\n#include <shared_mutex>\n#include <optional>\n#include <concepts>\n\n// 1. C++20 Concept constraint for extensible items\ntemplate <typename T>\nconcept Validatable = requires(T a) {\n    { a.isValid() } -> std::convertible_to<bool>;\n};\n\nstruct Resource {\n    int id;\n    std::string name;\n    [[nodiscard]] bool isValid() const noexcept { return id > 0 && !name.empty(); }\n};\n\n// 2. Thread-Safe Production Repository Pattern\nclass ThreadSafeResourceManager {\nprivate:\n    std::vector<Resource> resources;\n    mutable std::shared_mutex rwMtx;\n\npublic:\n    ThreadSafeResourceManager() = default;\n\n    // Rule of 5: Disallow accidental slicing or multi-threaded copy bugs\n    ThreadSafeResourceManager(const ThreadSafeResourceManager&) = delete;\n    ThreadSafeResourceManager& operator=(const ThreadSafeResourceManager&) = delete;\n    ThreadSafeResourceManager(ThreadSafeResourceManager&&) noexcept = default;\n    ThreadSafeResourceManager& operator=(ThreadSafeResourceManager&&) noexcept = default;\n\n    // Concurrent Reader (Shared Lock)\n    [[nodiscard]] std::optional<Resource> findById(int id) const {\n        std::shared_lock<std::shared_mutex> lock(rwMtx);\n        for (const auto& res : resources) {\n            if (res.id == id) return res;\n        }\n        return std::nullopt;\n    }\n\n    // Exclusive Writer (Unique Lock)\n    bool addResource(Resource res) {\n        if (!res.isValid()) return false;\n\n        std::unique_lock<std::shared_mutex> lock(rwMtx);\n        resources.push_back(std::move(res));\n        return true;\n    }\n\n    [[nodiscard]] size_t size() const noexcept {\n        std::shared_lock<std::shared_mutex> lock(rwMtx);\n        return resources.size();\n    }\n};\n\nint main() {\n    ThreadSafeResourceManager manager;\n    manager.addResource({1, \"DatabaseConnectionPool\"});\n    manager.addResource({2, \"KafkaConsumerGroup\"});\n\n    auto res = manager.findById(1);\n    if (res) {\n        std::cout << \"[FOUND] Resource: \" << res->name << \"\\n\";\n    }\n\n    std::cout << \"[SUCCESS] Total Managed Resources: \" << manager.size() << \"\\n\";\n    return 0;\n}",
+      "step_by_step_explanation": [
+        "<strong>1. Modern Rule of 5 Discipline:</strong> Explicitly deleting copy constructors prevents accidental mutex copy or object slicing.",
+        "<strong>2. Reader-Writer Lock Optimization:</strong> <code>std::shared_lock</code> allows 1,000 threads to read concurrently without contention.",
+        "<strong>3. Value Semantics and Move Semantics:</strong> Passing by value and moving with <code>std::move()</code> achieves optimal performance for both rvalues and lvalues.",
+        "<strong>4. Clean Optional Return Types:</strong> <code>std::optional<T></code> clearly communicates potential absence of data without using magic null pointers."
+      ],
+      "comparison_matrix": {
+        "title": "Interview Code Quality Rubric",
+        "headers": [
+          "Criterion",
+          "Beginner Code",
+          "Senior C++20 Candidate Code"
+        ],
+        "rows": [
+          [
+            "Memory Management",
+            "Raw `new` and `delete`",
+            "RAII (`std::unique_ptr`, `std::make_shared`)"
+          ],
+          [
+            "Null Handling",
+            "Returning raw `nullptr` or -1",
+            "`std::optional<T>` or `std::expected<T, Error>`"
+          ],
+          [
+            "Concurrency",
+            "Bare `mutex.lock()` (leak on throw)",
+            "`std::lock_guard` / `std::scoped_lock`"
+          ],
+          [
+            "Const Correctness",
+            "No `const` methods",
+            "`[[nodiscard]] const noexcept` throughout"
+          ]
+        ]
+      },
+      "common_mistakes": [
+        {
+          "mistake": "Writing `new` without a matching `delete` in interview whiteboard code",
+          "correction": "Never use raw `new` in modern C++. Use `std::make_unique` or `std::make_shared`."
+        },
+        {
+          "mistake": "Unlocking mutex manually at end of function instead of using RAII lock guards",
+          "correction": "If an exception throws or early return triggers, manual unlock is skipped causing permanent deadlock."
+        }
+      ],
+      "interview_traps": [
+        "<strong>Trap: 'Why did you use std::lock_guard instead of std::unique_lock?'</strong><br><em>Answer:</em> `std::lock_guard` is lighter with zero runtime overhead when you don't need manual unlocking, deferring, or condition variables; use `std::unique_lock` when pairing with `std::condition_variable`."
+      ],
+      "code_refactor_exercise": {
+        "problem": "Refactor legacy C++ code with raw pointers and manual mutex locks into modern idiomatic C++20.",
+        "bad_code": "Resource* r = new Resource(); mtx.lock(); list.push_back(r); mtx.unlock();",
+        "good_code": "std::lock_guard<std::mutex> lock(mtx); list.push_back(std::make_unique<Resource>());"
+      },
+      "practice_problem": {
+        "title": "Implement Thread-Safe Bounded Stack",
+        "description": "Write a complete `ThreadSafeBoundedStack<T, Capacity>` using `std::mutex`, `std::condition_variable`, and `std::optional<T>`.",
+        "hint": "Block `push` when full; block `pop` when empty."
+      }
+    }
+  ]
+}

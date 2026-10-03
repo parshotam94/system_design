@@ -1,0 +1,228 @@
+/* ==========================================================================
+   UML Diagram Styles: Class Diagrams, Connectors, Relationships, Hover Popups
+   ========================================================================== */
+
+.diagram-wrapper {
+  margin: 2rem 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  overflow-x: auto;
+  position: relative;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.diagram-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.diagram-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.diagram-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-symbol {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+/* UML Class Box Component */
+.uml-class-box {
+  background: #0d1527;
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius-md);
+  min-width: 220px;
+  max-width: 320px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transition: all var(--transition-normal);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  position: relative;
+}
+
+.uml-class-box:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+  transform: translateY(-2px);
+}
+
+.uml-class-box.interface {
+  border-style: dashed;
+  border-color: rgba(168, 85, 247, 0.6);
+}
+
+.uml-class-box.interface .uml-header {
+  background: rgba(168, 85, 247, 0.15);
+}
+
+.uml-header {
+  background: rgba(56, 189, 248, 0.12);
+  padding: 0.65rem 0.85rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.uml-stereotype {
+  font-size: 0.68rem;
+  color: var(--accent-purple);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.uml-class-name {
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-family: var(--font-sans);
+}
+
+.uml-section {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.uml-section:last-child {
+  border-bottom: none;
+}
+
+.uml-member {
+  line-height: 1.6;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.uml-vis-public { color: #34d399; font-weight: bold; }       /* + */
+.uml-vis-private { color: #fb7185; font-weight: bold; }      /* - */
+.uml-vis-protected { color: #fbbf24; font-weight: bold; }    /* # */
+
+/* Interactive Relationship Connectors & Hover Info */
+.diagram-canvas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2rem 1rem;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.uml-relation-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.uml-relation-connector:hover {
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.relation-label {
+  font-size: 0.72rem;
+  color: var(--accent-cyan);
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.relation-arrow-art {
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+/* Hover Detail Inspector Popup */
+.relation-inspect-card {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  background: #090e1a;
+  border: 1px solid var(--accent-blue);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  z-index: 50;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), var(--glow-cyan);
+  font-family: var(--font-sans);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+
+.uml-relation-connector:hover .relation-inspect-card {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(8px);
+}
+
+.inspect-header {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.35rem;
+}
+
+.inspect-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-bottom: 0.3rem;
+}
+
+.inspect-key {
+  color: var(--text-muted);
+}
+
+.inspect-val {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.inspect-code {
+  margin-top: 0.5rem;
+  background: var(--bg-primary);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent-cyan);
+}

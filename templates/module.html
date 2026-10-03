@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Module {{ current_module.id }}: {{ current_module.title }} - C++ LLD Mastery{% endblock %}
+
+{% block content %}
+<div class="module-layout">
+  <!-- Main Content Column -->
+  <div class="module-main-col">
+    <!-- Module Header Card -->
+    <div class="glass-panel" style="padding: 2.25rem; margin-bottom: 2.5rem; position: relative;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span class="badge badge-cpp">Module {{ current_module.id }}</span>
+          <span class="badge {% if current_module.level == 'Beginner' %}badge-beginner{% elif current_module.level == 'Intermediate' %}badge-intermediate{% elif current_module.level == 'Advanced' %}badge-advanced{% else %}badge-interview{% endif %}">
+            {{ current_module.level }}
+          </span>
+          <span class="badge badge-intermediate">{{ current_module.category }}</span>
+        </div>
+
+        <!-- Topic Status Controller -->
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status:</label>
+          <select id="module-status-select" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; cursor: pointer; background: var(--bg-card);">
+            <option value="not_started">○ Not Started</option>
+            <option value="in_progress">◐ In Progress</option>
+            <option value="completed">✓ Completed</option>
+          </select>
+        </div>
+      </div>
+
+      <h1 style="font-size: 2.4rem; color: #fff; margin-bottom: 0.75rem;">
+        {{ current_module.title }}
+      </h1>
+
+      <p style="font-size: 1.05rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 1.5rem;">
+        {{ current_module.description }}
+      </p>
+
+      <div style="display: flex; align-items: center; gap: 1.5rem; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem;">
+        <span><strong>{{ current_module.topics | length }}</strong> Topics</span>
+        <span>&bull;</span>
+        <span>Estimated Time: <strong>{{ current_module.estimated_hours }} Hours</strong></span>
+      </div>
+    </div>
+
+    <!-- Topics Container -->
+    <div id="module-topics-content">
+      {% if module_content and module_content.topics %}
+        {% for topic in module_content.topics %}
+          <div class="topic-container" id="{{ topic.id }}">
+            <div class="topic-header">
+              <div class="topic-header-meta">
+                <span class="badge badge-cpp">Topic {{ loop.index }}</span>
+              </div>
+              <h2 class="topic-title">{{ topic.title }}</h2>
+              <p style="font-size: 1.05rem; color: var(--text-secondary);">{{ topic.description }}</p>
+            </div>
+
+            <!-- 18-Step Structured Content (Sections Array or Direct Schema) -->
+            {% if topic.sections %}
+              {% for sec in topic.sections %}
+                <div class="step-section" id="{{ topic.id }}-sec-{{ sec.step_number }}">
+                  <div class="step-section-header">
+                    <div class="step-number">{{ sec.step_number }}</div>
+                    <h3 class="step-section-title">{{ sec.title }}</h3>
+                  </div>
+                  
+                  {% if sec.content %}
+                    <div class="step-body-content" style="color: var(--text-secondary); line-height: 1.7;">
+                      {{ sec.content | safe }}
+                    </div>
+                  {% endif %}
+
+                  {% if sec.code_example %}
+                    <div class="topic-code-target" data-filename="{{ sec.code_example.filename }}" data-code="{{ sec.code_example.code | escape }}"></div>
+                  {% endif %}
+
+                  {% if sec.callout %}
+                    <div class="callout callout-{{ sec.callout.type }}">
+                      <div class="callout-icon">
+                        {% if sec.callout.type == 'trap' %}⚠️{% elif sec.callout.type == 'tip' %}💡{% elif sec.callout.type == 'important' %}🛡️{% else %}ℹ️{% endif %}
+                      </div>
+                      <div class="callout-content">
+                        <h5>{{ sec.callout.title }}</h5>
+                        <p>{{ sec.callout.text }}</p>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {% if sec.comparison %}
+                    <div class="topic-comp-target" data-comp='{{ sec.comparison | tojson }}'></div>
+                  {% endif %}
+
+                  {% if sec.diagram %}
+                    <div class="topic-diagram-target" data-diagram='{{ sec.diagram | tojson }}'></div>
+                  {% endif %}
+
+                  {% if sec.animation %}
+                    <div class="topic-anim-target" data-anim='{{ sec.animation | tojson }}'></div>
+                  {% endif %}
+
+                  {% if sec.refactor %}
+                    <div class="topic-refactor-target" data-refactor='{{ sec.refactor | tojson }}'></div>
+                  {% endif %}
+
+                  {% if sec.practice %}
+                    <div class="topic-practice-target" data-practice='{{ sec.practice | tojson }}'></div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% elif topic.definition %}
+              <!-- Step 1: Formal Definition & Why It Matters -->
+              <div class="step-section" id="{{ topic.id }}-sec-1">
+                <div class="step-section-header">
+                  <div class="step-number">1</div>
+                  <h3 class="step-section-title">Formal Definition & Core Motivation</h3>
+                </div>
+                <div class="step-body-content" style="color: var(--text-secondary); line-height: 1.7;">
+                  <p><strong>Definition:</strong> {{ topic.definition | safe }}</p>
+                  <div class="callout callout-tip" style="margin-top: 1rem;">
+                    <div class="callout-icon">💡</div>
+                    <div class="callout-content">
+                      <h5>Why It Matters in Production LLD</h5>
+                      <p>{{ topic.why_it_matters | safe }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Real-World Analogy & Conceptual Breakdown -->
+              <div class="step-section" id="{{ topic.id }}-sec-2">
+                <div class="step-section-header">
+                  <div class="step-number">2</div>
+                  <h3 class="step-section-title">Real-World Analogy & Mental Model</h3>
+                </div>
+                <div class="step-body-content" style="color: var(--text-secondary); line-height: 1.7;">
+                  <div class="callout callout-info" style="margin-bottom: 1.25rem;">
+                    <div class="callout-icon">🌐</div>
+                    <div class="callout-content">
+                      <h5>Real-World System Analogy</h5>
+                      <p>{{ topic.real_world_analogy | safe }}</p>
+                    </div>
+                  </div>
+                  {% if topic.conceptual_breakdown %}
+                    <h4 style="color: #fff; margin-bottom: 0.75rem; font-size: 1.1rem;">Conceptual Breakdown & Architectural Pillars</h4>
+                    <ul style="padding-left: 1.25rem; line-height: 1.8;">
+                      {% for point in topic.conceptual_breakdown %}
+                        <li>{{ point | safe }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Step 3: Visual UML Class Diagram -->
+              {% if topic.visual_diagram %}
+                <div class="step-section" id="{{ topic.id }}-sec-3">
+                  <div class="step-section-header">
+                    <div class="step-number">3</div>
+                    <h3 class="step-section-title">Visual UML & Architectural Diagram</h3>
+                  </div>
+                  <div class="topic-diagram-target" data-diagram='{{ topic.visual_diagram | tojson }}'></div>
+                </div>
+              {% endif %}
+
+              <!-- Step 4: Interactive Object Communication Animation -->
+              {% if topic.interactive_animation %}
+                <div class="step-section" id="{{ topic.id }}-sec-4">
+                  <div class="step-section-header">
+                    <div class="step-number">4</div>
+                    <h3 class="step-section-title">Interactive Object Communication Simulation</h3>
+                  </div>
+                  <div class="topic-anim-target" data-anim='{{ topic.interactive_animation | tojson }}'></div>
+                </div>
+              {% endif %}
+
+              <!-- Step 5: Complete Modern C++20 Implementation -->
+              {% if topic.cpp_implementation %}
+                <div class="step-section" id="{{ topic.id }}-sec-5">
+                  <div class="step-section-header">
+                    <div class="step-number">5</div>
+                    <h3 class="step-section-title">Complete Modern C++20 Implementation</h3>
+                  </div>
+                  <div class="topic-code-target" data-filename="{{ topic.id }}.cpp" data-code="{{ topic.cpp_implementation | escape }}"></div>
+                </div>
+              {% endif %}
+
+              <!-- Step 6: Step-by-Step Code Walkthrough -->
+              {% if topic.step_by_step_explanation %}
+                <div class="step-section" id="{{ topic.id }}-sec-6">
+                  <div class="step-section-header">
+                    <div class="step-number">6</div>
+                    <h3 class="step-section-title">Deep Code Walkthrough & Design Decisions</h3>
+                  </div>
+                  <div class="step-body-content" style="color: var(--text-secondary); line-height: 1.7;">
+                    <ol style="padding-left: 1.25rem; line-height: 1.8;">
+                      {% for expl in topic.step_by_step_explanation %}
+                        <li>{{ expl | safe }}</li>
+                      {% endfor %}
+                    </ol>
+                  </div>
+                </div>
+              {% endif %}
+
+              <!-- Step 7: Trade-offs & Comparison Matrix -->
+              {% if topic.comparison_matrix %}
+                <div class="step-section" id="{{ topic.id }}-sec-7">
+                  <div class="step-section-header">
+                    <div class="step-number">7</div>
+                    <h3 class="step-section-title">Architectural Trade-offs & Comparison Matrix</h3>
+                  </div>
+                  <div class="topic-comp-target" data-comp='{{ topic.comparison_matrix | tojson }}'></div>
+                </div>
+              {% endif %}
+
+              <!-- Step 8: Common Mistakes & Interview Traps -->
+              {% if topic.common_mistakes or topic.interview_traps %}
+                <div class="step-section" id="{{ topic.id }}-sec-8">
+                  <div class="step-section-header">
+                    <div class="step-number">8</div>
+                    <h3 class="step-section-title">Common Anti-Patterns & Interview Traps</h3>
+                  </div>
+                  <div class="step-body-content">
+                    {% if topic.common_mistakes %}
+                      <h4 style="color: #fff; margin-bottom: 0.75rem; font-size: 1.1rem;">Frequent Anti-Patterns to Avoid</h4>
+                      {% for m in topic.common_mistakes %}
+                        <div class="callout callout-trap" style="margin-bottom: 0.75rem;">
+                          <div class="callout-icon">⚠️</div>
+                          <div class="callout-content">
+                            <h5>{{ m.mistake }}</h5>
+                            <p><strong>Correction:</strong> {{ m.correction }}</p>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+
+                    {% if topic.interview_traps %}
+                      <h4 style="color: #fff; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.1rem;">Senior Interview Traps & Direct Answers</h4>
+                      {% for trap in topic.interview_traps %}
+                        <div class="callout callout-important" style="margin-bottom: 0.75rem;">
+                          <div class="callout-icon">🛡️</div>
+                          <div class="callout-content">
+                            <p>{{ trap | safe }}</p>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+
+              <!-- Step 9: Interactive Code Refactoring Exercise -->
+              {% if topic.code_refactor_exercise %}
+                <div class="step-section" id="{{ topic.id }}-sec-9">
+                  <div class="step-section-header">
+                    <div class="step-number">9</div>
+                    <h3 class="step-section-title">Interactive Before vs After Refactoring</h3>
+                  </div>
+                  <div class="topic-refactor-target" data-refactor='{{ topic.code_refactor_exercise | tojson }}'></div>
+                </div>
+              {% endif %}
+
+              <!-- Step 10: Hands-On Practice Sandbox Challenge -->
+              {% if topic.practice_problem %}
+                <div class="step-section" id="{{ topic.id }}-sec-10">
+                  <div class="step-section-header">
+                    <div class="step-number">10</div>
+                    <h3 class="step-section-title">Hands-On Practice Sandbox</h3>
+                  </div>
+                  <div class="topic-practice-target" data-practice='{{ topic.practice_problem | tojson }}'></div>
+                </div>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <!-- Module Ready Placeholder with Interactive Demonstration -->
+        <div class="glass-panel" style="padding: 3rem 2rem; text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+          <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff;">Module {{ current_module.id }} Structure Ready</h2>
+          <p style="max-width: 600px; margin: 0 auto 1.5rem; color: var(--text-secondary);">
+            The data schema, navigation hierarchy, 18-step format pipeline, syntax highlighter, and interactive diagram systems are initialized for <strong>{{ current_module.title }}</strong>.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+            {% for top in current_module.topics %}
+              <span class="badge badge-intermediate" style="margin: 0.2rem;">{{ top.title }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Navigation Footer (Prev / Next Module) -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); flex-wrap: wrap; gap: 1rem;">
+      {% if prev_module %}
+        <a href="/module/{{ prev_module.id }}" class="btn btn-secondary">
+          &larr; Module {{ prev_module.id }}: {{ prev_module.title }}
+        </a>
+      {% else %}
+        <div></div>
+      {% endif %}
+
+      {% if next_module %}
+        <a href="/module/{{ next_module.id }}" class="btn btn-primary">
+          Module {{ next_module.id }}: {{ next_module.title }} &rarr;
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right Sticky Table of Contents -->
+  <aside class="module-toc">
+    <div class="toc-title">Module Contents</div>
+    <ul class="toc-list">
+      {% for top in current_module.topics %}
+        <li class="toc-item">
+          <a href="#{{ top.id }}">{{ loop.index }}. {{ top.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const moduleId = "{{ current_module.id }}";
+    const statusSelect = document.getElementById('module-status-select');
+
+    if (statusSelect && window.ProgressTracker) {
+      statusSelect.value = window.ProgressTracker.getModuleStatus(moduleId);
+      statusSelect.addEventListener('change', (e) => {
+        window.ProgressTracker.setModuleStatus(moduleId, e.target.value);
+        if (window.showToast) {
+          window.showToast(`Module ${moduleId} marked as ${e.target.value.replace('_', ' ')}`);
+        }
+      });
+    }
+
+    // Auto-render code blocks inside topics if present
+    document.querySelectorAll('.topic-code-target').forEach(el => {
+      const filename = el.getAttribute('data-filename');
+      const code = el.getAttribute('data-code');
+      if (window.CodeBlock && code) {
+        window.CodeBlock.render(el, filename, code);
+      }
+    });
+
+    // Auto-render Comparison Tables
+    document.querySelectorAll('.topic-comp-target').forEach(el => {
+      try {
+        const raw = el.getAttribute('data-comp');
+        if (raw && window.ComparisonTable) {
+          window.ComparisonTable.render(el, JSON.parse(raw));
+        }
+      } catch (e) { console.error('Failed to parse comp data', e); }
+    });
+
+    // Auto-render UML Diagrams
+    document.querySelectorAll('.topic-diagram-target').forEach(el => {
+      try {
+        const raw = el.getAttribute('data-diagram');
+        if (raw && window.ClassDiagram) {
+          window.ClassDiagram.render(el, JSON.parse(raw));
+        }
+      } catch (e) { console.error('Failed to parse diagram data', e); }
+    });
+
+    // Auto-render Interactive Animations
+    document.querySelectorAll('.topic-anim-target').forEach(el => {
+      try {
+        const raw = el.getAttribute('data-anim');
+        if (raw && window.AnimationPlayer) {
+          const config = JSON.parse(raw);
+          // Convert stage HTML strings into renderStage functions
+          const processedSteps = config.steps.map(step => {
+            return {
+              narrative: step.narrative,
+              renderStage: (stageEl) => {
+                stageEl.innerHTML = step.stageHtml || '<div style="color: #fff;">' + step.narrative + '</div>';
+              }
+            };
+          });
+          new window.AnimationPlayer(el, {
+            title: config.title || 'Interactive Visual Simulation',
+            steps: processedSteps
+          });
+        }
+      } catch (e) { console.error('Failed to parse animation data', e); }
+    });
+
+    // Auto-render Refactor Mode
+    document.querySelectorAll('.topic-refactor-target').forEach(el => {
+      try {
+        const raw = el.getAttribute('data-refactor');
+        if (raw && window.RefactorMode) {
+          window.RefactorMode.render(el, JSON.parse(raw));
+        }
+      } catch (e) { console.error('Failed to parse refactor data', e); }
+    });
+
+    // Auto-render Practice Mode
+    document.querySelectorAll('.topic-practice-target').forEach(el => {
+      try {
+        const raw = el.getAttribute('data-practice');
+        if (raw && window.PracticeMode) {
+          window.PracticeMode.render(el, JSON.parse(raw));
+        }
+      } catch (e) { console.error('Failed to parse practice data', e); }
+    });
+  });
+</script>
+{% endblock %}

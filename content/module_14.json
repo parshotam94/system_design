@@ -1,0 +1,418 @@
+{
+  "module_id": "14",
+  "title": "Memory & Resource Management",
+  "level": "Advanced",
+  "category": "Systems",
+  "description": "Stack vs heap memory layouts, ownership transfer semantics, circular references, custom deleters, and memory-safe LLD architectures.",
+  "topics": [
+    {
+      "id": "stack-vs-heap-lifetime",
+      "title": "Stack vs Heap Lifetime & Ownership Semantics",
+      "description": "Understanding memory allocation mechanics, cache locality, and deterministic stack lifetimes.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p><strong>Stack Memory</strong> is fast, automatic, LIFO memory managed by CPU stack pointer adjustments. <strong>Heap Memory</strong> is dynamic memory allocated via <code>new</code> / <code>malloc</code> requiring explicit lifetime management.</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Stack allocation is nanoseconds fast ($O(1)$ stack pointer move) with perfect CPU cache locality. Heap allocation involves operating system free-list searches ($O(N)$ allocator overhead) and pointer indirection.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Default to stack allocation. Use heap allocation only when objects must outlive the current scope, have dynamic sizes, or require polymorphic base pointers.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p>Stack objects are destroyed automatically when exiting scope. Heap objects must be wrapped in RAII smart pointers.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "comparison": {
+            "title": "Stack vs Heap Allocation in C++",
+            "columns": [
+              "Property",
+              "Stack Allocation",
+              "Heap Allocation"
+            ],
+            "rows": [
+              [
+                "Speed",
+                "Ultra-fast ($O(1)$ stack pointer shift)",
+                "Slower (OS allocator traversal)"
+              ],
+              [
+                "Lifetime",
+                "Scope-bound (Automatic LIFO cleanup)",
+                "Dynamic (Manual or Smart Pointer)"
+              ],
+              [
+                "Cache Locality",
+                "Excellent (Contiguous memory)",
+                "Poor (Fragmented heap pages)"
+              ],
+              [
+                "Size Limit",
+                "Small (Typically 1MB - 8MB per thread)",
+                "Gigabytes (Virtual memory limit)"
+              ]
+            ]
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "stack_vs_heap_demo.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <vector>\n\nstruct HeavyData { int data[1000]; };\n\nvoid stackAllocationExample() {\n    HeavyData localStack; // Fast, automatic cleanup\n}\n\nvoid heapAllocationExample() {\n    auto heapObject = std::make_unique<HeavyData>(); // Dynamic, managed via RAII\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Demonstrates stack allocation vs unique_ptr heap allocation.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>Real-time game loops, high-performance packet parsers, database engines.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Prefer stack objects for value semantics. Use heap for polymorphism and dynamic buffers.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not allocate huge 50MB buffers on the stack (triggers Stack Overflow crash).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Stack gives deterministic cleanup and maximum CPU cache efficiency.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Stack size is strictly limited per thread.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Stack, Heap, Static/BSS segment, Thread-Local Storage (TLS).</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Returning a pointer to a stack-allocated local variable.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> What causes a Stack Overflow error in C++?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Allocating an array too large for the stack (e.g. <code>int arr[10000000];</code>) or infinite deep recursion without a base exit condition.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a fixed-size StackArena allocator.</p>",
+          "practice": {
+            "title": "Stack Memory Arena",
+            "problemStatement": "Implement a fixed-size StackArena allocator.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Stack Memory Arena",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class StackArena { char buf[1024]; int offset{0}; public: void* alloc(size_t s) { void* p = &buf[offset]; offset += s; return p; } };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Stack vs Heap Lifetime & Ownership Semantics is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "smart-pointer-ownership-models",
+      "title": "Smart Pointer Ownership Models & Custom Deleters",
+      "description": "Deep dive into std::unique_ptr, std::shared_ptr control blocks, and integrating C API custom deleters.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>Smart pointers express explicit ownership semantics in modern C++: exclusive (<code>unique_ptr</code>), shared (<code>shared_ptr</code>), and observing (<code>weak_ptr</code>).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Eliminates memory leaks, dangling pointers, and double-free vulnerabilities.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Custom deleters allow smart pointers to manage non-memory OS handles (e.g. C file handles, sockets, database transaction handles).</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>std::unique_ptr&lt;FILE, decltype(&amp;fclose)&gt; file(fopen(\"...\"), &amp;fclose);</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "tip",
+            "title": "Custom Deleter Anatomy",
+            "text": "std::unique_ptr custom deleter is part of the TYPE. std::shared_ptr custom deleter is stored inside the CONTROL BLOCK!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "custom_deleter_socket.cpp",
+            "code": "#include <iostream>\n#include <memory>\n\nstruct MockSocket { int fd; };\nvoid closeMockSocket(MockSocket* s) {\n    std::cout << \"[Socket API] Closed socket fd #\" << s->fd << \"\\n\";\n    delete s;\n}\n\nusing UniqueSocket = std::unique_ptr<MockSocket, decltype(&closeMockSocket)>;\n\nUniqueSocket createSocket(int fd) {\n    return UniqueSocket(new MockSocket{fd}, &closeMockSocket);\n}\n\nint main() {\n    {\n        UniqueSocket sock = createSocket(8080);\n        std::cout << \"Socket active on fd: \" << sock->fd << \"\\n\";\n    } // closeMockSocket called automatically!\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>UniqueSocket wraps MockSocket with custom closeMockSocket deleter.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>C API integrations (OpenSSL SSL_free, POSIX close, SDL_DestroyWindow).</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use custom deleters whenever wrapping legacy C handles in RAII.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not pass stateful heavy custom deleters to unique_ptr without considering type bloat.</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Automatic leak-free management of any C handle.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>unique_ptr type includes the deleter signature.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>Function pointer deleters, Lambda deleters, Functor deleters.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Creating two independent shared_ptr instances from the same raw pointer.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> Why is the custom deleter of std::shared_ptr not part of its type?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> Because <code>std::shared_ptr</code> uses Type Erasure in its heap control block to store the deleter, keeping the <code>std::shared_ptr&lt;T&gt;</code> type clean and uniform.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Create unique_ptr wrapper calling glDeleteTextures custom deleter.</p>",
+          "practice": {
+            "title": "OpenGL Texture Smart Pointer",
+            "problemStatement": "Create unique_ptr wrapper calling glDeleteTextures custom deleter.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "OpenGL Texture Smart Pointer",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "using UniqueTex = std::unique_ptr<GLuint, void(*)(GLuint*)>;"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Smart Pointer Ownership Models & Custom Deleters is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    },
+    {
+      "id": "circular-reference-weak-ptr",
+      "title": "Circular Dependency Resolution with std::weak_ptr",
+      "description": "Breaking cyclic shared_ptr memory leaks using non-owning weak references.",
+      "sections": [
+        {
+          "step_number": 1,
+          "title": "1. What is it?",
+          "content": "<p>A <strong>Circular Reference</strong> occurs when Object A holds a <code>std::shared_ptr</code> to Object B, and Object B holds a <code>std::shared_ptr</code> to Object A, causing reference counts to stay $\\ge 1$ forever (Memory Leak).</p>"
+        },
+        {
+          "step_number": 2,
+          "title": "2. Why do we need it?",
+          "content": "<p>Even though all external pointers go out of scope, the objects keep each other alive in memory indefinitely.</p>"
+        },
+        {
+          "step_number": 3,
+          "title": "3. Core idea",
+          "content": "<p>Break the cycle: Child holds <code>std::weak_ptr&lt;Parent&gt;</code> back-pointer.</p>"
+        },
+        {
+          "step_number": 4,
+          "title": "4. How it works",
+          "content": "<p><code>weak_ptr</code> increments <code>weak_count</code>, NOT <code>use_count</code>. To use it, call <code>wp.lock()</code> returning a temporary <code>shared_ptr</code>.</p>"
+        },
+        {
+          "step_number": 5,
+          "title": "5. Visual explanation",
+          "content": "<p>Visual Architecture & Mechanics:</p>",
+          "callout": {
+            "type": "important",
+            "title": "Weak Pointer Lock",
+            "text": "std::shared_ptr<Parent> p = child->parent.lock(); if (p) { p->doSomething(); } // Safe access!"
+          }
+        },
+        {
+          "step_number": 6,
+          "title": "6. C++ implementation",
+          "content": "<p>Complete Production C++20 Implementation:</p>",
+          "code_example": {
+            "filename": "circular_weak_ptr_demo.cpp",
+            "code": "#include <iostream>\n#include <memory>\n#include <string>\n\nclass Window; // Forward declaration\n\nclass Button {\npublic:\n    std::string label;\n    // WEAK POINTER: Breaks cyclic leak back to parent window!\n    std::weak_ptr<Window> parentWindow;\n\n    explicit Button(std::string l) : label(std::move(l)) {}\n    ~Button() { std::cout << \"  [Button \" << label << \"] Destroyed.\\n\"; }\n\n    void onClick() {\n        if (auto win = parentWindow.lock()) { // Safely promote weak_ptr to shared_ptr\n            std::cout << \"Button clicked inside Window!\\n\";\n        } else {\n            std::cout << \"Parent Window has already been destroyed.\\n\";\n        }\n    }\n};\n\nclass Window {\npublic:\n    std::string title;\n    std::shared_ptr<Button> closeButton;\n\n    explicit Window(std::string t) : title(std::move(t)) {}\n    ~Window() { std::cout << \"[Window \" << title << \"] Destroyed.\\n\"; }\n};\n\nint main() {\n    {\n        auto win = std::make_shared<Window>(\"MainWindow\");\n        auto btn = std::make_shared<Button>(\"CloseBtn\");\n\n        win->closeButton = btn; // Window owns Button\n        btn->parentWindow = win; // Button observes Window via weak_ptr!\n\n        btn->onClick();\n    } // BOTH Window and Button destroyed cleanly with zero memory leaks!\n\n    std::cout << \"Memory verified: No circular leaks!\\n\";\n    return 0;\n}"
+          }
+        },
+        {
+          "step_number": 7,
+          "title": "7. Code walkthrough",
+          "content": "<p>Button uses std::weak_ptr<Window> preventing circular reference memory leaks.</p>"
+        },
+        {
+          "step_number": 8,
+          "title": "8. Real-world example",
+          "content": "<p>DOM Trees, Observer subscriber registries, Graph structures, Cache expiry observers.</p>"
+        },
+        {
+          "step_number": 9,
+          "title": "9. When to use",
+          "content": "<p>Use weak_ptr for parent back-pointers, caches, and observer registries.</p>"
+        },
+        {
+          "step_number": 10,
+          "title": "10. When NOT to use",
+          "content": "<p>Do not use weak_ptr if the relationship is exclusive ownership (use unique_ptr).</p>"
+        },
+        {
+          "step_number": 11,
+          "title": "11. Advantages",
+          "content": "<p>Completely eliminates reference cycle memory leaks.</p>"
+        },
+        {
+          "step_number": 12,
+          "title": "12. Disadvantages",
+          "content": "<p>Requires calling lock() before accessing the underlying object.</p>"
+        },
+        {
+          "step_number": 13,
+          "title": "13. Variations / Types",
+          "content": "<p>std::weak_ptr, std::enable_shared_from_this.</p>"
+        },
+        {
+          "step_number": 14,
+          "title": "14. Common mistakes",
+          "content": "<p>Dereferencing a weak_ptr directly without checking if lock() returned non-null.</p>"
+        },
+        {
+          "step_number": 15,
+          "title": "15. Interview questions",
+          "content": "<p><strong>Q:</strong> How does std::enable_shared_from_this use weak_ptr internally?</p>"
+        },
+        {
+          "step_number": 16,
+          "title": "16. Interview answer",
+          "content": "<p><strong>Answer:</strong> It holds a private <code>std::weak_ptr&lt;T&gt;</code> to <code>this</code>. Calling <code>shared_from_this()</code> locks this internal weak pointer, safely returning a new <code>std::shared_ptr&lt;T&gt;</code> without creating a duplicate control block.</p>"
+        },
+        {
+          "step_number": 17,
+          "title": "17. Practice problem",
+          "content": "<p>Implement a doubly linked graph node using shared_ptr for next and weak_ptr for prev.</p>",
+          "practice": {
+            "title": "Graph Node Weak Pointer",
+            "problemStatement": "Implement a doubly linked graph node using shared_ptr for next and weak_ptr for prev.",
+            "requirements": [
+              "Production C++20 code",
+              "Proper resource management"
+            ],
+            "constraints": [
+              "Zero memory leaks"
+            ],
+            "hint": "Follow standard C++ idioms.",
+            "expectedEntities": [
+              {
+                "name": "Graph Node Weak Pointer",
+                "responsibility": "Idiom implementation."
+              }
+            ],
+            "referenceCode": {
+              "filename": "practice_sol.cpp",
+              "code": "class Node { std::shared_ptr<Node> next; std::weak_ptr<Node> prev; };"
+            }
+          }
+        },
+        {
+          "step_number": 18,
+          "title": "18. Summary",
+          "content": "<p>Mastering Circular Dependency Resolution with std::weak_ptr is essential for advanced C++ systems design.</p>"
+        }
+      ]
+    }
+  ]
+}
