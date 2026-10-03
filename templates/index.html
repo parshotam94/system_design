@@ -175,32 +175,81 @@
   </div>
 </section>
 
-<!-- 24-Module Roadmap Section -->
+<!-- 24-Module Roadmap Section with Live Real-Time Progress -->
 <section style="margin: 4rem 0;">
+  <!-- Live Progress Overview Banner -->
+  <div class="glass-panel" style="padding: 1.75rem 2rem; margin-bottom: 2.5rem; border-color: rgba(56, 189, 248, 0.3); background: linear-gradient(135deg, rgba(13, 21, 39, 0.8), rgba(15, 23, 42, 0.9));">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.25rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <span style="font-size: 1.25rem;">📊</span>
+          <h3 style="font-size: 1.35rem; color: #fff; margin: 0;">Live Roadmap Progress</h3>
+          <span class="badge badge-cpp" style="font-size: 0.75rem;">Real-time</span>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.92rem; margin: 0;">
+          Track your C++ Low-Level Design mastery across all 24 modules and 125 core topics.
+        </p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="text-align: right;">
+          <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Topics Completed</div>
+          <div class="total-completed-topics-count" style="font-size: 1.3rem; font-weight: 800; color: var(--accent-cyan);">0 / 125</div>
+        </div>
+        <div style="text-align: right; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 1.5rem;">
+          <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Overall Mastery</div>
+          <div class="overall-progress-pct-text" style="font-size: 1.3rem; font-weight: 800; color: #10b981;">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Overall Progress Bar -->
+    <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; position: relative;">
+      <div class="overall-progress-bar-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0072CE, #38BDF8, #10B981); border-radius: 999px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);"></div>
+    </div>
+  </div>
+
   <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <div>
       <h2 style="font-size: 2rem; margin-bottom: 0.35rem;">Curriculum <span class="gradient-text-purple">Roadmap</span></h2>
       <p style="color: var(--text-secondary);">Complete 24-module journey from foundational C++ object mechanics to full distributed capstone design.</p>
     </div>
-    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-      <span class="badge badge-beginner">Beginner: 5 Modules</span>
-      <span class="badge badge-intermediate">Intermediate: 8 Modules</span>
-      <span class="badge badge-advanced">Advanced: 6 Modules</span>
-      <span class="badge badge-interview">Interview: 5 Modules</span>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="roadmap-filter-pills">
+      <button class="badge badge-cpp filter-btn active" data-filter="all" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">All: 24 Modules</button>
+      <button class="badge badge-beginner filter-btn" data-filter="Beginner" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">Beginner (5)</button>
+      <button class="badge badge-intermediate filter-btn" data-filter="Intermediate" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">Intermediate (8)</button>
+      <button class="badge badge-advanced filter-btn" data-filter="Advanced" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">Advanced (6)</button>
+      <button class="badge badge-interview filter-btn" data-filter="Interview" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">Interview (5)</button>
     </div>
   </div>
 
-  <div class="cards-grid">
+  <div class="cards-grid" id="modules-cards-grid">
     {% for mod in modules %}
-      <a href="/module/{{ mod.id }}" class="module-card">
+      <a href="/module/{{ mod.id }}" class="module-card" data-module-card-id="{{ mod.id }}" data-module-level="{{ mod.level }}" data-total-topics="{{ mod.topics | length }}">
         <div class="module-card-top">
           <span class="module-card-num">MODULE {{ mod.id }}</span>
-          <span class="badge {% if mod.level == 'Beginner' %}badge-beginner{% elif mod.level == 'Intermediate' %}badge-intermediate{% elif mod.level == 'Advanced' %}badge-advanced{% else %}badge-interview{% endif %}">
-            {{ mod.level }}
-          </span>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span class="badge {% if mod.level == 'Beginner' %}badge-beginner{% elif mod.level == 'Intermediate' %}badge-intermediate{% elif mod.level == 'Advanced' %}badge-advanced{% else %}badge-interview{% endif %}">
+              {{ mod.level }}
+            </span>
+            <span class="badge badge-not-started module-card-status-badge">○ Not Started</span>
+          </div>
         </div>
+        
         <h3>{{ mod.title }}</h3>
         <p>{{ mod.description }}</p>
+        
+        <!-- Live Per-Module Progress Fill -->
+        <div style="margin: 1.25rem 0 0.75rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+            <span>Progress</span>
+            <span class="module-card-progress-text">0/{{ mod.topics | length }} completed (0%)</span>
+          </div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden;">
+            <div class="module-card-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); border-radius: 999px; transition: width 0.4s ease;"></div>
+          </div>
+        </div>
+
         <div class="module-card-footer">
           <div class="module-card-meta">
             <span>{{ mod.topics | length }} Topics</span>

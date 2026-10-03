@@ -1,22 +1,12 @@
 /**
- * C++ Low-Level Design Mastery - Real-Time Progress Tracking Engine
- * Powered by LocalStorage with Live Reactive UI Synchronization
+ * High-Level Design (HLD) Progress Tracking Engine - LocalStorage Powered
  */
 
-const ProgressTracker = {
-  STORAGE_KEY: 'cpp_lld_mastery_progress_v2',
-  
-  // Total curriculum metadata
-  TOTAL_MODULES: 24,
-  TOTAL_TOPICS: 125,
+const HLDProgressTracker = {
+  STORAGE_KEY: 'cpp_hld_mastery_progress_v1',
+  TOTAL_MODULES: 40,
+  TOTAL_TOPICS: 156,
 
-  // State schema:
-  // {
-  //   modules: {
-  //     "01": { status: 'in_progress', topics: { "classes-and-objects": "completed", ... } },
-  //     ...
-  //   }
-  // }
   state: {
     modules: {}
   },
@@ -31,7 +21,7 @@ const ProgressTracker = {
         this.state = { modules: {} };
       }
     } catch (e) {
-      console.error('[ProgressTracker] Failed to load from localStorage', e);
+      console.error('[HLDProgressTracker] Failed to load from localStorage', e);
       this.state = { modules: {} };
     }
 
@@ -43,16 +33,16 @@ const ProgressTracker = {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
       this.updateUI();
-      window.dispatchEvent(new CustomEvent('progressUpdated', { detail: this.getGlobalStats() }));
+      window.dispatchEvent(new CustomEvent('hldProgressUpdated', { detail: this.getGlobalStats() }));
     } catch (e) {
-      console.error('[ProgressTracker] Failed to save to localStorage', e);
+      console.error('[HLDProgressTracker] Failed to save to localStorage', e);
     }
   },
 
   bindEvents() {
-    // Topic completion buttons
+    // Topic completion buttons on HLD pages
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.btn-topic-toggle');
+      const btn = e.target.closest('.btn-hld-topic-toggle');
       if (btn) {
         const topicId = btn.getAttribute('data-topic-id');
         const moduleId = btn.getAttribute('data-module-id');
@@ -63,16 +53,16 @@ const ProgressTracker = {
           
           if (window.showToast) {
             if (next === 'completed') {
-              window.showToast(`✓ Marked topic as Completed!`, 'success');
+              window.showToast(`✓ Marked HLD topic as Completed!`, 'success');
             } else {
-              window.showToast(`○ Reset topic progress`, 'info');
+              window.showToast(`○ Reset HLD topic progress`, 'info');
             }
           }
         }
       }
 
-      // Quick Mark Entire Module Button
-      const modBtn = e.target.closest('.btn-mark-module-complete');
+      // Quick Mark Entire HLD Module Button
+      const modBtn = e.target.closest('.btn-mark-hld-module-complete');
       if (modBtn) {
         const moduleId = modBtn.getAttribute('data-module-id');
         if (moduleId) {
@@ -81,12 +71,11 @@ const ProgressTracker = {
       }
     });
 
-    // Module dropdown status select
-    const statusSelect = document.getElementById('module-status-select');
+    const statusSelect = document.getElementById('hld-module-status-select');
     if (statusSelect) {
       statusSelect.addEventListener('change', (e) => {
-        const activeMod = document.querySelector('[data-current-module-id]');
-        const modId = activeMod ? activeMod.getAttribute('data-current-module-id') : null;
+        const activeMod = document.querySelector('[data-current-hld-module-id]');
+        const modId = activeMod ? activeMod.getAttribute('data-current-hld-module-id') : null;
         if (modId) {
           this.setModuleStatus(modId, e.target.value);
         }
@@ -112,17 +101,8 @@ const ProgressTracker = {
     }
 
     this.state.modules[padId].topics[topicId] = status;
-
-    // Recalculate module status
     this.refreshModuleStatus(padId);
     this.save();
-  },
-
-  toggleTopic(moduleId, topicId) {
-    const current = this.getTopicStatus(moduleId, topicId);
-    const next = current === 'completed' ? 'not_started' : 'completed';
-    this.setTopicStatus(moduleId, topicId, next);
-    return next;
   },
 
   getModuleStatus(moduleId) {
@@ -182,7 +162,7 @@ const ProgressTracker = {
     this.save();
 
     if (window.showToast) {
-      window.showToast(targetStatus === 'completed' ? `🎉 Module ${padId} marked fully completed!` : `○ Module ${padId} progress reset`, 'success');
+      window.showToast(targetStatus === 'completed' ? `🎉 HLD Module ${padId} marked fully completed!` : `○ HLD Module ${padId} progress reset`, 'success');
     }
   },
 
@@ -237,49 +217,57 @@ const ProgressTracker = {
   updateUI() {
     const stats = this.getGlobalStats();
 
-    // 1. Update Global Header Progress Indicators
-    document.querySelectorAll('.progress-fill-mini, .progress-fill-global, .overall-progress-bar-fill').forEach(el => {
+    // Update Global HLD Indicators
+    document.querySelectorAll('.hld-overall-progress-bar-fill').forEach(el => {
       el.style.width = `${stats.percentage}%`;
     });
 
-    document.querySelectorAll('.progress-info-pct, .progress-pct-display, .overall-progress-pct-text').forEach(el => {
+    document.querySelectorAll('.hld-overall-progress-pct-text').forEach(el => {
       el.textContent = `${stats.percentage}%`;
     });
 
-    document.querySelectorAll('.total-completed-topics-count').forEach(el => {
+    document.querySelectorAll('.hld-total-completed-topics-count').forEach(el => {
       el.textContent = `${stats.completedTopics} / ${stats.totalTopics}`;
     });
 
-    document.querySelectorAll('.total-completed-modules-count').forEach(el => {
-      el.textContent = `${stats.completedModules} / ${stats.totalModules}`;
-    });
+    // Update HLD Module Cards on /hld
+    document.querySelectorAll('[data-hld-module-card-id]').forEach(card => {
+      const modId = card.getAttribute('data-hld-module-card-id');
+      const padId = String(modId).padStart(2, '0');
+      const totalTopicsAttr = parseInt(card.getAttribute('data-total-topics') || '4', 10);
+      const modStats = this.getModuleStats(padId, totalTopicsAttr);
 
-    // 2. Update Sidebar Navigation Indicators
-    document.querySelectorAll('.module-nav-link').forEach(link => {
-      const modId = link.getAttribute('data-module-id');
-      if (modId) {
-        const padId = String(modId).padStart(2, '0');
-        const status = this.getModuleStatus(padId);
-        const indicator = link.querySelector('.nav-status-indicator');
-        if (indicator) {
-          indicator.className = `nav-status-indicator ${status}`;
+      const fill = card.querySelector('.hld-module-card-progress-fill');
+      if (fill) {
+        fill.style.width = `${modStats.percentage}%`;
+      }
+
+      const text = card.querySelector('.hld-module-card-progress-text');
+      if (text) {
+        text.textContent = `${modStats.completed}/${modStats.total} completed (${modStats.percentage}%)`;
+      }
+
+      const badge = card.querySelector('.hld-module-card-status-badge');
+      if (badge) {
+        if (modStats.status === 'completed') {
+          badge.className = 'badge badge-completed hld-module-card-status-badge';
+          badge.textContent = '✓ Completed';
+        } else if (modStats.status === 'in_progress') {
+          badge.className = 'badge badge-in-progress hld-module-card-status-badge';
+          badge.textContent = '◐ In Progress';
+        } else {
+          badge.className = 'badge badge-not-started hld-module-card-status-badge';
+          badge.textContent = '○ Not Started';
         }
       }
     });
 
-    // 3. Update Module Page Controls
-    const currentModuleEl = document.querySelector('[data-current-module-id]');
+    // Update HLD Module Page topic buttons
+    const currentModuleEl = document.querySelector('[data-current-hld-module-id]');
     if (currentModuleEl) {
-      const currentModId = currentModuleEl.getAttribute('data-current-module-id');
+      const currentModId = currentModuleEl.getAttribute('data-current-hld-module-id');
       const padId = String(currentModId).padStart(2, '0');
 
-      // Update dropdown select if present
-      const statusSelect = document.getElementById('module-status-select');
-      if (statusSelect) {
-        statusSelect.value = this.getModuleStatus(padId);
-      }
-
-      // Update each Topic toggle button & container
       document.querySelectorAll('.topic-container').forEach(topicContainer => {
         const topicId = topicContainer.id;
         const isComp = this.getTopicStatus(padId, topicId) === 'completed';
@@ -290,61 +278,23 @@ const ProgressTracker = {
           topicContainer.classList.remove('topic-completed');
         }
 
-        const toggleBtn = topicContainer.querySelector('.btn-topic-toggle');
+        const toggleBtn = topicContainer.querySelector('.btn-hld-topic-toggle');
         if (toggleBtn) {
           if (isComp) {
-            toggleBtn.className = 'btn btn-sm btn-topic-toggle btn-completed';
+            toggleBtn.className = 'btn btn-sm btn-hld-topic-toggle btn-completed';
             toggleBtn.innerHTML = `✓ Completed`;
           } else {
-            toggleBtn.className = 'btn btn-sm btn-topic-toggle btn-outline';
+            toggleBtn.className = 'btn btn-sm btn-hld-topic-toggle btn-outline';
             toggleBtn.innerHTML = `○ Mark Completed`;
-          }
-        }
-
-        // Update Right TOC link
-        const tocLink = document.querySelector(`.toc-link[href="#${topicId}"]`);
-        if (tocLink) {
-          if (isComp) {
-            tocLink.classList.add('toc-item-completed');
-          } else {
-            tocLink.classList.remove('toc-item-completed');
           }
         }
       });
     }
-
-    // 4. Update Roadmap Cards on Homepage
-    document.querySelectorAll('[data-module-card-id]').forEach(card => {
-      const modId = card.getAttribute('data-module-card-id');
-      const padId = String(modId).padStart(2, '0');
-      const totalTopicsAttr = parseInt(card.getAttribute('data-total-topics') || '5', 10);
-      const modStats = this.getModuleStats(padId, totalTopicsAttr);
-
-      const fill = card.querySelector('.module-card-progress-fill');
-      if (fill) {
-        fill.style.width = `${modStats.percentage}%`;
-      }
-
-      const text = card.querySelector('.module-card-progress-text');
-      if (text) {
-        text.textContent = `${modStats.completed}/${modStats.total} completed (${modStats.percentage}%)`;
-      }
-
-      const badge = card.querySelector('.module-card-status-badge');
-      if (badge) {
-        if (modStats.status === 'completed') {
-          badge.className = 'badge badge-completed module-card-status-badge';
-          badge.textContent = '✓ Completed';
-        } else if (modStats.status === 'in_progress') {
-          badge.className = 'badge badge-in-progress module-card-status-badge';
-          badge.textContent = '◐ In Progress';
-        } else {
-          badge.className = 'badge badge-not-started module-card-status-badge';
-          badge.textContent = '○ Not Started';
-        }
-      }
-    });
   }
 };
 
-window.ProgressTracker = ProgressTracker;
+document.addEventListener('DOMContentLoaded', () => {
+  HLDProgressTracker.init();
+});
+
+window.HLDProgressTracker = HLDProgressTracker;

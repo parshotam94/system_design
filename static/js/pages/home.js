@@ -4,7 +4,31 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initArchitecturePipeline();
+  initRoadmapFilters();
 });
+
+function initRoadmapFilters() {
+  const filterBtns = document.querySelectorAll('#roadmap-filter-pills .filter-btn');
+  const cards = document.querySelectorAll('#modules-cards-grid .module-card');
+  if (!filterBtns.length || !cards.length) return;
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.getAttribute('data-filter');
+      cards.forEach(card => {
+        const level = card.getAttribute('data-module-level');
+        if (filter === 'all' || level === filter) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+}
 
 function initArchitecturePipeline() {
   const pipelineNodes = document.querySelectorAll('.pipeline-node');

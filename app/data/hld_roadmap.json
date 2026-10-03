@@ -1,0 +1,1264 @@
+{
+  "modules": [
+    {
+      "id": "01",
+      "slug": "01-system-design-foundations",
+      "title": "System Design Foundations",
+      "level": "Beginner",
+      "category": "Foundations",
+      "icon": "layers",
+      "description": "Start from absolute zero: Clients, Servers, APIs, Databases, Infrastructure, and the progressive evolution from single-server to distributed architecture.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "what-is-system-design",
+          "title": "What is System Design & Software Architecture?",
+          "status": "not_started"
+        },
+        {
+          "id": "hld-vs-lld",
+          "title": "High-Level Design (HLD) vs Low-Level Design (LLD)",
+          "status": "not_started"
+        },
+        {
+          "id": "anatomy-of-systems",
+          "title": "Components, Services, Modules, Dependencies & Boundaries",
+          "status": "not_started"
+        },
+        {
+          "id": "client-server-api-database",
+          "title": "The Core Foundation: Client, Server, API, Database & Infra",
+          "status": "not_started"
+        },
+        {
+          "id": "system-evolution-journey",
+          "title": "The Progressive Evolution: 1 Server to Multi-Tier Distributed Web",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "slug": "02-requirements-analysis",
+      "title": "Requirements Analysis & Scoping",
+      "level": "Beginner",
+      "category": "Foundations",
+      "icon": "clipboard",
+      "description": "How to start any system design problem: Functional vs Non-Functional Requirements, Constraints, Assumptions, Traffic, and System Boundaries.",
+      "estimated_hours": 3,
+      "topics": [
+        {
+          "id": "functional-vs-non-functional",
+          "title": "Functional vs Non-Functional Requirements (NFRs)",
+          "status": "not_started"
+        },
+        {
+          "id": "assumptions-and-constraints",
+          "title": "Establishing Constraints, Assumptions, Users & Actors",
+          "status": "not_started"
+        },
+        {
+          "id": "defining-system-boundaries",
+          "title": "System Boundaries, Core APIs & Data Contracts",
+          "status": "not_started"
+        },
+        {
+          "id": "interview-scoping-walkthrough",
+          "title": "Interview Case Walkthrough: Scoping 'Design YouTube' from Scratch",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "slug": "03-capacity-estimation",
+      "title": "Capacity Estimation & Back-of-the-Envelope",
+      "level": "Beginner",
+      "category": "Calculations",
+      "icon": "calculator",
+      "description": "Master QPS, peak multipliers, read/write ratios, storage growth, network bandwidth, memory, cache sizing, and units (KB to PB).",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "math-units-and-latency-numbers",
+          "title": "System Units (KB to PB, QPS) & Numbers Every Engineer Should Know",
+          "status": "not_started"
+        },
+        {
+          "id": "traffic-and-qps-estimation",
+          "title": "DAU/MAU to Average & Peak QPS Estimation",
+          "status": "not_started"
+        },
+        {
+          "id": "storage-and-bandwidth-estimation",
+          "title": "Read/Write Ratios, Storage Growth & Ingress/Egress Bandwidth",
+          "status": "not_started"
+        },
+        {
+          "id": "memory-and-cache-sizing",
+          "title": "Memory, 80/20 Rule & Distributed Cache Sizing",
+          "status": "not_started"
+        },
+        {
+          "id": "interactive-capacity-calculator",
+          "title": "Interactive Back-of-the-Envelope Capacity Calculator Tool",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "slug": "04-networking-foundations",
+      "title": "Internet & Networking Foundations",
+      "level": "Beginner",
+      "category": "Networking",
+      "icon": "globe",
+      "description": "Everything needed for HLD: IP, MAC, DNS resolution, TCP vs UDP, TLS/HTTPS, NAT, Firewalls, Proxies, WebSockets, and SSE.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "dns-resolution-lifecycle",
+          "title": "DNS Lifecycle: Browser to Root, TLD & Authoritative Nameservers",
+          "status": "not_started"
+        },
+        {
+          "id": "tcp-vs-udp-tls-handshake",
+          "title": "TCP 3-Way Handshake, UDP, and TLS 1.3 Encryption Handshake",
+          "status": "not_started"
+        },
+        {
+          "id": "proxies-and-firewalls",
+          "title": "Forward Proxy, Reverse Proxy, NAT & Web Application Firewalls (WAF)",
+          "status": "not_started"
+        },
+        {
+          "id": "real-time-protocols",
+          "title": "Real-time Communication: WebSockets, Long Polling & Server-Sent Events (SSE)",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "slug": "05-api-design-protocols",
+      "title": "HTTP & API Design: REST, GraphQL & gRPC",
+      "level": "Beginner",
+      "category": "APIs",
+      "icon": "zap",
+      "description": "HTTP semantics, REST principles, GraphQL schemas, gRPC Protocol Buffers, API Gateways, rate limiting, idempotency keys, and pagination.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "http-methods-headers-status-codes",
+          "title": "HTTP Methods (GET, POST, PUT, PATCH, DELETE), Status Codes & Headers",
+          "status": "not_started"
+        },
+        {
+          "id": "rest-vs-graphql-vs-grpc",
+          "title": "Protocol Shootout: REST vs GraphQL vs gRPC Trade-offs",
+          "status": "not_started"
+        },
+        {
+          "id": "api-pagination-filtering-sorting",
+          "title": "Pagination (Offset vs Cursor-based), Filtering, and Sorting Strategies",
+          "status": "not_started"
+        },
+        {
+          "id": "idempotency-retries-rate-limiting",
+          "title": "Idempotency Keys, Exponential Backoff Retries & API Gateway Routing",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "slug": "06-system-architecture-patterns",
+      "title": "System Architecture Patterns",
+      "level": "Intermediate",
+      "category": "Architecture",
+      "icon": "layout",
+      "description": "Monolith vs Modular Monolith vs Microservices vs Serverless, Event-Driven, Clean/Hexagonal Architecture, CQRS, and Event Sourcing.",
+      "estimated_hours": 5,
+      "topics": [
+        {
+          "id": "monolith-to-microservices",
+          "title": "Monolith, Modular Monolith & Microservices Trade-offs",
+          "status": "not_started"
+        },
+        {
+          "id": "three-tier-and-layered-architecture",
+          "title": "Three-Tier, N-Tier & Hexagonal / Clean Architecture",
+          "status": "not_started"
+        },
+        {
+          "id": "serverless-and-event-driven",
+          "title": "Serverless Functions (FaaS) & Event-Driven Architecture",
+          "status": "not_started"
+        },
+        {
+          "id": "cqrs-and-event-sourcing",
+          "title": "CQRS (Command Query Responsibility Segregation) & Event Sourcing",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "slug": "07-load-balancing",
+      "title": "Load Balancing & Reverse Proxies",
+      "level": "Intermediate",
+      "category": "Traffic Management",
+      "icon": "git-branch",
+      "description": "L4 vs L7 Load Balancing, Algorithms (Round Robin, Least Conn, Consistent Hashing), Health Checks, Failover, and Sticky Sessions.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "why-load-balancing-l4-vs-l7",
+          "title": "Why Load Balancers? Layer 4 (Transport) vs Layer 7 (Application) Routing",
+          "status": "not_started"
+        },
+        {
+          "id": "load-balancing-algorithms",
+          "title": "Balancing Algorithms: Round Robin, Weighted, Least Conn & IP Hash",
+          "status": "not_started"
+        },
+        {
+          "id": "consistent-hashing-deep-dive",
+          "title": "Consistent Hashing with Virtual Nodes Deep Dive",
+          "status": "not_started"
+        },
+        {
+          "id": "health-checks-failover-sticky-sessions",
+          "title": "Active/Passive Health Checks, DNS Failover & Sticky Sessions",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "08",
+      "slug": "08-caching-strategies",
+      "title": "Caching Strategies & Distributed Caches",
+      "level": "Intermediate",
+      "category": "Storage & Performance",
+      "icon": "database",
+      "description": "Cache-Aside, Read-Through, Write-Through, Write-Back, Write-Around, Redis, Memcached, Stampede, Avalanche, Penetration & Hot Keys.",
+      "estimated_hours": 5,
+      "topics": [
+        {
+          "id": "caching-fundamentals-and-locality",
+          "title": "Caching Fundamentals: Hits, Misses, TTL & Eviction Policies (LRU/LFU)",
+          "status": "not_started"
+        },
+        {
+          "id": "caching-patterns-and-write-strategies",
+          "title": "Caching Patterns: Cache-Aside, Read-Through, Write-Through, Write-Back & Write-Around",
+          "status": "not_started"
+        },
+        {
+          "id": "redis-vs-memcached-distributed-cache",
+          "title": "Distributed Caching: Redis Architecture vs Memcached",
+          "status": "not_started"
+        },
+        {
+          "id": "cache-stampede-avalanche-penetration",
+          "title": "Cache Traps: Stampede, Avalanche, Penetration, Hot Key Mitigation & Mutex Locks",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "slug": "09-database-foundations",
+      "title": "Database Foundations & Relational DBs",
+      "level": "Intermediate",
+      "category": "Databases",
+      "icon": "server",
+      "description": "Relational vs NoSQL, Tables, Keys, Constraints, Transactions, ACID guarantees, Normalization, Joins, and Connection Pooling.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "relational-vs-nosql-paradigm",
+          "title": "Relational (RDBMS) vs NoSQL: Data Modeling & Query Paradigms",
+          "status": "not_started"
+        },
+        {
+          "id": "acid-transactions-explained",
+          "title": "ACID Properties: Atomicity, Consistency, Isolation & Durability",
+          "status": "not_started"
+        },
+        {
+          "id": "normalization-vs-denormalization",
+          "title": "Database Normalization (1NF to 3NF) vs Intentional Denormalization",
+          "status": "not_started"
+        },
+        {
+          "id": "connection-pooling-and-locks",
+          "title": "Connection Pooling, Optimistic vs Pessimistic Locking & Deadlocks",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "slug": "10-deep-dive-sql",
+      "title": "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+      "level": "Intermediate",
+      "category": "Databases",
+      "icon": "terminal",
+      "description": "B-Tree Indexes, Composite & Covering Indexes, Query Plans (EXPLAIN ANALYZE), Isolation Levels (Read Committed to Serializable).",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "btree-and-indexing-internals",
+          "title": "B-Tree & LSM Index Internals: Clustered vs Secondary Indexes",
+          "status": "not_started"
+        },
+        {
+          "id": "composite-and-covering-indexes",
+          "title": "Composite Indexes, Leftmost Prefix Rule & Covering Indexes",
+          "status": "not_started"
+        },
+        {
+          "id": "transaction-isolation-levels",
+          "title": "SQL Isolation Levels: Dirty Read, Non-Repeatable Read & Phantom Read",
+          "status": "not_started"
+        },
+        {
+          "id": "query-optimization-and-explain",
+          "title": "Query Planning, EXPLAIN ANALYZE & Slow Query Optimization",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "slug": "11-nosql-databases",
+      "title": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+      "level": "Intermediate",
+      "category": "Databases",
+      "icon": "cpu",
+      "description": "Deep comparison of Key-Value (Redis), Document (MongoDB), Wide-Column (Cassandra), and Graph (Neo4j) database engines.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "nosql-categories-and-internals",
+          "title": "The 4 NoSQL Engines: Key-Value, Document, Wide-Column & Graph",
+          "status": "not_started"
+        },
+        {
+          "id": "mongodb-and-document-stores",
+          "title": "Document Stores: MongoDB BSON, Indexing & Embedding vs Referencing",
+          "status": "not_started"
+        },
+        {
+          "id": "cassandra-and-wide-column",
+          "title": "Wide-Column Stores: Cassandra Architecture, SSTables, Memtables & Compaction",
+          "status": "not_started"
+        },
+        {
+          "id": "graph-databases-and-sql-vs-nosql",
+          "title": "Graph DBs (Neo4j) & The Comprehensive SQL vs NoSQL Decision Matrix",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "slug": "12-database-scaling",
+      "title": "Database Scaling: Replication, Sharding & Partitioning",
+      "level": "Advanced",
+      "category": "Databases",
+      "icon": "maximize-2",
+      "description": "Vertical vs Horizontal Scaling, Primary-Replica, Multi-Primary, Range vs Hash Sharding, Hot Partitions, and Cross-Shard Queries.",
+      "estimated_hours": 5,
+      "topics": [
+        {
+          "id": "read-replicas-and-replication-lag",
+          "title": "Primary-Replica Replication: Sync vs Async & Handling Replication Lag",
+          "status": "not_started"
+        },
+        {
+          "id": "database-sharding-strategies",
+          "title": "Horizontal Sharding: Range-based, Hash-based, Directory-based & Consistent Hashing",
+          "status": "not_started"
+        },
+        {
+          "id": "hot-partitions-and-rebalancing",
+          "title": "Hot Partitions (Celebrity Problem), Resharding & Zero-Downtime Data Migration",
+          "status": "not_started"
+        },
+        {
+          "id": "cross-shard-queries-and-distributed-joins",
+          "title": "Solving Cross-Shard Queries, Scatter-Gather & Distributed Joins",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "slug": "13-distributed-system-fundamentals",
+      "title": "Distributed System Fundamentals",
+      "level": "Advanced",
+      "category": "Distributed Systems",
+      "icon": "activity",
+      "description": "Partial failures, network partitions, physical vs logical clocks (Lamport, Vector), distributed locks, and the fallacies of distributed computing.",
+      "estimated_hours": 5,
+      "topics": [
+        {
+          "id": "fallacies-and-partial-failures",
+          "title": "The 8 Fallacies of Distributed Computing & The Reality of Partial Failures",
+          "status": "not_started"
+        },
+        {
+          "id": "clocks-and-ordering-in-distributed-systems",
+          "title": "Physical Clocks (NTP Drift), Lamport Timestamps & Vector Clocks",
+          "status": "not_started"
+        },
+        {
+          "id": "distributed-locking-patterns",
+          "title": "Distributed Locks: Redis Redlock vs Zookeeper Ephemeral Nodes & Fencing Tokens",
+          "status": "not_started"
+        },
+        {
+          "id": "idempotency-and-deduplication-at-scale",
+          "title": "Distributed Idempotency, Deduplication Stores & Out-of-Order Delivery",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "slug": "14-cap-theorem",
+      "title": "CAP Theorem & PACELC Explained",
+      "level": "Advanced",
+      "category": "Distributed Systems",
+      "icon": "shield",
+      "description": "Consistency, Availability, Partition Tolerance demystified. Why network partitions are unavoidable and how PACELC models latency trade-offs.",
+      "estimated_hours": 3,
+      "topics": [
+        {
+          "id": "cap-theorem-deep-dive",
+          "title": "CAP Theorem Realities: Why You Can NEVER Choose 'CA' Over a Partition",
+          "status": "not_started"
+        },
+        {
+          "id": "cp-vs-ap-systems",
+          "title": "CP Systems (HBase, Zookeeper) vs AP Systems (Cassandra, DynamoDB)",
+          "status": "not_started"
+        },
+        {
+          "id": "pacelc-theorem-and-latency",
+          "title": "Beyond CAP: PACELC Theorem (Else Latency vs Consistency)",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "slug": "15-consistency-models",
+      "title": "Consistency Models: Strong to Eventual",
+      "level": "Advanced",
+      "category": "Distributed Systems",
+      "icon": "refresh-cw",
+      "description": "Linearizability, Sequential, Causal, Read-Your-Writes, Monotonic Reads, Eventual Consistency, and Conflict Resolution (LWW, CRDTs).",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "linearizability-and-strong-consistency",
+          "title": "Strong Consistency & Linearizability: Strict Global Time Ordering",
+          "status": "not_started"
+        },
+        {
+          "id": "eventual-consistency-and-guarantees",
+          "title": "Eventual Consistency, Read-Your-Writes & Monotonic Reads",
+          "status": "not_started"
+        },
+        {
+          "id": "causal-consistency-and-conflict-resolution",
+          "title": "Causal Consistency, Last-Write-Wins (LWW) & Conflict-Free Replicated Data Types (CRDTs)",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "slug": "16-consensus-algorithms",
+      "title": "Distributed Consensus: Raft, Paxos & Quorums",
+      "level": "Advanced",
+      "category": "Distributed Systems",
+      "icon": "check-square",
+      "description": "Leader Election, Quorum math (R + W > N), Raft state machine replication, log compaction, and Paxos concepts.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "why-consensus-and-quorum-math",
+          "title": "The Consensus Problem, Split-Brain & Quorum Arithmetic (R + W > N)",
+          "status": "not_started"
+        },
+        {
+          "id": "raft-consensus-algorithm",
+          "title": "Raft Protocol: Leader Election, Heartbeats, Log Replication & Safety Invariants",
+          "status": "not_started"
+        },
+        {
+          "id": "paxos-and-production-coordination",
+          "title": "Paxos Concepts, Zookeeper ZAB & Production Coordination Services (etcd, Consul)",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "slug": "17-message-queues",
+      "title": "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+      "level": "Advanced",
+      "category": "Messaging",
+      "icon": "inbox",
+      "description": "Producers, Consumers, Brokers, Topics, Partitions, Consumer Groups, Offsets, Delivery Guarantees (At-least-once, Exactly-once), and DLQs.",
+      "estimated_hours": 5,
+      "topics": [
+        {
+          "id": "point-to-point-vs-partitioned-log",
+          "title": "Point-to-Point Queue (RabbitMQ) vs Distributed Partitioned Log (Kafka)",
+          "status": "not_started"
+        },
+        {
+          "id": "kafka-internals-and-offsets",
+          "title": "Kafka Architecture: Brokers, Partitions, Consumer Groups, Offsets & Commit Semantics",
+          "status": "not_started"
+        },
+        {
+          "id": "delivery-guarantees-and-idempotence",
+          "title": "Delivery Guarantees: At-Most-Once, At-Least-Once & Exactly-Once (Idempotent Producers + Transactions)",
+          "status": "not_started"
+        },
+        {
+          "id": "dead-letter-queues-and-backpressure",
+          "title": "Dead-Letter Queues (DLQ), Poison Pill Handling & Consumer Backpressure",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "slug": "18-event-driven-architecture",
+      "title": "Event-Driven Architecture & Pub/Sub",
+      "level": "Advanced",
+      "category": "Messaging",
+      "icon": "radio",
+      "description": "Pub/Sub topologies, Event Sourcing, CQRS read models, Event schemas (Avro/Protobuf), Schema Registry, and Eventual Consistency reconciliation.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "pubsub-patterns-and-topologies",
+          "title": "Pub/Sub Topologies: Fan-out, Topic Filtering & Dynamic Subscriptions",
+          "status": "not_started"
+        },
+        {
+          "id": "event-sourcing-and-materialized-views",
+          "title": "Event Sourcing: Rebuilding Application State from Immutable Append-Only Logs",
+          "status": "not_started"
+        },
+        {
+          "id": "schema-registry-and-evolution",
+          "title": "Schema Registry, Avro/Protobuf Evolution & Backward/Forward Compatibility",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "slug": "19-cdn-edge-computing",
+      "title": "Content Delivery Networks (CDN) & Edge Computing",
+      "level": "Intermediate",
+      "category": "Networking & Storage",
+      "icon": "cloud",
+      "description": "Edge locations, Point of Presence (PoP), Static vs Dynamic Acceleration, Anycast Routing, Cache Invalidation, and Cloudflare Workers/Edge Compute.",
+      "estimated_hours": 3,
+      "topics": [
+        {
+          "id": "cdn-architecture-and-anycast",
+          "title": "CDN Architecture: Edge PoPs, Anycast BGP Routing & Origin Shielding",
+          "status": "not_started"
+        },
+        {
+          "id": "static-vs-dynamic-acceleration",
+          "title": "Static Asset Caching vs Dynamic Content Acceleration (TCP Optimization, TLS Termination)",
+          "status": "not_started"
+        },
+        {
+          "id": "cache-invalidation-and-edge-workers",
+          "title": "Cache Purging/Invalidation Strategies & Serverless Edge Functions",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "20",
+      "slug": "20-file-and-storage-systems",
+      "title": "File & Storage Systems: Object, Block & File",
+      "level": "Intermediate",
+      "category": "Storage",
+      "icon": "folder",
+      "description": "Block Storage vs File Storage (NFS/EFS) vs Object Storage (S3), Multipart Uploads, Signed URLs, Erasure Coding, and Storage Tiering.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "block-vs-file-vs-object-storage",
+          "title": "Storage Typology: Block Storage (SAN/EBS) vs Network File Systems (NFS) vs Object Storage (S3)",
+          "status": "not_started"
+        },
+        {
+          "id": "object-storage-internals",
+          "title": "Object Storage Architecture: Buckets, Keys, Metadata, Immutability & Signed URLs",
+          "status": "not_started"
+        },
+        {
+          "id": "erasure-coding-and-multipart-uploads",
+          "title": "High Durability: Reed-Solomon Erasure Coding, Chunking & Resumable Multipart Uploads",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "21",
+      "slug": "21-search-systems",
+      "title": "Distributed Search Systems: Elasticsearch & Inverted Index",
+      "level": "Advanced",
+      "category": "Search",
+      "icon": "search",
+      "description": "Inverted index internals, Tokenization, Stemming, TF-IDF / BM25 ranking, Sharding/Replication in Lucene, and Search Autocomplete (Trie vs Prefix Index).",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "inverted-index-and-tokenization",
+          "title": "Inverted Index Mechanics: Analyzers, Tokenizers, Stop Words & Stemming",
+          "status": "not_started"
+        },
+        {
+          "id": "elasticsearch-architecture-and-sharding",
+          "title": "Elasticsearch / OpenSearch Architecture: Master, Data Nodes, Shards & Translog",
+          "status": "not_started"
+        },
+        {
+          "id": "relevance-ranking-and-indexing-pipeline",
+          "title": "Relevance Scoring (TF-IDF, BM25) & Near-Real-Time (NRT) Indexing Pipelines",
+          "status": "not_started"
+        },
+        {
+          "id": "search-autocomplete-and-typeahead",
+          "title": "Search Autocomplete & Typeahead: Prefix Trees (Trie), N-grams & Fuzzy Matching",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "22",
+      "slug": "22-rate-limiting-traffic-shaping",
+      "title": "Distributed Rate Limiting & Traffic Shaping",
+      "level": "Advanced",
+      "category": "Traffic Management",
+      "icon": "sliders",
+      "description": "Fixed Window, Sliding Window Log, Sliding Window Counter, Token Bucket, Leaky Bucket, Distributed Redis Lua Rate Limiters, and DoS Mitigation.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "rate-limiting-algorithms-comparison",
+          "title": "Algorithm Comparison: Token Bucket, Leaky Bucket, Fixed Window & Sliding Window Counter",
+          "status": "not_started"
+        },
+        {
+          "id": "distributed-rate-limiter-with-redis",
+          "title": "Distributed Rate Limiting with Redis & Atomic Lua Scripts (Eliminating Race Conditions)",
+          "status": "not_started"
+        },
+        {
+          "id": "client-identification-and-tiering",
+          "title": "Multi-Tier Rate Limiting: IP, API Key, User ID, Global Throttling & HTTP 429 Retry-After",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "23",
+      "slug": "23-reliability-and-durability",
+      "title": "High Availability, Reliability & Disaster Recovery",
+      "level": "Advanced",
+      "category": "Resilience",
+      "icon": "heart",
+      "description": "Availability Nines (99.999%), Single Points of Failure (SPOF), Active-Active vs Active-Passive, Redundancy, RTO, RPO, and Chaos Engineering.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "availability-metrics-and-nines",
+          "title": "Measuring Reliability: Availability Nines (99.9% to 99.999%), MTBF, MTTR & Downtime Math",
+          "status": "not_started"
+        },
+        {
+          "id": "spof-elimination-and-redundancy",
+          "title": "Eliminating Single Points of Failure (SPOF) with N+1 and 2N Redundancy",
+          "status": "not_started"
+        },
+        {
+          "id": "active-active-vs-active-passive-dr",
+          "title": "Disaster Recovery: Active-Active Multi-Region vs Active-Passive (Warm/Cold Standby)",
+          "status": "not_started"
+        },
+        {
+          "id": "rto-rpo-and-chaos-engineering",
+          "title": "RTO (Recovery Time Objective), RPO (Recovery Point Objective) & Chaos Engineering",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "24",
+      "slug": "24-fault-tolerance-failure-handling",
+      "title": "Fault Tolerance & Failure Handling Patterns",
+      "level": "Advanced",
+      "category": "Resilience",
+      "icon": "alert-triangle",
+      "description": "Timeouts, Exponential Backoff with Jitter, Circuit Breaker State Machine, Bulkhead Isolation, Fallback Responses, and Graceful Degradation.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "timeouts-and-cascading-failures",
+          "title": "Timeouts & The Cascade of Doom: How 1 Slow Dependency Crashes the Entire Fleet",
+          "status": "not_started"
+        },
+        {
+          "id": "exponential-backoff-and-jitter",
+          "title": "Exponential Backoff & Full Jitter (Preventing Thundering Herd Retries)",
+          "status": "not_started"
+        },
+        {
+          "id": "circuit-breaker-pattern-deep-dive",
+          "title": "Circuit Breaker Pattern: Closed, Open, Half-Open State Transitions",
+          "status": "not_started"
+        },
+        {
+          "id": "bulkheads-and-graceful-degradation",
+          "title": "Bulkhead Isolation (Thread Pool Partitioning), Fallbacks & Graceful Degradation",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "25",
+      "slug": "25-observability-monitoring-tracing",
+      "title": "Observability: Metrics, Distributed Tracing & Logs",
+      "level": "Advanced",
+      "category": "Operations",
+      "icon": "eye",
+      "description": "The 3 Pillars of Observability, Structured Logging, Prometheus Metrics, OpenTelemetry Distributed Tracing, Correlation IDs, and SLIs/SLOs/SLAs.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "three-pillars-of-observability",
+          "title": "The 3 Pillars: Structured JSON Logs, Push/Pull Metrics & Distributed Tracing",
+          "status": "not_started"
+        },
+        {
+          "id": "distributed-tracing-and-correlation-ids",
+          "title": "Distributed Tracing: Trace IDs, Span Context Propagation & OpenTelemetry Architecture",
+          "status": "not_started"
+        },
+        {
+          "id": "sli-slo-sla-and-alerting",
+          "title": "SLI (Indicators), SLO (Objectives), SLA (Agreements) & Error Budget Burn Rate Alerting",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "26",
+      "slug": "26-system-security-architecture",
+      "title": "System Security & Authentication Architecture",
+      "level": "Advanced",
+      "category": "Security",
+      "icon": "lock",
+      "description": "Authentication vs Authorization, OAuth 2.0 & OIDC, JWT vs Server Sessions, RBAC vs ABAC, Encryption at Rest / in Transit, and Zero Trust.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "authn-vs-authz-and-oauth2-jwt",
+          "title": "Authentication vs Authorization: OAuth 2.0 Authorization Code Flow & JWT Tokens",
+          "status": "not_started"
+        },
+        {
+          "id": "rbac-vs-abac-and-api-security",
+          "title": "Access Control: Role-Based (RBAC) vs Attribute-Based (ABAC) & API Key Management",
+          "status": "not_started"
+        },
+        {
+          "id": "encryption-and-zero-trust-architecture",
+          "title": "Encryption in Transit (TLS 1.3), At Rest (AES-256 Envelope Encryption) & Zero Trust Principles",
+          "status": "not_started"
+        },
+        {
+          "id": "ddos-mitigation-and-waf",
+          "title": "DDoS Defense (SYN Flood, HTTP Flood) & Web Application Firewall (WAF) Rules",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "slug": "27-microservices-architecture",
+      "title": "Microservices Architecture & Decomposition",
+      "level": "Advanced",
+      "category": "Architecture",
+      "icon": "grid",
+      "description": "Domain-Driven Design (DDD) Bounded Contexts, Database-Per-Service, Sync vs Async Communication, Service Mesh, and When NOT to use Microservices.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "domain-driven-design-and-bounded-contexts",
+          "title": "Decomposing Monoliths: Domain-Driven Design (DDD) & Bounded Contexts",
+          "status": "not_started"
+        },
+        {
+          "id": "database-per-service-and-sync-vs-async",
+          "title": "Database-per-Service Pattern & Sync (gRPC/HTTP) vs Async (Kafka) Inter-Service Comms",
+          "status": "not_started"
+        },
+        {
+          "id": "service-mesh-and-sidecars",
+          "title": "Service Mesh Architecture (Envoy / Istio): Traffic Routing, mTLS & Observability Sidecars",
+          "status": "not_started"
+        },
+        {
+          "id": "microservices-anti-patterns",
+          "title": "Microservices Anti-Patterns: Distributed Monolith, Shared DB, and When NOT to Migrate",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "28",
+      "slug": "28-service-discovery-routing",
+      "title": "Service Discovery & Dynamic Routing",
+      "level": "Advanced",
+      "category": "Architecture",
+      "icon": "compass",
+      "description": "Client-Side vs Server-Side Service Discovery, Service Registries (Consul, Eureka, ZooKeeper), Health Registrations, and DNS limitations.",
+      "estimated_hours": 3,
+      "topics": [
+        {
+          "id": "why-dynamic-service-discovery",
+          "title": "Why Static IP Configs Fail in Elastic Cloud Auto-Scaling Environments",
+          "status": "not_started"
+        },
+        {
+          "id": "client-side-vs-server-side-discovery",
+          "title": "Client-Side Discovery (Eureka/Ribbon) vs Server-Side Discovery (AWS ALB / K8s CoreDNS)",
+          "status": "not_started"
+        },
+        {
+          "id": "service-registries-and-health-checks",
+          "title": "Service Registry Architecture: Heartbeat Leases, TTL Eviction & Cluster Coordination",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "29",
+      "slug": "29-distributed-transactions",
+      "title": "Distributed Transactions: 2PC vs Saga Pattern",
+      "level": "Advanced",
+      "category": "Distributed Systems",
+      "icon": "repeat",
+      "description": "Two-Phase Commit (2PC) blocking coordinator protocol, Saga Pattern (Orchestration vs Choreography), and Compensating Transactions.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "two-phase-commit-2pc-protocol",
+          "title": "Two-Phase Commit (2PC): Prepare Phase, Commit Phase & The Blocking Coordinator Flaw",
+          "status": "not_started"
+        },
+        {
+          "id": "saga-choreography-vs-orchestration",
+          "title": "Saga Pattern: Choreography (Event-Driven) vs Orchestration (Centralized Workflow)",
+          "status": "not_started"
+        },
+        {
+          "id": "compensating-transactions-and-failures",
+          "title": "Compensating Transactions: Handling Mid-Flow Failures & Semantic Rollbacks",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "30",
+      "slug": "30-data-consistency-patterns",
+      "title": "Data Consistency Patterns: Outbox, Inbox, CDC",
+      "level": "Advanced",
+      "category": "Distributed Systems",
+      "icon": "check-circle",
+      "description": "Transactional Outbox Pattern, Polling Publisher vs Change Data Capture (Debezium), Idempotent Consumers, and Inbox Pattern.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "transactional-outbox-pattern",
+          "title": "Transactional Outbox Pattern: Dual-Write Problem Elimination",
+          "status": "not_started"
+        },
+        {
+          "id": "change-data-capture-cdc",
+          "title": "Change Data Capture (CDC): Streaming Database WAL Logs into Kafka via Debezium",
+          "status": "not_started"
+        },
+        {
+          "id": "transactional-inbox-and-deduplication",
+          "title": "Transactional Inbox Pattern & End-to-End Exactly-Once Message Processing",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "31",
+      "slug": "31-asynchronous-architecture",
+      "title": "Asynchronous Processing & Task Queues",
+      "level": "Intermediate",
+      "category": "Architecture",
+      "icon": "clock",
+      "description": "Replacing synchronous chains with Async Task Queues (Celery, BullMQ), Delayed Execution, Polling vs Webhooks, and Worker Scaling.",
+      "estimated_hours": 3,
+      "topics": [
+        {
+          "id": "sync-chains-vs-async-task-queues",
+          "title": "Sync Request Chains vs Asynchronous Background Worker Queues",
+          "status": "not_started"
+        },
+        {
+          "id": "delayed-jobs-and-scheduled-execution",
+          "title": "Delayed Tasks, Cron Jobs & Priority Task Scheduling at Scale",
+          "status": "not_started"
+        },
+        {
+          "id": "polling-vs-webhooks-for-results",
+          "title": "Delivering Async Results: Status Polling vs Long-Polling vs Outbound Webhooks",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "32",
+      "slug": "32-concurrency-and-worker-pools",
+      "title": "Concurrency & Parallelism at System Level",
+      "level": "Advanced",
+      "category": "Performance",
+      "icon": "cpu",
+      "description": "Processes vs Threads vs Coroutines, CPU-bound vs I/O-bound scaling, Worker Thread Pools, Backpressure, and Event Loop architectures.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "processes-threads-and-event-loops",
+          "title": "Concurrency Models: Multi-Process vs Multi-Threaded vs Event-Driven Asynchronous (Epoll/Kqueue)",
+          "status": "not_started"
+        },
+        {
+          "id": "cpu-bound-vs-io-bound-architectures",
+          "title": "Architecting for CPU-Bound (Parallel Worker Pool) vs I/O-Bound Workloads (Async Coroutines)",
+          "status": "not_started"
+        },
+        {
+          "id": "system-backpressure-and-resource-limits",
+          "title": "Reactive Backpressure, Thread Pool Starvation & CPU Saturation Guardrails",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "33",
+      "slug": "33-system-scalability-evolution",
+      "title": "End-to-End System Scalability: 100 to 10M+ Users",
+      "level": "Advanced",
+      "category": "Scaling",
+      "icon": "trending-up",
+      "description": "Step-by-step interactive evolution of an architecture: 100 users -> 10,000 -> 100,000 -> 1M -> 10M+ global scale.",
+      "estimated_hours": 5,
+      "topics": [
+        {
+          "id": "scaling-stage-1-single-box-to-tier2",
+          "title": "Stage 1 (100 - 10k Users): Single Server -> Dedicated DB -> Master-Slave Replicas",
+          "status": "not_started"
+        },
+        {
+          "id": "scaling-stage-2-caching-load-balancing",
+          "title": "Stage 2 (100k Users): Horizontal Stateless App Tier + Redis Cache + CDN",
+          "status": "not_started"
+        },
+        {
+          "id": "scaling-stage-3-sharding-and-queues",
+          "title": "Stage 3 (1M Users): Database Sharding + Message Queues + Microservices",
+          "status": "not_started"
+        },
+        {
+          "id": "scaling-stage-4-multi-region-global",
+          "title": "Stage 4 (10M+ Users): Multi-Region Active-Active Deployments + Global CDN Anycast",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "34",
+      "slug": "34-performance-engineering",
+      "title": "Performance Engineering & Latency Optimization",
+      "level": "Advanced",
+      "category": "Performance",
+      "icon": "activity",
+      "description": "Latency vs Throughput, p50/p90/p95/p99 Tail Latency, Database Index Tuning, Network Optimization, HTTP/2 & HTTP/3 (QUIC), and Compression.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "tail-latency-and-percentiles",
+          "title": "Tail Latency (p99 / p99.9): Why Averages Lie and How Slow Outliers Kill Systems",
+          "status": "not_started"
+        },
+        {
+          "id": "network-and-protocol-optimization",
+          "title": "Protocol Performance: HTTP/2 Multiplexing, HTTP/3 QUIC (UDP) & Brotli Compression",
+          "status": "not_started"
+        },
+        {
+          "id": "end-to-end-bottleneck-elimination",
+          "title": "System Profiling: Identifying CPU, RAM, Disk I/O & Database Locks Bottlenecks",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "35",
+      "slug": "35-deployment-infrastructure",
+      "title": "Deployment, Containers & CI/CD Strategies",
+      "level": "Intermediate",
+      "category": "Deployment",
+      "icon": "package",
+      "description": "Bare Metal vs VMs vs Docker Containers vs Kubernetes concepts, Rolling, Blue-Green, Canary Deployments, and Auto-scaling triggers.",
+      "estimated_hours": 3,
+      "topics": [
+        {
+          "id": "virtualization-containers-and-k8s",
+          "title": "Infrastructure Evolution: VMs vs Docker Containers & Kubernetes Architectural Role",
+          "status": "not_started"
+        },
+        {
+          "id": "zero-downtime-deployment-strategies",
+          "title": "Deployment Patterns: Rolling Updates vs Blue-Green vs Canary Deployments",
+          "status": "not_started"
+        },
+        {
+          "id": "horizontal-pod-autoscaling",
+          "title": "Auto-Scaling Architectures: Metric Triggers (CPU, Memory, Request Queue Depth)",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "36",
+      "slug": "36-cloud-architecture-concepts",
+      "title": "Cloud Architecture Concepts (Cloud-Agnostic)",
+      "level": "Intermediate",
+      "category": "Cloud",
+      "icon": "cloud-rain",
+      "description": "Cloud primitives: Compute, Storage, Managed DBs, Caches, Object Storage, IAM, VPCs, and mapping conceptually across AWS, Azure, and GCP.",
+      "estimated_hours": 3,
+      "topics": [
+        {
+          "id": "cloud-primitives-and-building-blocks",
+          "title": "The Universal Cloud Primitives: Compute, Block/Object Storage, Managed DB & IAM",
+          "status": "not_started"
+        },
+        {
+          "id": "multi-az-and-multi-region-topology",
+          "title": "High-Availability Topologies: Availability Zones (AZs) vs Geographic Regions",
+          "status": "not_started"
+        },
+        {
+          "id": "cloud-agnostic-mapping",
+          "title": "Cloud Rosetta Stone: Mapping Architectural Concepts across AWS, GCP & Azure",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "37",
+      "slug": "37-system-design-patterns-catalog",
+      "title": "System Design Patterns Catalog",
+      "level": "Advanced",
+      "category": "Patterns Catalog",
+      "icon": "book-open",
+      "description": "Comprehensive reference catalog of 25+ classic system design patterns with problem, solution, trade-offs, and failure scenarios.",
+      "estimated_hours": 6,
+      "topics": [
+        {
+          "id": "data-and-caching-patterns",
+          "title": "Data & Caching Patterns: Cache-Aside, Write-Back, Write-Through & CQRS",
+          "status": "not_started"
+        },
+        {
+          "id": "resilience-and-stability-patterns",
+          "title": "Resilience Patterns: Circuit Breaker, Bulkhead, Retry with Jitter & Fallback",
+          "status": "not_started"
+        },
+        {
+          "id": "integration-and-routing-patterns",
+          "title": "Integration Patterns: API Gateway, Backend-for-Frontend (BFF), Strangler Fig & Sidecar",
+          "status": "not_started"
+        },
+        {
+          "id": "distributed-coordination-patterns",
+          "title": "Coordination Patterns: Saga, Outbox, Leader-Follower, Sharding & Consistent Hashing",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "38",
+      "slug": "38-real-world-system-design-library",
+      "title": "Real-World System Design Problem Library",
+      "level": "Interview",
+      "category": "Real-World Systems",
+      "icon": "briefcase",
+      "description": "30+ end-to-end production designs: URL Shortener, Pastebin, YouTube, Netflix, Instagram, Twitter/X, WhatsApp, Uber, Distributed Cache, Web Crawler.",
+      "estimated_hours": 20,
+      "topics": [
+        {
+          "id": "design-url-shortener-tinyurl",
+          "title": "Problem 1 (Beginner): Design a URL Shortener (TinyURL / Bitly)",
+          "status": "not_started"
+        },
+        {
+          "id": "design-pastebin-storage",
+          "title": "Problem 2 (Beginner): Design Pastebin / Text Sharing Service",
+          "status": "not_started"
+        },
+        {
+          "id": "design-scalable-notification-system",
+          "title": "Problem 3 (Beginner): Design a Scalable Notification Service (SMS, Email, Push)",
+          "status": "not_started"
+        },
+        {
+          "id": "design-youtube-video-streaming",
+          "title": "Problem 4 (Intermediate): Design YouTube / Netflix Video Streaming Platform",
+          "status": "not_started"
+        },
+        {
+          "id": "design-twitter-newsfeed-system",
+          "title": "Problem 5 (Intermediate): Design Twitter / X News Feed & Timeline Fan-out",
+          "status": "not_started"
+        },
+        {
+          "id": "design-whatsapp-chat-messenger",
+          "title": "Problem 6 (Intermediate): Design WhatsApp / Real-time Messaging System",
+          "status": "not_started"
+        },
+        {
+          "id": "design-uber-ride-matching",
+          "title": "Problem 7 (Intermediate): Design Uber / Ride Hailing & Spatial Matching Service",
+          "status": "not_started"
+        },
+        {
+          "id": "design-distributed-rate-limiter",
+          "title": "Problem 8 (Intermediate): Design a Multi-Tier Distributed Rate Limiter",
+          "status": "not_started"
+        },
+        {
+          "id": "design-distributed-cache-redis",
+          "title": "Problem 9 (Intermediate): Design a Distributed In-Memory Cache (Redis-like)",
+          "status": "not_started"
+        },
+        {
+          "id": "design-google-drive-file-sync",
+          "title": "Problem 10 (Advanced): Design Google Drive / Dropbox Cloud File Synchronization",
+          "status": "not_started"
+        },
+        {
+          "id": "design-google-docs-collaborative-editor",
+          "title": "Problem 11 (Advanced): Design Google Docs Real-time Collaborative Editor (OT / CRDT)",
+          "status": "not_started"
+        },
+        {
+          "id": "design-distributed-web-crawler",
+          "title": "Problem 12 (Advanced): Design a Distributed Web Crawler & Indexer at Scale",
+          "status": "not_started"
+        },
+        {
+          "id": "design-distributed-job-scheduler",
+          "title": "Problem 13 (Advanced): Design a Distributed Task / Job Scheduler at Scale",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "39",
+      "slug": "39-system-design-interview-framework",
+      "title": "21-Step System Design Interview Framework",
+      "level": "Interview",
+      "category": "Interview Prep",
+      "icon": "check-circle",
+      "description": "Master the repeatable 21-step battle-tested interview roadmap from requirement gathering to architectural defense.",
+      "estimated_hours": 4,
+      "topics": [
+        {
+          "id": "the-21-step-interview-roadmap",
+          "title": "The 21-Step Battle-Tested System Design Interview Process",
+          "status": "not_started"
+        },
+        {
+          "id": "scoping-and-traffic-math-live",
+          "title": "Steps 1-6: Live Clarification, User Flow & Estimation Calculations",
+          "status": "not_started"
+        },
+        {
+          "id": "drawing-high-level-architecture-live",
+          "title": "Steps 7-12: Live High-Level Block Diagram, DB & API Contracts",
+          "status": "not_started"
+        },
+        {
+          "id": "scaling-bottlenecks-and-defense",
+          "title": "Steps 13-21: Scaling Bottlenecks, Failure Defense & Trade-offs",
+          "status": "not_started"
+        }
+      ]
+    },
+    {
+      "id": "40",
+      "slug": "40-hld-cheat-sheets-and-decisions",
+      "title": "HLD Quick Revision Cheat Sheets & Decision Trees",
+      "level": "Interview",
+      "category": "Cheat Sheets",
+      "icon": "file-text",
+      "description": "High-yield summary cheat sheets: Architecture Decision Trees (SQL vs NoSQL, Sync vs Async), CAP matrix, Networking, and SLA Math.",
+      "estimated_hours": 3,
+      "topics": [
+        {
+          "id": "architecture-decision-assistant-tree",
+          "title": "Architecture Decision Trees: SQL vs NoSQL, Cache vs DB, REST vs gRPC",
+          "status": "not_started"
+        },
+        {
+          "id": "system-design-tradeoff-matrix",
+          "title": "Master Trade-offs Matrix: Strong vs Eventual, Sharding vs Replicas, Sync vs Async",
+          "status": "not_started"
+        },
+        {
+          "id": "networking-and-protocols-cheat-sheet",
+          "title": "Networking, HTTP Statuses, Headers & Protocols Cheat Sheet",
+          "status": "not_started"
+        },
+        {
+          "id": "distributed-systems-and-cap-cheat-sheet",
+          "title": "Distributed Systems, CAP, Consensus & Consistency Models Cheat Sheet",
+          "status": "not_started"
+        },
+        {
+          "id": "hld-lld-bridge-mapping-guide",
+          "title": "The Bridge: Connecting High-Level Architecture Directly to Low-Level C++ Design",
+          "status": "not_started"
+        }
+      ]
+    }
+  ]
+}

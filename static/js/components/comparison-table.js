@@ -35,7 +35,25 @@ const ComparisonTable = {
       el.style.padding = '0.75rem 1rem';
       el.style.borderBottom = '1px solid rgba(255, 255, 255, 0.06)';
     });
+  },
+
+  initAll() {
+    document.querySelectorAll('.topic-comp-target, .comp-table-target').forEach(el => {
+      const raw = el.getAttribute('data-comp');
+      if (raw) {
+        try {
+          const data = JSON.parse(raw);
+          this.render(el, data);
+        } catch (e) {
+          console.error('[ComparisonTable] Failed to parse data', e);
+        }
+      }
+    });
   }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  ComparisonTable.initAll();
+});
 
 window.ComparisonTable = ComparisonTable;

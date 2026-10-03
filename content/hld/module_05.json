@@ -1,0 +1,665 @@
+{
+  "module_id": "05",
+  "module_title": "HTTP & API Design: REST, GraphQL & gRPC",
+  "description": "HTTP semantics, REST principles, GraphQL schemas, gRPC Protocol Buffers, API Gateways, rate limiting, idempotency keys, and pagination.",
+  "topics": [
+    {
+      "id": "http-methods-headers-status-codes",
+      "title": "HTTP Methods (GET, POST, PUT, PATCH, DELETE), Status Codes & Headers",
+      "definition": "The formal vocabulary and semantic rules of Hypertext Transfer Protocol (HTTP), governing how client-server systems request, mutate, delete, cache, and authenticate resources.",
+      "why_we_need_it": "Adhering to HTTP semantics ensures your API is predictable, cacheable by CDNs, safe from data corruption, and self-documenting across international engineering teams.",
+      "real_world_analogy": "Standard postal mail: HTTP Method is the action label (Return to sender, Certified delivery), Headers are the envelope stamps and return address, Status Codes are postal tracking confirmations (Delivered, Address not found, Returned).",
+      "how_it_works": "<p><strong>HTTP Methods & Idempotence:</strong></p><ul><li><code>GET</code>: Safe & Idempotent (Fetches resource without mutation). Cacheable!</li><li><code>POST</code>: Unsafe & Non-Idempotent (Creates a new resource; calling 5 times creates 5 records).</li><li><code>PUT</code>: Idempotent (Replaces entire resource; calling 5 times results in same state).</li><li><code>PATCH</code>: Non-Idempotent / Partial Update (Mutates specific fields).</li><li><code>DELETE</code>: Idempotent (Removes resource; calling 5 times produces same result).</li></ul>",
+      "conceptual_breakdown": [
+        "<strong>2xx Success:</strong> 200 OK, 201 Created, 204 No Content (Deletion success with empty body).",
+        "<strong>3xx Redirection:</strong> 301 Moved Permanently (SEO permanent redirect), 304 Not Modified (Conditional GET cache hit).",
+        "<strong>4xx Client Errors:</strong> 400 Bad Request, 401 Unauthorized (Missing auth), 403 Forbidden (Authenticated but lacking permissions), 404 Not Found, 409 Conflict, 429 Too Many Requests.",
+        "<strong>5xx Server Errors:</strong> 500 Internal Error, 502 Bad Gateway (Upstream crashed), 503 Service Unavailable (Overload/maintenance), 504 Gateway Timeout."
+      ],
+      "arch_diagram": {
+        "title": "HTTP Method Semantics & Status Flow",
+        "tiers": [
+          {
+            "label": "Client Actions",
+            "nodes": [
+              {
+                "name": "GET /orders/101",
+                "type": "client",
+                "icon": "\ud83d\udce5",
+                "what": "Fetch Order 101",
+                "why": "Read operation (Safe & Idempotent)",
+                "when": "View order",
+                "failure": "404 Not Found"
+              },
+              {
+                "name": "POST /orders",
+                "type": "client",
+                "icon": "\ud83d\udce4",
+                "what": "Create New Order",
+                "why": "Mutation (Non-Idempotent)",
+                "when": "Checkout click",
+                "failure": "400 Bad Request / 409 Conflict"
+              },
+              {
+                "name": "PUT /orders/101",
+                "type": "client",
+                "icon": "\ud83d\udd04",
+                "what": "Replace Full Order 101",
+                "why": "Full update (Idempotent)",
+                "when": "Overwriting entity",
+                "failure": "404 Not Found"
+              }
+            ]
+          },
+          {
+            "label": "Gateway Semantic Verification",
+            "nodes": [
+              {
+                "name": "REST API Gateway",
+                "type": "lb",
+                "icon": "\u2696\ufe0f",
+                "what": "Validates Headers & Methods",
+                "why": "Enforces protocol semantics",
+                "when": "Every incoming request",
+                "failure": "Returns 405 Method Not Allowed"
+              }
+            ]
+          },
+          {
+            "label": "Response Status Tier",
+            "nodes": [
+              {
+                "name": "201 Created / 200 OK",
+                "type": "db",
+                "icon": "\u2705",
+                "what": "Successful execution",
+                "why": "Standard success confirmation",
+                "when": "Happy path",
+                "failure": "N/A"
+              },
+              {
+                "name": "429 Too Many Requests",
+                "type": "cache",
+                "icon": "\ud83d\uded1",
+                "what": "Rate limit exceeded with Retry-After",
+                "why": "Prevents DDoS abuse",
+                "when": "Traffic spike",
+                "failure": "Client backoff"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Conditional GET & 304 Not Modified Caching",
+        "steps": [
+          {
+            "step": 1,
+            "description": "1. Client sends GET /product/42. Server returns JSON with 'ETag: 0xABCD12' and 'Cache-Control: max-age=3600'.",
+            "active_nodes": [
+              "GET /orders/101",
+              "REST API Gateway",
+              "201 Created / 200 OK"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "2. Client re-requests product later: sends 'If-None-Match: 0xABCD12' in request header.",
+            "active_nodes": [
+              "GET /orders/101",
+              "REST API Gateway"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "3. Server checks hash: Product unchanged! Returns lightweight HTTP 304 Not Modified with ZERO response body bytes.",
+            "active_nodes": [
+              "REST API Gateway",
+              "201 Created / 200 OK"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Using `PUT` requires the client to send the entire object payload (wasting bandwidth for 1-field changes). Using `PATCH` saves bandwidth by sending only changed fields (`{ \"status\": \"shipped\" }`) but requires complex partial update validation.",
+      "comparison_matrix": {
+        "title": "HTTP Methods Idempotence & Safety Matrix",
+        "headers": [
+          "HTTP Method",
+          "Safe? (No mutation)",
+          "Idempotent? (N calls = 1 call)",
+          "Cacheable?",
+          "Typical Usage"
+        ],
+        "rows": [
+          [
+            "GET",
+            "YES",
+            "YES",
+            "YES",
+            "Fetch resource data"
+          ],
+          [
+            "HEAD",
+            "YES",
+            "YES",
+            "YES",
+            "Fetch headers only without body (Checking ETag / file size)"
+          ],
+          [
+            "POST",
+            "NO",
+            "NO",
+            "Only with explicit headers",
+            "Create new entity / Submit payment"
+          ],
+          [
+            "PUT",
+            "NO",
+            "YES",
+            "NO",
+            "Replace entire entity (Full update)"
+          ],
+          [
+            "PATCH",
+            "NO",
+            "NO (typically)",
+            "NO",
+            "Partial field update"
+          ],
+          [
+            "DELETE",
+            "NO",
+            "YES",
+            "NO",
+            "Delete entity"
+          ]
+        ]
+      },
+      "failure_scenarios": "Using `GET` for state-modifying actions (e.g. `GET /user/delete?id=5`): web crawlers, search indexing bots, and browser pre-fetching engines automatically trigger GET requests, unintentionally deleting entire databases.",
+      "common_mistakes": [
+        {
+          "mistake": "Returning HTTP 200 OK with an error body like `{ \"status\": \"error\", \"code\": 404 }`",
+          "correction": "Always use real HTTP status codes (e.g. 404, 401, 500). Proxies, CDNs, load balancers, and monitoring tools rely on true HTTP status codes for alerting and caching."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What is the difference between HTTP 401 Unauthorized and HTTP 403 Forbidden?",
+          "answer": "HTTP 401 Unauthorized means authentication is missing or invalid (the server does not know who you are; provide a valid JWT/API key). HTTP 403 Forbidden means the server knows who you are, but you do not have permission to access that specific resource (RBAC authorization failure)."
+        }
+      ]
+    },
+    {
+      "id": "rest-vs-graphql-vs-grpc",
+      "title": "Protocol Shootout: REST vs GraphQL vs gRPC Trade-offs",
+      "definition": "The definitive technical comparison between the 3 major API paradigms: REST (Resource-oriented JSON over HTTP), GraphQL (Query-driven flexible client schemas), and gRPC (High-performance Protocol Buffers over HTTP/2).",
+      "why_we_need_it": "Choosing the wrong API protocol cripples performance: using REST for high-throughput internal microservices wastes CPU parsing ASCII JSON strings, while using gRPC for public web clients requires heavy browser proxy polyfills.",
+      "real_world_analogy": "REST is ordering a set combo meal from a menu; GraphQL is a custom salad bar where you pick the exact 3 ingredients you want; gRPC is a pneumatic tube delivering compressed military capsules at Mach 2.",
+      "how_it_works": "<p><strong>REST:</strong> Resource URLs (`/users/42/posts`). Simple, universal, highly cacheable by CDNs, but suffers from Over-fetching (getting 50 fields when you need 1) and Under-fetching (requiring 5 sequential network calls to load 1 screen).</p><p><strong>GraphQL:</strong> Single POST endpoint (`/graphql`). Client specifies exact fields needed in query body. Eliminates over/under-fetching, but prevents native CDN caching and risks complex nested N+1 database queries.</p><p><strong>gRPC:</strong> Defines services in `.proto` files. Compiles into compact binary Protocol Buffers over HTTP/2 multiplexed streams. $7\\times - 10\\times$ faster serialization and $30\\% - 50\\%$ smaller payloads than JSON!</p>",
+      "conceptual_breakdown": [
+        "<strong>REST:</strong> Best for Public Developer APIs and standard CRUD web applications.",
+        "<strong>GraphQL:</strong> Best for Mobile Apps, complex analytics dashboards, and aggregating multi-service backends (Backend-For-Frontend / BFF pattern).",
+        "<strong>gRPC:</strong> Best for Internal East-West microservice communication, real-time streaming, and polyglot systems (C++, Go, Java, Python)."
+      ],
+      "arch_diagram": {
+        "title": "REST vs GraphQL vs gRPC Architectural Placement",
+        "tiers": [
+          {
+            "label": "External Client Boundary (North-South Traffic)",
+            "nodes": [
+              {
+                "name": "Public Mobile / Web App",
+                "type": "client",
+                "icon": "\ud83d\udcf1",
+                "what": "GraphQL / REST Client",
+                "why": "Fetches exact view data in 1 request",
+                "when": "Public Internet",
+                "failure": "Token refresh"
+              }
+            ]
+          },
+          {
+            "label": "API Gateway / BFF Tier",
+            "nodes": [
+              {
+                "name": "GraphQL BFF Gateway",
+                "type": "lb",
+                "icon": "\ud83e\udde9",
+                "what": "Aggregates Microservices",
+                "why": "Translates public GraphQL to internal gRPC",
+                "when": "North-South boundary",
+                "failure": "Query depth limiting"
+              }
+            ]
+          },
+          {
+            "label": "Internal Microservice Tier (East-West Traffic)",
+            "nodes": [
+              {
+                "name": "Order Microservice (gRPC)",
+                "type": "service",
+                "icon": "\u26a1",
+                "what": "C++ / Go Service",
+                "why": "Ultra fast binary Protobuf over HTTP/2",
+                "when": "Internal inter-service RPC",
+                "failure": "Circuit breaker fallback"
+              },
+              {
+                "name": "Inventory Microservice (gRPC)",
+                "type": "service",
+                "icon": "\u26a1",
+                "what": "Java / C++ Service",
+                "why": "Multiplexed streams",
+                "when": "Internal inter-service RPC",
+                "failure": "Circuit breaker fallback"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "BFF Pattern: GraphQL Ingress to gRPC Internal Mesh",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Mobile App sends 1 GraphQL Query: 'query { user(id:1) { name, orders { id, total } } }'.",
+            "active_nodes": [
+              "Public Mobile / Web App",
+              "GraphQL BFF Gateway"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "GraphQL Gateway parses AST and fires 2 parallel gRPC binary calls to User Service and Order Service.",
+            "active_nodes": [
+              "GraphQL BFF Gateway",
+              "Order Microservice (gRPC)",
+              "Inventory Microservice (gRPC)"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "Internal services respond via binary Protobuf in 1.5ms. Gateway combines data and returns clean JSON to mobile app.",
+            "active_nodes": [
+              "Order Microservice (gRPC)",
+              "GraphQL BFF Gateway",
+              "Public Mobile / Web App"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "GraphQL solves over-fetching but shifts query complexity to the backend; malicious users can submit 10-level deep nested queries that crash the database. Always enforce query depth limits and query cost analysis in GraphQL.",
+      "comparison_matrix": {
+        "title": "REST vs GraphQL vs gRPC Technical Shootout",
+        "headers": [
+          "Metric",
+          "REST (HTTP/JSON)",
+          "GraphQL",
+          "gRPC (HTTP/2 Protobuf)"
+        ],
+        "rows": [
+          [
+            "Data Format",
+            "JSON (Text / ASCII)",
+            "JSON (Text / ASCII)",
+            "Protocol Buffers (Compact Binary)"
+          ],
+          [
+            "Network Transport",
+            "HTTP/1.1 or HTTP/2",
+            "HTTP/1.1 or HTTP/2 POST",
+            "HTTP/2 Strictly (Multiplexing)"
+          ],
+          [
+            "Performance / Latency",
+            "Baseline (1x)",
+            "Moderate (AST parsing overhead)",
+            "7x - 10x Faster (Binary serialization)"
+          ],
+          [
+            "Payload Size",
+            "Large (Verbose JSON keys)",
+            "Optimized (Only requested fields)",
+            "Ultra-compact (30-50% smaller than JSON)"
+          ],
+          [
+            "CDN Caching",
+            "Trivial (GET /resource cacheable)",
+            "Difficult (Most queries use HTTP POST)",
+            "Not designed for edge HTTP caching"
+          ],
+          [
+            "Contract Definition",
+            "OpenAPI / Swagger (Optional)",
+            "GraphQL Schema Definition (SDL)",
+            "Strict `.proto` file contract (Compile-time code-gen)"
+          ],
+          [
+            "Streaming Support",
+            "Limited (SSE)",
+            "Subscriptions (WebSockets)",
+            "Native Bi-directional streaming"
+          ]
+        ]
+      },
+      "failure_scenarios": "The GraphQL N+1 Problem: fetching 100 users and their orders executes 1 query for users plus 100 individual queries for each user's orders (101 SQL queries total). Mitigation: Use Facebook's `DataLoader` pattern to batch and memoize database queries into a single `SELECT * FROM orders WHERE user_id IN (...)`.",
+      "common_mistakes": [
+        {
+          "mistake": "Using JSON REST for high-frequency internal microservice communication handling 100k QPS",
+          "correction": "Use gRPC for internal service-to-service communication. Parsing text JSON consumes up to 30% of CPU time at high throughput."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you explain the architectural decision of using GraphQL at the edge and gRPC internally?",
+          "answer": "GraphQL is ideal for North-South client traffic because mobile devices over cellular connections need to fetch heterogeneous data in a single roundtrip without over-fetching. gRPC is ideal for East-West internal traffic because datacenter networks benefit from HTTP/2 multiplexing, binary serialization speed, and strict compile-time Protobuf typing."
+        }
+      ]
+    },
+    {
+      "id": "api-pagination-filtering-sorting",
+      "title": "Pagination (Offset vs Cursor-based), Filtering, and Sorting Strategies",
+      "definition": "Techniques for querying and streaming large database result sets across API boundaries without exhausting database memory or suffering from the 'Missing/Duplicate Item' pagination bug.",
+      "why_we_need_it": "Returning 1,000,000 database rows in a single HTTP response crashes server memory and browser DOMs. Choosing between Offset and Cursor pagination determines whether query performance degrades as users scroll deeper.",
+      "real_world_analogy": "Offset pagination is counting 5,000 pages into a physical encyclopedia from Page 1 every single time; Cursor pagination is keeping a bookmark on the exact page you just read.",
+      "how_it_works": "<p><strong>1. Offset-Based Pagination:</strong> Uses SQL <code>LIMIT 20 OFFSET 10000</code>. The database must scan and discard the first 10,000 rows before returning 20. Performance degrades linearly ($O(N)$). Also causes duplicate/skipped items when new rows are inserted!</p><p><strong>2. Cursor-Based Pagination (Keyset):</strong> Uses SQL <code>WHERE id < 'last_seen_id' ORDER BY id DESC LIMIT 20</code>. The database jumps directly to the indexed cursor in $O(1)$ / $O(\\log N)$ time. Infinite scroll stays lightning fast regardless of depth!</p>",
+      "conceptual_breakdown": [
+        "<strong>Offset Pagination:</strong> `GET /items?page=5&limit=20` &bull; Good for static admin tables where jumping to a specific page (e.g. Page 12) is required.",
+        "<strong>Cursor Pagination:</strong> `GET /feed?cursor=eyJpZCI6MTAxfQ==&limit=20` &bull; Standard for social feeds (Twitter, Instagram, Reddit, TikTok infinite scroll).",
+        "<strong>Cursor Structure:</strong> Base64-encoded string containing `(timestamp, id)` ensuring unique tie-breaking on identical timestamps."
+      ],
+      "arch_diagram": {
+        "title": "Offset Pagination vs Cursor Pagination Performance",
+        "tiers": [
+          {
+            "label": "Client Scrolling",
+            "nodes": [
+              {
+                "name": "Client Infinite Scroll",
+                "type": "client",
+                "icon": "\ud83d\udcdc",
+                "what": "User scrolls to item #100,000",
+                "why": "Fetches next page",
+                "when": "Scroll bottom",
+                "failure": "Retry with last valid cursor"
+              }
+            ]
+          },
+          {
+            "label": "Offset Approach (Slow)",
+            "nodes": [
+              {
+                "name": "LIMIT 20 OFFSET 100000",
+                "type": "cache",
+                "icon": "\ud83d\udc22",
+                "what": "Scans 100,000 rows in memory & discards",
+                "why": "O(N) full index scan",
+                "when": "Page 5,000",
+                "failure": "Database CPU 100% saturation"
+              }
+            ]
+          },
+          {
+            "label": "Cursor Approach (Optimal)",
+            "nodes": [
+              {
+                "name": "WHERE id < cursor LIMIT 20",
+                "type": "db",
+                "icon": "\u26a1",
+                "what": "B-Tree index seek directly to key",
+                "why": "O(log N) constant time",
+                "when": "Infinite scroll",
+                "failure": "N/A"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Cursor-Based Infinite Scroll Request Flow",
+        "steps": [
+          {
+            "step": 1,
+            "description": "1. Client requests initial feed: GET /api/v1/feed?limit=10.",
+            "active_nodes": [
+              "Client Infinite Scroll",
+              "Cursor Approach (Optimal)"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "2. Server queries DB: 'SELECT * FROM posts ORDER BY id DESC LIMIT 10'. Returns posts + 'next_cursor: 1042'.",
+            "active_nodes": [
+              "Cursor Approach (Optimal)"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "3. New post inserted at top by another user.",
+            "active_nodes": [
+              "Cursor Approach (Optimal)"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "4. User scrolls: Client sends GET /api/v1/feed?cursor=1042&limit=10. Queries 'WHERE id < 1042'. Zero duplicate posts!",
+            "active_nodes": [
+              "Client Infinite Scroll",
+              "Cursor Approach (Optimal)"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Cursor pagination delivers optimal $O(1)$ performance and prevents duplicate items, but prevents users from jumping directly to arbitrary page numbers (e.g. 'Jump to Page 45').",
+      "comparison_matrix": {
+        "title": "Offset vs Cursor Pagination Comparison",
+        "headers": [
+          "Dimension",
+          "Offset Pagination (`LIMIT/OFFSET`)",
+          "Cursor Pagination (`WHERE id < cursor`)"
+        ],
+        "rows": [
+          [
+            "Query Performance",
+            "Degrades linearly $O(N)$ (Very slow on page 10,000)",
+            "Constant $O(\\log N)$ B-Tree seek time"
+          ],
+          [
+            "Data Drift Immunity",
+            "Unsafe (New inserts cause duplicate/skipped items)",
+            "Immune (Cursor points to immutable anchor key)"
+          ],
+          [
+            "Jump to Page Number",
+            "Yes (`page=42`)",
+            "No (Only `next` and `prev` navigation)"
+          ],
+          [
+            "Implementation Complexity",
+            "Trivial (`page * limit`)",
+            "Moderate (Requires indexed sort keys and encoding)"
+          ],
+          [
+            "Best Suited For",
+            "Internal Admin dashboards with numbered pages",
+            "High-scale consumer feeds, mobile infinite scroll, chat logs"
+          ]
+        ]
+      },
+      "failure_scenarios": "The Offset Pagination Duplication Glitch: User is viewing Page 1 (Items 1-10). A new post is published at the top. User clicks Page 2 (`OFFSET 10`). Item #10 has now shifted to position #11, so the user sees Item #10 a second time on Page 2.",
+      "common_mistakes": [
+        {
+          "mistake": "Using `OFFSET 50000` on a table with 100 million rows",
+          "correction": "Never use large offsets on massive tables. Always adopt cursor-based pagination with indexed timestamp/ID compound keys."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you construct a tamper-proof cursor for cursor-based pagination with multiple sort fields (e.g. sort by likes, then by id)?",
+          "answer": "Combine the sort fields into a tuple, serialize to JSON, and Base64-encode it: `base64_encode(JSON.stringify({ likes: 450, id: \"post_992\" }))`. In SQL, use row-value comparison: `WHERE (likes, id) < (450, 'post_992') ORDER BY likes DESC, id DESC LIMIT 20`."
+        }
+      ]
+    },
+    {
+      "id": "idempotency-retries-rate-limiting",
+      "title": "Idempotency Keys, Exponential Backoff Retries & API Gateway Routing",
+      "definition": "The reliability triad of distributed APIs: Idempotency Keys (guaranteeing that duplicate network requests execute exactly once), Exponential Backoff with Jitter (safe client retries), and API Gateway rate-limiting policies.",
+      "why_we_need_it": "Networks drop packets. If a mobile user clicks 'Pay $100' and the Wi-Fi disconnects after the server charges the card but before returning the HTTP 200 response, the mobile app retries. Without an idempotency key, the user is double-charged.",
+      "real_world_analogy": "An elevator call button: pressing the button 10 times in a row produces the exact same result as pressing it once (Idempotent).",
+      "how_it_works": "<p><strong>Idempotency Key Workflow (Stripe Standard):</strong></p><ol><li>Client generates a unique UUID (<code>Idempotency-Key: 7b3e9...</code>) and attaches it in HTTP header.</li><li>Server receives request and attempts an atomic <code>SET idempotency:7b3e9... IN_PROGRESS NX EX 120</code> in Redis.</li><li>If key already exists with status <code>COMPLETED</code>, server skips execution and immediately returns the cached HTTP response from Redis!</li><li>If key does not exist, server executes payment, stores final response in Redis, and returns HTTP 200.</li></ol>",
+      "conceptual_breakdown": [
+        "<strong>Idempotency-Key Header:</strong> Client-generated UUID attached to unsafe `POST` requests.",
+        "<strong>Exponential Backoff:</strong> Retrying with exponentially increasing wait times ($T = 2^{\\text{attempt}} \\times 100\\text{ms}$).",
+        "<strong>Full Jitter:</strong> Adding randomized noise to backoff ($T = \\text{random}(0, 2^{\\text{attempt}} \\times 100\\text{ms})$) to prevent the <em>Thundering Herd</em> retry storm.",
+        "<strong>API Gateway Rate Limiting:</strong> Enforces token-bucket rate limits returning `HTTP 429 Too Many Requests` with `Retry-After: 30` header."
+      ],
+      "arch_diagram": {
+        "title": "Idempotency Key & Redis Deduplication Engine",
+        "tiers": [
+          {
+            "label": "Client Retry Layer",
+            "nodes": [
+              {
+                "name": "Client (Idempotency-Key: UUID-101)",
+                "type": "client",
+                "icon": "\ud83d\udcb3",
+                "what": "Submits $100 Payment with UUID-101",
+                "why": "Network drops initial response",
+                "when": "Retry attempt #2",
+                "failure": "Client backoff"
+              }
+            ]
+          },
+          {
+            "label": "Deduplication Gateway",
+            "nodes": [
+              {
+                "name": "API Gateway / Payment Service",
+                "type": "lb",
+                "icon": "\u2696\ufe0f",
+                "what": "Checks Redis for UUID-101",
+                "why": "Prevents duplicate charge",
+                "when": "Every incoming mutation",
+                "failure": "Atomic Redis lock"
+              }
+            ]
+          },
+          {
+            "label": "Idempotency Store",
+            "nodes": [
+              {
+                "name": "Redis Idempotency Cache",
+                "type": "cache",
+                "icon": "\u26a1",
+                "what": "Key: UUID-101 -> Stored HTTP 200 Response",
+                "why": "Cached payment confirmation",
+                "when": "Duplicate request",
+                "failure": "TTL expiry after 24h"
+              }
+            ]
+          },
+          {
+            "label": "Payment Execution",
+            "nodes": [
+              {
+                "name": "Stripe / Banking Core",
+                "type": "db",
+                "icon": "\ud83c\udfe6",
+                "what": "Executes credit card charge ONCE",
+                "why": "Financial state mutation",
+                "when": "First execution only",
+                "failure": "Card declined"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Idempotent Payment Retry Execution",
+        "steps": [
+          {
+            "step": 1,
+            "description": "1. Client submits POST /checkout with 'Idempotency-Key: UUID-99'. Initial payment charges $100.",
+            "active_nodes": [
+              "Client (Idempotency-Key: UUID-101)",
+              "API Gateway / Payment Service",
+              "Payment Execution"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "2. Payment succeeds, response cached in Redis, but Wi-Fi drops before client receives ACK!",
+            "active_nodes": [
+              "Redis Idempotency Cache"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "3. Client re-sends POST /checkout with identical 'Idempotency-Key: UUID-99'.",
+            "active_nodes": [
+              "Client (Idempotency-Key: UUID-101)",
+              "API Gateway / Payment Service"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "4. Gateway finds UUID-99 in Redis with status COMPLETED. Returns cached HTTP 200 instantly without re-charging card!",
+            "active_nodes": [
+              "Redis Idempotency Cache",
+              "Client (Idempotency-Key: UUID-101)"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Retrying without jitter causes thousands of failed clients to retry at the exact same second (e.g. at $t=1\\text{s}, t=2\\text{s}, t=4\\text{s}$), delivering a synchronized DDoS wave that crashes the recovering server.",
+      "comparison_matrix": {
+        "title": "Client Retry Strategies Comparison",
+        "headers": [
+          "Strategy",
+          "Formula",
+          "Thundering Herd Risk",
+          "Recovery Behavior"
+        ],
+        "rows": [
+          [
+            "Immediate Retry",
+            "Retry immediately ($0\\text{ms}$)",
+            "Severe (Destroys overloaded server)",
+            "Guarantees complete outage"
+          ],
+          [
+            "Fixed Interval Retry",
+            "Retry every $1,000\\text{ms}$",
+            "High (Clients synchronize on 1-sec pulses)",
+            "Prolongs recovery time"
+          ],
+          [
+            "Exponential Backoff",
+            "$T = 2^{\\text{attempt}} \\times \\text{base}$",
+            "Moderate (Spreads attempts, but identical clients still pulse together)",
+            "Acceptable"
+          ],
+          [
+            "Exponential Backoff + Full Jitter",
+            "$T = \\text{rand}(0, 2^{\\text{attempt}} \\times \\text{base})$",
+            "Zero (Smooths retry traffic evenly over time spectrum)",
+            "Optimal production standard"
+          ]
+        ]
+      },
+      "failure_scenarios": "Double-Charging Bug: Mobile user taps 'Pay' twice during slow 3G connectivity. Without an idempotency key, the server processes two distinct database inserts, debiting the user's bank account twice.",
+      "common_mistakes": [
+        {
+          "mistake": "Generating the Idempotency Key on the server side",
+          "correction": "The Idempotency Key MUST be generated on the CLIENT side (in the mobile app/browser) BEFORE transmitting the first network request, so retries carry the identical key."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you implement an atomic idempotency check in distributed systems using Redis?",
+          "answer": "Use Redis atomic command: `SET idempotency:<key> \"IN_PROGRESS\" NX EX 120`. 1. If return is `OK` (key was set), this is the first execution -> proceed to execute business logic. 2. When execution completes, update key with the response JSON: `SET idempotency:<key> \"{\\\"status\\\":200,...}\" EX 86400`. 3. If initial `SET NX` returned `nil` (key already exists), check its value: if still `IN_PROGRESS`, return HTTP 409 Conflict / 425 Too Early; if contains completed response, return cached response immediately."
+        }
+      ]
+    }
+  ]
+}

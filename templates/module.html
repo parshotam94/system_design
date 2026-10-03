@@ -7,7 +7,7 @@
   <!-- Main Content Column -->
   <div class="module-main-col">
     <!-- Module Header Card -->
-    <div class="glass-panel" style="padding: 2.25rem; margin-bottom: 2.5rem; position: relative;">
+    <div class="glass-panel" data-current-module-id="{{ current_module.id }}" style="padding: 2.25rem; margin-bottom: 2.5rem; position: relative;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
           <span class="badge badge-cpp">Module {{ current_module.id }}</span>
@@ -17,14 +17,19 @@
           <span class="badge badge-intermediate">{{ current_module.category }}</span>
         </div>
 
-        <!-- Topic Status Controller -->
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <label style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status:</label>
-          <select id="module-status-select" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; cursor: pointer; background: var(--bg-card);">
-            <option value="not_started">○ Not Started</option>
-            <option value="in_progress">◐ In Progress</option>
-            <option value="completed">✓ Completed</option>
-          </select>
+        <!-- Topic Status Controller & Bulk Action -->
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm btn-mark-module-complete" data-module-id="{{ current_module.id }}" style="cursor: pointer;">
+            ✓ Toggle Module Completed
+          </button>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <label style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status:</label>
+            <select id="module-status-select" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; cursor: pointer; background: var(--bg-card);">
+              <option value="not_started">○ Not Started</option>
+              <option value="in_progress">◐ In Progress</option>
+              <option value="completed">✓ Completed</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -48,12 +53,17 @@
       {% if module_content and module_content.topics %}
         {% for topic in module_content.topics %}
           <div class="topic-container" id="{{ topic.id }}">
-            <div class="topic-header">
-              <div class="topic-header-meta">
-                <span class="badge badge-cpp">Topic {{ loop.index }}</span>
+            <div class="topic-header" style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div style="flex: 1; min-width: 250px;">
+                <div class="topic-header-meta">
+                  <span class="badge badge-cpp">Topic {{ loop.index }}</span>
+                </div>
+                <h2 class="topic-title">{{ topic.title }}</h2>
+                <p style="font-size: 1.05rem; color: var(--text-secondary);">{{ topic.description }}</p>
               </div>
-              <h2 class="topic-title">{{ topic.title }}</h2>
-              <p style="font-size: 1.05rem; color: var(--text-secondary);">{{ topic.description }}</p>
+              <button class="btn btn-sm btn-topic-toggle btn-outline" data-topic-id="{{ topic.id }}" data-module-id="{{ current_module.id }}" style="cursor: pointer; white-space: nowrap;">
+                ○ Mark Completed
+              </button>
             </div>
 
             <!-- 18-Step Structured Content (Sections Array or Direct Schema) -->

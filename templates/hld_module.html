@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}HLD Module {{ current_module.id }}: {{ current_module.title }} - System Design Mastery{% endblock %}
+
+{% block content %}
+<div class="module-layout">
+  <!-- Main Content Column -->
+  <div class="module-main-col">
+    <!-- Module Header Card -->
+    <div class="glass-panel" data-current-hld-module-id="{{ current_module.id }}" style="padding: 2.25rem; margin-bottom: 2.5rem; position: relative; border-color: rgba(168, 85, 247, 0.3);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span class="badge" style="background: rgba(147, 51, 234, 0.2); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.4);">HLD Module {{ current_module.id }}</span>
+          <span class="badge {% if current_module.level == 'Beginner' %}badge-beginner{% elif current_module.level == 'Intermediate' %}badge-intermediate{% elif current_module.level == 'Advanced' %}badge-advanced{% else %}badge-interview{% endif %}">
+            {{ current_module.level }}
+          </span>
+          <span class="badge badge-intermediate">{{ current_module.category }}</span>
+        </div>
+
+        <!-- Topic Status Controller & Bulk Action -->
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm btn-mark-hld-module-complete" data-module-id="{{ current_module.id }}" style="cursor: pointer;">
+            ✓ Toggle Module Completed
+          </button>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <label style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status:</label>
+            <select id="hld-module-status-select" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; cursor: pointer; background: var(--bg-card);">
+              <option value="not_started">○ Not Started</option>
+              <option value="in_progress">◐ In Progress</option>
+              <option value="completed">✓ Completed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <h1 style="font-size: 2.3rem; color: #fff; margin-bottom: 0.75rem;">
+        {{ current_module.title }}
+      </h1>
+
+      <p style="font-size: 1.05rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 1.5rem;">
+        {{ current_module.description }}
+      </p>
+
+      <div style="display: flex; align-items: center; gap: 1.5rem; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem;">
+        <span><strong>{{ current_module.topics | length }}</strong> Architectural Topics</span>
+        <span>&bull;</span>
+        <span>Estimated Time: <strong>{{ current_module.estimated_hours }} Hours</strong></span>
+      </div>
+    </div>
+
+    <!-- Topics Container -->
+    <div id="module-topics-content">
+      {% if module_content and module_content.topics %}
+        {% for topic in module_content.topics %}
+          <div class="topic-container" id="{{ topic.id }}">
+            <div class="topic-header" style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div style="flex: 1; min-width: 250px;">
+                <div class="topic-header-meta">
+                  <span class="badge" style="background: rgba(147, 51, 234, 0.15); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.35);">HLD Topic {{ loop.index }}</span>
+                </div>
+                <h2 class="topic-title">{{ topic.title }}</h2>
+                <p style="font-size: 1.05rem; color: var(--text-secondary);">{{ topic.description or topic.definition }}</p>
+              </div>
+              <button class="btn btn-sm btn-hld-topic-toggle btn-outline" data-topic-id="{{ topic.id }}" data-module-id="{{ current_module.id }}" style="cursor: pointer; white-space: nowrap;">
+                ○ Mark Completed
+              </button>
+            </div>
+
+            <!-- Step 1: What is it? & Why do we need it? -->
+            <div class="step-section" id="{{ topic.id }}-sec-1">
+              <div class="step-section-header">
+                <div class="step-number">1</div>
+                <h3 class="step-section-title">What is it & Why do we need it?</h3>
+              </div>
+              <div class="step-body-content" style="color: var(--text-secondary); line-height: 1.7;">
+                <p><strong>Overview:</strong> {{ topic.definition or topic.what_is_it | safe }}</p>
+                {% if topic.why_we_need_it or topic.why_it_matters %}
+                  <div class="callout callout-tip" style="margin-top: 1rem;">
+                    <div class="callout-icon">💡</div>
+                    <div class="callout-content">
+                      <h5>Problem Being Solved</h5>
+                      <p>{{ topic.why_we_need_it or topic.why_it_matters | safe }}</p>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Step 2: How does it work? & Real-World Analogy -->
+            {% if topic.how_it_works or topic.real_world_analogy %}
+              <div class="step-section" id="{{ topic.id }}-sec-2">
+                <div class="step-section-header">
+                  <div class="step-number">2</div>
+                  <h3 class="step-section-title">Technical Deep-Dive & Real-World Analogy</h3>
+                </div>
+                <div class="step-body-content" style="color: var(--text-secondary); line-height: 1.7;">
+                  {% if topic.real_world_analogy %}
+                    <div class="callout callout-info" style="margin-bottom: 1.25rem;">
+                      <div class="callout-icon">🌐</div>
+                      <div class="callout-content">
+                        <h5>Real-World System Analogy</h5>
+                        <p>{{ topic.real_world_analogy | safe }}</p>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {% if topic.how_it_works %}
+                    <div style="margin-top: 1rem;">
+                      {{ topic.how_it_works | safe }}
+                    </div>
+                  {% endif %}
+
+                  {% if topic.conceptual_breakdown %}
+                    <h4 style="color: #fff; margin: 1.25rem 0 0.75rem; font-size: 1.1rem;">Architectural Invariants & Core Pillars</h4>
+                    <ul style="padding-left: 1.25rem; line-height: 1.8;">
+                      {% for point in topic.conceptual_breakdown %}
+                        <li>{{ point | safe }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+
+            <!-- Step 3: Interactive Architecture Diagram -->
+            {% if topic.arch_diagram %}
+              <div class="step-section" id="{{ topic.id }}-sec-3">
+                <div class="step-section-header">
+                  <div class="step-number">3</div>
+                  <h3 class="step-section-title">Interactive System Architecture Diagram</h3>
+                </div>
+                <div class="topic-arch-diagram-target" data-arch-diagram='{{ topic.arch_diagram | tojson }}'></div>
+              </div>
+            {% endif %}
+
+            <!-- Step 4: System Flow Animation Player -->
+            {% if topic.system_flow_animation %}
+              <div class="step-section" id="{{ topic.id }}-sec-4">
+                <div class="step-section-header">
+                  <div class="step-number">4</div>
+                  <h3 class="step-section-title">Interactive Request & Data Flow Simulation</h3>
+                </div>
+                <div class="topic-system-flow-target" data-system-flow='{{ topic.system_flow_animation | tojson }}'></div>
+              </div>
+            {% endif %}
+
+            <!-- Step 5: Capacity Calculator or Code/Config Example -->
+            {% if topic.capacity_calculator %}
+              <div class="step-section" id="{{ topic.id }}-sec-5">
+                <div class="step-section-header">
+                  <div class="step-number">5</div>
+                  <h3 class="step-section-title">Live Capacity & Back-of-the-Envelope Calculator</h3>
+                </div>
+                <div class="topic-capacity-calc-target"></div>
+              </div>
+            {% elif topic.code_example or topic.cpp_implementation %}
+              <div class="step-section" id="{{ topic.id }}-sec-5">
+                <div class="step-section-header">
+                  <div class="step-number">5</div>
+                  <h3 class="step-section-title">Production Code / Configuration Example</h3>
+                </div>
+                <div class="topic-code-target" data-filename="{{ topic.id }}.cpp" data-code="{{ (topic.code_example or topic.cpp_implementation) | escape }}"></div>
+              </div>
+            {% endif %}
+
+            <!-- Step 6: Trade-offs & Comparison Matrix -->
+            {% if topic.comparison_matrix or topic.tradeoffs %}
+              <div class="step-section" id="{{ topic.id }}-sec-6">
+                <div class="step-section-header">
+                  <div class="step-number">6</div>
+                  <h3 class="step-section-title">Trade-offs & Multi-Dimensional Comparison</h3>
+                </div>
+                {% if topic.comparison_matrix %}
+                  <div class="topic-comp-target" data-comp='{{ topic.comparison_matrix | tojson }}'></div>
+                {% endif %}
+                {% if topic.tradeoffs %}
+                  <div class="step-body-content" style="color: var(--text-secondary); line-height: 1.7; margin-top: 1rem;">
+                    {{ topic.tradeoffs | safe }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+            <!-- Step 7: Failure Scenarios & Common Anti-Patterns -->
+            {% if topic.failure_scenarios or topic.common_mistakes %}
+              <div class="step-section" id="{{ topic.id }}-sec-7">
+                <div class="step-section-header">
+                  <div class="step-number">7</div>
+                  <h3 class="step-section-title">Failure Scenarios & Common Mistakes</h3>
+                </div>
+                <div class="step-body-content">
+                  {% if topic.failure_scenarios %}
+                    <div class="callout callout-important" style="margin-bottom: 1rem;">
+                      <div class="callout-icon">⚡</div>
+                      <div class="callout-content">
+                        <h5>Production Failure Modes & Mitigation</h5>
+                        <p>{{ topic.failure_scenarios | safe }}</p>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {% if topic.common_mistakes %}
+                    <h4 style="color: #fff; margin-bottom: 0.75rem; font-size: 1.1rem;">Frequent Anti-Patterns to Avoid</h4>
+                    {% for m in topic.common_mistakes %}
+                      <div class="callout callout-trap" style="margin-bottom: 0.75rem;">
+                        <div class="callout-icon">⚠️</div>
+                        <div class="callout-content">
+                          <h5>{{ m.mistake if m.mistake is defined else m }}</h5>
+                          {% if m.correction is defined %}<p><strong>Correction:</strong> {{ m.correction }}</p>{% endif %}
+                        </div>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+
+            <!-- Step 8: Interview Questions & Defense -->
+            {% if topic.interview_questions or topic.interview_traps %}
+              <div class="step-section" id="{{ topic.id }}-sec-8">
+                <div class="step-section-header">
+                  <div class="step-number">8</div>
+                  <h3 class="step-section-title">System Design Interview Questions & Defense</h3>
+                </div>
+                <div class="step-body-content">
+                  {% if topic.interview_questions %}
+                    {% for q in topic.interview_questions %}
+                      <div class="callout callout-info" style="margin-bottom: 1rem;">
+                        <div class="callout-icon">❓</div>
+                        <div class="callout-content">
+                          <h5 style="color: #fff;">{{ q.question if q.question is defined else q }}</h5>
+                          {% if q.answer is defined %}
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);"><strong>Expected Answer:</strong> {{ q.answer | safe }}</p>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <!-- Module Ready Placeholder -->
+        <div class="glass-panel" style="padding: 3rem 2rem; text-align: center; border-color: rgba(168, 85, 247, 0.3);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🏗️</div>
+          <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff;">HLD Module {{ current_module.id }} Structure Ready</h2>
+          <p style="max-width: 600px; margin: 0 auto 1.5rem; color: var(--text-secondary);">
+            The data schema, navigation hierarchy, 18-step format pipeline, interactive architecture diagrams, capacity calculators, and flow simulation engines are initialized for <strong>{{ current_module.title }}</strong>.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+            {% for top in current_module.topics %}
+              <span class="badge" style="background: rgba(147, 51, 234, 0.15); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.35); margin: 0.2rem;">{{ top.title }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Navigation Footer (Prev / Next Module) -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); flex-wrap: wrap; gap: 1rem;">
+      {% if prev_module %}
+        <a href="/hld/module/{{ prev_module.id }}" class="btn btn-secondary">
+          &larr; HLD {{ prev_module.id }}: {{ prev_module.title }}
+        </a>
+      {% else %}
+        <div></div>
+      {% endif %}
+
+      {% if next_module %}
+        <a href="/hld/module/{{ next_module.id }}" class="btn btn-primary">
+          HLD {{ next_module.id }}: {{ next_module.title }} &rarr;
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right Sticky Table of Contents -->
+  <div class="module-toc-col">
+    <div class="toc-card glass-panel" style="border-color: rgba(168, 85, 247, 0.25);">
+      <div class="toc-header">
+        <span style="font-size: 0.85rem; font-weight: 700; color: #fff; text-transform: uppercase;">Topics in Module</span>
+      </div>
+      <div class="toc-list">
+        {% for top in current_module.topics %}
+          <a href="#{{ top.id }}" class="toc-link">
+            <span class="toc-num">{{ loop.index }}</span>
+            <span class="toc-text">{{ top.title }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/components/arch-diagram.js"></script>
+<script src="/static/js/components/system-flow-anim.js"></script>
+<script src="/static/js/components/capacity-calculator.js"></script>
+<script src="/static/js/components/comparison-table.js"></script>
+<script src="/static/js/hld_progress.js"></script>
+{% endblock %}

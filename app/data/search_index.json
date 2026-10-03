@@ -1,8 +1,8 @@
 [
   {
-    "title": "Classes & Objects in C++ (Module 01)",
+    "title": "[LLD] Classes & Objects in C++ (Module 01)",
     "url": "/module/01#classes-and-objects",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "classes-and-objects",
@@ -10,13 +10,15 @@
     "tags": [
       "",
       "Classes & Objects in C++",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Constructors & Destructors (Module 01)",
+    "title": "[LLD] Constructors & Destructors (Module 01)",
     "url": "/module/01#constructors-destructors",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "constructors-destructors",
@@ -24,13 +26,15 @@
     "tags": [
       "",
       "Constructors & Destructors",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Access Modifiers & Encapsulation (Module 01)",
+    "title": "[LLD] Access Modifiers & Encapsulation (Module 01)",
     "url": "/module/01#access-modifiers",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "access-modifiers",
@@ -38,13 +42,15 @@
     "tags": [
       "",
       "Access Modifiers & Encapsulation",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Static Members & Const Correctness (Module 01)",
+    "title": "[LLD] Static Members & Const Correctness (Module 01)",
     "url": "/module/01#static-and-const",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "static-and-const",
@@ -52,13 +58,15 @@
     "tags": [
       "",
       "Static Members & Const Correctness",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Pointers, References & the 'this' Pointer (Module 01)",
+    "title": "[LLD] Pointers, References & the 'this' Pointer (Module 01)",
     "url": "/module/01#pointers-and-references",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "pointers-and-references",
@@ -66,13 +74,15 @@
     "tags": [
       "",
       "Pointers, References & the 'this' Pointer",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Namespaces & Header/Source Separation (Module 01)",
+    "title": "[LLD] Namespaces & Header/Source Separation (Module 01)",
     "url": "/module/01#friend-and-namespaces",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "friend-and-namespaces",
@@ -80,13 +90,15 @@
     "tags": [
       "",
       "Namespaces & Header/Source Separation",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Header & Source File Separation (Module 01)",
+    "title": "[LLD] Header & Source File Separation (Module 01)",
     "url": "/module/01#header-source-separation",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "header-source-separation",
@@ -94,13 +106,15 @@
     "tags": [
       "",
       "Header & Source File Separation",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "RAII (Resource Acquisition Is Initialization) (Module 01)",
+    "title": "[LLD] RAII (Resource Acquisition Is Initialization) (Module 01)",
     "url": "/module/01#raii-and-resource-mgmt",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "raii-and-resource-mgmt",
@@ -108,13 +122,15 @@
     "tags": [
       "",
       "RAII (Resource Acquisition Is Initialization)",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Rule of 0, Rule of 3, and Rule of 5 (Module 01)",
+    "title": "[LLD] Rule of 0, Rule of 3, and Rule of 5 (Module 01)",
     "url": "/module/01#rule-of-0-3-5",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "rule-of-0-3-5",
@@ -122,13 +138,15 @@
     "tags": [
       "",
       "Rule of 0, Rule of 3, and Rule of 5",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Copy vs Move Semantics (rvalue references) (Module 01)",
+    "title": "[LLD] Copy vs Move Semantics (rvalue references) (Module 01)",
     "url": "/module/01#copy-and-move-semantics",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "copy-and-move-semantics",
@@ -136,13 +154,15 @@
     "tags": [
       "",
       "Copy vs Move Semantics (rvalue references)",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Smart Pointers (unique_ptr, shared_ptr, weak_ptr) (Module 01)",
+    "title": "[LLD] Smart Pointers (unique_ptr, shared_ptr, weak_ptr) (Module 01)",
     "url": "/module/01#smart-pointers-ownership",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "01",
     "module_title": "",
     "topic_id": "smart-pointers-ownership",
@@ -150,13 +170,15 @@
     "tags": [
       "",
       "Smart Pointers (unique_ptr, shared_ptr, weak_ptr)",
-      "Module 01"
+      "Module 01",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Encapsulation & Data Hiding (Module 02)",
+    "title": "[LLD] Encapsulation & Data Hiding (Module 02)",
     "url": "/module/02#encapsulation",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "02",
     "module_title": "",
     "topic_id": "encapsulation",
@@ -164,13 +186,15 @@
     "tags": [
       "",
       "Encapsulation & Data Hiding",
-      "Module 02"
+      "Module 02",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Abstraction & Information Hiding (Module 02)",
+    "title": "[LLD] Abstraction & Information Hiding (Module 02)",
     "url": "/module/02#abstraction",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "02",
     "module_title": "",
     "topic_id": "abstraction",
@@ -178,13 +202,15 @@
     "tags": [
       "",
       "Abstraction & Information Hiding",
-      "Module 02"
+      "Module 02",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Inheritance Types in C++ (Module 02)",
+    "title": "[LLD] Inheritance Types in C++ (Module 02)",
     "url": "/module/02#inheritance-types",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "02",
     "module_title": "",
     "topic_id": "inheritance-types",
@@ -192,13 +218,15 @@
     "tags": [
       "",
       "Inheritance Types in C++",
-      "Module 02"
+      "Module 02",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Compile-time Polymorphism (Overloading & Templates) (Module 02)",
+    "title": "[LLD] Compile-time Polymorphism (Overloading & Templates) (Module 02)",
     "url": "/module/02#compile-time-polymorphism",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "02",
     "module_title": "",
     "topic_id": "compile-time-polymorphism",
@@ -206,13 +234,15 @@
     "tags": [
       "",
       "Compile-time Polymorphism (Overloading & Templates)",
-      "Module 02"
+      "Module 02",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Runtime Polymorphism (Virtual Functions & Overriding) (Module 02)",
+    "title": "[LLD] Runtime Polymorphism (Virtual Functions & Overriding) (Module 02)",
     "url": "/module/02#runtime-polymorphism",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "02",
     "module_title": "",
     "topic_id": "runtime-polymorphism",
@@ -220,13 +250,15 @@
     "tags": [
       "",
       "Runtime Polymorphism (Virtual Functions & Overriding)",
-      "Module 02"
+      "Module 02",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Virtual Table (VTable) & VPTR Mechanism (Module 02)",
+    "title": "[LLD] Virtual Table (VTable) & VPTR Mechanism (Module 02)",
     "url": "/module/02#vtable-and-vptr",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "02",
     "module_title": "",
     "topic_id": "vtable-and-vptr",
@@ -234,13 +266,15 @@
     "tags": [
       "",
       "Virtual Table (VTable) & VPTR Mechanism",
-      "Module 02"
+      "Module 02",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Abstract Classes & Pure Virtual Functions (Module 03)",
+    "title": "[LLD] Abstract Classes & Pure Virtual Functions (Module 03)",
     "url": "/module/03#abstract-classes-interfaces",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "03",
     "module_title": "",
     "topic_id": "abstract-classes-interfaces",
@@ -248,13 +282,15 @@
     "tags": [
       "",
       "Abstract Classes & Pure Virtual Functions",
-      "Module 03"
+      "Module 03",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Virtual Destructors & Polymorphic Deletion (Module 03)",
+    "title": "[LLD] Virtual Destructors & Polymorphic Deletion (Module 03)",
     "url": "/module/03#virtual-destructors",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "03",
     "module_title": "",
     "topic_id": "virtual-destructors",
@@ -262,13 +298,15 @@
     "tags": [
       "",
       "Virtual Destructors & Polymorphic Deletion",
-      "Module 03"
+      "Module 03",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Object Slicing & Value Semantics Trap (Module 03)",
+    "title": "[LLD] Object Slicing & Value Semantics Trap (Module 03)",
     "url": "/module/03#object-slicing",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "03",
     "module_title": "",
     "topic_id": "object-slicing",
@@ -276,13 +314,15 @@
     "tags": [
       "",
       "Object Slicing & Value Semantics Trap",
-      "Module 03"
+      "Module 03",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Diamond Problem & Virtual Inheritance (Module 03)",
+    "title": "[LLD] Diamond Problem & Virtual Inheritance (Module 03)",
     "url": "/module/03#diamond-problem-virtual-inheritance",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "03",
     "module_title": "",
     "topic_id": "diamond-problem-virtual-inheritance",
@@ -290,13 +330,15 @@
     "tags": [
       "",
       "Diamond Problem & Virtual Inheritance",
-      "Module 03"
+      "Module 03",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Composition vs Inheritance in C++ (Module 03)",
+    "title": "[LLD] Composition vs Inheritance in C++ (Module 03)",
     "url": "/module/03#composition-vs-inheritance",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "03",
     "module_title": "",
     "topic_id": "composition-vs-inheritance",
@@ -304,13 +346,15 @@
     "tags": [
       "",
       "Composition vs Inheritance in C++",
-      "Module 03"
+      "Module 03",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Dependency Injection & Delegation Idioms (Module 03)",
+    "title": "[LLD] Dependency Injection & Delegation Idioms (Module 03)",
     "url": "/module/03#dependency-injection-delegation",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "03",
     "module_title": "",
     "topic_id": "dependency-injection-delegation",
@@ -318,13 +362,15 @@
     "tags": [
       "",
       "Dependency Injection & Delegation Idioms",
-      "Module 03"
+      "Module 03",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "UML Class Diagram Notations (+, -, #) (Module 04)",
+    "title": "[LLD] UML Class Diagram Notations (+, -, #) (Module 04)",
     "url": "/module/04#uml-class-diagrams",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "04",
     "module_title": "",
     "topic_id": "uml-class-diagrams",
@@ -332,13 +378,15 @@
     "tags": [
       "",
       "UML Class Diagram Notations (+, -, #)",
-      "Module 04"
+      "Module 04",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "UML Relationship Arrows & Multiplicities (Module 04)",
+    "title": "[LLD] UML Relationship Arrows & Multiplicities (Module 04)",
     "url": "/module/04#uml-relationships-notation",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "04",
     "module_title": "",
     "topic_id": "uml-relationships-notation",
@@ -346,13 +394,15 @@
     "tags": [
       "",
       "UML Relationship Arrows & Multiplicities",
-      "Module 04"
+      "Module 04",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Sequence Diagrams & Lifelines (Module 04)",
+    "title": "[LLD] Sequence Diagrams & Lifelines (Module 04)",
     "url": "/module/04#uml-sequence-diagrams",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "04",
     "module_title": "",
     "topic_id": "uml-sequence-diagrams",
@@ -360,13 +410,15 @@
     "tags": [
       "",
       "Sequence Diagrams & Lifelines",
-      "Module 04"
+      "Module 04",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "State Machines & Activity Diagrams (Module 04)",
+    "title": "[LLD] State Machines & Activity Diagrams (Module 04)",
     "url": "/module/04#uml-state-and-activity",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "04",
     "module_title": "",
     "topic_id": "uml-state-and-activity",
@@ -374,13 +426,15 @@
     "tags": [
       "",
       "State Machines & Activity Diagrams",
-      "Module 04"
+      "Module 04",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Association ('uses a') (Module 05)",
+    "title": "[LLD] Association ('uses a') (Module 05)",
     "url": "/module/05#association",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "05",
     "module_title": "",
     "topic_id": "association",
@@ -388,13 +442,15 @@
     "tags": [
       "",
       "Association ('uses a')",
-      "Module 05"
+      "Module 05",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Aggregation ('has a' - weak ownership) (Module 05)",
+    "title": "[LLD] Aggregation ('has a' - weak ownership) (Module 05)",
     "url": "/module/05#aggregation",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "05",
     "module_title": "",
     "topic_id": "aggregation",
@@ -402,13 +458,15 @@
     "tags": [
       "",
       "Aggregation ('has a' - weak ownership)",
-      "Module 05"
+      "Module 05",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Composition ('has a' - strong ownership) (Module 05)",
+    "title": "[LLD] Composition ('has a' - strong ownership) (Module 05)",
     "url": "/module/05#composition",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "05",
     "module_title": "",
     "topic_id": "composition",
@@ -416,13 +474,15 @@
     "tags": [
       "",
       "Composition ('has a' - strong ownership)",
-      "Module 05"
+      "Module 05",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Inheritance ('is a') vs Realization ('implements') (Module 05)",
+    "title": "[LLD] Inheritance ('is a') vs Realization ('implements') (Module 05)",
     "url": "/module/05#inheritance-vs-realization",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "05",
     "module_title": "",
     "topic_id": "inheritance-vs-realization",
@@ -430,13 +490,15 @@
     "tags": [
       "",
       "Inheritance ('is a') vs Realization ('implements')",
-      "Module 05"
+      "Module 05",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Dependency ('depends on') (Module 05)",
+    "title": "[LLD] Dependency ('depends on') (Module 05)",
     "url": "/module/05#dependency",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "05",
     "module_title": "",
     "topic_id": "dependency",
@@ -444,13 +506,15 @@
     "tags": [
       "",
       "Dependency ('depends on')",
-      "Module 05"
+      "Module 05",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "The Master Class Relationship Comparison Matrix (Module 05)",
+    "title": "[LLD] The Master Class Relationship Comparison Matrix (Module 05)",
     "url": "/module/05#relationships-matrix",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "05",
     "module_title": "",
     "topic_id": "relationships-matrix",
@@ -458,13 +522,15 @@
     "tags": [
       "",
       "The Master Class Relationship Comparison Matrix",
-      "Module 05"
+      "Module 05",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Single Responsibility Principle (SRP) (Module 06)",
+    "title": "[LLD] Single Responsibility Principle (SRP) (Module 06)",
     "url": "/module/06#srp",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "06",
     "module_title": "",
     "topic_id": "srp",
@@ -472,13 +538,15 @@
     "tags": [
       "",
       "Single Responsibility Principle (SRP)",
-      "Module 06"
+      "Module 06",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Open/Closed Principle (OCP) (Module 06)",
+    "title": "[LLD] Open/Closed Principle (OCP) (Module 06)",
     "url": "/module/06#ocp",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "06",
     "module_title": "",
     "topic_id": "ocp",
@@ -486,13 +554,15 @@
     "tags": [
       "",
       "Open/Closed Principle (OCP)",
-      "Module 06"
+      "Module 06",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Liskov Substitution Principle (LSP) (Module 06)",
+    "title": "[LLD] Liskov Substitution Principle (LSP) (Module 06)",
     "url": "/module/06#lsp",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "06",
     "module_title": "",
     "topic_id": "lsp",
@@ -500,13 +570,15 @@
     "tags": [
       "",
       "Liskov Substitution Principle (LSP)",
-      "Module 06"
+      "Module 06",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Interface Segregation Principle (ISP) (Module 06)",
+    "title": "[LLD] Interface Segregation Principle (ISP) (Module 06)",
     "url": "/module/06#isp",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "06",
     "module_title": "",
     "topic_id": "isp",
@@ -514,13 +586,15 @@
     "tags": [
       "",
       "Interface Segregation Principle (ISP)",
-      "Module 06"
+      "Module 06",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Dependency Inversion Principle (DIP) (Module 06)",
+    "title": "[LLD] Dependency Inversion Principle (DIP) (Module 06)",
     "url": "/module/06#dip",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "06",
     "module_title": "",
     "topic_id": "dip",
@@ -528,13 +602,15 @@
     "tags": [
       "",
       "Dependency Inversion Principle (DIP)",
-      "Module 06"
+      "Module 06",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Entities vs Value Objects (Module 07)",
+    "title": "[LLD] Entities vs Value Objects (Module 07)",
     "url": "/module/07#entities-vs-value-objects",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "07",
     "module_title": "",
     "topic_id": "entities-vs-value-objects",
@@ -542,13 +618,15 @@
     "tags": [
       "",
       "Entities vs Value Objects",
-      "Module 07"
+      "Module 07",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "CRC Cards & Identifying Responsibilities (Module 07)",
+    "title": "[LLD] CRC Cards & Identifying Responsibilities (Module 07)",
     "url": "/module/07#identifying-responsibilities",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "07",
     "module_title": "",
     "topic_id": "identifying-responsibilities",
@@ -556,13 +634,15 @@
     "tags": [
       "",
       "CRC Cards & Identifying Responsibilities",
-      "Module 07"
+      "Module 07",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Domain Invariants & Boundary Design (Module 07)",
+    "title": "[LLD] Domain Invariants & Boundary Design (Module 07)",
     "url": "/module/07#domain-invariants-boundaries",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "07",
     "module_title": "",
     "topic_id": "domain-invariants-boundaries",
@@ -570,13 +650,15 @@
     "tags": [
       "",
       "Domain Invariants & Boundary Design",
-      "Module 07"
+      "Module 07",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "High Cohesion & Low Coupling (Module 07)",
+    "title": "[LLD] High Cohesion & Low Coupling (Module 07)",
     "url": "/module/07#cohesion-and-coupling",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "07",
     "module_title": "",
     "topic_id": "cohesion-and-coupling",
@@ -584,13 +666,15 @@
     "tags": [
       "",
       "High Cohesion & Low Coupling",
-      "Module 07"
+      "Module 07",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "DRY, KISS, and YAGNI (Module 08)",
+    "title": "[LLD] DRY, KISS, and YAGNI (Module 08)",
     "url": "/module/08#dry-kiss-yagni",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "08",
     "module_title": "",
     "topic_id": "dry-kiss-yagni",
@@ -598,13 +682,15 @@
     "tags": [
       "",
       "DRY, KISS, and YAGNI",
-      "Module 08"
+      "Module 08",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Law of Demeter (Principle of Least Knowledge) (Module 08)",
+    "title": "[LLD] Law of Demeter (Principle of Least Knowledge) (Module 08)",
     "url": "/module/08#law-of-demeter",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "08",
     "module_title": "",
     "topic_id": "law-of-demeter",
@@ -612,13 +698,15 @@
     "tags": [
       "",
       "Law of Demeter (Principle of Least Knowledge)",
-      "Module 08"
+      "Module 08",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Separation of Concerns & Modularity (Module 08)",
+    "title": "[LLD] Separation of Concerns & Modularity (Module 08)",
     "url": "/module/08#separation-of-concerns",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "08",
     "module_title": "",
     "topic_id": "separation-of-concerns",
@@ -626,13 +714,15 @@
     "tags": [
       "",
       "Separation of Concerns & Modularity",
-      "Module 08"
+      "Module 08",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Encapsulate What Varies & Favor Immutability (Module 08)",
+    "title": "[LLD] Encapsulate What Varies & Favor Immutability (Module 08)",
     "url": "/module/08#encapsulate-variation",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "08",
     "module_title": "",
     "topic_id": "encapsulate-variation",
@@ -640,13 +730,15 @@
     "tags": [
       "",
       "Encapsulate What Varies & Favor Immutability",
-      "Module 08"
+      "Module 08",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Singleton (Meyers Singleton & Concurrency) (Module 09)",
+    "title": "[LLD] Singleton (Meyers Singleton & Concurrency) (Module 09)",
     "url": "/module/09#singleton-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "09",
     "module_title": "",
     "topic_id": "singleton-pattern",
@@ -655,13 +747,14 @@
       "",
       "Singleton (Meyers Singleton & Concurrency)",
       "Module 09",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Factory Method Pattern (Module 09)",
+    "title": "[LLD] Factory Method Pattern (Module 09)",
     "url": "/module/09#factory-method-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "09",
     "module_title": "",
     "topic_id": "factory-method-pattern",
@@ -670,13 +763,14 @@
       "",
       "Factory Method Pattern",
       "Module 09",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Abstract Factory Pattern (Module 09)",
+    "title": "[LLD] Abstract Factory Pattern (Module 09)",
     "url": "/module/09#abstract-factory-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "09",
     "module_title": "",
     "topic_id": "abstract-factory-pattern",
@@ -685,13 +779,14 @@
       "",
       "Abstract Factory Pattern",
       "Module 09",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Builder Pattern & Fluent Interfaces (Module 09)",
+    "title": "[LLD] Builder Pattern & Fluent Interfaces (Module 09)",
     "url": "/module/09#builder-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "09",
     "module_title": "",
     "topic_id": "builder-pattern",
@@ -700,13 +795,14 @@
       "",
       "Builder Pattern & Fluent Interfaces",
       "Module 09",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Prototype Pattern & Virtual Clone Idiom (Module 09)",
+    "title": "[LLD] Prototype Pattern & Virtual Clone Idiom (Module 09)",
     "url": "/module/09#prototype-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "09",
     "module_title": "",
     "topic_id": "prototype-pattern",
@@ -715,13 +811,14 @@
       "",
       "Prototype Pattern & Virtual Clone Idiom",
       "Module 09",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Adapter Pattern (Class & Object Adapter) (Module 10)",
+    "title": "[LLD] Adapter Pattern (Class & Object Adapter) (Module 10)",
     "url": "/module/10#adapter-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "10",
     "module_title": "",
     "topic_id": "adapter-pattern",
@@ -730,13 +827,14 @@
       "",
       "Adapter Pattern (Class & Object Adapter)",
       "Module 10",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Bridge Pattern (Module 10)",
+    "title": "[LLD] Bridge Pattern (Module 10)",
     "url": "/module/10#bridge-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "10",
     "module_title": "",
     "topic_id": "bridge-pattern",
@@ -745,13 +843,14 @@
       "",
       "Bridge Pattern",
       "Module 10",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Composite Pattern (Tree Hierarchies) (Module 10)",
+    "title": "[LLD] Composite Pattern (Tree Hierarchies) (Module 10)",
     "url": "/module/10#composite-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "10",
     "module_title": "",
     "topic_id": "composite-pattern",
@@ -760,13 +859,14 @@
       "",
       "Composite Pattern (Tree Hierarchies)",
       "Module 10",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Decorator Pattern (Module 10)",
+    "title": "[LLD] Decorator Pattern (Module 10)",
     "url": "/module/10#decorator-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "10",
     "module_title": "",
     "topic_id": "decorator-pattern",
@@ -775,13 +875,14 @@
       "",
       "Decorator Pattern",
       "Module 10",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Facade Pattern (Module 10)",
+    "title": "[LLD] Facade Pattern (Module 10)",
     "url": "/module/10#facade-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "10",
     "module_title": "",
     "topic_id": "facade-pattern",
@@ -790,13 +891,14 @@
       "",
       "Facade Pattern",
       "Module 10",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Flyweight Pattern (Module 10)",
+    "title": "[LLD] Flyweight Pattern (Module 10)",
     "url": "/module/10#flyweight-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "10",
     "module_title": "",
     "topic_id": "flyweight-pattern",
@@ -805,13 +907,14 @@
       "",
       "Flyweight Pattern",
       "Module 10",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Proxy Pattern (Virtual, Remote, Protection) (Module 10)",
+    "title": "[LLD] Proxy Pattern (Virtual, Remote, Protection) (Module 10)",
     "url": "/module/10#proxy-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "10",
     "module_title": "",
     "topic_id": "proxy-pattern",
@@ -820,13 +923,14 @@
       "",
       "Proxy Pattern (Virtual, Remote, Protection)",
       "Module 10",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Observer Pattern & Event Dispatchers (Module 11)",
+    "title": "[LLD] Observer Pattern & Event Dispatchers (Module 11)",
     "url": "/module/11#observer-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "observer-pattern",
@@ -835,13 +939,14 @@
       "",
       "Observer Pattern & Event Dispatchers",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Strategy Pattern & Interchangeable Algorithms (Module 11)",
+    "title": "[LLD] Strategy Pattern & Interchangeable Algorithms (Module 11)",
     "url": "/module/11#strategy-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "strategy-pattern",
@@ -850,13 +955,14 @@
       "",
       "Strategy Pattern & Interchangeable Algorithms",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Command Pattern & Undo/Redo Architecture (Module 11)",
+    "title": "[LLD] Command Pattern & Undo/Redo Architecture (Module 11)",
     "url": "/module/11#command-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "command-pattern",
@@ -865,13 +971,14 @@
       "",
       "Command Pattern & Undo/Redo Architecture",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "State Pattern & Finite State Machines (Module 11)",
+    "title": "[LLD] State Pattern & Finite State Machines (Module 11)",
     "url": "/module/11#state-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "state-pattern",
@@ -880,13 +987,14 @@
       "",
       "State Pattern & Finite State Machines",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Chain of Responsibility Pattern (Module 11)",
+    "title": "[LLD] Chain of Responsibility Pattern (Module 11)",
     "url": "/module/11#chain-of-responsibility",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "chain-of-responsibility",
@@ -894,13 +1002,15 @@
     "tags": [
       "",
       "Chain of Responsibility Pattern",
-      "Module 11"
+      "Module 11",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Template Method Pattern (Module 11)",
+    "title": "[LLD] Template Method Pattern (Module 11)",
     "url": "/module/11#template-method-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "template-method-pattern",
@@ -909,13 +1019,14 @@
       "",
       "Template Method Pattern",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Mediator Pattern & Loose Coupling (Module 11)",
+    "title": "[LLD] Mediator Pattern & Loose Coupling (Module 11)",
     "url": "/module/11#mediator-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "mediator-pattern",
@@ -924,13 +1035,14 @@
       "",
       "Mediator Pattern & Loose Coupling",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Iterator Pattern & Custom Iterators (Module 11)",
+    "title": "[LLD] Iterator Pattern & Custom Iterators (Module 11)",
     "url": "/module/11#iterator-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "iterator-pattern",
@@ -939,13 +1051,14 @@
       "",
       "Iterator Pattern & Custom Iterators",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Memento Pattern (State Snapshots) (Module 11)",
+    "title": "[LLD] Memento Pattern (State Snapshots) (Module 11)",
     "url": "/module/11#memento-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "memento-pattern",
@@ -954,13 +1067,14 @@
       "",
       "Memento Pattern (State Snapshots)",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Visitor Pattern & Double Dispatch (Module 11)",
+    "title": "[LLD] Visitor Pattern & Double Dispatch (Module 11)",
     "url": "/module/11#visitor-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "11",
     "module_title": "",
     "topic_id": "visitor-pattern",
@@ -969,13 +1083,14 @@
       "",
       "Visitor Pattern & Double Dispatch",
       "Module 11",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "PImpl Idiom (Pointer to Implementation) (Module 12)",
+    "title": "[LLD] PImpl Idiom (Pointer to Implementation) (Module 12)",
     "url": "/module/12#pimpl-idiom",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "12",
     "module_title": "",
     "topic_id": "pimpl-idiom",
@@ -983,13 +1098,15 @@
     "tags": [
       "",
       "PImpl Idiom (Pointer to Implementation)",
-      "Module 12"
+      "Module 12",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "CRTP (Curiously Recurring Template Pattern) (Module 12)",
+    "title": "[LLD] CRTP (Curiously Recurring Template Pattern) (Module 12)",
     "url": "/module/12#crtp-static-polymorphism",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "12",
     "module_title": "",
     "topic_id": "crtp-static-polymorphism",
@@ -997,13 +1114,15 @@
     "tags": [
       "",
       "CRTP (Curiously Recurring Template Pattern)",
-      "Module 12"
+      "Module 12",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Type Erasure (std::function & Custom Erasures) (Module 12)",
+    "title": "[LLD] Type Erasure (std::function & Custom Erasures) (Module 12)",
     "url": "/module/12#type-erasure",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "12",
     "module_title": "",
     "topic_id": "type-erasure",
@@ -1011,13 +1130,15 @@
     "tags": [
       "",
       "Type Erasure (std::function & Custom Erasures)",
-      "Module 12"
+      "Module 12",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Function Objects, Lambdas & Callback Architecture (Module 12)",
+    "title": "[LLD] Function Objects, Lambdas & Callback Architecture (Module 12)",
     "url": "/module/12#function-objects-lambdas",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "12",
     "module_title": "",
     "topic_id": "function-objects-lambdas",
@@ -1025,13 +1146,15 @@
     "tags": [
       "",
       "Function Objects, Lambdas & Callback Architecture",
-      "Module 12"
+      "Module 12",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Threads, Data Races & Memory Safety (Module 13)",
+    "title": "[LLD] Threads, Data Races & Memory Safety (Module 13)",
     "url": "/module/13#threads-and-race-conditions",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "13",
     "module_title": "",
     "topic_id": "threads-and-race-conditions",
@@ -1039,13 +1162,15 @@
     "tags": [
       "",
       "Threads, Data Races & Memory Safety",
-      "Module 13"
+      "Module 13",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "std::mutex, std::lock_guard & std::unique_lock (Module 13)",
+    "title": "[LLD] std::mutex, std::lock_guard & std::unique_lock (Module 13)",
     "url": "/module/13#mutexes-and-lock-guards",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "13",
     "module_title": "",
     "topic_id": "mutexes-and-lock-guards",
@@ -1054,13 +1179,14 @@
       "",
       "std::mutex, std::lock_guard & std::unique_lock",
       "Module 13",
-      "Concurrency"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Read-Write Locks (std::shared_mutex) (Module 13)",
+    "title": "[LLD] Read-Write Locks (std::shared_mutex) (Module 13)",
     "url": "/module/13#read-write-locks",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "13",
     "module_title": "",
     "topic_id": "read-write-locks",
@@ -1068,13 +1194,15 @@
     "tags": [
       "",
       "Read-Write Locks (std::shared_mutex)",
-      "Module 13"
+      "Module 13",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Deadlock Prevention & std::scoped_lock (Module 13)",
+    "title": "[LLD] Deadlock Prevention & std::scoped_lock (Module 13)",
     "url": "/module/13#deadlock-prevention",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "13",
     "module_title": "",
     "topic_id": "deadlock-prevention",
@@ -1082,13 +1210,15 @@
     "tags": [
       "",
       "Deadlock Prevention & std::scoped_lock",
-      "Module 13"
+      "Module 13",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Condition Variables & Producer-Consumer Queues (Module 13)",
+    "title": "[LLD] Condition Variables & Producer-Consumer Queues (Module 13)",
     "url": "/module/13#condition-variables",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "13",
     "module_title": "",
     "topic_id": "condition-variables",
@@ -1096,13 +1226,15 @@
     "tags": [
       "",
       "Condition Variables & Producer-Consumer Queues",
-      "Module 13"
+      "Module 13",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "std::atomic & Lock-Free Design Concepts (Module 13)",
+    "title": "[LLD] std::atomic & Lock-Free Design Concepts (Module 13)",
     "url": "/module/13#atomics-lock-free-basics",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "13",
     "module_title": "",
     "topic_id": "atomics-lock-free-basics",
@@ -1111,13 +1243,14 @@
       "",
       "std::atomic & Lock-Free Design Concepts",
       "Module 13",
-      "Concurrency"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Thread-safe Singleton & Double-Checked Locking Trap (Module 13)",
+    "title": "[LLD] Thread-safe Singleton & Double-Checked Locking Trap (Module 13)",
     "url": "/module/13#thread-safe-singleton",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "13",
     "module_title": "",
     "topic_id": "thread-safe-singleton",
@@ -1125,13 +1258,15 @@
     "tags": [
       "",
       "Thread-safe Singleton & Double-Checked Locking Trap",
-      "Module 13"
+      "Module 13",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Stack vs Heap Lifetime & Ownership Semantics (Module 14)",
+    "title": "[LLD] Stack vs Heap Lifetime & Ownership Semantics (Module 14)",
     "url": "/module/14#stack-vs-heap-lifetime",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "14",
     "module_title": "",
     "topic_id": "stack-vs-heap-lifetime",
@@ -1139,13 +1274,15 @@
     "tags": [
       "",
       "Stack vs Heap Lifetime & Ownership Semantics",
-      "Module 14"
+      "Module 14",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Smart Pointer Ownership Models & Custom Deleters (Module 14)",
+    "title": "[LLD] Smart Pointer Ownership Models & Custom Deleters (Module 14)",
     "url": "/module/14#smart-pointer-ownership-models",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "14",
     "module_title": "",
     "topic_id": "smart-pointer-ownership-models",
@@ -1153,13 +1290,15 @@
     "tags": [
       "",
       "Smart Pointer Ownership Models & Custom Deleters",
-      "Module 14"
+      "Module 14",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Circular Dependency Resolution with std::weak_ptr (Module 14)",
+    "title": "[LLD] Circular Dependency Resolution with std::weak_ptr (Module 14)",
     "url": "/module/14#circular-reference-weak-ptr",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "14",
     "module_title": "",
     "topic_id": "circular-reference-weak-ptr",
@@ -1167,13 +1306,15 @@
     "tags": [
       "",
       "Circular Dependency Resolution with std::weak_ptr",
-      "Module 14"
+      "Module 14",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Exception Safety Guarantees (Basic, Strong, Nothrow) (Module 15)",
+    "title": "[LLD] Exception Safety Guarantees (Basic, Strong, Nothrow) (Module 15)",
     "url": "/module/15#exception-safety-guarantees",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "15",
     "module_title": "",
     "topic_id": "exception-safety-guarantees",
@@ -1181,13 +1322,15 @@
     "tags": [
       "",
       "Exception Safety Guarantees (Basic, Strong, Nothrow)",
-      "Module 15"
+      "Module 15",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "std::optional & std::expected for Explicit Errors (Module 15)",
+    "title": "[LLD] std::optional & std::expected for Explicit Errors (Module 15)",
     "url": "/module/15#optional-and-expected-design",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "15",
     "module_title": "",
     "topic_id": "optional-and-expected-design",
@@ -1195,13 +1338,15 @@
     "tags": [
       "",
       "std::optional & std::expected for Explicit Errors",
-      "Module 15"
+      "Module 15",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Exceptions vs Error Codes in Low-Level Design (Module 15)",
+    "title": "[LLD] Exceptions vs Error Codes in Low-Level Design (Module 15)",
     "url": "/module/15#error-handling-tradeoffs",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "15",
     "module_title": "",
     "topic_id": "error-handling-tradeoffs",
@@ -1209,13 +1354,15 @@
     "tags": [
       "",
       "Exceptions vs Error Codes in Low-Level Design",
-      "Module 15"
+      "Module 15",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Designing Intuitive & Hard-to-Misuse Interfaces (Module 16)",
+    "title": "[LLD] Designing Intuitive & Hard-to-Misuse Interfaces (Module 16)",
     "url": "/module/16#stable-public-interfaces",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "16",
     "module_title": "",
     "topic_id": "stable-public-interfaces",
@@ -1223,13 +1370,15 @@
     "tags": [
       "",
       "Designing Intuitive & Hard-to-Misuse Interfaces",
-      "Module 16"
+      "Module 16",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Design by Contract (Preconditions, Postconditions, Invariants) (Module 16)",
+    "title": "[LLD] Design by Contract (Preconditions, Postconditions, Invariants) (Module 16)",
     "url": "/module/16#design-by-contract",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "16",
     "module_title": "",
     "topic_id": "design-by-contract",
@@ -1237,13 +1386,15 @@
     "tags": [
       "",
       "Design by Contract (Preconditions, Postconditions, Invariants)",
-      "Module 16"
+      "Module 16",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "API Evolution, Versioning & Extensibility (Module 16)",
+    "title": "[LLD] API Evolution, Versioning & Extensibility (Module 16)",
     "url": "/module/16#backward-compatibility-versioning",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "16",
     "module_title": "",
     "topic_id": "backward-compatibility-versioning",
@@ -1251,13 +1402,15 @@
     "tags": [
       "",
       "API Evolution, Versioning & Extensibility",
-      "Module 16"
+      "Module 16",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Refactoring Giant Switch/If-Else Chains (Module 17)",
+    "title": "[LLD] Refactoring Giant Switch/If-Else Chains (Module 17)",
     "url": "/module/17#refactoring-switch-chains",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "17",
     "module_title": "",
     "topic_id": "refactoring-switch-chains",
@@ -1265,13 +1418,15 @@
     "tags": [
       "",
       "Refactoring Giant Switch/If-Else Chains",
-      "Module 17"
+      "Module 17",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Plugin & Registry Architectures in C++ (Module 17)",
+    "title": "[LLD] Plugin & Registry Architectures in C++ (Module 17)",
     "url": "/module/17#plugin-and-registry-architecture",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "17",
     "module_title": "",
     "topic_id": "plugin-and-registry-architecture",
@@ -1279,13 +1434,15 @@
     "tags": [
       "",
       "Plugin & Registry Architectures in C++",
-      "Module 17"
+      "Module 17",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Case Study: Multi-Gateway Extensible Payment Engine (Module 17)",
+    "title": "[LLD] Case Study: Multi-Gateway Extensible Payment Engine (Module 17)",
     "url": "/module/17#extensible-payment-system-case-study",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "17",
     "module_title": "",
     "topic_id": "extensible-payment-system-case-study",
@@ -1293,13 +1450,15 @@
     "tags": [
       "",
       "Case Study: Multi-Gateway Extensible Payment Engine",
-      "Module 17"
+      "Module 17",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Object Pool Pattern for High-Performance C++ (Module 18)",
+    "title": "[LLD] Object Pool Pattern for High-Performance C++ (Module 18)",
     "url": "/module/18#object-pool-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "18",
     "module_title": "",
     "topic_id": "object-pool-pattern",
@@ -1308,13 +1467,14 @@
       "",
       "Object Pool Pattern for High-Performance C++",
       "Module 18",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Repository & Data Access Object (DAO) Patterns (Module 18)",
+    "title": "[LLD] Repository & Data Access Object (DAO) Patterns (Module 18)",
     "url": "/module/18#repository-dao-pattern",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "18",
     "module_title": "",
     "topic_id": "repository-dao-pattern",
@@ -1323,13 +1483,14 @@
       "",
       "Repository & Data Access Object (DAO) Patterns",
       "Module 18",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Service Locator vs Dependency Injection (Module 18)",
+    "title": "[LLD] Service Locator vs Dependency Injection (Module 18)",
     "url": "/module/18#service-locator-di",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "18",
     "module_title": "",
     "topic_id": "service-locator-di",
@@ -1337,13 +1498,15 @@
     "tags": [
       "",
       "Service Locator vs Dependency Injection",
-      "Module 18"
+      "Module 18",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Parking Lot System (Beginner) (Module 19)",
+    "title": "[LLD] Parking Lot System (Beginner) (Module 19)",
     "url": "/module/19#parking-lot-system",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "parking-lot-system",
@@ -1351,13 +1514,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Parking Lot System (Beginner)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Elevator System (Beginner) (Module 19)",
+    "title": "[LLD] Elevator System (Beginner) (Module 19)",
     "url": "/module/19#elevator-system",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "elevator-system",
@@ -1365,13 +1530,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Elevator System (Beginner)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Vending Machine System (Beginner) (Module 19)",
+    "title": "[LLD] Vending Machine System (Beginner) (Module 19)",
     "url": "/module/19#vending-machine-system",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "vending-machine-system",
@@ -1379,13 +1546,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Vending Machine System (Beginner)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Splitwise / Expense Sharing App (Intermediate) (Module 19)",
+    "title": "[LLD] Splitwise / Expense Sharing App (Intermediate) (Module 19)",
     "url": "/module/19#splitwise-expense-manager",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "splitwise-expense-manager",
@@ -1393,13 +1562,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Splitwise / Expense Sharing App (Intermediate)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Movie Ticket Booking System (Intermediate) (Module 19)",
+    "title": "[LLD] Movie Ticket Booking System (Intermediate) (Module 19)",
     "url": "/module/19#movie-ticket-booking-bookmyshow",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "movie-ticket-booking-bookmyshow",
@@ -1407,13 +1578,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Movie Ticket Booking System (Intermediate)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Ride Sharing System (Intermediate) (Module 19)",
+    "title": "[LLD] Ride Sharing System (Intermediate) (Module 19)",
     "url": "/module/19#ride-sharing-uber-ola",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "ride-sharing-uber-ola",
@@ -1421,13 +1594,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Ride Sharing System (Intermediate)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Thread-safe LRU Cache (Advanced) (Module 19)",
+    "title": "[LLD] Thread-safe LRU Cache (Advanced) (Module 19)",
     "url": "/module/19#in-memory-lru-cache",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "in-memory-lru-cache",
@@ -1435,13 +1610,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Thread-safe LRU Cache (Advanced)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Rate Limiter System (Advanced) (Module 19)",
+    "title": "[LLD] Rate Limiter System (Advanced) (Module 19)",
     "url": "/module/19#rate-limiter-system",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "rate-limiter-system",
@@ -1449,13 +1626,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Rate Limiter System (Advanced)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Pub/Sub In-Memory Message Queue (Advanced) (Module 19)",
+    "title": "[LLD] Pub/Sub In-Memory Message Queue (Advanced) (Module 19)",
     "url": "/module/19#pub-sub-message-queue",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "pub-sub-message-queue",
@@ -1463,13 +1642,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Pub/Sub In-Memory Message Queue (Advanced)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Stock Trading Matching Order Book (Advanced) (Module 19)",
+    "title": "[LLD] Stock Trading Matching Order Book (Advanced) (Module 19)",
     "url": "/module/19#stock-order-book",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "19",
     "module_title": "Real-World LLD Problem Library",
     "topic_id": "stock-order-book",
@@ -1477,13 +1658,15 @@
     "tags": [
       "Real-World LLD Problem Library",
       "Stock Trading Matching Order Book (Advanced)",
-      "Module 19"
+      "Module 19",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Cache Locality & Data-Oriented Design vs OOP (Module 20)",
+    "title": "[LLD] Cache Locality & Data-Oriented Design vs OOP (Module 20)",
     "url": "/module/20#cache-locality-data-oriented-design",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "20",
     "module_title": "Advanced Low-Level Design & Scaling",
     "topic_id": "cache-locality-data-oriented-design",
@@ -1491,13 +1674,15 @@
     "tags": [
       "Advanced Low-Level Design & Scaling",
       "Cache Locality & Data-Oriented Design vs OOP",
-      "Module 20"
+      "Module 20",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Lock-free SPSC Ring Buffer Design (Module 20)",
+    "title": "[LLD] Lock-free SPSC Ring Buffer Design (Module 20)",
     "url": "/module/20#lock-free-spsc-queue",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "20",
     "module_title": "Advanced Low-Level Design & Scaling",
     "topic_id": "lock-free-spsc-queue",
@@ -1505,13 +1690,15 @@
     "tags": [
       "Advanced Low-Level Design & Scaling",
       "Lock-free SPSC Ring Buffer Design",
-      "Module 20"
+      "Module 20",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Zero-Copy Buffer Abstractions (Module 20)",
+    "title": "[LLD] Zero-Copy Buffer Abstractions (Module 20)",
     "url": "/module/20#zero-copy-buffer-abstractions",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "20",
     "module_title": "Advanced Low-Level Design & Scaling",
     "topic_id": "zero-copy-buffer-abstractions",
@@ -1519,13 +1706,15 @@
     "tags": [
       "Advanced Low-Level Design & Scaling",
       "Zero-Copy Buffer Abstractions",
-      "Module 20"
+      "Module 20",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "The 14-Step Systematic Interview Roadmap (Module 21)",
+    "title": "[LLD] The 14-Step Systematic Interview Roadmap (Module 21)",
     "url": "/module/21#the-14-step-interview-process",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "21",
     "module_title": "14-Step LLD Interview Framework",
     "topic_id": "the-14-step-interview-process",
@@ -1533,13 +1722,15 @@
     "tags": [
       "14-Step LLD Interview Framework",
       "The 14-Step Systematic Interview Roadmap",
-      "Module 21"
+      "Module 21",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Step 1-4: Clarification & Domain Decomposition (Module 21)",
+    "title": "[LLD] Step 1-4: Clarification & Domain Decomposition (Module 21)",
     "url": "/module/21#clarifying-functional-and-non-functional",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "21",
     "module_title": "14-Step LLD Interview Framework",
     "topic_id": "clarifying-functional-and-non-functional",
@@ -1547,13 +1738,15 @@
     "tags": [
       "14-Step LLD Interview Framework",
       "Step 1-4: Clarification & Domain Decomposition",
-      "Module 21"
+      "Module 21",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Step 5-9: Drawing Class & Sequence Diagrams Live (Module 21)",
+    "title": "[LLD] Step 5-9: Drawing Class & Sequence Diagrams Live (Module 21)",
     "url": "/module/21#designing-clean-diagrams-live",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "21",
     "module_title": "14-Step LLD Interview Framework",
     "topic_id": "designing-clean-diagrams-live",
@@ -1561,13 +1754,15 @@
     "tags": [
       "14-Step LLD Interview Framework",
       "Step 5-9: Drawing Class & Sequence Diagrams Live",
-      "Module 21"
+      "Module 21",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Step 10-14: Live C++ Coding & Concurrency Defense (Module 21)",
+    "title": "[LLD] Step 10-14: Live C++ Coding & Concurrency Defense (Module 21)",
     "url": "/module/21#writing-idiomatic-cpp-live",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "21",
     "module_title": "14-Step LLD Interview Framework",
     "topic_id": "writing-idiomatic-cpp-live",
@@ -1576,13 +1771,14 @@
       "14-Step LLD Interview Framework",
       "Step 10-14: Live C++ Coding & Concurrency Defense",
       "Module 21",
+      "LLD",
       "C++"
     ]
   },
   {
-    "title": "Practice 1: Tic-Tac-Toe Game Engine (Module 22)",
+    "title": "[LLD] Practice 1: Tic-Tac-Toe Game Engine (Module 22)",
     "url": "/module/22#practice-tic-tac-toe",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "22",
     "module_title": "Interactive LLD Practice Sandbox",
     "topic_id": "practice-tic-tac-toe",
@@ -1590,13 +1786,15 @@
     "tags": [
       "Interactive LLD Practice Sandbox",
       "Practice 1: Tic-Tac-Toe Game Engine",
-      "Module 22"
+      "Module 22",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Practice 2: Snake & Ladder Multiplayer Game (Module 22)",
+    "title": "[LLD] Practice 2: Snake & Ladder Multiplayer Game (Module 22)",
     "url": "/module/22#practice-snake-and-ladder",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "22",
     "module_title": "Interactive LLD Practice Sandbox",
     "topic_id": "practice-snake-and-ladder",
@@ -1604,13 +1802,15 @@
     "tags": [
       "Interactive LLD Practice Sandbox",
       "Practice 2: Snake & Ladder Multiplayer Game",
-      "Module 22"
+      "Module 22",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Practice 3: Multi-recipe Coffee Machine (Module 22)",
+    "title": "[LLD] Practice 3: Multi-recipe Coffee Machine (Module 22)",
     "url": "/module/22#practice-coffee-machine",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "22",
     "module_title": "Interactive LLD Practice Sandbox",
     "topic_id": "practice-coffee-machine",
@@ -1618,13 +1818,15 @@
     "tags": [
       "Interactive LLD Practice Sandbox",
       "Practice 3: Multi-recipe Coffee Machine",
-      "Module 22"
+      "Module 22",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Practice 4: Asynchronous Logging Framework (Module 22)",
+    "title": "[LLD] Practice 4: Asynchronous Logging Framework (Module 22)",
     "url": "/module/22#practice-logging-framework",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "22",
     "module_title": "Interactive LLD Practice Sandbox",
     "topic_id": "practice-logging-framework",
@@ -1632,13 +1834,15 @@
     "tags": [
       "Interactive LLD Practice Sandbox",
       "Practice 4: Asynchronous Logging Framework",
-      "Module 22"
+      "Module 22",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "C++ OOP & Memory Interview Questions (Module 23)",
+    "title": "[LLD] C++ OOP & Memory Interview Questions (Module 23)",
     "url": "/module/23#cpp-oop-interview-questions",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "23",
     "module_title": "Curated LLD Interview Question Bank",
     "topic_id": "cpp-oop-interview-questions",
@@ -1647,13 +1851,14 @@
       "Curated LLD Interview Question Bank",
       "C++ OOP & Memory Interview Questions",
       "Module 23",
+      "LLD",
       "C++"
     ]
   },
   {
-    "title": "SOLID Principles Interview Questions (Module 23)",
+    "title": "[LLD] SOLID Principles Interview Questions (Module 23)",
     "url": "/module/23#solid-interview-questions",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "23",
     "module_title": "Curated LLD Interview Question Bank",
     "topic_id": "solid-interview-questions",
@@ -1662,13 +1867,14 @@
       "Curated LLD Interview Question Bank",
       "SOLID Principles Interview Questions",
       "Module 23",
-      "SOLID"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Design Patterns & Trade-offs Questions (Module 23)",
+    "title": "[LLD] Design Patterns & Trade-offs Questions (Module 23)",
     "url": "/module/23#design-patterns-interview-questions",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "23",
     "module_title": "Curated LLD Interview Question Bank",
     "topic_id": "design-patterns-interview-questions",
@@ -1677,13 +1883,14 @@
       "Curated LLD Interview Question Bank",
       "Design Patterns & Trade-offs Questions",
       "Module 23",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Concurrency & Multi-threading LLD Questions (Module 23)",
+    "title": "[LLD] Concurrency & Multi-threading LLD Questions (Module 23)",
     "url": "/module/23#concurrency-interview-questions",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "23",
     "module_title": "Curated LLD Interview Question Bank",
     "topic_id": "concurrency-interview-questions",
@@ -1692,13 +1899,14 @@
       "Curated LLD Interview Question Bank",
       "Concurrency & Multi-threading LLD Questions",
       "Module 23",
-      "Concurrency"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Top 20 Critical C++ Interview Traps (Module 23)",
+    "title": "[LLD] Top 20 Critical C++ Interview Traps (Module 23)",
     "url": "/module/23#top-interview-traps",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "23",
     "module_title": "Curated LLD Interview Question Bank",
     "topic_id": "top-interview-traps",
@@ -1706,13 +1914,15 @@
     "tags": [
       "Curated LLD Interview Question Bank",
       "Top 20 Critical C++ Interview Traps",
-      "Module 23"
+      "Module 23",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "SOLID Quick Reference Matrix (Module 24)",
+    "title": "[LLD] SOLID Quick Reference Matrix (Module 24)",
     "url": "/module/24#solid-cheat-sheet",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "24",
     "module_title": "Quick Revision Cheat Sheets",
     "topic_id": "solid-cheat-sheet",
@@ -1721,13 +1931,14 @@
       "Quick Revision Cheat Sheets",
       "SOLID Quick Reference Matrix",
       "Module 24",
-      "SOLID"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Design Pattern Selection Decision Tree (Module 24)",
+    "title": "[LLD] Design Pattern Selection Decision Tree (Module 24)",
     "url": "/module/24#design-pattern-decision-tree",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "24",
     "module_title": "Quick Revision Cheat Sheets",
     "topic_id": "design-pattern-decision-tree",
@@ -1736,13 +1947,14 @@
       "Quick Revision Cheat Sheets",
       "Design Pattern Selection Decision Tree",
       "Module 24",
-      "Design Patterns"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "UML Relationships & C++ Code Mappings (Module 24)",
+    "title": "[LLD] UML Relationships & C++ Code Mappings (Module 24)",
     "url": "/module/24#uml-relationship-cheat-sheet",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "24",
     "module_title": "Quick Revision Cheat Sheets",
     "topic_id": "uml-relationship-cheat-sheet",
@@ -1750,13 +1962,15 @@
     "tags": [
       "Quick Revision Cheat Sheets",
       "UML Relationships & C++ Code Mappings",
-      "Module 24"
+      "Module 24",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "Smart Pointers Ownership Cheat Sheet (Module 24)",
+    "title": "[LLD] Smart Pointers Ownership Cheat Sheet (Module 24)",
     "url": "/module/24#smart-pointer-lifecycle-cheat-sheet",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "24",
     "module_title": "Quick Revision Cheat Sheets",
     "topic_id": "smart-pointer-lifecycle-cheat-sheet",
@@ -1764,13 +1978,15 @@
     "tags": [
       "Quick Revision Cheat Sheets",
       "Smart Pointers Ownership Cheat Sheet",
-      "Module 24"
+      "Module 24",
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "C++ Concurrency & Thread Safety Rules (Module 24)",
+    "title": "[LLD] C++ Concurrency & Thread Safety Rules (Module 24)",
     "url": "/module/24#concurrency-safety-cheat-sheet",
-    "type": "topic",
+    "type": "lld_topic",
     "module_id": "24",
     "module_title": "Quick Revision Cheat Sheets",
     "topic_id": "concurrency-safety-cheat-sheet",
@@ -1779,11 +1995,3362 @@
       "Quick Revision Cheat Sheets",
       "C++ Concurrency & Thread Safety Rules",
       "Module 24",
-      "Concurrency"
+      "LLD",
+      "C++"
     ]
   },
   {
-    "title": "14-Step Systematic LLD Interview Roadmap",
+    "title": "[HLD Module] System Design Foundations (HLD 01)",
+    "url": "/hld/module/01",
+    "type": "hld_module",
+    "module_id": "01",
+    "module_title": "System Design Foundations",
+    "topic_id": "01-system-design-foundations",
+    "summary": "Start from absolute zero: Clients, Servers, APIs, Databases, Infrastructure, and the progressive evolution from single-server to distributed architecture.",
+    "tags": [
+      "System Design Foundations",
+      "Beginner",
+      "Foundations",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] What is System Design & Software Architecture? (HLD 01)",
+    "url": "/hld/module/01#what-is-system-design",
+    "type": "hld_topic",
+    "module_id": "01",
+    "module_title": "System Design Foundations",
+    "topic_id": "what-is-system-design",
+    "summary": "System Design Foundations &bull; Foundations",
+    "tags": [
+      "System Design Foundations",
+      "What is System Design & Software Architecture?",
+      "HLD 01",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] High-Level Design (HLD) vs Low-Level Design (LLD) (HLD 01)",
+    "url": "/hld/module/01#hld-vs-lld",
+    "type": "hld_topic",
+    "module_id": "01",
+    "module_title": "System Design Foundations",
+    "topic_id": "hld-vs-lld",
+    "summary": "System Design Foundations &bull; Foundations",
+    "tags": [
+      "System Design Foundations",
+      "High-Level Design (HLD) vs Low-Level Design (LLD)",
+      "HLD 01",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Components, Services, Modules, Dependencies & Boundaries (HLD 01)",
+    "url": "/hld/module/01#anatomy-of-systems",
+    "type": "hld_topic",
+    "module_id": "01",
+    "module_title": "System Design Foundations",
+    "topic_id": "anatomy-of-systems",
+    "summary": "System Design Foundations &bull; Foundations",
+    "tags": [
+      "System Design Foundations",
+      "Components, Services, Modules, Dependencies & Boundaries",
+      "HLD 01",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] The Core Foundation: Client, Server, API, Database & Infra (HLD 01)",
+    "url": "/hld/module/01#client-server-api-database",
+    "type": "hld_topic",
+    "module_id": "01",
+    "module_title": "System Design Foundations",
+    "topic_id": "client-server-api-database",
+    "summary": "System Design Foundations &bull; Foundations",
+    "tags": [
+      "System Design Foundations",
+      "The Core Foundation: Client, Server, API, Database & Infra",
+      "HLD 01",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] The Progressive Evolution: 1 Server to Multi-Tier Distributed Web (HLD 01)",
+    "url": "/hld/module/01#system-evolution-journey",
+    "type": "hld_topic",
+    "module_id": "01",
+    "module_title": "System Design Foundations",
+    "topic_id": "system-evolution-journey",
+    "summary": "System Design Foundations &bull; Foundations",
+    "tags": [
+      "System Design Foundations",
+      "The Progressive Evolution: 1 Server to Multi-Tier Distributed Web",
+      "HLD 01",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Requirements Analysis & Scoping (HLD 02)",
+    "url": "/hld/module/02",
+    "type": "hld_module",
+    "module_id": "02",
+    "module_title": "Requirements Analysis & Scoping",
+    "topic_id": "02-requirements-analysis",
+    "summary": "How to start any system design problem: Functional vs Non-Functional Requirements, Constraints, Assumptions, Traffic, and System Boundaries.",
+    "tags": [
+      "Requirements Analysis & Scoping",
+      "Beginner",
+      "Foundations",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Functional vs Non-Functional Requirements (NFRs) (HLD 02)",
+    "url": "/hld/module/02#functional-vs-non-functional",
+    "type": "hld_topic",
+    "module_id": "02",
+    "module_title": "Requirements Analysis & Scoping",
+    "topic_id": "functional-vs-non-functional",
+    "summary": "Requirements Analysis & Scoping &bull; Foundations",
+    "tags": [
+      "Requirements Analysis & Scoping",
+      "Functional vs Non-Functional Requirements (NFRs)",
+      "HLD 02",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Establishing Constraints, Assumptions, Users & Actors (HLD 02)",
+    "url": "/hld/module/02#assumptions-and-constraints",
+    "type": "hld_topic",
+    "module_id": "02",
+    "module_title": "Requirements Analysis & Scoping",
+    "topic_id": "assumptions-and-constraints",
+    "summary": "Requirements Analysis & Scoping &bull; Foundations",
+    "tags": [
+      "Requirements Analysis & Scoping",
+      "Establishing Constraints, Assumptions, Users & Actors",
+      "HLD 02",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] System Boundaries, Core APIs & Data Contracts (HLD 02)",
+    "url": "/hld/module/02#defining-system-boundaries",
+    "type": "hld_topic",
+    "module_id": "02",
+    "module_title": "Requirements Analysis & Scoping",
+    "topic_id": "defining-system-boundaries",
+    "summary": "Requirements Analysis & Scoping &bull; Foundations",
+    "tags": [
+      "Requirements Analysis & Scoping",
+      "System Boundaries, Core APIs & Data Contracts",
+      "HLD 02",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Interview Case Walkthrough: Scoping 'Design YouTube' from Scratch (HLD 02)",
+    "url": "/hld/module/02#interview-scoping-walkthrough",
+    "type": "hld_topic",
+    "module_id": "02",
+    "module_title": "Requirements Analysis & Scoping",
+    "topic_id": "interview-scoping-walkthrough",
+    "summary": "Requirements Analysis & Scoping &bull; Foundations",
+    "tags": [
+      "Requirements Analysis & Scoping",
+      "Interview Case Walkthrough: Scoping 'Design YouTube' from Scratch",
+      "HLD 02",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Capacity Estimation & Back-of-the-Envelope (HLD 03)",
+    "url": "/hld/module/03",
+    "type": "hld_module",
+    "module_id": "03",
+    "module_title": "Capacity Estimation & Back-of-the-Envelope",
+    "topic_id": "03-capacity-estimation",
+    "summary": "Master QPS, peak multipliers, read/write ratios, storage growth, network bandwidth, memory, cache sizing, and units (KB to PB).",
+    "tags": [
+      "Capacity Estimation & Back-of-the-Envelope",
+      "Beginner",
+      "Calculations",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] System Units (KB to PB, QPS) & Numbers Every Engineer Should Know (HLD 03)",
+    "url": "/hld/module/03#math-units-and-latency-numbers",
+    "type": "hld_topic",
+    "module_id": "03",
+    "module_title": "Capacity Estimation & Back-of-the-Envelope",
+    "topic_id": "math-units-and-latency-numbers",
+    "summary": "Capacity Estimation & Back-of-the-Envelope &bull; Calculations",
+    "tags": [
+      "Capacity Estimation & Back-of-the-Envelope",
+      "System Units (KB to PB, QPS) & Numbers Every Engineer Should Know",
+      "HLD 03",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] DAU/MAU to Average & Peak QPS Estimation (HLD 03)",
+    "url": "/hld/module/03#traffic-and-qps-estimation",
+    "type": "hld_topic",
+    "module_id": "03",
+    "module_title": "Capacity Estimation & Back-of-the-Envelope",
+    "topic_id": "traffic-and-qps-estimation",
+    "summary": "Capacity Estimation & Back-of-the-Envelope &bull; Calculations",
+    "tags": [
+      "Capacity Estimation & Back-of-the-Envelope",
+      "DAU/MAU to Average & Peak QPS Estimation",
+      "HLD 03",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Read/Write Ratios, Storage Growth & Ingress/Egress Bandwidth (HLD 03)",
+    "url": "/hld/module/03#storage-and-bandwidth-estimation",
+    "type": "hld_topic",
+    "module_id": "03",
+    "module_title": "Capacity Estimation & Back-of-the-Envelope",
+    "topic_id": "storage-and-bandwidth-estimation",
+    "summary": "Capacity Estimation & Back-of-the-Envelope &bull; Calculations",
+    "tags": [
+      "Capacity Estimation & Back-of-the-Envelope",
+      "Read/Write Ratios, Storage Growth & Ingress/Egress Bandwidth",
+      "HLD 03",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Memory, 80/20 Rule & Distributed Cache Sizing (HLD 03)",
+    "url": "/hld/module/03#memory-and-cache-sizing",
+    "type": "hld_topic",
+    "module_id": "03",
+    "module_title": "Capacity Estimation & Back-of-the-Envelope",
+    "topic_id": "memory-and-cache-sizing",
+    "summary": "Capacity Estimation & Back-of-the-Envelope &bull; Calculations",
+    "tags": [
+      "Capacity Estimation & Back-of-the-Envelope",
+      "Memory, 80/20 Rule & Distributed Cache Sizing",
+      "HLD 03",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Interactive Back-of-the-Envelope Capacity Calculator Tool (HLD 03)",
+    "url": "/hld/module/03#interactive-capacity-calculator",
+    "type": "hld_topic",
+    "module_id": "03",
+    "module_title": "Capacity Estimation & Back-of-the-Envelope",
+    "topic_id": "interactive-capacity-calculator",
+    "summary": "Capacity Estimation & Back-of-the-Envelope &bull; Calculations",
+    "tags": [
+      "Capacity Estimation & Back-of-the-Envelope",
+      "Interactive Back-of-the-Envelope Capacity Calculator Tool",
+      "HLD 03",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Internet & Networking Foundations (HLD 04)",
+    "url": "/hld/module/04",
+    "type": "hld_module",
+    "module_id": "04",
+    "module_title": "Internet & Networking Foundations",
+    "topic_id": "04-networking-foundations",
+    "summary": "Everything needed for HLD: IP, MAC, DNS resolution, TCP vs UDP, TLS/HTTPS, NAT, Firewalls, Proxies, WebSockets, and SSE.",
+    "tags": [
+      "Internet & Networking Foundations",
+      "Beginner",
+      "Networking",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] DNS Lifecycle: Browser to Root, TLD & Authoritative Nameservers (HLD 04)",
+    "url": "/hld/module/04#dns-resolution-lifecycle",
+    "type": "hld_topic",
+    "module_id": "04",
+    "module_title": "Internet & Networking Foundations",
+    "topic_id": "dns-resolution-lifecycle",
+    "summary": "Internet & Networking Foundations &bull; Networking",
+    "tags": [
+      "Internet & Networking Foundations",
+      "DNS Lifecycle: Browser to Root, TLD & Authoritative Nameservers",
+      "HLD 04",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] TCP 3-Way Handshake, UDP, and TLS 1.3 Encryption Handshake (HLD 04)",
+    "url": "/hld/module/04#tcp-vs-udp-tls-handshake",
+    "type": "hld_topic",
+    "module_id": "04",
+    "module_title": "Internet & Networking Foundations",
+    "topic_id": "tcp-vs-udp-tls-handshake",
+    "summary": "Internet & Networking Foundations &bull; Networking",
+    "tags": [
+      "Internet & Networking Foundations",
+      "TCP 3-Way Handshake, UDP, and TLS 1.3 Encryption Handshake",
+      "HLD 04",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Forward Proxy, Reverse Proxy, NAT & Web Application Firewalls (WAF) (HLD 04)",
+    "url": "/hld/module/04#proxies-and-firewalls",
+    "type": "hld_topic",
+    "module_id": "04",
+    "module_title": "Internet & Networking Foundations",
+    "topic_id": "proxies-and-firewalls",
+    "summary": "Internet & Networking Foundations &bull; Networking",
+    "tags": [
+      "Internet & Networking Foundations",
+      "Forward Proxy, Reverse Proxy, NAT & Web Application Firewalls (WAF)",
+      "HLD 04",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Real-time Communication: WebSockets, Long Polling & Server-Sent Events (SSE) (HLD 04)",
+    "url": "/hld/module/04#real-time-protocols",
+    "type": "hld_topic",
+    "module_id": "04",
+    "module_title": "Internet & Networking Foundations",
+    "topic_id": "real-time-protocols",
+    "summary": "Internet & Networking Foundations &bull; Networking",
+    "tags": [
+      "Internet & Networking Foundations",
+      "Real-time Communication: WebSockets, Long Polling & Server-Sent Events (SSE)",
+      "HLD 04",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] HTTP & API Design: REST, GraphQL & gRPC (HLD 05)",
+    "url": "/hld/module/05",
+    "type": "hld_module",
+    "module_id": "05",
+    "module_title": "HTTP & API Design: REST, GraphQL & gRPC",
+    "topic_id": "05-api-design-protocols",
+    "summary": "HTTP semantics, REST principles, GraphQL schemas, gRPC Protocol Buffers, API Gateways, rate limiting, idempotency keys, and pagination.",
+    "tags": [
+      "HTTP & API Design: REST, GraphQL & gRPC",
+      "Beginner",
+      "APIs",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] HTTP Methods (GET, POST, PUT, PATCH, DELETE), Status Codes & Headers (HLD 05)",
+    "url": "/hld/module/05#http-methods-headers-status-codes",
+    "type": "hld_topic",
+    "module_id": "05",
+    "module_title": "HTTP & API Design: REST, GraphQL & gRPC",
+    "topic_id": "http-methods-headers-status-codes",
+    "summary": "HTTP & API Design: REST, GraphQL & gRPC &bull; APIs",
+    "tags": [
+      "HTTP & API Design: REST, GraphQL & gRPC",
+      "HTTP Methods (GET, POST, PUT, PATCH, DELETE), Status Codes & Headers",
+      "HLD 05",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Protocol Shootout: REST vs GraphQL vs gRPC Trade-offs (HLD 05)",
+    "url": "/hld/module/05#rest-vs-graphql-vs-grpc",
+    "type": "hld_topic",
+    "module_id": "05",
+    "module_title": "HTTP & API Design: REST, GraphQL & gRPC",
+    "topic_id": "rest-vs-graphql-vs-grpc",
+    "summary": "HTTP & API Design: REST, GraphQL & gRPC &bull; APIs",
+    "tags": [
+      "HTTP & API Design: REST, GraphQL & gRPC",
+      "Protocol Shootout: REST vs GraphQL vs gRPC Trade-offs",
+      "HLD 05",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Pagination (Offset vs Cursor-based), Filtering, and Sorting Strategies (HLD 05)",
+    "url": "/hld/module/05#api-pagination-filtering-sorting",
+    "type": "hld_topic",
+    "module_id": "05",
+    "module_title": "HTTP & API Design: REST, GraphQL & gRPC",
+    "topic_id": "api-pagination-filtering-sorting",
+    "summary": "HTTP & API Design: REST, GraphQL & gRPC &bull; APIs",
+    "tags": [
+      "HTTP & API Design: REST, GraphQL & gRPC",
+      "Pagination (Offset vs Cursor-based), Filtering, and Sorting Strategies",
+      "HLD 05",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Idempotency Keys, Exponential Backoff Retries & API Gateway Routing (HLD 05)",
+    "url": "/hld/module/05#idempotency-retries-rate-limiting",
+    "type": "hld_topic",
+    "module_id": "05",
+    "module_title": "HTTP & API Design: REST, GraphQL & gRPC",
+    "topic_id": "idempotency-retries-rate-limiting",
+    "summary": "HTTP & API Design: REST, GraphQL & gRPC &bull; APIs",
+    "tags": [
+      "HTTP & API Design: REST, GraphQL & gRPC",
+      "Idempotency Keys, Exponential Backoff Retries & API Gateway Routing",
+      "HLD 05",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] System Architecture Patterns (HLD 06)",
+    "url": "/hld/module/06",
+    "type": "hld_module",
+    "module_id": "06",
+    "module_title": "System Architecture Patterns",
+    "topic_id": "06-system-architecture-patterns",
+    "summary": "Monolith vs Modular Monolith vs Microservices vs Serverless, Event-Driven, Clean/Hexagonal Architecture, CQRS, and Event Sourcing.",
+    "tags": [
+      "System Architecture Patterns",
+      "Intermediate",
+      "Architecture",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Monolith, Modular Monolith & Microservices Trade-offs (HLD 06)",
+    "url": "/hld/module/06#monolith-to-microservices",
+    "type": "hld_topic",
+    "module_id": "06",
+    "module_title": "System Architecture Patterns",
+    "topic_id": "monolith-to-microservices",
+    "summary": "System Architecture Patterns &bull; Architecture",
+    "tags": [
+      "System Architecture Patterns",
+      "Monolith, Modular Monolith & Microservices Trade-offs",
+      "HLD 06",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Three-Tier, N-Tier & Hexagonal / Clean Architecture (HLD 06)",
+    "url": "/hld/module/06#three-tier-and-layered-architecture",
+    "type": "hld_topic",
+    "module_id": "06",
+    "module_title": "System Architecture Patterns",
+    "topic_id": "three-tier-and-layered-architecture",
+    "summary": "System Architecture Patterns &bull; Architecture",
+    "tags": [
+      "System Architecture Patterns",
+      "Three-Tier, N-Tier & Hexagonal / Clean Architecture",
+      "HLD 06",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Serverless Functions (FaaS) & Event-Driven Architecture (HLD 06)",
+    "url": "/hld/module/06#serverless-and-event-driven",
+    "type": "hld_topic",
+    "module_id": "06",
+    "module_title": "System Architecture Patterns",
+    "topic_id": "serverless-and-event-driven",
+    "summary": "System Architecture Patterns &bull; Architecture",
+    "tags": [
+      "System Architecture Patterns",
+      "Serverless Functions (FaaS) & Event-Driven Architecture",
+      "HLD 06",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] CQRS (Command Query Responsibility Segregation) & Event Sourcing (HLD 06)",
+    "url": "/hld/module/06#cqrs-and-event-sourcing",
+    "type": "hld_topic",
+    "module_id": "06",
+    "module_title": "System Architecture Patterns",
+    "topic_id": "cqrs-and-event-sourcing",
+    "summary": "System Architecture Patterns &bull; Architecture",
+    "tags": [
+      "System Architecture Patterns",
+      "CQRS (Command Query Responsibility Segregation) & Event Sourcing",
+      "HLD 06",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Load Balancing & Reverse Proxies (HLD 07)",
+    "url": "/hld/module/07",
+    "type": "hld_module",
+    "module_id": "07",
+    "module_title": "Load Balancing & Reverse Proxies",
+    "topic_id": "07-load-balancing",
+    "summary": "L4 vs L7 Load Balancing, Algorithms (Round Robin, Least Conn, Consistent Hashing), Health Checks, Failover, and Sticky Sessions.",
+    "tags": [
+      "Load Balancing & Reverse Proxies",
+      "Intermediate",
+      "Traffic Management",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Why Load Balancers? Layer 4 (Transport) vs Layer 7 (Application) Routing (HLD 07)",
+    "url": "/hld/module/07#why-load-balancing-l4-vs-l7",
+    "type": "hld_topic",
+    "module_id": "07",
+    "module_title": "Load Balancing & Reverse Proxies",
+    "topic_id": "why-load-balancing-l4-vs-l7",
+    "summary": "Load Balancing & Reverse Proxies &bull; Traffic Management",
+    "tags": [
+      "Load Balancing & Reverse Proxies",
+      "Why Load Balancers? Layer 4 (Transport) vs Layer 7 (Application) Routing",
+      "HLD 07",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Balancing Algorithms: Round Robin, Weighted, Least Conn & IP Hash (HLD 07)",
+    "url": "/hld/module/07#load-balancing-algorithms",
+    "type": "hld_topic",
+    "module_id": "07",
+    "module_title": "Load Balancing & Reverse Proxies",
+    "topic_id": "load-balancing-algorithms",
+    "summary": "Load Balancing & Reverse Proxies &bull; Traffic Management",
+    "tags": [
+      "Load Balancing & Reverse Proxies",
+      "Balancing Algorithms: Round Robin, Weighted, Least Conn & IP Hash",
+      "HLD 07",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Consistent Hashing with Virtual Nodes Deep Dive (HLD 07)",
+    "url": "/hld/module/07#consistent-hashing-deep-dive",
+    "type": "hld_topic",
+    "module_id": "07",
+    "module_title": "Load Balancing & Reverse Proxies",
+    "topic_id": "consistent-hashing-deep-dive",
+    "summary": "Load Balancing & Reverse Proxies &bull; Traffic Management",
+    "tags": [
+      "Load Balancing & Reverse Proxies",
+      "Consistent Hashing with Virtual Nodes Deep Dive",
+      "HLD 07",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Active/Passive Health Checks, DNS Failover & Sticky Sessions (HLD 07)",
+    "url": "/hld/module/07#health-checks-failover-sticky-sessions",
+    "type": "hld_topic",
+    "module_id": "07",
+    "module_title": "Load Balancing & Reverse Proxies",
+    "topic_id": "health-checks-failover-sticky-sessions",
+    "summary": "Load Balancing & Reverse Proxies &bull; Traffic Management",
+    "tags": [
+      "Load Balancing & Reverse Proxies",
+      "Active/Passive Health Checks, DNS Failover & Sticky Sessions",
+      "HLD 07",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Caching Strategies & Distributed Caches (HLD 08)",
+    "url": "/hld/module/08",
+    "type": "hld_module",
+    "module_id": "08",
+    "module_title": "Caching Strategies & Distributed Caches",
+    "topic_id": "08-caching-strategies",
+    "summary": "Cache-Aside, Read-Through, Write-Through, Write-Back, Write-Around, Redis, Memcached, Stampede, Avalanche, Penetration & Hot Keys.",
+    "tags": [
+      "Caching Strategies & Distributed Caches",
+      "Intermediate",
+      "Storage & Performance",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Caching Fundamentals: Hits, Misses, TTL & Eviction Policies (LRU/LFU) (HLD 08)",
+    "url": "/hld/module/08#caching-fundamentals-and-locality",
+    "type": "hld_topic",
+    "module_id": "08",
+    "module_title": "Caching Strategies & Distributed Caches",
+    "topic_id": "caching-fundamentals-and-locality",
+    "summary": "Caching Strategies & Distributed Caches &bull; Storage & Performance",
+    "tags": [
+      "Caching Strategies & Distributed Caches",
+      "Caching Fundamentals: Hits, Misses, TTL & Eviction Policies (LRU/LFU)",
+      "HLD 08",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Caching Patterns: Cache-Aside, Read-Through, Write-Through, Write-Back & Write-Around (HLD 08)",
+    "url": "/hld/module/08#caching-patterns-and-write-strategies",
+    "type": "hld_topic",
+    "module_id": "08",
+    "module_title": "Caching Strategies & Distributed Caches",
+    "topic_id": "caching-patterns-and-write-strategies",
+    "summary": "Caching Strategies & Distributed Caches &bull; Storage & Performance",
+    "tags": [
+      "Caching Strategies & Distributed Caches",
+      "Caching Patterns: Cache-Aside, Read-Through, Write-Through, Write-Back & Write-Around",
+      "HLD 08",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Distributed Caching: Redis Architecture vs Memcached (HLD 08)",
+    "url": "/hld/module/08#redis-vs-memcached-distributed-cache",
+    "type": "hld_topic",
+    "module_id": "08",
+    "module_title": "Caching Strategies & Distributed Caches",
+    "topic_id": "redis-vs-memcached-distributed-cache",
+    "summary": "Caching Strategies & Distributed Caches &bull; Storage & Performance",
+    "tags": [
+      "Caching Strategies & Distributed Caches",
+      "Distributed Caching: Redis Architecture vs Memcached",
+      "HLD 08",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Cache Traps: Stampede, Avalanche, Penetration, Hot Key Mitigation & Mutex Locks (HLD 08)",
+    "url": "/hld/module/08#cache-stampede-avalanche-penetration",
+    "type": "hld_topic",
+    "module_id": "08",
+    "module_title": "Caching Strategies & Distributed Caches",
+    "topic_id": "cache-stampede-avalanche-penetration",
+    "summary": "Caching Strategies & Distributed Caches &bull; Storage & Performance",
+    "tags": [
+      "Caching Strategies & Distributed Caches",
+      "Cache Traps: Stampede, Avalanche, Penetration, Hot Key Mitigation & Mutex Locks",
+      "HLD 08",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Database Foundations & Relational DBs (HLD 09)",
+    "url": "/hld/module/09",
+    "type": "hld_module",
+    "module_id": "09",
+    "module_title": "Database Foundations & Relational DBs",
+    "topic_id": "09-database-foundations",
+    "summary": "Relational vs NoSQL, Tables, Keys, Constraints, Transactions, ACID guarantees, Normalization, Joins, and Connection Pooling.",
+    "tags": [
+      "Database Foundations & Relational DBs",
+      "Intermediate",
+      "Databases",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Relational (RDBMS) vs NoSQL: Data Modeling & Query Paradigms (HLD 09)",
+    "url": "/hld/module/09#relational-vs-nosql-paradigm",
+    "type": "hld_topic",
+    "module_id": "09",
+    "module_title": "Database Foundations & Relational DBs",
+    "topic_id": "relational-vs-nosql-paradigm",
+    "summary": "Database Foundations & Relational DBs &bull; Databases",
+    "tags": [
+      "Database Foundations & Relational DBs",
+      "Relational (RDBMS) vs NoSQL: Data Modeling & Query Paradigms",
+      "HLD 09",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] ACID Properties: Atomicity, Consistency, Isolation & Durability (HLD 09)",
+    "url": "/hld/module/09#acid-transactions-explained",
+    "type": "hld_topic",
+    "module_id": "09",
+    "module_title": "Database Foundations & Relational DBs",
+    "topic_id": "acid-transactions-explained",
+    "summary": "Database Foundations & Relational DBs &bull; Databases",
+    "tags": [
+      "Database Foundations & Relational DBs",
+      "ACID Properties: Atomicity, Consistency, Isolation & Durability",
+      "HLD 09",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Database Normalization (1NF to 3NF) vs Intentional Denormalization (HLD 09)",
+    "url": "/hld/module/09#normalization-vs-denormalization",
+    "type": "hld_topic",
+    "module_id": "09",
+    "module_title": "Database Foundations & Relational DBs",
+    "topic_id": "normalization-vs-denormalization",
+    "summary": "Database Foundations & Relational DBs &bull; Databases",
+    "tags": [
+      "Database Foundations & Relational DBs",
+      "Database Normalization (1NF to 3NF) vs Intentional Denormalization",
+      "HLD 09",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Connection Pooling, Optimistic vs Pessimistic Locking & Deadlocks (HLD 09)",
+    "url": "/hld/module/09#connection-pooling-and-locks",
+    "type": "hld_topic",
+    "module_id": "09",
+    "module_title": "Database Foundations & Relational DBs",
+    "topic_id": "connection-pooling-and-locks",
+    "summary": "Database Foundations & Relational DBs &bull; Databases",
+    "tags": [
+      "Database Foundations & Relational DBs",
+      "Connection Pooling, Optimistic vs Pessimistic Locking & Deadlocks",
+      "HLD 09",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Deep Dive SQL: PostgreSQL, MySQL & Indexing (HLD 10)",
+    "url": "/hld/module/10",
+    "type": "hld_module",
+    "module_id": "10",
+    "module_title": "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+    "topic_id": "10-deep-dive-sql",
+    "summary": "B-Tree Indexes, Composite & Covering Indexes, Query Plans (EXPLAIN ANALYZE), Isolation Levels (Read Committed to Serializable).",
+    "tags": [
+      "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+      "Intermediate",
+      "Databases",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] B-Tree & LSM Index Internals: Clustered vs Secondary Indexes (HLD 10)",
+    "url": "/hld/module/10#btree-and-indexing-internals",
+    "type": "hld_topic",
+    "module_id": "10",
+    "module_title": "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+    "topic_id": "btree-and-indexing-internals",
+    "summary": "Deep Dive SQL: PostgreSQL, MySQL & Indexing &bull; Databases",
+    "tags": [
+      "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+      "B-Tree & LSM Index Internals: Clustered vs Secondary Indexes",
+      "HLD 10",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Composite Indexes, Leftmost Prefix Rule & Covering Indexes (HLD 10)",
+    "url": "/hld/module/10#composite-and-covering-indexes",
+    "type": "hld_topic",
+    "module_id": "10",
+    "module_title": "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+    "topic_id": "composite-and-covering-indexes",
+    "summary": "Deep Dive SQL: PostgreSQL, MySQL & Indexing &bull; Databases",
+    "tags": [
+      "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+      "Composite Indexes, Leftmost Prefix Rule & Covering Indexes",
+      "HLD 10",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] SQL Isolation Levels: Dirty Read, Non-Repeatable Read & Phantom Read (HLD 10)",
+    "url": "/hld/module/10#transaction-isolation-levels",
+    "type": "hld_topic",
+    "module_id": "10",
+    "module_title": "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+    "topic_id": "transaction-isolation-levels",
+    "summary": "Deep Dive SQL: PostgreSQL, MySQL & Indexing &bull; Databases",
+    "tags": [
+      "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+      "SQL Isolation Levels: Dirty Read, Non-Repeatable Read & Phantom Read",
+      "HLD 10",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Query Planning, EXPLAIN ANALYZE & Slow Query Optimization (HLD 10)",
+    "url": "/hld/module/10#query-optimization-and-explain",
+    "type": "hld_topic",
+    "module_id": "10",
+    "module_title": "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+    "topic_id": "query-optimization-and-explain",
+    "summary": "Deep Dive SQL: PostgreSQL, MySQL & Indexing &bull; Databases",
+    "tags": [
+      "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+      "Query Planning, EXPLAIN ANALYZE & Slow Query Optimization",
+      "HLD 10",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] NoSQL Databases: Key-Value, Document, Wide-Column, Graph (HLD 11)",
+    "url": "/hld/module/11",
+    "type": "hld_module",
+    "module_id": "11",
+    "module_title": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+    "topic_id": "11-nosql-databases",
+    "summary": "Deep comparison of Key-Value (Redis), Document (MongoDB), Wide-Column (Cassandra), and Graph (Neo4j) database engines.",
+    "tags": [
+      "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+      "Intermediate",
+      "Databases",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] The 4 NoSQL Engines: Key-Value, Document, Wide-Column & Graph (HLD 11)",
+    "url": "/hld/module/11#nosql-categories-and-internals",
+    "type": "hld_topic",
+    "module_id": "11",
+    "module_title": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+    "topic_id": "nosql-categories-and-internals",
+    "summary": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph &bull; Databases",
+    "tags": [
+      "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+      "The 4 NoSQL Engines: Key-Value, Document, Wide-Column & Graph",
+      "HLD 11",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Document Stores: MongoDB BSON, Indexing & Embedding vs Referencing (HLD 11)",
+    "url": "/hld/module/11#mongodb-and-document-stores",
+    "type": "hld_topic",
+    "module_id": "11",
+    "module_title": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+    "topic_id": "mongodb-and-document-stores",
+    "summary": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph &bull; Databases",
+    "tags": [
+      "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+      "Document Stores: MongoDB BSON, Indexing & Embedding vs Referencing",
+      "HLD 11",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Wide-Column Stores: Cassandra Architecture, SSTables, Memtables & Compaction (HLD 11)",
+    "url": "/hld/module/11#cassandra-and-wide-column",
+    "type": "hld_topic",
+    "module_id": "11",
+    "module_title": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+    "topic_id": "cassandra-and-wide-column",
+    "summary": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph &bull; Databases",
+    "tags": [
+      "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+      "Wide-Column Stores: Cassandra Architecture, SSTables, Memtables & Compaction",
+      "HLD 11",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Graph DBs (Neo4j) & The Comprehensive SQL vs NoSQL Decision Matrix (HLD 11)",
+    "url": "/hld/module/11#graph-databases-and-sql-vs-nosql",
+    "type": "hld_topic",
+    "module_id": "11",
+    "module_title": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+    "topic_id": "graph-databases-and-sql-vs-nosql",
+    "summary": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph &bull; Databases",
+    "tags": [
+      "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+      "Graph DBs (Neo4j) & The Comprehensive SQL vs NoSQL Decision Matrix",
+      "HLD 11",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Database Scaling: Replication, Sharding & Partitioning (HLD 12)",
+    "url": "/hld/module/12",
+    "type": "hld_module",
+    "module_id": "12",
+    "module_title": "Database Scaling: Replication, Sharding & Partitioning",
+    "topic_id": "12-database-scaling",
+    "summary": "Vertical vs Horizontal Scaling, Primary-Replica, Multi-Primary, Range vs Hash Sharding, Hot Partitions, and Cross-Shard Queries.",
+    "tags": [
+      "Database Scaling: Replication, Sharding & Partitioning",
+      "Advanced",
+      "Databases",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Primary-Replica Replication: Sync vs Async & Handling Replication Lag (HLD 12)",
+    "url": "/hld/module/12#read-replicas-and-replication-lag",
+    "type": "hld_topic",
+    "module_id": "12",
+    "module_title": "Database Scaling: Replication, Sharding & Partitioning",
+    "topic_id": "read-replicas-and-replication-lag",
+    "summary": "Database Scaling: Replication, Sharding & Partitioning &bull; Databases",
+    "tags": [
+      "Database Scaling: Replication, Sharding & Partitioning",
+      "Primary-Replica Replication: Sync vs Async & Handling Replication Lag",
+      "HLD 12",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Horizontal Sharding: Range-based, Hash-based, Directory-based & Consistent Hashing (HLD 12)",
+    "url": "/hld/module/12#database-sharding-strategies",
+    "type": "hld_topic",
+    "module_id": "12",
+    "module_title": "Database Scaling: Replication, Sharding & Partitioning",
+    "topic_id": "database-sharding-strategies",
+    "summary": "Database Scaling: Replication, Sharding & Partitioning &bull; Databases",
+    "tags": [
+      "Database Scaling: Replication, Sharding & Partitioning",
+      "Horizontal Sharding: Range-based, Hash-based, Directory-based & Consistent Hashing",
+      "HLD 12",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Hot Partitions (Celebrity Problem), Resharding & Zero-Downtime Data Migration (HLD 12)",
+    "url": "/hld/module/12#hot-partitions-and-rebalancing",
+    "type": "hld_topic",
+    "module_id": "12",
+    "module_title": "Database Scaling: Replication, Sharding & Partitioning",
+    "topic_id": "hot-partitions-and-rebalancing",
+    "summary": "Database Scaling: Replication, Sharding & Partitioning &bull; Databases",
+    "tags": [
+      "Database Scaling: Replication, Sharding & Partitioning",
+      "Hot Partitions (Celebrity Problem), Resharding & Zero-Downtime Data Migration",
+      "HLD 12",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Solving Cross-Shard Queries, Scatter-Gather & Distributed Joins (HLD 12)",
+    "url": "/hld/module/12#cross-shard-queries-and-distributed-joins",
+    "type": "hld_topic",
+    "module_id": "12",
+    "module_title": "Database Scaling: Replication, Sharding & Partitioning",
+    "topic_id": "cross-shard-queries-and-distributed-joins",
+    "summary": "Database Scaling: Replication, Sharding & Partitioning &bull; Databases",
+    "tags": [
+      "Database Scaling: Replication, Sharding & Partitioning",
+      "Solving Cross-Shard Queries, Scatter-Gather & Distributed Joins",
+      "HLD 12",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Distributed System Fundamentals (HLD 13)",
+    "url": "/hld/module/13",
+    "type": "hld_module",
+    "module_id": "13",
+    "module_title": "Distributed System Fundamentals",
+    "topic_id": "13-distributed-system-fundamentals",
+    "summary": "Partial failures, network partitions, physical vs logical clocks (Lamport, Vector), distributed locks, and the fallacies of distributed computing.",
+    "tags": [
+      "Distributed System Fundamentals",
+      "Advanced",
+      "Distributed Systems",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] The 8 Fallacies of Distributed Computing & The Reality of Partial Failures (HLD 13)",
+    "url": "/hld/module/13#fallacies-and-partial-failures",
+    "type": "hld_topic",
+    "module_id": "13",
+    "module_title": "Distributed System Fundamentals",
+    "topic_id": "fallacies-and-partial-failures",
+    "summary": "Distributed System Fundamentals &bull; Distributed Systems",
+    "tags": [
+      "Distributed System Fundamentals",
+      "The 8 Fallacies of Distributed Computing & The Reality of Partial Failures",
+      "HLD 13",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Physical Clocks (NTP Drift), Lamport Timestamps & Vector Clocks (HLD 13)",
+    "url": "/hld/module/13#clocks-and-ordering-in-distributed-systems",
+    "type": "hld_topic",
+    "module_id": "13",
+    "module_title": "Distributed System Fundamentals",
+    "topic_id": "clocks-and-ordering-in-distributed-systems",
+    "summary": "Distributed System Fundamentals &bull; Distributed Systems",
+    "tags": [
+      "Distributed System Fundamentals",
+      "Physical Clocks (NTP Drift), Lamport Timestamps & Vector Clocks",
+      "HLD 13",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Distributed Locks: Redis Redlock vs Zookeeper Ephemeral Nodes & Fencing Tokens (HLD 13)",
+    "url": "/hld/module/13#distributed-locking-patterns",
+    "type": "hld_topic",
+    "module_id": "13",
+    "module_title": "Distributed System Fundamentals",
+    "topic_id": "distributed-locking-patterns",
+    "summary": "Distributed System Fundamentals &bull; Distributed Systems",
+    "tags": [
+      "Distributed System Fundamentals",
+      "Distributed Locks: Redis Redlock vs Zookeeper Ephemeral Nodes & Fencing Tokens",
+      "HLD 13",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Distributed Idempotency, Deduplication Stores & Out-of-Order Delivery (HLD 13)",
+    "url": "/hld/module/13#idempotency-and-deduplication-at-scale",
+    "type": "hld_topic",
+    "module_id": "13",
+    "module_title": "Distributed System Fundamentals",
+    "topic_id": "idempotency-and-deduplication-at-scale",
+    "summary": "Distributed System Fundamentals &bull; Distributed Systems",
+    "tags": [
+      "Distributed System Fundamentals",
+      "Distributed Idempotency, Deduplication Stores & Out-of-Order Delivery",
+      "HLD 13",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] CAP Theorem & PACELC Explained (HLD 14)",
+    "url": "/hld/module/14",
+    "type": "hld_module",
+    "module_id": "14",
+    "module_title": "CAP Theorem & PACELC Explained",
+    "topic_id": "14-cap-theorem",
+    "summary": "Consistency, Availability, Partition Tolerance demystified. Why network partitions are unavoidable and how PACELC models latency trade-offs.",
+    "tags": [
+      "CAP Theorem & PACELC Explained",
+      "Advanced",
+      "Distributed Systems",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] CAP Theorem Realities: Why You Can NEVER Choose 'CA' Over a Partition (HLD 14)",
+    "url": "/hld/module/14#cap-theorem-deep-dive",
+    "type": "hld_topic",
+    "module_id": "14",
+    "module_title": "CAP Theorem & PACELC Explained",
+    "topic_id": "cap-theorem-deep-dive",
+    "summary": "CAP Theorem & PACELC Explained &bull; Distributed Systems",
+    "tags": [
+      "CAP Theorem & PACELC Explained",
+      "CAP Theorem Realities: Why You Can NEVER Choose 'CA' Over a Partition",
+      "HLD 14",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] CP Systems (HBase, Zookeeper) vs AP Systems (Cassandra, DynamoDB) (HLD 14)",
+    "url": "/hld/module/14#cp-vs-ap-systems",
+    "type": "hld_topic",
+    "module_id": "14",
+    "module_title": "CAP Theorem & PACELC Explained",
+    "topic_id": "cp-vs-ap-systems",
+    "summary": "CAP Theorem & PACELC Explained &bull; Distributed Systems",
+    "tags": [
+      "CAP Theorem & PACELC Explained",
+      "CP Systems (HBase, Zookeeper) vs AP Systems (Cassandra, DynamoDB)",
+      "HLD 14",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Beyond CAP: PACELC Theorem (Else Latency vs Consistency) (HLD 14)",
+    "url": "/hld/module/14#pacelc-theorem-and-latency",
+    "type": "hld_topic",
+    "module_id": "14",
+    "module_title": "CAP Theorem & PACELC Explained",
+    "topic_id": "pacelc-theorem-and-latency",
+    "summary": "CAP Theorem & PACELC Explained &bull; Distributed Systems",
+    "tags": [
+      "CAP Theorem & PACELC Explained",
+      "Beyond CAP: PACELC Theorem (Else Latency vs Consistency)",
+      "HLD 14",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Consistency Models: Strong to Eventual (HLD 15)",
+    "url": "/hld/module/15",
+    "type": "hld_module",
+    "module_id": "15",
+    "module_title": "Consistency Models: Strong to Eventual",
+    "topic_id": "15-consistency-models",
+    "summary": "Linearizability, Sequential, Causal, Read-Your-Writes, Monotonic Reads, Eventual Consistency, and Conflict Resolution (LWW, CRDTs).",
+    "tags": [
+      "Consistency Models: Strong to Eventual",
+      "Advanced",
+      "Distributed Systems",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Strong Consistency & Linearizability: Strict Global Time Ordering (HLD 15)",
+    "url": "/hld/module/15#linearizability-and-strong-consistency",
+    "type": "hld_topic",
+    "module_id": "15",
+    "module_title": "Consistency Models: Strong to Eventual",
+    "topic_id": "linearizability-and-strong-consistency",
+    "summary": "Consistency Models: Strong to Eventual &bull; Distributed Systems",
+    "tags": [
+      "Consistency Models: Strong to Eventual",
+      "Strong Consistency & Linearizability: Strict Global Time Ordering",
+      "HLD 15",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Eventual Consistency, Read-Your-Writes & Monotonic Reads (HLD 15)",
+    "url": "/hld/module/15#eventual-consistency-and-guarantees",
+    "type": "hld_topic",
+    "module_id": "15",
+    "module_title": "Consistency Models: Strong to Eventual",
+    "topic_id": "eventual-consistency-and-guarantees",
+    "summary": "Consistency Models: Strong to Eventual &bull; Distributed Systems",
+    "tags": [
+      "Consistency Models: Strong to Eventual",
+      "Eventual Consistency, Read-Your-Writes & Monotonic Reads",
+      "HLD 15",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Causal Consistency, Last-Write-Wins (LWW) & Conflict-Free Replicated Data Types (CRDTs) (HLD 15)",
+    "url": "/hld/module/15#causal-consistency-and-conflict-resolution",
+    "type": "hld_topic",
+    "module_id": "15",
+    "module_title": "Consistency Models: Strong to Eventual",
+    "topic_id": "causal-consistency-and-conflict-resolution",
+    "summary": "Consistency Models: Strong to Eventual &bull; Distributed Systems",
+    "tags": [
+      "Consistency Models: Strong to Eventual",
+      "Causal Consistency, Last-Write-Wins (LWW) & Conflict-Free Replicated Data Types (CRDTs)",
+      "HLD 15",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Distributed Consensus: Raft, Paxos & Quorums (HLD 16)",
+    "url": "/hld/module/16",
+    "type": "hld_module",
+    "module_id": "16",
+    "module_title": "Distributed Consensus: Raft, Paxos & Quorums",
+    "topic_id": "16-consensus-algorithms",
+    "summary": "Leader Election, Quorum math (R + W > N), Raft state machine replication, log compaction, and Paxos concepts.",
+    "tags": [
+      "Distributed Consensus: Raft, Paxos & Quorums",
+      "Advanced",
+      "Distributed Systems",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] The Consensus Problem, Split-Brain & Quorum Arithmetic (R + W > N) (HLD 16)",
+    "url": "/hld/module/16#why-consensus-and-quorum-math",
+    "type": "hld_topic",
+    "module_id": "16",
+    "module_title": "Distributed Consensus: Raft, Paxos & Quorums",
+    "topic_id": "why-consensus-and-quorum-math",
+    "summary": "Distributed Consensus: Raft, Paxos & Quorums &bull; Distributed Systems",
+    "tags": [
+      "Distributed Consensus: Raft, Paxos & Quorums",
+      "The Consensus Problem, Split-Brain & Quorum Arithmetic (R + W > N)",
+      "HLD 16",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Raft Protocol: Leader Election, Heartbeats, Log Replication & Safety Invariants (HLD 16)",
+    "url": "/hld/module/16#raft-consensus-algorithm",
+    "type": "hld_topic",
+    "module_id": "16",
+    "module_title": "Distributed Consensus: Raft, Paxos & Quorums",
+    "topic_id": "raft-consensus-algorithm",
+    "summary": "Distributed Consensus: Raft, Paxos & Quorums &bull; Distributed Systems",
+    "tags": [
+      "Distributed Consensus: Raft, Paxos & Quorums",
+      "Raft Protocol: Leader Election, Heartbeats, Log Replication & Safety Invariants",
+      "HLD 16",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Paxos Concepts, Zookeeper ZAB & Production Coordination Services (etcd, Consul) (HLD 16)",
+    "url": "/hld/module/16#paxos-and-production-coordination",
+    "type": "hld_topic",
+    "module_id": "16",
+    "module_title": "Distributed Consensus: Raft, Paxos & Quorums",
+    "topic_id": "paxos-and-production-coordination",
+    "summary": "Distributed Consensus: Raft, Paxos & Quorums &bull; Distributed Systems",
+    "tags": [
+      "Distributed Consensus: Raft, Paxos & Quorums",
+      "Paxos Concepts, Zookeeper ZAB & Production Coordination Services (etcd, Consul)",
+      "HLD 16",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Message Queues & Event Streaming: Kafka vs RabbitMQ (HLD 17)",
+    "url": "/hld/module/17",
+    "type": "hld_module",
+    "module_id": "17",
+    "module_title": "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+    "topic_id": "17-message-queues",
+    "summary": "Producers, Consumers, Brokers, Topics, Partitions, Consumer Groups, Offsets, Delivery Guarantees (At-least-once, Exactly-once), and DLQs.",
+    "tags": [
+      "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+      "Advanced",
+      "Messaging",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Point-to-Point Queue (RabbitMQ) vs Distributed Partitioned Log (Kafka) (HLD 17)",
+    "url": "/hld/module/17#point-to-point-vs-partitioned-log",
+    "type": "hld_topic",
+    "module_id": "17",
+    "module_title": "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+    "topic_id": "point-to-point-vs-partitioned-log",
+    "summary": "Message Queues & Event Streaming: Kafka vs RabbitMQ &bull; Messaging",
+    "tags": [
+      "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+      "Point-to-Point Queue (RabbitMQ) vs Distributed Partitioned Log (Kafka)",
+      "HLD 17",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Kafka Architecture: Brokers, Partitions, Consumer Groups, Offsets & Commit Semantics (HLD 17)",
+    "url": "/hld/module/17#kafka-internals-and-offsets",
+    "type": "hld_topic",
+    "module_id": "17",
+    "module_title": "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+    "topic_id": "kafka-internals-and-offsets",
+    "summary": "Message Queues & Event Streaming: Kafka vs RabbitMQ &bull; Messaging",
+    "tags": [
+      "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+      "Kafka Architecture: Brokers, Partitions, Consumer Groups, Offsets & Commit Semantics",
+      "HLD 17",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Delivery Guarantees: At-Most-Once, At-Least-Once & Exactly-Once (Idempotent Producers + Transactions) (HLD 17)",
+    "url": "/hld/module/17#delivery-guarantees-and-idempotence",
+    "type": "hld_topic",
+    "module_id": "17",
+    "module_title": "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+    "topic_id": "delivery-guarantees-and-idempotence",
+    "summary": "Message Queues & Event Streaming: Kafka vs RabbitMQ &bull; Messaging",
+    "tags": [
+      "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+      "Delivery Guarantees: At-Most-Once, At-Least-Once & Exactly-Once (Idempotent Producers + Transactions)",
+      "HLD 17",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Dead-Letter Queues (DLQ), Poison Pill Handling & Consumer Backpressure (HLD 17)",
+    "url": "/hld/module/17#dead-letter-queues-and-backpressure",
+    "type": "hld_topic",
+    "module_id": "17",
+    "module_title": "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+    "topic_id": "dead-letter-queues-and-backpressure",
+    "summary": "Message Queues & Event Streaming: Kafka vs RabbitMQ &bull; Messaging",
+    "tags": [
+      "Message Queues & Event Streaming: Kafka vs RabbitMQ",
+      "Dead-Letter Queues (DLQ), Poison Pill Handling & Consumer Backpressure",
+      "HLD 17",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Event-Driven Architecture & Pub/Sub (HLD 18)",
+    "url": "/hld/module/18",
+    "type": "hld_module",
+    "module_id": "18",
+    "module_title": "Event-Driven Architecture & Pub/Sub",
+    "topic_id": "18-event-driven-architecture",
+    "summary": "Pub/Sub topologies, Event Sourcing, CQRS read models, Event schemas (Avro/Protobuf), Schema Registry, and Eventual Consistency reconciliation.",
+    "tags": [
+      "Event-Driven Architecture & Pub/Sub",
+      "Advanced",
+      "Messaging",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Pub/Sub Topologies: Fan-out, Topic Filtering & Dynamic Subscriptions (HLD 18)",
+    "url": "/hld/module/18#pubsub-patterns-and-topologies",
+    "type": "hld_topic",
+    "module_id": "18",
+    "module_title": "Event-Driven Architecture & Pub/Sub",
+    "topic_id": "pubsub-patterns-and-topologies",
+    "summary": "Event-Driven Architecture & Pub/Sub &bull; Messaging",
+    "tags": [
+      "Event-Driven Architecture & Pub/Sub",
+      "Pub/Sub Topologies: Fan-out, Topic Filtering & Dynamic Subscriptions",
+      "HLD 18",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Event Sourcing: Rebuilding Application State from Immutable Append-Only Logs (HLD 18)",
+    "url": "/hld/module/18#event-sourcing-and-materialized-views",
+    "type": "hld_topic",
+    "module_id": "18",
+    "module_title": "Event-Driven Architecture & Pub/Sub",
+    "topic_id": "event-sourcing-and-materialized-views",
+    "summary": "Event-Driven Architecture & Pub/Sub &bull; Messaging",
+    "tags": [
+      "Event-Driven Architecture & Pub/Sub",
+      "Event Sourcing: Rebuilding Application State from Immutable Append-Only Logs",
+      "HLD 18",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Schema Registry, Avro/Protobuf Evolution & Backward/Forward Compatibility (HLD 18)",
+    "url": "/hld/module/18#schema-registry-and-evolution",
+    "type": "hld_topic",
+    "module_id": "18",
+    "module_title": "Event-Driven Architecture & Pub/Sub",
+    "topic_id": "schema-registry-and-evolution",
+    "summary": "Event-Driven Architecture & Pub/Sub &bull; Messaging",
+    "tags": [
+      "Event-Driven Architecture & Pub/Sub",
+      "Schema Registry, Avro/Protobuf Evolution & Backward/Forward Compatibility",
+      "HLD 18",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Content Delivery Networks (CDN) & Edge Computing (HLD 19)",
+    "url": "/hld/module/19",
+    "type": "hld_module",
+    "module_id": "19",
+    "module_title": "Content Delivery Networks (CDN) & Edge Computing",
+    "topic_id": "19-cdn-edge-computing",
+    "summary": "Edge locations, Point of Presence (PoP), Static vs Dynamic Acceleration, Anycast Routing, Cache Invalidation, and Cloudflare Workers/Edge Compute.",
+    "tags": [
+      "Content Delivery Networks (CDN) & Edge Computing",
+      "Intermediate",
+      "Networking & Storage",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] CDN Architecture: Edge PoPs, Anycast BGP Routing & Origin Shielding (HLD 19)",
+    "url": "/hld/module/19#cdn-architecture-and-anycast",
+    "type": "hld_topic",
+    "module_id": "19",
+    "module_title": "Content Delivery Networks (CDN) & Edge Computing",
+    "topic_id": "cdn-architecture-and-anycast",
+    "summary": "Content Delivery Networks (CDN) & Edge Computing &bull; Networking & Storage",
+    "tags": [
+      "Content Delivery Networks (CDN) & Edge Computing",
+      "CDN Architecture: Edge PoPs, Anycast BGP Routing & Origin Shielding",
+      "HLD 19",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Static Asset Caching vs Dynamic Content Acceleration (TCP Optimization, TLS Termination) (HLD 19)",
+    "url": "/hld/module/19#static-vs-dynamic-acceleration",
+    "type": "hld_topic",
+    "module_id": "19",
+    "module_title": "Content Delivery Networks (CDN) & Edge Computing",
+    "topic_id": "static-vs-dynamic-acceleration",
+    "summary": "Content Delivery Networks (CDN) & Edge Computing &bull; Networking & Storage",
+    "tags": [
+      "Content Delivery Networks (CDN) & Edge Computing",
+      "Static Asset Caching vs Dynamic Content Acceleration (TCP Optimization, TLS Termination)",
+      "HLD 19",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Cache Purging/Invalidation Strategies & Serverless Edge Functions (HLD 19)",
+    "url": "/hld/module/19#cache-invalidation-and-edge-workers",
+    "type": "hld_topic",
+    "module_id": "19",
+    "module_title": "Content Delivery Networks (CDN) & Edge Computing",
+    "topic_id": "cache-invalidation-and-edge-workers",
+    "summary": "Content Delivery Networks (CDN) & Edge Computing &bull; Networking & Storage",
+    "tags": [
+      "Content Delivery Networks (CDN) & Edge Computing",
+      "Cache Purging/Invalidation Strategies & Serverless Edge Functions",
+      "HLD 19",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] File & Storage Systems: Object, Block & File (HLD 20)",
+    "url": "/hld/module/20",
+    "type": "hld_module",
+    "module_id": "20",
+    "module_title": "File & Storage Systems: Object, Block & File",
+    "topic_id": "20-file-and-storage-systems",
+    "summary": "Block Storage vs File Storage (NFS/EFS) vs Object Storage (S3), Multipart Uploads, Signed URLs, Erasure Coding, and Storage Tiering.",
+    "tags": [
+      "File & Storage Systems: Object, Block & File",
+      "Intermediate",
+      "Storage",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Storage Typology: Block Storage (SAN/EBS) vs Network File Systems (NFS) vs Object Storage (S3) (HLD 20)",
+    "url": "/hld/module/20#block-vs-file-vs-object-storage",
+    "type": "hld_topic",
+    "module_id": "20",
+    "module_title": "File & Storage Systems: Object, Block & File",
+    "topic_id": "block-vs-file-vs-object-storage",
+    "summary": "File & Storage Systems: Object, Block & File &bull; Storage",
+    "tags": [
+      "File & Storage Systems: Object, Block & File",
+      "Storage Typology: Block Storage (SAN/EBS) vs Network File Systems (NFS) vs Object Storage (S3)",
+      "HLD 20",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Object Storage Architecture: Buckets, Keys, Metadata, Immutability & Signed URLs (HLD 20)",
+    "url": "/hld/module/20#object-storage-internals",
+    "type": "hld_topic",
+    "module_id": "20",
+    "module_title": "File & Storage Systems: Object, Block & File",
+    "topic_id": "object-storage-internals",
+    "summary": "File & Storage Systems: Object, Block & File &bull; Storage",
+    "tags": [
+      "File & Storage Systems: Object, Block & File",
+      "Object Storage Architecture: Buckets, Keys, Metadata, Immutability & Signed URLs",
+      "HLD 20",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] High Durability: Reed-Solomon Erasure Coding, Chunking & Resumable Multipart Uploads (HLD 20)",
+    "url": "/hld/module/20#erasure-coding-and-multipart-uploads",
+    "type": "hld_topic",
+    "module_id": "20",
+    "module_title": "File & Storage Systems: Object, Block & File",
+    "topic_id": "erasure-coding-and-multipart-uploads",
+    "summary": "File & Storage Systems: Object, Block & File &bull; Storage",
+    "tags": [
+      "File & Storage Systems: Object, Block & File",
+      "High Durability: Reed-Solomon Erasure Coding, Chunking & Resumable Multipart Uploads",
+      "HLD 20",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Distributed Search Systems: Elasticsearch & Inverted Index (HLD 21)",
+    "url": "/hld/module/21",
+    "type": "hld_module",
+    "module_id": "21",
+    "module_title": "Distributed Search Systems: Elasticsearch & Inverted Index",
+    "topic_id": "21-search-systems",
+    "summary": "Inverted index internals, Tokenization, Stemming, TF-IDF / BM25 ranking, Sharding/Replication in Lucene, and Search Autocomplete (Trie vs Prefix Index).",
+    "tags": [
+      "Distributed Search Systems: Elasticsearch & Inverted Index",
+      "Advanced",
+      "Search",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Inverted Index Mechanics: Analyzers, Tokenizers, Stop Words & Stemming (HLD 21)",
+    "url": "/hld/module/21#inverted-index-and-tokenization",
+    "type": "hld_topic",
+    "module_id": "21",
+    "module_title": "Distributed Search Systems: Elasticsearch & Inverted Index",
+    "topic_id": "inverted-index-and-tokenization",
+    "summary": "Distributed Search Systems: Elasticsearch & Inverted Index &bull; Search",
+    "tags": [
+      "Distributed Search Systems: Elasticsearch & Inverted Index",
+      "Inverted Index Mechanics: Analyzers, Tokenizers, Stop Words & Stemming",
+      "HLD 21",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Elasticsearch / OpenSearch Architecture: Master, Data Nodes, Shards & Translog (HLD 21)",
+    "url": "/hld/module/21#elasticsearch-architecture-and-sharding",
+    "type": "hld_topic",
+    "module_id": "21",
+    "module_title": "Distributed Search Systems: Elasticsearch & Inverted Index",
+    "topic_id": "elasticsearch-architecture-and-sharding",
+    "summary": "Distributed Search Systems: Elasticsearch & Inverted Index &bull; Search",
+    "tags": [
+      "Distributed Search Systems: Elasticsearch & Inverted Index",
+      "Elasticsearch / OpenSearch Architecture: Master, Data Nodes, Shards & Translog",
+      "HLD 21",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Relevance Scoring (TF-IDF, BM25) & Near-Real-Time (NRT) Indexing Pipelines (HLD 21)",
+    "url": "/hld/module/21#relevance-ranking-and-indexing-pipeline",
+    "type": "hld_topic",
+    "module_id": "21",
+    "module_title": "Distributed Search Systems: Elasticsearch & Inverted Index",
+    "topic_id": "relevance-ranking-and-indexing-pipeline",
+    "summary": "Distributed Search Systems: Elasticsearch & Inverted Index &bull; Search",
+    "tags": [
+      "Distributed Search Systems: Elasticsearch & Inverted Index",
+      "Relevance Scoring (TF-IDF, BM25) & Near-Real-Time (NRT) Indexing Pipelines",
+      "HLD 21",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Search Autocomplete & Typeahead: Prefix Trees (Trie), N-grams & Fuzzy Matching (HLD 21)",
+    "url": "/hld/module/21#search-autocomplete-and-typeahead",
+    "type": "hld_topic",
+    "module_id": "21",
+    "module_title": "Distributed Search Systems: Elasticsearch & Inverted Index",
+    "topic_id": "search-autocomplete-and-typeahead",
+    "summary": "Distributed Search Systems: Elasticsearch & Inverted Index &bull; Search",
+    "tags": [
+      "Distributed Search Systems: Elasticsearch & Inverted Index",
+      "Search Autocomplete & Typeahead: Prefix Trees (Trie), N-grams & Fuzzy Matching",
+      "HLD 21",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Distributed Rate Limiting & Traffic Shaping (HLD 22)",
+    "url": "/hld/module/22",
+    "type": "hld_module",
+    "module_id": "22",
+    "module_title": "Distributed Rate Limiting & Traffic Shaping",
+    "topic_id": "22-rate-limiting-traffic-shaping",
+    "summary": "Fixed Window, Sliding Window Log, Sliding Window Counter, Token Bucket, Leaky Bucket, Distributed Redis Lua Rate Limiters, and DoS Mitigation.",
+    "tags": [
+      "Distributed Rate Limiting & Traffic Shaping",
+      "Advanced",
+      "Traffic Management",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Algorithm Comparison: Token Bucket, Leaky Bucket, Fixed Window & Sliding Window Counter (HLD 22)",
+    "url": "/hld/module/22#rate-limiting-algorithms-comparison",
+    "type": "hld_topic",
+    "module_id": "22",
+    "module_title": "Distributed Rate Limiting & Traffic Shaping",
+    "topic_id": "rate-limiting-algorithms-comparison",
+    "summary": "Distributed Rate Limiting & Traffic Shaping &bull; Traffic Management",
+    "tags": [
+      "Distributed Rate Limiting & Traffic Shaping",
+      "Algorithm Comparison: Token Bucket, Leaky Bucket, Fixed Window & Sliding Window Counter",
+      "HLD 22",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Distributed Rate Limiting with Redis & Atomic Lua Scripts (Eliminating Race Conditions) (HLD 22)",
+    "url": "/hld/module/22#distributed-rate-limiter-with-redis",
+    "type": "hld_topic",
+    "module_id": "22",
+    "module_title": "Distributed Rate Limiting & Traffic Shaping",
+    "topic_id": "distributed-rate-limiter-with-redis",
+    "summary": "Distributed Rate Limiting & Traffic Shaping &bull; Traffic Management",
+    "tags": [
+      "Distributed Rate Limiting & Traffic Shaping",
+      "Distributed Rate Limiting with Redis & Atomic Lua Scripts (Eliminating Race Conditions)",
+      "HLD 22",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Multi-Tier Rate Limiting: IP, API Key, User ID, Global Throttling & HTTP 429 Retry-After (HLD 22)",
+    "url": "/hld/module/22#client-identification-and-tiering",
+    "type": "hld_topic",
+    "module_id": "22",
+    "module_title": "Distributed Rate Limiting & Traffic Shaping",
+    "topic_id": "client-identification-and-tiering",
+    "summary": "Distributed Rate Limiting & Traffic Shaping &bull; Traffic Management",
+    "tags": [
+      "Distributed Rate Limiting & Traffic Shaping",
+      "Multi-Tier Rate Limiting: IP, API Key, User ID, Global Throttling & HTTP 429 Retry-After",
+      "HLD 22",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] High Availability, Reliability & Disaster Recovery (HLD 23)",
+    "url": "/hld/module/23",
+    "type": "hld_module",
+    "module_id": "23",
+    "module_title": "High Availability, Reliability & Disaster Recovery",
+    "topic_id": "23-reliability-and-durability",
+    "summary": "Availability Nines (99.999%), Single Points of Failure (SPOF), Active-Active vs Active-Passive, Redundancy, RTO, RPO, and Chaos Engineering.",
+    "tags": [
+      "High Availability, Reliability & Disaster Recovery",
+      "Advanced",
+      "Resilience",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Measuring Reliability: Availability Nines (99.9% to 99.999%), MTBF, MTTR & Downtime Math (HLD 23)",
+    "url": "/hld/module/23#availability-metrics-and-nines",
+    "type": "hld_topic",
+    "module_id": "23",
+    "module_title": "High Availability, Reliability & Disaster Recovery",
+    "topic_id": "availability-metrics-and-nines",
+    "summary": "High Availability, Reliability & Disaster Recovery &bull; Resilience",
+    "tags": [
+      "High Availability, Reliability & Disaster Recovery",
+      "Measuring Reliability: Availability Nines (99.9% to 99.999%), MTBF, MTTR & Downtime Math",
+      "HLD 23",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Eliminating Single Points of Failure (SPOF) with N+1 and 2N Redundancy (HLD 23)",
+    "url": "/hld/module/23#spof-elimination-and-redundancy",
+    "type": "hld_topic",
+    "module_id": "23",
+    "module_title": "High Availability, Reliability & Disaster Recovery",
+    "topic_id": "spof-elimination-and-redundancy",
+    "summary": "High Availability, Reliability & Disaster Recovery &bull; Resilience",
+    "tags": [
+      "High Availability, Reliability & Disaster Recovery",
+      "Eliminating Single Points of Failure (SPOF) with N+1 and 2N Redundancy",
+      "HLD 23",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Disaster Recovery: Active-Active Multi-Region vs Active-Passive (Warm/Cold Standby) (HLD 23)",
+    "url": "/hld/module/23#active-active-vs-active-passive-dr",
+    "type": "hld_topic",
+    "module_id": "23",
+    "module_title": "High Availability, Reliability & Disaster Recovery",
+    "topic_id": "active-active-vs-active-passive-dr",
+    "summary": "High Availability, Reliability & Disaster Recovery &bull; Resilience",
+    "tags": [
+      "High Availability, Reliability & Disaster Recovery",
+      "Disaster Recovery: Active-Active Multi-Region vs Active-Passive (Warm/Cold Standby)",
+      "HLD 23",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] RTO (Recovery Time Objective), RPO (Recovery Point Objective) & Chaos Engineering (HLD 23)",
+    "url": "/hld/module/23#rto-rpo-and-chaos-engineering",
+    "type": "hld_topic",
+    "module_id": "23",
+    "module_title": "High Availability, Reliability & Disaster Recovery",
+    "topic_id": "rto-rpo-and-chaos-engineering",
+    "summary": "High Availability, Reliability & Disaster Recovery &bull; Resilience",
+    "tags": [
+      "High Availability, Reliability & Disaster Recovery",
+      "RTO (Recovery Time Objective), RPO (Recovery Point Objective) & Chaos Engineering",
+      "HLD 23",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Fault Tolerance & Failure Handling Patterns (HLD 24)",
+    "url": "/hld/module/24",
+    "type": "hld_module",
+    "module_id": "24",
+    "module_title": "Fault Tolerance & Failure Handling Patterns",
+    "topic_id": "24-fault-tolerance-failure-handling",
+    "summary": "Timeouts, Exponential Backoff with Jitter, Circuit Breaker State Machine, Bulkhead Isolation, Fallback Responses, and Graceful Degradation.",
+    "tags": [
+      "Fault Tolerance & Failure Handling Patterns",
+      "Advanced",
+      "Resilience",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Timeouts & The Cascade of Doom: How 1 Slow Dependency Crashes the Entire Fleet (HLD 24)",
+    "url": "/hld/module/24#timeouts-and-cascading-failures",
+    "type": "hld_topic",
+    "module_id": "24",
+    "module_title": "Fault Tolerance & Failure Handling Patterns",
+    "topic_id": "timeouts-and-cascading-failures",
+    "summary": "Fault Tolerance & Failure Handling Patterns &bull; Resilience",
+    "tags": [
+      "Fault Tolerance & Failure Handling Patterns",
+      "Timeouts & The Cascade of Doom: How 1 Slow Dependency Crashes the Entire Fleet",
+      "HLD 24",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Exponential Backoff & Full Jitter (Preventing Thundering Herd Retries) (HLD 24)",
+    "url": "/hld/module/24#exponential-backoff-and-jitter",
+    "type": "hld_topic",
+    "module_id": "24",
+    "module_title": "Fault Tolerance & Failure Handling Patterns",
+    "topic_id": "exponential-backoff-and-jitter",
+    "summary": "Fault Tolerance & Failure Handling Patterns &bull; Resilience",
+    "tags": [
+      "Fault Tolerance & Failure Handling Patterns",
+      "Exponential Backoff & Full Jitter (Preventing Thundering Herd Retries)",
+      "HLD 24",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Circuit Breaker Pattern: Closed, Open, Half-Open State Transitions (HLD 24)",
+    "url": "/hld/module/24#circuit-breaker-pattern-deep-dive",
+    "type": "hld_topic",
+    "module_id": "24",
+    "module_title": "Fault Tolerance & Failure Handling Patterns",
+    "topic_id": "circuit-breaker-pattern-deep-dive",
+    "summary": "Fault Tolerance & Failure Handling Patterns &bull; Resilience",
+    "tags": [
+      "Fault Tolerance & Failure Handling Patterns",
+      "Circuit Breaker Pattern: Closed, Open, Half-Open State Transitions",
+      "HLD 24",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Bulkhead Isolation (Thread Pool Partitioning), Fallbacks & Graceful Degradation (HLD 24)",
+    "url": "/hld/module/24#bulkheads-and-graceful-degradation",
+    "type": "hld_topic",
+    "module_id": "24",
+    "module_title": "Fault Tolerance & Failure Handling Patterns",
+    "topic_id": "bulkheads-and-graceful-degradation",
+    "summary": "Fault Tolerance & Failure Handling Patterns &bull; Resilience",
+    "tags": [
+      "Fault Tolerance & Failure Handling Patterns",
+      "Bulkhead Isolation (Thread Pool Partitioning), Fallbacks & Graceful Degradation",
+      "HLD 24",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Observability: Metrics, Distributed Tracing & Logs (HLD 25)",
+    "url": "/hld/module/25",
+    "type": "hld_module",
+    "module_id": "25",
+    "module_title": "Observability: Metrics, Distributed Tracing & Logs",
+    "topic_id": "25-observability-monitoring-tracing",
+    "summary": "The 3 Pillars of Observability, Structured Logging, Prometheus Metrics, OpenTelemetry Distributed Tracing, Correlation IDs, and SLIs/SLOs/SLAs.",
+    "tags": [
+      "Observability: Metrics, Distributed Tracing & Logs",
+      "Advanced",
+      "Operations",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] The 3 Pillars: Structured JSON Logs, Push/Pull Metrics & Distributed Tracing (HLD 25)",
+    "url": "/hld/module/25#three-pillars-of-observability",
+    "type": "hld_topic",
+    "module_id": "25",
+    "module_title": "Observability: Metrics, Distributed Tracing & Logs",
+    "topic_id": "three-pillars-of-observability",
+    "summary": "Observability: Metrics, Distributed Tracing & Logs &bull; Operations",
+    "tags": [
+      "Observability: Metrics, Distributed Tracing & Logs",
+      "The 3 Pillars: Structured JSON Logs, Push/Pull Metrics & Distributed Tracing",
+      "HLD 25",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Distributed Tracing: Trace IDs, Span Context Propagation & OpenTelemetry Architecture (HLD 25)",
+    "url": "/hld/module/25#distributed-tracing-and-correlation-ids",
+    "type": "hld_topic",
+    "module_id": "25",
+    "module_title": "Observability: Metrics, Distributed Tracing & Logs",
+    "topic_id": "distributed-tracing-and-correlation-ids",
+    "summary": "Observability: Metrics, Distributed Tracing & Logs &bull; Operations",
+    "tags": [
+      "Observability: Metrics, Distributed Tracing & Logs",
+      "Distributed Tracing: Trace IDs, Span Context Propagation & OpenTelemetry Architecture",
+      "HLD 25",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] SLI (Indicators), SLO (Objectives), SLA (Agreements) & Error Budget Burn Rate Alerting (HLD 25)",
+    "url": "/hld/module/25#sli-slo-sla-and-alerting",
+    "type": "hld_topic",
+    "module_id": "25",
+    "module_title": "Observability: Metrics, Distributed Tracing & Logs",
+    "topic_id": "sli-slo-sla-and-alerting",
+    "summary": "Observability: Metrics, Distributed Tracing & Logs &bull; Operations",
+    "tags": [
+      "Observability: Metrics, Distributed Tracing & Logs",
+      "SLI (Indicators), SLO (Objectives), SLA (Agreements) & Error Budget Burn Rate Alerting",
+      "HLD 25",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] System Security & Authentication Architecture (HLD 26)",
+    "url": "/hld/module/26",
+    "type": "hld_module",
+    "module_id": "26",
+    "module_title": "System Security & Authentication Architecture",
+    "topic_id": "26-system-security-architecture",
+    "summary": "Authentication vs Authorization, OAuth 2.0 & OIDC, JWT vs Server Sessions, RBAC vs ABAC, Encryption at Rest / in Transit, and Zero Trust.",
+    "tags": [
+      "System Security & Authentication Architecture",
+      "Advanced",
+      "Security",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Authentication vs Authorization: OAuth 2.0 Authorization Code Flow & JWT Tokens (HLD 26)",
+    "url": "/hld/module/26#authn-vs-authz-and-oauth2-jwt",
+    "type": "hld_topic",
+    "module_id": "26",
+    "module_title": "System Security & Authentication Architecture",
+    "topic_id": "authn-vs-authz-and-oauth2-jwt",
+    "summary": "System Security & Authentication Architecture &bull; Security",
+    "tags": [
+      "System Security & Authentication Architecture",
+      "Authentication vs Authorization: OAuth 2.0 Authorization Code Flow & JWT Tokens",
+      "HLD 26",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Access Control: Role-Based (RBAC) vs Attribute-Based (ABAC) & API Key Management (HLD 26)",
+    "url": "/hld/module/26#rbac-vs-abac-and-api-security",
+    "type": "hld_topic",
+    "module_id": "26",
+    "module_title": "System Security & Authentication Architecture",
+    "topic_id": "rbac-vs-abac-and-api-security",
+    "summary": "System Security & Authentication Architecture &bull; Security",
+    "tags": [
+      "System Security & Authentication Architecture",
+      "Access Control: Role-Based (RBAC) vs Attribute-Based (ABAC) & API Key Management",
+      "HLD 26",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Encryption in Transit (TLS 1.3), At Rest (AES-256 Envelope Encryption) & Zero Trust Principles (HLD 26)",
+    "url": "/hld/module/26#encryption-and-zero-trust-architecture",
+    "type": "hld_topic",
+    "module_id": "26",
+    "module_title": "System Security & Authentication Architecture",
+    "topic_id": "encryption-and-zero-trust-architecture",
+    "summary": "System Security & Authentication Architecture &bull; Security",
+    "tags": [
+      "System Security & Authentication Architecture",
+      "Encryption in Transit (TLS 1.3), At Rest (AES-256 Envelope Encryption) & Zero Trust Principles",
+      "HLD 26",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] DDoS Defense (SYN Flood, HTTP Flood) & Web Application Firewall (WAF) Rules (HLD 26)",
+    "url": "/hld/module/26#ddos-mitigation-and-waf",
+    "type": "hld_topic",
+    "module_id": "26",
+    "module_title": "System Security & Authentication Architecture",
+    "topic_id": "ddos-mitigation-and-waf",
+    "summary": "System Security & Authentication Architecture &bull; Security",
+    "tags": [
+      "System Security & Authentication Architecture",
+      "DDoS Defense (SYN Flood, HTTP Flood) & Web Application Firewall (WAF) Rules",
+      "HLD 26",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Microservices Architecture & Decomposition (HLD 27)",
+    "url": "/hld/module/27",
+    "type": "hld_module",
+    "module_id": "27",
+    "module_title": "Microservices Architecture & Decomposition",
+    "topic_id": "27-microservices-architecture",
+    "summary": "Domain-Driven Design (DDD) Bounded Contexts, Database-Per-Service, Sync vs Async Communication, Service Mesh, and When NOT to use Microservices.",
+    "tags": [
+      "Microservices Architecture & Decomposition",
+      "Advanced",
+      "Architecture",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Decomposing Monoliths: Domain-Driven Design (DDD) & Bounded Contexts (HLD 27)",
+    "url": "/hld/module/27#domain-driven-design-and-bounded-contexts",
+    "type": "hld_topic",
+    "module_id": "27",
+    "module_title": "Microservices Architecture & Decomposition",
+    "topic_id": "domain-driven-design-and-bounded-contexts",
+    "summary": "Microservices Architecture & Decomposition &bull; Architecture",
+    "tags": [
+      "Microservices Architecture & Decomposition",
+      "Decomposing Monoliths: Domain-Driven Design (DDD) & Bounded Contexts",
+      "HLD 27",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Database-per-Service Pattern & Sync (gRPC/HTTP) vs Async (Kafka) Inter-Service Comms (HLD 27)",
+    "url": "/hld/module/27#database-per-service-and-sync-vs-async",
+    "type": "hld_topic",
+    "module_id": "27",
+    "module_title": "Microservices Architecture & Decomposition",
+    "topic_id": "database-per-service-and-sync-vs-async",
+    "summary": "Microservices Architecture & Decomposition &bull; Architecture",
+    "tags": [
+      "Microservices Architecture & Decomposition",
+      "Database-per-Service Pattern & Sync (gRPC/HTTP) vs Async (Kafka) Inter-Service Comms",
+      "HLD 27",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Service Mesh Architecture (Envoy / Istio): Traffic Routing, mTLS & Observability Sidecars (HLD 27)",
+    "url": "/hld/module/27#service-mesh-and-sidecars",
+    "type": "hld_topic",
+    "module_id": "27",
+    "module_title": "Microservices Architecture & Decomposition",
+    "topic_id": "service-mesh-and-sidecars",
+    "summary": "Microservices Architecture & Decomposition &bull; Architecture",
+    "tags": [
+      "Microservices Architecture & Decomposition",
+      "Service Mesh Architecture (Envoy / Istio): Traffic Routing, mTLS & Observability Sidecars",
+      "HLD 27",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Microservices Anti-Patterns: Distributed Monolith, Shared DB, and When NOT to Migrate (HLD 27)",
+    "url": "/hld/module/27#microservices-anti-patterns",
+    "type": "hld_topic",
+    "module_id": "27",
+    "module_title": "Microservices Architecture & Decomposition",
+    "topic_id": "microservices-anti-patterns",
+    "summary": "Microservices Architecture & Decomposition &bull; Architecture",
+    "tags": [
+      "Microservices Architecture & Decomposition",
+      "Microservices Anti-Patterns: Distributed Monolith, Shared DB, and When NOT to Migrate",
+      "HLD 27",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Service Discovery & Dynamic Routing (HLD 28)",
+    "url": "/hld/module/28",
+    "type": "hld_module",
+    "module_id": "28",
+    "module_title": "Service Discovery & Dynamic Routing",
+    "topic_id": "28-service-discovery-routing",
+    "summary": "Client-Side vs Server-Side Service Discovery, Service Registries (Consul, Eureka, ZooKeeper), Health Registrations, and DNS limitations.",
+    "tags": [
+      "Service Discovery & Dynamic Routing",
+      "Advanced",
+      "Architecture",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Why Static IP Configs Fail in Elastic Cloud Auto-Scaling Environments (HLD 28)",
+    "url": "/hld/module/28#why-dynamic-service-discovery",
+    "type": "hld_topic",
+    "module_id": "28",
+    "module_title": "Service Discovery & Dynamic Routing",
+    "topic_id": "why-dynamic-service-discovery",
+    "summary": "Service Discovery & Dynamic Routing &bull; Architecture",
+    "tags": [
+      "Service Discovery & Dynamic Routing",
+      "Why Static IP Configs Fail in Elastic Cloud Auto-Scaling Environments",
+      "HLD 28",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Client-Side Discovery (Eureka/Ribbon) vs Server-Side Discovery (AWS ALB / K8s CoreDNS) (HLD 28)",
+    "url": "/hld/module/28#client-side-vs-server-side-discovery",
+    "type": "hld_topic",
+    "module_id": "28",
+    "module_title": "Service Discovery & Dynamic Routing",
+    "topic_id": "client-side-vs-server-side-discovery",
+    "summary": "Service Discovery & Dynamic Routing &bull; Architecture",
+    "tags": [
+      "Service Discovery & Dynamic Routing",
+      "Client-Side Discovery (Eureka/Ribbon) vs Server-Side Discovery (AWS ALB / K8s CoreDNS)",
+      "HLD 28",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Service Registry Architecture: Heartbeat Leases, TTL Eviction & Cluster Coordination (HLD 28)",
+    "url": "/hld/module/28#service-registries-and-health-checks",
+    "type": "hld_topic",
+    "module_id": "28",
+    "module_title": "Service Discovery & Dynamic Routing",
+    "topic_id": "service-registries-and-health-checks",
+    "summary": "Service Discovery & Dynamic Routing &bull; Architecture",
+    "tags": [
+      "Service Discovery & Dynamic Routing",
+      "Service Registry Architecture: Heartbeat Leases, TTL Eviction & Cluster Coordination",
+      "HLD 28",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Distributed Transactions: 2PC vs Saga Pattern (HLD 29)",
+    "url": "/hld/module/29",
+    "type": "hld_module",
+    "module_id": "29",
+    "module_title": "Distributed Transactions: 2PC vs Saga Pattern",
+    "topic_id": "29-distributed-transactions",
+    "summary": "Two-Phase Commit (2PC) blocking coordinator protocol, Saga Pattern (Orchestration vs Choreography), and Compensating Transactions.",
+    "tags": [
+      "Distributed Transactions: 2PC vs Saga Pattern",
+      "Advanced",
+      "Distributed Systems",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Two-Phase Commit (2PC): Prepare Phase, Commit Phase & The Blocking Coordinator Flaw (HLD 29)",
+    "url": "/hld/module/29#two-phase-commit-2pc-protocol",
+    "type": "hld_topic",
+    "module_id": "29",
+    "module_title": "Distributed Transactions: 2PC vs Saga Pattern",
+    "topic_id": "two-phase-commit-2pc-protocol",
+    "summary": "Distributed Transactions: 2PC vs Saga Pattern &bull; Distributed Systems",
+    "tags": [
+      "Distributed Transactions: 2PC vs Saga Pattern",
+      "Two-Phase Commit (2PC): Prepare Phase, Commit Phase & The Blocking Coordinator Flaw",
+      "HLD 29",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Saga Pattern: Choreography (Event-Driven) vs Orchestration (Centralized Workflow) (HLD 29)",
+    "url": "/hld/module/29#saga-choreography-vs-orchestration",
+    "type": "hld_topic",
+    "module_id": "29",
+    "module_title": "Distributed Transactions: 2PC vs Saga Pattern",
+    "topic_id": "saga-choreography-vs-orchestration",
+    "summary": "Distributed Transactions: 2PC vs Saga Pattern &bull; Distributed Systems",
+    "tags": [
+      "Distributed Transactions: 2PC vs Saga Pattern",
+      "Saga Pattern: Choreography (Event-Driven) vs Orchestration (Centralized Workflow)",
+      "HLD 29",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Compensating Transactions: Handling Mid-Flow Failures & Semantic Rollbacks (HLD 29)",
+    "url": "/hld/module/29#compensating-transactions-and-failures",
+    "type": "hld_topic",
+    "module_id": "29",
+    "module_title": "Distributed Transactions: 2PC vs Saga Pattern",
+    "topic_id": "compensating-transactions-and-failures",
+    "summary": "Distributed Transactions: 2PC vs Saga Pattern &bull; Distributed Systems",
+    "tags": [
+      "Distributed Transactions: 2PC vs Saga Pattern",
+      "Compensating Transactions: Handling Mid-Flow Failures & Semantic Rollbacks",
+      "HLD 29",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Data Consistency Patterns: Outbox, Inbox, CDC (HLD 30)",
+    "url": "/hld/module/30",
+    "type": "hld_module",
+    "module_id": "30",
+    "module_title": "Data Consistency Patterns: Outbox, Inbox, CDC",
+    "topic_id": "30-data-consistency-patterns",
+    "summary": "Transactional Outbox Pattern, Polling Publisher vs Change Data Capture (Debezium), Idempotent Consumers, and Inbox Pattern.",
+    "tags": [
+      "Data Consistency Patterns: Outbox, Inbox, CDC",
+      "Advanced",
+      "Distributed Systems",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Transactional Outbox Pattern: Dual-Write Problem Elimination (HLD 30)",
+    "url": "/hld/module/30#transactional-outbox-pattern",
+    "type": "hld_topic",
+    "module_id": "30",
+    "module_title": "Data Consistency Patterns: Outbox, Inbox, CDC",
+    "topic_id": "transactional-outbox-pattern",
+    "summary": "Data Consistency Patterns: Outbox, Inbox, CDC &bull; Distributed Systems",
+    "tags": [
+      "Data Consistency Patterns: Outbox, Inbox, CDC",
+      "Transactional Outbox Pattern: Dual-Write Problem Elimination",
+      "HLD 30",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Change Data Capture (CDC): Streaming Database WAL Logs into Kafka via Debezium (HLD 30)",
+    "url": "/hld/module/30#change-data-capture-cdc",
+    "type": "hld_topic",
+    "module_id": "30",
+    "module_title": "Data Consistency Patterns: Outbox, Inbox, CDC",
+    "topic_id": "change-data-capture-cdc",
+    "summary": "Data Consistency Patterns: Outbox, Inbox, CDC &bull; Distributed Systems",
+    "tags": [
+      "Data Consistency Patterns: Outbox, Inbox, CDC",
+      "Change Data Capture (CDC): Streaming Database WAL Logs into Kafka via Debezium",
+      "HLD 30",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Transactional Inbox Pattern & End-to-End Exactly-Once Message Processing (HLD 30)",
+    "url": "/hld/module/30#transactional-inbox-and-deduplication",
+    "type": "hld_topic",
+    "module_id": "30",
+    "module_title": "Data Consistency Patterns: Outbox, Inbox, CDC",
+    "topic_id": "transactional-inbox-and-deduplication",
+    "summary": "Data Consistency Patterns: Outbox, Inbox, CDC &bull; Distributed Systems",
+    "tags": [
+      "Data Consistency Patterns: Outbox, Inbox, CDC",
+      "Transactional Inbox Pattern & End-to-End Exactly-Once Message Processing",
+      "HLD 30",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Asynchronous Processing & Task Queues (HLD 31)",
+    "url": "/hld/module/31",
+    "type": "hld_module",
+    "module_id": "31",
+    "module_title": "Asynchronous Processing & Task Queues",
+    "topic_id": "31-asynchronous-architecture",
+    "summary": "Replacing synchronous chains with Async Task Queues (Celery, BullMQ), Delayed Execution, Polling vs Webhooks, and Worker Scaling.",
+    "tags": [
+      "Asynchronous Processing & Task Queues",
+      "Intermediate",
+      "Architecture",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Sync Request Chains vs Asynchronous Background Worker Queues (HLD 31)",
+    "url": "/hld/module/31#sync-chains-vs-async-task-queues",
+    "type": "hld_topic",
+    "module_id": "31",
+    "module_title": "Asynchronous Processing & Task Queues",
+    "topic_id": "sync-chains-vs-async-task-queues",
+    "summary": "Asynchronous Processing & Task Queues &bull; Architecture",
+    "tags": [
+      "Asynchronous Processing & Task Queues",
+      "Sync Request Chains vs Asynchronous Background Worker Queues",
+      "HLD 31",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Delayed Tasks, Cron Jobs & Priority Task Scheduling at Scale (HLD 31)",
+    "url": "/hld/module/31#delayed-jobs-and-scheduled-execution",
+    "type": "hld_topic",
+    "module_id": "31",
+    "module_title": "Asynchronous Processing & Task Queues",
+    "topic_id": "delayed-jobs-and-scheduled-execution",
+    "summary": "Asynchronous Processing & Task Queues &bull; Architecture",
+    "tags": [
+      "Asynchronous Processing & Task Queues",
+      "Delayed Tasks, Cron Jobs & Priority Task Scheduling at Scale",
+      "HLD 31",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Delivering Async Results: Status Polling vs Long-Polling vs Outbound Webhooks (HLD 31)",
+    "url": "/hld/module/31#polling-vs-webhooks-for-results",
+    "type": "hld_topic",
+    "module_id": "31",
+    "module_title": "Asynchronous Processing & Task Queues",
+    "topic_id": "polling-vs-webhooks-for-results",
+    "summary": "Asynchronous Processing & Task Queues &bull; Architecture",
+    "tags": [
+      "Asynchronous Processing & Task Queues",
+      "Delivering Async Results: Status Polling vs Long-Polling vs Outbound Webhooks",
+      "HLD 31",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Concurrency & Parallelism at System Level (HLD 32)",
+    "url": "/hld/module/32",
+    "type": "hld_module",
+    "module_id": "32",
+    "module_title": "Concurrency & Parallelism at System Level",
+    "topic_id": "32-concurrency-and-worker-pools",
+    "summary": "Processes vs Threads vs Coroutines, CPU-bound vs I/O-bound scaling, Worker Thread Pools, Backpressure, and Event Loop architectures.",
+    "tags": [
+      "Concurrency & Parallelism at System Level",
+      "Advanced",
+      "Performance",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Concurrency Models: Multi-Process vs Multi-Threaded vs Event-Driven Asynchronous (Epoll/Kqueue) (HLD 32)",
+    "url": "/hld/module/32#processes-threads-and-event-loops",
+    "type": "hld_topic",
+    "module_id": "32",
+    "module_title": "Concurrency & Parallelism at System Level",
+    "topic_id": "processes-threads-and-event-loops",
+    "summary": "Concurrency & Parallelism at System Level &bull; Performance",
+    "tags": [
+      "Concurrency & Parallelism at System Level",
+      "Concurrency Models: Multi-Process vs Multi-Threaded vs Event-Driven Asynchronous (Epoll/Kqueue)",
+      "HLD 32",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Architecting for CPU-Bound (Parallel Worker Pool) vs I/O-Bound Workloads (Async Coroutines) (HLD 32)",
+    "url": "/hld/module/32#cpu-bound-vs-io-bound-architectures",
+    "type": "hld_topic",
+    "module_id": "32",
+    "module_title": "Concurrency & Parallelism at System Level",
+    "topic_id": "cpu-bound-vs-io-bound-architectures",
+    "summary": "Concurrency & Parallelism at System Level &bull; Performance",
+    "tags": [
+      "Concurrency & Parallelism at System Level",
+      "Architecting for CPU-Bound (Parallel Worker Pool) vs I/O-Bound Workloads (Async Coroutines)",
+      "HLD 32",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Reactive Backpressure, Thread Pool Starvation & CPU Saturation Guardrails (HLD 32)",
+    "url": "/hld/module/32#system-backpressure-and-resource-limits",
+    "type": "hld_topic",
+    "module_id": "32",
+    "module_title": "Concurrency & Parallelism at System Level",
+    "topic_id": "system-backpressure-and-resource-limits",
+    "summary": "Concurrency & Parallelism at System Level &bull; Performance",
+    "tags": [
+      "Concurrency & Parallelism at System Level",
+      "Reactive Backpressure, Thread Pool Starvation & CPU Saturation Guardrails",
+      "HLD 32",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] End-to-End System Scalability: 100 to 10M+ Users (HLD 33)",
+    "url": "/hld/module/33",
+    "type": "hld_module",
+    "module_id": "33",
+    "module_title": "End-to-End System Scalability: 100 to 10M+ Users",
+    "topic_id": "33-system-scalability-evolution",
+    "summary": "Step-by-step interactive evolution of an architecture: 100 users -> 10,000 -> 100,000 -> 1M -> 10M+ global scale.",
+    "tags": [
+      "End-to-End System Scalability: 100 to 10M+ Users",
+      "Advanced",
+      "Scaling",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Stage 1 (100 - 10k Users): Single Server -> Dedicated DB -> Master-Slave Replicas (HLD 33)",
+    "url": "/hld/module/33#scaling-stage-1-single-box-to-tier2",
+    "type": "hld_topic",
+    "module_id": "33",
+    "module_title": "End-to-End System Scalability: 100 to 10M+ Users",
+    "topic_id": "scaling-stage-1-single-box-to-tier2",
+    "summary": "End-to-End System Scalability: 100 to 10M+ Users &bull; Scaling",
+    "tags": [
+      "End-to-End System Scalability: 100 to 10M+ Users",
+      "Stage 1 (100 - 10k Users): Single Server -> Dedicated DB -> Master-Slave Replicas",
+      "HLD 33",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Stage 2 (100k Users): Horizontal Stateless App Tier + Redis Cache + CDN (HLD 33)",
+    "url": "/hld/module/33#scaling-stage-2-caching-load-balancing",
+    "type": "hld_topic",
+    "module_id": "33",
+    "module_title": "End-to-End System Scalability: 100 to 10M+ Users",
+    "topic_id": "scaling-stage-2-caching-load-balancing",
+    "summary": "End-to-End System Scalability: 100 to 10M+ Users &bull; Scaling",
+    "tags": [
+      "End-to-End System Scalability: 100 to 10M+ Users",
+      "Stage 2 (100k Users): Horizontal Stateless App Tier + Redis Cache + CDN",
+      "HLD 33",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Stage 3 (1M Users): Database Sharding + Message Queues + Microservices (HLD 33)",
+    "url": "/hld/module/33#scaling-stage-3-sharding-and-queues",
+    "type": "hld_topic",
+    "module_id": "33",
+    "module_title": "End-to-End System Scalability: 100 to 10M+ Users",
+    "topic_id": "scaling-stage-3-sharding-and-queues",
+    "summary": "End-to-End System Scalability: 100 to 10M+ Users &bull; Scaling",
+    "tags": [
+      "End-to-End System Scalability: 100 to 10M+ Users",
+      "Stage 3 (1M Users): Database Sharding + Message Queues + Microservices",
+      "HLD 33",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Stage 4 (10M+ Users): Multi-Region Active-Active Deployments + Global CDN Anycast (HLD 33)",
+    "url": "/hld/module/33#scaling-stage-4-multi-region-global",
+    "type": "hld_topic",
+    "module_id": "33",
+    "module_title": "End-to-End System Scalability: 100 to 10M+ Users",
+    "topic_id": "scaling-stage-4-multi-region-global",
+    "summary": "End-to-End System Scalability: 100 to 10M+ Users &bull; Scaling",
+    "tags": [
+      "End-to-End System Scalability: 100 to 10M+ Users",
+      "Stage 4 (10M+ Users): Multi-Region Active-Active Deployments + Global CDN Anycast",
+      "HLD 33",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Performance Engineering & Latency Optimization (HLD 34)",
+    "url": "/hld/module/34",
+    "type": "hld_module",
+    "module_id": "34",
+    "module_title": "Performance Engineering & Latency Optimization",
+    "topic_id": "34-performance-engineering",
+    "summary": "Latency vs Throughput, p50/p90/p95/p99 Tail Latency, Database Index Tuning, Network Optimization, HTTP/2 & HTTP/3 (QUIC), and Compression.",
+    "tags": [
+      "Performance Engineering & Latency Optimization",
+      "Advanced",
+      "Performance",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Tail Latency (p99 / p99.9): Why Averages Lie and How Slow Outliers Kill Systems (HLD 34)",
+    "url": "/hld/module/34#tail-latency-and-percentiles",
+    "type": "hld_topic",
+    "module_id": "34",
+    "module_title": "Performance Engineering & Latency Optimization",
+    "topic_id": "tail-latency-and-percentiles",
+    "summary": "Performance Engineering & Latency Optimization &bull; Performance",
+    "tags": [
+      "Performance Engineering & Latency Optimization",
+      "Tail Latency (p99 / p99.9): Why Averages Lie and How Slow Outliers Kill Systems",
+      "HLD 34",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Protocol Performance: HTTP/2 Multiplexing, HTTP/3 QUIC (UDP) & Brotli Compression (HLD 34)",
+    "url": "/hld/module/34#network-and-protocol-optimization",
+    "type": "hld_topic",
+    "module_id": "34",
+    "module_title": "Performance Engineering & Latency Optimization",
+    "topic_id": "network-and-protocol-optimization",
+    "summary": "Performance Engineering & Latency Optimization &bull; Performance",
+    "tags": [
+      "Performance Engineering & Latency Optimization",
+      "Protocol Performance: HTTP/2 Multiplexing, HTTP/3 QUIC (UDP) & Brotli Compression",
+      "HLD 34",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] System Profiling: Identifying CPU, RAM, Disk I/O & Database Locks Bottlenecks (HLD 34)",
+    "url": "/hld/module/34#end-to-end-bottleneck-elimination",
+    "type": "hld_topic",
+    "module_id": "34",
+    "module_title": "Performance Engineering & Latency Optimization",
+    "topic_id": "end-to-end-bottleneck-elimination",
+    "summary": "Performance Engineering & Latency Optimization &bull; Performance",
+    "tags": [
+      "Performance Engineering & Latency Optimization",
+      "System Profiling: Identifying CPU, RAM, Disk I/O & Database Locks Bottlenecks",
+      "HLD 34",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Deployment, Containers & CI/CD Strategies (HLD 35)",
+    "url": "/hld/module/35",
+    "type": "hld_module",
+    "module_id": "35",
+    "module_title": "Deployment, Containers & CI/CD Strategies",
+    "topic_id": "35-deployment-infrastructure",
+    "summary": "Bare Metal vs VMs vs Docker Containers vs Kubernetes concepts, Rolling, Blue-Green, Canary Deployments, and Auto-scaling triggers.",
+    "tags": [
+      "Deployment, Containers & CI/CD Strategies",
+      "Intermediate",
+      "Deployment",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Infrastructure Evolution: VMs vs Docker Containers & Kubernetes Architectural Role (HLD 35)",
+    "url": "/hld/module/35#virtualization-containers-and-k8s",
+    "type": "hld_topic",
+    "module_id": "35",
+    "module_title": "Deployment, Containers & CI/CD Strategies",
+    "topic_id": "virtualization-containers-and-k8s",
+    "summary": "Deployment, Containers & CI/CD Strategies &bull; Deployment",
+    "tags": [
+      "Deployment, Containers & CI/CD Strategies",
+      "Infrastructure Evolution: VMs vs Docker Containers & Kubernetes Architectural Role",
+      "HLD 35",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Deployment Patterns: Rolling Updates vs Blue-Green vs Canary Deployments (HLD 35)",
+    "url": "/hld/module/35#zero-downtime-deployment-strategies",
+    "type": "hld_topic",
+    "module_id": "35",
+    "module_title": "Deployment, Containers & CI/CD Strategies",
+    "topic_id": "zero-downtime-deployment-strategies",
+    "summary": "Deployment, Containers & CI/CD Strategies &bull; Deployment",
+    "tags": [
+      "Deployment, Containers & CI/CD Strategies",
+      "Deployment Patterns: Rolling Updates vs Blue-Green vs Canary Deployments",
+      "HLD 35",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Auto-Scaling Architectures: Metric Triggers (CPU, Memory, Request Queue Depth) (HLD 35)",
+    "url": "/hld/module/35#horizontal-pod-autoscaling",
+    "type": "hld_topic",
+    "module_id": "35",
+    "module_title": "Deployment, Containers & CI/CD Strategies",
+    "topic_id": "horizontal-pod-autoscaling",
+    "summary": "Deployment, Containers & CI/CD Strategies &bull; Deployment",
+    "tags": [
+      "Deployment, Containers & CI/CD Strategies",
+      "Auto-Scaling Architectures: Metric Triggers (CPU, Memory, Request Queue Depth)",
+      "HLD 35",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Cloud Architecture Concepts (Cloud-Agnostic) (HLD 36)",
+    "url": "/hld/module/36",
+    "type": "hld_module",
+    "module_id": "36",
+    "module_title": "Cloud Architecture Concepts (Cloud-Agnostic)",
+    "topic_id": "36-cloud-architecture-concepts",
+    "summary": "Cloud primitives: Compute, Storage, Managed DBs, Caches, Object Storage, IAM, VPCs, and mapping conceptually across AWS, Azure, and GCP.",
+    "tags": [
+      "Cloud Architecture Concepts (Cloud-Agnostic)",
+      "Intermediate",
+      "Cloud",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] The Universal Cloud Primitives: Compute, Block/Object Storage, Managed DB & IAM (HLD 36)",
+    "url": "/hld/module/36#cloud-primitives-and-building-blocks",
+    "type": "hld_topic",
+    "module_id": "36",
+    "module_title": "Cloud Architecture Concepts (Cloud-Agnostic)",
+    "topic_id": "cloud-primitives-and-building-blocks",
+    "summary": "Cloud Architecture Concepts (Cloud-Agnostic) &bull; Cloud",
+    "tags": [
+      "Cloud Architecture Concepts (Cloud-Agnostic)",
+      "The Universal Cloud Primitives: Compute, Block/Object Storage, Managed DB & IAM",
+      "HLD 36",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] High-Availability Topologies: Availability Zones (AZs) vs Geographic Regions (HLD 36)",
+    "url": "/hld/module/36#multi-az-and-multi-region-topology",
+    "type": "hld_topic",
+    "module_id": "36",
+    "module_title": "Cloud Architecture Concepts (Cloud-Agnostic)",
+    "topic_id": "multi-az-and-multi-region-topology",
+    "summary": "Cloud Architecture Concepts (Cloud-Agnostic) &bull; Cloud",
+    "tags": [
+      "Cloud Architecture Concepts (Cloud-Agnostic)",
+      "High-Availability Topologies: Availability Zones (AZs) vs Geographic Regions",
+      "HLD 36",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Cloud Rosetta Stone: Mapping Architectural Concepts across AWS, GCP & Azure (HLD 36)",
+    "url": "/hld/module/36#cloud-agnostic-mapping",
+    "type": "hld_topic",
+    "module_id": "36",
+    "module_title": "Cloud Architecture Concepts (Cloud-Agnostic)",
+    "topic_id": "cloud-agnostic-mapping",
+    "summary": "Cloud Architecture Concepts (Cloud-Agnostic) &bull; Cloud",
+    "tags": [
+      "Cloud Architecture Concepts (Cloud-Agnostic)",
+      "Cloud Rosetta Stone: Mapping Architectural Concepts across AWS, GCP & Azure",
+      "HLD 36",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] System Design Patterns Catalog (HLD 37)",
+    "url": "/hld/module/37",
+    "type": "hld_module",
+    "module_id": "37",
+    "module_title": "System Design Patterns Catalog",
+    "topic_id": "37-system-design-patterns-catalog",
+    "summary": "Comprehensive reference catalog of 25+ classic system design patterns with problem, solution, trade-offs, and failure scenarios.",
+    "tags": [
+      "System Design Patterns Catalog",
+      "Advanced",
+      "Patterns Catalog",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Data & Caching Patterns: Cache-Aside, Write-Back, Write-Through & CQRS (HLD 37)",
+    "url": "/hld/module/37#data-and-caching-patterns",
+    "type": "hld_topic",
+    "module_id": "37",
+    "module_title": "System Design Patterns Catalog",
+    "topic_id": "data-and-caching-patterns",
+    "summary": "System Design Patterns Catalog &bull; Patterns Catalog",
+    "tags": [
+      "System Design Patterns Catalog",
+      "Data & Caching Patterns: Cache-Aside, Write-Back, Write-Through & CQRS",
+      "HLD 37",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Resilience Patterns: Circuit Breaker, Bulkhead, Retry with Jitter & Fallback (HLD 37)",
+    "url": "/hld/module/37#resilience-and-stability-patterns",
+    "type": "hld_topic",
+    "module_id": "37",
+    "module_title": "System Design Patterns Catalog",
+    "topic_id": "resilience-and-stability-patterns",
+    "summary": "System Design Patterns Catalog &bull; Patterns Catalog",
+    "tags": [
+      "System Design Patterns Catalog",
+      "Resilience Patterns: Circuit Breaker, Bulkhead, Retry with Jitter & Fallback",
+      "HLD 37",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Integration Patterns: API Gateway, Backend-for-Frontend (BFF), Strangler Fig & Sidecar (HLD 37)",
+    "url": "/hld/module/37#integration-and-routing-patterns",
+    "type": "hld_topic",
+    "module_id": "37",
+    "module_title": "System Design Patterns Catalog",
+    "topic_id": "integration-and-routing-patterns",
+    "summary": "System Design Patterns Catalog &bull; Patterns Catalog",
+    "tags": [
+      "System Design Patterns Catalog",
+      "Integration Patterns: API Gateway, Backend-for-Frontend (BFF), Strangler Fig & Sidecar",
+      "HLD 37",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Coordination Patterns: Saga, Outbox, Leader-Follower, Sharding & Consistent Hashing (HLD 37)",
+    "url": "/hld/module/37#distributed-coordination-patterns",
+    "type": "hld_topic",
+    "module_id": "37",
+    "module_title": "System Design Patterns Catalog",
+    "topic_id": "distributed-coordination-patterns",
+    "summary": "System Design Patterns Catalog &bull; Patterns Catalog",
+    "tags": [
+      "System Design Patterns Catalog",
+      "Coordination Patterns: Saga, Outbox, Leader-Follower, Sharding & Consistent Hashing",
+      "HLD 37",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] Real-World System Design Problem Library (HLD 38)",
+    "url": "/hld/module/38",
+    "type": "hld_module",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "38-real-world-system-design-library",
+    "summary": "30+ end-to-end production designs: URL Shortener, Pastebin, YouTube, Netflix, Instagram, Twitter/X, WhatsApp, Uber, Distributed Cache, Web Crawler.",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Interview",
+      "Real-World Systems",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 1 (Beginner): Design a URL Shortener (TinyURL / Bitly) (HLD 38)",
+    "url": "/hld/module/38#design-url-shortener-tinyurl",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-url-shortener-tinyurl",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 1 (Beginner): Design a URL Shortener (TinyURL / Bitly)",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 2 (Beginner): Design Pastebin / Text Sharing Service (HLD 38)",
+    "url": "/hld/module/38#design-pastebin-storage",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-pastebin-storage",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 2 (Beginner): Design Pastebin / Text Sharing Service",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 3 (Beginner): Design a Scalable Notification Service (SMS, Email, Push) (HLD 38)",
+    "url": "/hld/module/38#design-scalable-notification-system",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-scalable-notification-system",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 3 (Beginner): Design a Scalable Notification Service (SMS, Email, Push)",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 4 (Intermediate): Design YouTube / Netflix Video Streaming Platform (HLD 38)",
+    "url": "/hld/module/38#design-youtube-video-streaming",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-youtube-video-streaming",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 4 (Intermediate): Design YouTube / Netflix Video Streaming Platform",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 5 (Intermediate): Design Twitter / X News Feed & Timeline Fan-out (HLD 38)",
+    "url": "/hld/module/38#design-twitter-newsfeed-system",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-twitter-newsfeed-system",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 5 (Intermediate): Design Twitter / X News Feed & Timeline Fan-out",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 6 (Intermediate): Design WhatsApp / Real-time Messaging System (HLD 38)",
+    "url": "/hld/module/38#design-whatsapp-chat-messenger",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-whatsapp-chat-messenger",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 6 (Intermediate): Design WhatsApp / Real-time Messaging System",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 7 (Intermediate): Design Uber / Ride Hailing & Spatial Matching Service (HLD 38)",
+    "url": "/hld/module/38#design-uber-ride-matching",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-uber-ride-matching",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 7 (Intermediate): Design Uber / Ride Hailing & Spatial Matching Service",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 8 (Intermediate): Design a Multi-Tier Distributed Rate Limiter (HLD 38)",
+    "url": "/hld/module/38#design-distributed-rate-limiter",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-distributed-rate-limiter",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 8 (Intermediate): Design a Multi-Tier Distributed Rate Limiter",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 9 (Intermediate): Design a Distributed In-Memory Cache (Redis-like) (HLD 38)",
+    "url": "/hld/module/38#design-distributed-cache-redis",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-distributed-cache-redis",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 9 (Intermediate): Design a Distributed In-Memory Cache (Redis-like)",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 10 (Advanced): Design Google Drive / Dropbox Cloud File Synchronization (HLD 38)",
+    "url": "/hld/module/38#design-google-drive-file-sync",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-google-drive-file-sync",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 10 (Advanced): Design Google Drive / Dropbox Cloud File Synchronization",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 11 (Advanced): Design Google Docs Real-time Collaborative Editor (OT / CRDT) (HLD 38)",
+    "url": "/hld/module/38#design-google-docs-collaborative-editor",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-google-docs-collaborative-editor",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 11 (Advanced): Design Google Docs Real-time Collaborative Editor (OT / CRDT)",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 12 (Advanced): Design a Distributed Web Crawler & Indexer at Scale (HLD 38)",
+    "url": "/hld/module/38#design-distributed-web-crawler",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-distributed-web-crawler",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 12 (Advanced): Design a Distributed Web Crawler & Indexer at Scale",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Problem 13 (Advanced): Design a Distributed Task / Job Scheduler at Scale (HLD 38)",
+    "url": "/hld/module/38#design-distributed-job-scheduler",
+    "type": "hld_topic",
+    "module_id": "38",
+    "module_title": "Real-World System Design Problem Library",
+    "topic_id": "design-distributed-job-scheduler",
+    "summary": "Real-World System Design Problem Library &bull; Real-World Systems",
+    "tags": [
+      "Real-World System Design Problem Library",
+      "Problem 13 (Advanced): Design a Distributed Task / Job Scheduler at Scale",
+      "HLD 38",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] 21-Step System Design Interview Framework (HLD 39)",
+    "url": "/hld/module/39",
+    "type": "hld_module",
+    "module_id": "39",
+    "module_title": "21-Step System Design Interview Framework",
+    "topic_id": "39-system-design-interview-framework",
+    "summary": "Master the repeatable 21-step battle-tested interview roadmap from requirement gathering to architectural defense.",
+    "tags": [
+      "21-Step System Design Interview Framework",
+      "Interview",
+      "Interview Prep",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] The 21-Step Battle-Tested System Design Interview Process (HLD 39)",
+    "url": "/hld/module/39#the-21-step-interview-roadmap",
+    "type": "hld_topic",
+    "module_id": "39",
+    "module_title": "21-Step System Design Interview Framework",
+    "topic_id": "the-21-step-interview-roadmap",
+    "summary": "21-Step System Design Interview Framework &bull; Interview Prep",
+    "tags": [
+      "21-Step System Design Interview Framework",
+      "The 21-Step Battle-Tested System Design Interview Process",
+      "HLD 39",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Steps 1-6: Live Clarification, User Flow & Estimation Calculations (HLD 39)",
+    "url": "/hld/module/39#scoping-and-traffic-math-live",
+    "type": "hld_topic",
+    "module_id": "39",
+    "module_title": "21-Step System Design Interview Framework",
+    "topic_id": "scoping-and-traffic-math-live",
+    "summary": "21-Step System Design Interview Framework &bull; Interview Prep",
+    "tags": [
+      "21-Step System Design Interview Framework",
+      "Steps 1-6: Live Clarification, User Flow & Estimation Calculations",
+      "HLD 39",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Steps 7-12: Live High-Level Block Diagram, DB & API Contracts (HLD 39)",
+    "url": "/hld/module/39#drawing-high-level-architecture-live",
+    "type": "hld_topic",
+    "module_id": "39",
+    "module_title": "21-Step System Design Interview Framework",
+    "topic_id": "drawing-high-level-architecture-live",
+    "summary": "21-Step System Design Interview Framework &bull; Interview Prep",
+    "tags": [
+      "21-Step System Design Interview Framework",
+      "Steps 7-12: Live High-Level Block Diagram, DB & API Contracts",
+      "HLD 39",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Steps 13-21: Scaling Bottlenecks, Failure Defense & Trade-offs (HLD 39)",
+    "url": "/hld/module/39#scaling-bottlenecks-and-defense",
+    "type": "hld_topic",
+    "module_id": "39",
+    "module_title": "21-Step System Design Interview Framework",
+    "topic_id": "scaling-bottlenecks-and-defense",
+    "summary": "21-Step System Design Interview Framework &bull; Interview Prep",
+    "tags": [
+      "21-Step System Design Interview Framework",
+      "Steps 13-21: Scaling Bottlenecks, Failure Defense & Trade-offs",
+      "HLD 39",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Module] HLD Quick Revision Cheat Sheets & Decision Trees (HLD 40)",
+    "url": "/hld/module/40",
+    "type": "hld_module",
+    "module_id": "40",
+    "module_title": "HLD Quick Revision Cheat Sheets & Decision Trees",
+    "topic_id": "40-hld-cheat-sheets-and-decisions",
+    "summary": "High-yield summary cheat sheets: Architecture Decision Trees (SQL vs NoSQL, Sync vs Async), CAP matrix, Networking, and SLA Math.",
+    "tags": [
+      "HLD Quick Revision Cheat Sheets & Decision Trees",
+      "Interview",
+      "Cheat Sheets",
+      "HLD",
+      "System Design",
+      "Architecture"
+    ]
+  },
+  {
+    "title": "[HLD] Architecture Decision Trees: SQL vs NoSQL, Cache vs DB, REST vs gRPC (HLD 40)",
+    "url": "/hld/module/40#architecture-decision-assistant-tree",
+    "type": "hld_topic",
+    "module_id": "40",
+    "module_title": "HLD Quick Revision Cheat Sheets & Decision Trees",
+    "topic_id": "architecture-decision-assistant-tree",
+    "summary": "HLD Quick Revision Cheat Sheets & Decision Trees &bull; Cheat Sheets",
+    "tags": [
+      "HLD Quick Revision Cheat Sheets & Decision Trees",
+      "Architecture Decision Trees: SQL vs NoSQL, Cache vs DB, REST vs gRPC",
+      "HLD 40",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Master Trade-offs Matrix: Strong vs Eventual, Sharding vs Replicas, Sync vs Async (HLD 40)",
+    "url": "/hld/module/40#system-design-tradeoff-matrix",
+    "type": "hld_topic",
+    "module_id": "40",
+    "module_title": "HLD Quick Revision Cheat Sheets & Decision Trees",
+    "topic_id": "system-design-tradeoff-matrix",
+    "summary": "HLD Quick Revision Cheat Sheets & Decision Trees &bull; Cheat Sheets",
+    "tags": [
+      "HLD Quick Revision Cheat Sheets & Decision Trees",
+      "Master Trade-offs Matrix: Strong vs Eventual, Sharding vs Replicas, Sync vs Async",
+      "HLD 40",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Networking, HTTP Statuses, Headers & Protocols Cheat Sheet (HLD 40)",
+    "url": "/hld/module/40#networking-and-protocols-cheat-sheet",
+    "type": "hld_topic",
+    "module_id": "40",
+    "module_title": "HLD Quick Revision Cheat Sheets & Decision Trees",
+    "topic_id": "networking-and-protocols-cheat-sheet",
+    "summary": "HLD Quick Revision Cheat Sheets & Decision Trees &bull; Cheat Sheets",
+    "tags": [
+      "HLD Quick Revision Cheat Sheets & Decision Trees",
+      "Networking, HTTP Statuses, Headers & Protocols Cheat Sheet",
+      "HLD 40",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] Distributed Systems, CAP, Consensus & Consistency Models Cheat Sheet (HLD 40)",
+    "url": "/hld/module/40#distributed-systems-and-cap-cheat-sheet",
+    "type": "hld_topic",
+    "module_id": "40",
+    "module_title": "HLD Quick Revision Cheat Sheets & Decision Trees",
+    "topic_id": "distributed-systems-and-cap-cheat-sheet",
+    "summary": "HLD Quick Revision Cheat Sheets & Decision Trees &bull; Cheat Sheets",
+    "tags": [
+      "HLD Quick Revision Cheat Sheets & Decision Trees",
+      "Distributed Systems, CAP, Consensus & Consistency Models Cheat Sheet",
+      "HLD 40",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD] The Bridge: Connecting High-Level Architecture Directly to Low-Level C++ Design (HLD 40)",
+    "url": "/hld/module/40#hld-lld-bridge-mapping-guide",
+    "type": "hld_topic",
+    "module_id": "40",
+    "module_title": "HLD Quick Revision Cheat Sheets & Decision Trees",
+    "topic_id": "hld-lld-bridge-mapping-guide",
+    "summary": "HLD Quick Revision Cheat Sheets & Decision Trees &bull; Cheat Sheets",
+    "tags": [
+      "HLD Quick Revision Cheat Sheets & Decision Trees",
+      "The Bridge: Connecting High-Level Architecture Directly to Low-Level C++ Design",
+      "HLD 40",
+      "HLD",
+      "System Design",
+      "Distributed Systems"
+    ]
+  },
+  {
+    "title": "[HLD Tool] Interactive Capacity & Back-of-the-Envelope Calculator",
+    "url": "/hld/calculator",
+    "type": "hld_tool",
+    "module_id": "03",
+    "module_title": "Capacity Estimation",
+    "topic_id": "capacity-calculator",
+    "summary": "Interactive QPS, Storage, Bandwidth, Memory, and Cache sizing calculator for System Design interviews.",
+    "tags": [
+      "HLD",
+      "Capacity Estimation",
+      "Calculator",
+      "QPS",
+      "Storage",
+      "Bandwidth",
+      "Back-of-the-Envelope"
+    ]
+  },
+  {
+    "title": "[LLD Guide] 14-Step Systematic LLD Interview Roadmap",
     "url": "/interview-framework",
     "type": "guide",
     "module_id": "21",
@@ -1791,6 +5358,7 @@
     "topic_id": "the-14-step-interview-process",
     "summary": "Master the repeatable 14-step battle-tested interview roadmap from requirement gathering to clean C++ code.",
     "tags": [
+      "LLD",
       "Interview",
       "Framework",
       "Roadmap",
@@ -1798,24 +5366,24 @@
     ]
   },
   {
-    "title": "Quick Revision Cheat Sheets (SOLID, Patterns, UML, Pointers, Mutexes)",
+    "title": "[LLD Guide] Quick Revision Cheat Sheets (SOLID, Patterns, UML, Pointers)",
     "url": "/cheat-sheets",
     "type": "cheatsheet",
     "module_id": "24",
     "module_title": "Quick Revision Cheat Sheets",
     "topic_id": "solid-cheat-sheet",
-    "summary": "High-yield summary sheets for fast revision before tech interviews: SOLID matrix, Pattern decision tree, UML cheat sheet, Smart Pointers, Concurrency.",
+    "summary": "High-yield summary sheets for fast revision: SOLID matrix, Pattern decision tree, UML cheat sheet, Smart Pointers, Concurrency.",
     "tags": [
+      "LLD",
       "Cheat Sheet",
       "SOLID",
       "Patterns",
       "UML",
-      "Smart Pointers",
-      "Mutex"
+      "Smart Pointers"
     ]
   },
   {
-    "title": "Interactive Modern C++ LLD Playground",
+    "title": "[LLD Tool] Interactive Modern C++ Design Pattern Playground",
     "url": "/playground",
     "type": "playground",
     "module_id": "00",
@@ -1823,6 +5391,7 @@
     "topic_id": "playground",
     "summary": "Interactive C++ design sandbox with preset design patterns (Singleton, Strategy, Observer, Factory, State, ThreadSafe LRU Cache).",
     "tags": [
+      "LLD",
       "Playground",
       "Sandbox",
       "Interactive",

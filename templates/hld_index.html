@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}High-Level Design (HLD) & Distributed System Design Mastery{% endblock %}
+
+{% block content %}
+<!-- HLD Hero Section -->
+<section class="hero-section" style="padding: 2.5rem 1rem 3.5rem;">
+  <div class="hero-badge-container">
+    <span class="badge badge-intermediate">High-Level Design (HLD)</span>
+    <span class="badge badge-advanced">Distributed Systems</span>
+    <span class="badge badge-interview">FAANG System Design Prep</span>
+  </div>
+
+  <h1 class="hero-title" style="font-size: 3.2rem;">
+    High-Level Design & <span class="gradient-text-purple">System Design</span>
+  </h1>
+
+  <p class="hero-subtitle" style="font-size: 1.15rem; max-width: 800px;">
+    Learn how real-world software systems are designed, scaled, secured, deployed, monitored, and evolved — from single-server prototypes to planetary-scale distributed architectures.
+  </p>
+
+  <!-- Complete Clickable Visual Roadmap Progression -->
+  <div class="glass-panel" style="padding: 1.5rem; margin: 2rem auto; max-width: 1050px; background: rgba(13, 21, 39, 0.75);">
+    <div style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--accent-cyan); text-transform: uppercase; font-weight: 700; margin-bottom: 1rem; text-align: center;">
+      🗺️ Clickable High-Level Design Learning Progression
+    </div>
+    <div class="hld-roadmap-flow" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem;">
+      <a href="#foundations" class="badge badge-beginner" style="text-decoration: none; padding: 0.4rem 0.75rem;">Foundations</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#requirements" class="badge badge-beginner" style="text-decoration: none; padding: 0.4rem 0.75rem;">Requirements</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#capacity" class="badge badge-beginner" style="text-decoration: none; padding: 0.4rem 0.75rem;">Estimation</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#networking" class="badge badge-beginner" style="text-decoration: none; padding: 0.4rem 0.75rem;">Networking</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#apis" class="badge badge-beginner" style="text-decoration: none; padding: 0.4rem 0.75rem;">APIs</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#architecture" class="badge badge-intermediate" style="text-decoration: none; padding: 0.4rem 0.75rem;">Architecture</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#loadbalancing" class="badge badge-intermediate" style="text-decoration: none; padding: 0.4rem 0.75rem;">Load Balancers</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#caching" class="badge badge-intermediate" style="text-decoration: none; padding: 0.4rem 0.75rem;">Caching</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#databases" class="badge badge-intermediate" style="text-decoration: none; padding: 0.4rem 0.75rem;">Databases</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#distributed" class="badge badge-advanced" style="text-decoration: none; padding: 0.4rem 0.75rem;">Distributed Systems</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#messaging" class="badge badge-advanced" style="text-decoration: none; padding: 0.4rem 0.75rem;">Messaging & Queues</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#storage" class="badge badge-advanced" style="text-decoration: none; padding: 0.4rem 0.75rem;">Storage & Search</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#scalability" class="badge badge-advanced" style="text-decoration: none; padding: 0.4rem 0.75rem;">Scalability</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#reliability" class="badge badge-advanced" style="text-decoration: none; padding: 0.4rem 0.75rem;">Reliability</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#security" class="badge badge-advanced" style="text-decoration: none; padding: 0.4rem 0.75rem;">Security & Observability</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#realworld" class="badge badge-interview" style="text-decoration: none; padding: 0.4rem 0.75rem;">Real-World Designs</a>
+      <span style="color: var(--text-muted);">&rarr;</span>
+      <a href="#interviews" class="badge badge-interview" style="text-decoration: none; padding: 0.4rem 0.75rem;">System Design Interviews</a>
+    </div>
+  </div>
+
+  <div class="hero-cta-group">
+    <a href="/hld/module/01" class="btn btn-primary btn-lg">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+      Start HLD Module 01
+    </a>
+    <a href="/hld/calculator" class="btn btn-secondary btn-lg">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>
+      Capacity Calculator
+    </a>
+    <a href="/" class="btn btn-outline btn-lg">
+      &larr; Switch to LLD (C++)
+    </a>
+  </div>
+</section>
+
+<!-- The Bridge: LLD vs HLD Deep Distinction -->
+<section style="margin: 2rem 0 3.5rem;">
+  <div class="glass-panel" style="padding: 2.25rem; border-color: rgba(168, 85, 247, 0.3);">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <span class="badge badge-intermediate" style="margin-bottom: 0.5rem;">The Engineering Spectrum</span>
+      <h2 style="font-size: 2rem; color: #fff; margin: 0.25rem 0 0.5rem;">
+        Understanding <span class="gradient-text-purple">HLD vs LLD</span> & The End-to-End Bridge
+      </h2>
+      <p style="color: var(--text-secondary); max-width: 750px; margin: 0 auto; font-size: 0.95rem;">
+        How high-level infrastructure abstractions and low-level code implementations work together in real-world production engineering.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+      <!-- LLD Box -->
+      <div style="background: rgba(0, 114, 206, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <span style="font-size: 1.5rem;">🏛️</span>
+          <h3 style="color: var(--accent-cyan); margin: 0; font-size: 1.2rem;">Low-Level Design (LLD)</h3>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+          Focuses on internal object design, class hierarchies, interfaces, and execution efficiency inside a single process.
+        </p>
+        <ul style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.8; padding-left: 1.2rem; margin: 0;">
+          <li><strong>Classes & Objects:</strong> Encapsulation, Invariants, State</li>
+          <li><strong>Design Patterns:</strong> Strategy, Observer, Factory, Decorator</li>
+          <li><strong>Clean Code:</strong> SOLID Principles, DRY, Law of Demeter</li>
+          <li><strong>Concurrency:</strong> Mutexes, Locks, Condition Variables, Atomics</li>
+          <li><strong>Language Engine:</strong> Modern C++20, RAII, Memory Locality</li>
+        </ul>
+      </div>
+
+      <!-- HLD Box -->
+      <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: var(--radius-md); padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <span style="font-size: 1.5rem;">🌐</span>
+          <h3 style="color: #c084fc; margin: 0; font-size: 1.2rem;">High-Level Design (HLD)</h3>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+          Focuses on distributed system architecture, scalability, network boundaries, data storage, and reliability across clusters.
+        </p>
+        <ul style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.8; padding-left: 1.2rem; margin: 0;">
+          <li><strong>Infrastructure:</strong> Load Balancers, API Gateways, CDNs</li>
+          <li><strong>Data Tier:</strong> SQL vs NoSQL, Sharding, Replication, Caches</li>
+          <li><strong>Messaging:</strong> Kafka Event Streams, Pub/Sub, Task Queues</li>
+          <li><strong>Distributed Guarantees:</strong> CAP Theorem, Consistency, Consensus</li>
+          <li><strong>Operational:</strong> SLOs, Distributed Tracing, Security, Failover</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- The Vertical Bridge -->
+    <div style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 1.5rem; text-align: center;">
+      <div style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.75rem;">
+        The Real-World System Transformation Flow
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; font-size: 0.9rem; font-weight: 700;">
+        <span class="badge badge-beginner">1. Product Requirements</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="badge badge-intermediate">2. HLD Architecture (Services & DBs)</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="badge badge-advanced">3. API & Data Contracts</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="badge badge-cpp">4. LLD (Classes & Design Patterns)</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="badge badge-interview">5. Production Implementation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Interactive Capacity Calculator Preview Widget -->
+<section style="margin: 3.5rem 0;">
+  <div class="topic-capacity-calc-target"></div>
+</section>
+
+<!-- 40-Module HLD Curriculum Roadmap -->
+<section style="margin: 4rem 0;">
+  <!-- Live Progress Overview Banner -->
+  <div class="glass-panel" style="padding: 1.75rem 2rem; margin-bottom: 2.5rem; border-color: rgba(168, 85, 247, 0.3); background: linear-gradient(135deg, rgba(13, 21, 39, 0.8), rgba(26, 16, 48, 0.9));">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.25rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <span style="font-size: 1.25rem;">📊</span>
+          <h3 style="font-size: 1.35rem; color: #fff; margin: 0;">Live HLD Roadmap Progress</h3>
+          <span class="badge badge-intermediate" style="font-size: 0.75rem;">Real-time</span>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.92rem; margin: 0;">
+          Track your High-Level Design mastery across all 40 modules and 156 distributed architecture topics.
+        </p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="text-align: right;">
+          <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Topics Completed</div>
+          <div class="hld-total-completed-topics-count" style="font-size: 1.3rem; font-weight: 800; color: #c084fc;">0 / 156</div>
+        </div>
+        <div style="text-align: right; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 1.5rem;">
+          <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Overall Mastery</div>
+          <div class="hld-overall-progress-pct-text" style="font-size: 1.3rem; font-weight: 800; color: #10b981;">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Overall Progress Bar -->
+    <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; position: relative;">
+      <div class="hld-overall-progress-bar-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #9333ea, #c084fc, #10B981); border-radius: 999px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);"></div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2 style="font-size: 2rem; margin-bottom: 0.35rem;">HLD Curriculum <span class="gradient-text-purple">Roadmap</span></h2>
+      <p style="color: var(--text-secondary);">40 modules progressing from zero to FAANG-grade large-scale distributed system design.</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="hld-filter-pills">
+      <button class="badge badge-cpp filter-btn active" data-filter="all" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">All (40)</button>
+      <button class="badge badge-beginner filter-btn" data-filter="Beginner" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">Beginner (5)</button>
+      <button class="badge badge-intermediate filter-btn" data-filter="Intermediate" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">Intermediate (10)</button>
+      <button class="badge badge-advanced filter-btn" data-filter="Advanced" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">Advanced (22)</button>
+      <button class="badge badge-interview filter-btn" data-filter="Interview" style="cursor: pointer; border: none; padding: 0.4rem 0.8rem;">Interview (3)</button>
+    </div>
+  </div>
+
+  <div class="cards-grid" id="hld-modules-cards-grid">
+    {% for mod in hld_modules %}
+      <a href="/hld/module/{{ mod.id }}" class="module-card" data-hld-module-card-id="{{ mod.id }}" data-module-level="{{ mod.level }}" data-total-topics="{{ mod.topics | length }}">
+        <div class="module-card-top">
+          <span class="module-card-num" style="color: #c084fc;">HLD {{ mod.id }}</span>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span class="badge {% if mod.level == 'Beginner' %}badge-beginner{% elif mod.level == 'Intermediate' %}badge-intermediate{% elif mod.level == 'Advanced' %}badge-advanced{% else %}badge-interview{% endif %}">
+              {{ mod.level }}
+            </span>
+            <span class="badge badge-not-started hld-module-card-status-badge">○ Not Started</span>
+          </div>
+        </div>
+        
+        <h3 style="color: #fff;">{{ mod.title }}</h3>
+        <p>{{ mod.description }}</p>
+        
+        <!-- Live Per-Module Progress Fill -->
+        <div style="margin: 1.25rem 0 0.75rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+            <span>Progress</span>
+            <span class="hld-module-card-progress-text">0/{{ mod.topics | length }} completed (0%)</span>
+          </div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden;">
+            <div class="hld-module-card-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #9333ea, #c084fc); border-radius: 999px; transition: width 0.4s ease;"></div>
+          </div>
+        </div>
+
+        <div class="module-card-footer">
+          <div class="module-card-meta">
+            <span>{{ mod.topics | length }} Topics</span>
+            <span>&bull;</span>
+            <span>~{{ mod.estimated_hours }} Hours</span>
+          </div>
+          <span style="color: #c084fc; font-weight: 600; display: flex; align-items: center; gap: 0.25rem;">
+            Explore &rarr;
+          </span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/components/capacity-calculator.js"></script>
+<script src="/static/js/hld_progress.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const filterBtns = document.querySelectorAll('#hld-filter-pills .filter-btn');
+  const cards = document.querySelectorAll('#hld-modules-cards-grid .module-card');
+  if (filterBtns.length && cards.length) {
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.getAttribute('data-filter');
+        cards.forEach(card => {
+          const level = card.getAttribute('data-module-level');
+          if (filter === 'all' || level === filter) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  }
+});
+</script>
+{% endblock %}

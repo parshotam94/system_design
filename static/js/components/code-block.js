@@ -96,7 +96,21 @@ const CodeBlock = {
         });
       });
     }
+  },
+
+  initAll() {
+    document.querySelectorAll('.topic-code-target, .code-block-target').forEach(el => {
+      const filename = el.getAttribute('data-filename') || 'example.cpp';
+      const code = el.getAttribute('data-code');
+      if (code) {
+        this.render(el, filename, code);
+      }
+    });
   }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  CodeBlock.initAll();
+});
 
 window.CodeBlock = CodeBlock;

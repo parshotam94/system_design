@@ -1,0 +1,631 @@
+{
+  "module_id": "02",
+  "module_title": "Requirements Analysis & Scoping",
+  "description": "How to start any system design problem: Functional vs Non-Functional Requirements, Constraints, Assumptions, Traffic, and System Boundaries.",
+  "topics": [
+    {
+      "id": "functional-vs-non-functional",
+      "title": "Functional vs Non-Functional Requirements (NFRs)",
+      "definition": "Functional Requirements (FR) define WHAT a system must do (features, user actions, business workflows). Non-Functional Requirements (NFR) define HOW WELL the system must perform (availability, latency, consistency, scalability, durability, security).",
+      "why_we_need_it": "A system that correctly stores a tweet (FR) but takes 15 seconds to load and crashes every Friday (failed NFR) is an engineering failure. Senior system design interviews are 80% about solving NFRs.",
+      "real_world_analogy": "Buying an automobile: Functional requirement is that it drives from Point A to Point B with 4 passengers. Non-functional requirements are fuel efficiency (35 MPG), top speed (120 MPH), safety rating (5-star crash durability), and maintenance intervals (every 10,000 miles).",
+      "how_it_works": "<p>In the first 5 minutes of any system design discussion, you must explicitly partition the problem space into two clear lists: 3-5 core Functional use-cases and 4-5 measurable Non-Functional targets.</p>",
+      "conceptual_breakdown": [
+        "<strong>Functional Scope (FR):</strong> User post creation, timeline feed retrieval, user search, follow graph, push notifications.",
+        "<strong>High Availability (NFR):</strong> System must achieve 99.99% uptime (~52 minutes downtime per year).",
+        "<strong>Low Latency (NFR):</strong> p99 read latency < 100ms for timeline rendering; p99 write latency < 500ms for post ingestion.",
+        "<strong>Eventual vs Strong Consistency (NFR):</strong> Timelines can tolerate 2-3 seconds of replication lag (Eventual Consistency), but credit card billing requires Strong Consistency."
+      ],
+      "arch_diagram": {
+        "title": "Requirements Decomposition Matrix",
+        "tiers": [
+          {
+            "label": "User Actions",
+            "nodes": [
+              {
+                "name": "Functional: Post Tweet",
+                "type": "client",
+                "icon": "\u270d\ufe0f",
+                "what": "User publishes 280-char text + media",
+                "why": "Core content generation",
+                "when": "Write path",
+                "failure": "Store in client outbox & retry"
+              }
+            ]
+          },
+          {
+            "label": "Architectural Guardrails",
+            "nodes": [
+              {
+                "name": "NFR: 99.99% Availability",
+                "type": "lb",
+                "icon": "\ud83d\udee1\ufe0f",
+                "what": "Multi-AZ redundant infrastructure",
+                "why": "Zero single points of failure",
+                "when": "System availability",
+                "failure": "Automatic DNS health failover"
+              },
+              {
+                "name": "NFR: p99 Latency < 100ms",
+                "type": "cache",
+                "icon": "\u26a1",
+                "what": "Redis Fan-out Timeline Cache",
+                "why": "Sub-millisecond feed generation",
+                "when": "Read path",
+                "failure": "Pre-computed timeline cache"
+              }
+            ]
+          },
+          {
+            "label": "Data Guarantees",
+            "nodes": [
+              {
+                "name": "NFR: 100% Durability",
+                "type": "db",
+                "icon": "\ud83d\udcbe",
+                "what": "3x Replicated Distributed Storage",
+                "why": "Never lose user data once ACKed",
+                "when": "Data persistence",
+                "failure": "Cross-region backup"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Balancing FRs with Strict NFR Latency Budgets",
+        "steps": [
+          {
+            "step": 1,
+            "description": "FR Execution: User requests Timeline Feed (GET /feed).",
+            "active_nodes": [
+              "Functional: Post Tweet"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "NFR Enforcement: Request hits Redis timeline cache to satisfy < 100ms p99 latency SLA.",
+            "active_nodes": [
+              "NFR: p99 Latency < 100ms"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "NFR Enforcement: Multi-AZ load balancer guarantees 99.99% availability even if Zone A is offline.",
+            "active_nodes": [
+              "NFR: 99.99% Availability"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Result: Functional requirement delivered while strictly meeting all Non-Functional SLAs.",
+            "active_nodes": [
+              "NFR: 100% Durability"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "You cannot maximize all NFRs simultaneously. For example, guaranteeing absolute Strong Consistency (ACID across regions) increases write latency and decreases availability during network partitions (CAP theorem).",
+      "comparison_matrix": {
+        "title": "Core Non-Functional Requirements Spectrum",
+        "headers": [
+          "NFR Metric",
+          "Target SLA Example",
+          "Primary Architecture Solution"
+        ],
+        "rows": [
+          [
+            "Availability",
+            "99.99% (4 Nines)",
+            "Redundant active-active instances across multiple Availability Zones"
+          ],
+          [
+            "Read Latency",
+            "p99 < 50ms",
+            "Distributed in-memory caching (Redis), CDNs, and read replicas"
+          ],
+          [
+            "Write Latency",
+            "p99 < 200ms",
+            "Asynchronous task queues (Kafka) and Write-Ahead Logging"
+          ],
+          [
+            "Data Durability",
+            "99.999999999% (11 Nines)",
+            "Multi-region Erasure Coding and 3x replica storage (Amazon S3)"
+          ],
+          [
+            "Consistency",
+            "Eventual vs Strong",
+            "Choose between CP (Raft/Paxos) and AP (Dynamo/Cassandra)"
+          ]
+        ]
+      },
+      "failure_scenarios": "Failing to define NFRs upfront: designing a payment system with eventual consistency that double-charges customers, or designing a chat app with synchronous SQL queries that freezes under 10,000 active group chats.",
+      "common_mistakes": [
+        {
+          "mistake": "Listing 25 functional features during an interview instead of focusing on the top 3-4 core workflows",
+          "correction": "Deep-dive into 3 core use cases. Interviewers evaluate architectural depth, not exhaustive feature lists."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you handle conflicting NFRs like ultra-low latency vs strong data consistency?",
+          "answer": "Explicitly identify which data requires strict consistency (e.g. financial balances require CP) versus data that thrives on low latency with eventual consistency (e.g. video view counters, social feeds). Apply different architectural pipelines to each."
+        }
+      ]
+    },
+    {
+      "id": "assumptions-and-constraints",
+      "title": "Establishing Constraints, Assumptions, Users & Actors",
+      "definition": "The technique of establishing explicit mathematical scale, traffic boundaries, user demographics, hardware constraints, and out-of-scope agreements to eliminate ambiguity.",
+      "why_we_need_it": "Vague questions like 'Design Netflix' can mean designing the video encoding pipeline, the recommendation machine learning model, the billing engine, or the content delivery network. Establishing constraints scopes the problem to a solvable engineering goal.",
+      "real_world_analogy": "A defense contractor building a military vehicle: before designing, they must know if it operates in desert heat (-10\u00b0C to +50\u00b0C), aquatic rivers, or urban roads, and whether ammunition weight is 500kg or 5,000kg.",
+      "how_it_works": "<p>Actively state reasonable assumptions and confirm them with the interviewer:</p><ul><li>'I assume our target is 100 million Daily Active Users with a 10:1 Read-to-Write ratio.'</li><li>'I assume video files are up to 4K resolution with an average duration of 10 minutes.'</li><li>'I will treat user recommendation ML algorithms as an external black-box service and focus on video ingestion, encoding, storage, and streaming CDN delivery.'</li></ul>",
+      "conceptual_breakdown": [
+        "<strong>Actors:</strong> Creators (uploaders), Consumers (viewers), Moderators (admins), Automated Systems (billing cron, transcoders).",
+        "<strong>Hard Constraints:</strong> Maximum upload size (2 GB), network bandwidth budget, legal data compliance (GDPR in EU).",
+        "<strong>Out of Scope:</strong> Explicitly agreeing on features NOT to build in this 45-minute session to avoid wasting time."
+      ],
+      "arch_diagram": {
+        "title": "System Scoping and Boundary Partitioning",
+        "tiers": [
+          {
+            "label": "System Actors",
+            "nodes": [
+              {
+                "name": "Content Creator (Writer)",
+                "type": "client",
+                "icon": "\ud83c\udfa5",
+                "what": "Uploads 1080p/4K raw video",
+                "why": "Ingestion path actor",
+                "when": "Upload sessions",
+                "failure": "Resumable chunked upload"
+              },
+              {
+                "name": "Content Viewer (Reader)",
+                "type": "client",
+                "icon": "\ud83c\udf7f",
+                "what": "Streams video on mobile/TV",
+                "why": "Egress path actor (95% of traffic)",
+                "when": "Playback",
+                "failure": "Adaptive bitrate switching"
+              }
+            ]
+          },
+          {
+            "label": "In Scope System",
+            "nodes": [
+              {
+                "name": "Video Streaming Architecture",
+                "type": "service",
+                "icon": "\u26a1",
+                "what": "Ingestion -> Transcode -> CDN Delivery",
+                "why": "Core design focus",
+                "when": "In-Scope",
+                "failure": "Handled with full redundancy"
+              }
+            ]
+          },
+          {
+            "label": "Explicitly Out of Scope",
+            "nodes": [
+              {
+                "name": "Ad Bidding / Payment Engine",
+                "type": "storage",
+                "icon": "\ud83d\udeab",
+                "what": "External third-party integration",
+                "why": "Agreed out of scope to preserve focus",
+                "when": "Out of scope",
+                "failure": "Mocked with stub interface"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Actor-Based Request Routing",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Creator uploads 1GB video file via resumable HTTP multipart upload.",
+            "active_nodes": [
+              "Content Creator (Writer)",
+              "Video Streaming Architecture"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "System transcodes video into 360p, 720p, 1080p, 4K HLS chunked streams.",
+            "active_nodes": [
+              "Video Streaming Architecture"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "100,000 Viewers stream chunks simultaneously from Edge CDN with zero origin server strain.",
+            "active_nodes": [
+              "Content Viewer (Reader)",
+              "Video Streaming Architecture"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Designing for an overly broad scope results in shallow box-drawing. Designing for a tightly scoped set of constraints allows deep architectural exploration of bottlenecks and failure handling.",
+      "comparison_matrix": {
+        "title": "System Actors and Workload Characteristics",
+        "headers": [
+          "Actor / Persona",
+          "Traffic Ratio",
+          "Primary Operation",
+          "Critical SLA"
+        ],
+        "rows": [
+          [
+            "Content Consumer",
+            "95% - 99% of requests",
+            "Read-heavy (GET requests, CDN caching)",
+            "Sub-second start latency (TTFB < 200ms)"
+          ],
+          [
+            "Content Producer",
+            "1% - 5% of requests",
+            "Write-heavy (Large multipart file uploads)",
+            "100% upload durability & zero data corruption"
+          ],
+          [
+            "System Admin / Ops",
+            "< 0.1% of requests",
+            "Audit queries, moderation flags, analytics",
+            "Audit trail consistency over raw speed"
+          ]
+        ]
+      },
+      "failure_scenarios": "Assuming an unlimited upload size without constraints: a single user uploading a 500 GB file consumes all server memory and disk space, starving other users (Denial of Service).",
+      "common_mistakes": [
+        {
+          "mistake": "Silently making assumptions in your head without stating them to the interviewer",
+          "correction": "Always vocalize your assumptions clearly and ask: 'Does this scale match your expectations for this problem?'"
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you handle an interviewer who refuses to answer your clarifying questions and says 'You decide'?",
+          "answer": "State: 'Understood. In that case, I will assume a large-scale global service with 50M DAU, 10:1 read/write ratio, and 99.99% availability target. If our time allows, I will show how the architecture adapts if these constraints change.'"
+        }
+      ]
+    },
+    {
+      "id": "defining-system-boundaries",
+      "title": "System Boundaries, Core APIs & Data Contracts",
+      "definition": "The practice of creating formal input/output contracts (APIs) and defining data entity schemas before designing internal storage and microservice topologies.",
+      "why_we_need_it": "APIs and Data Schemas represent the non-negotiable contract between your system and the outside world. Designing the API first (API-First Design) ensures the architecture directly satisfies real user use cases.",
+      "real_world_analogy": "Ordering goods in international shipping: the standardized shipping container dimensions (20ft / 40ft ISO standards) dictate crane designs, cargo ship layouts, and highway truck trailers worldwide.",
+      "how_it_works": "<p>Translate functional requirements directly into clean RESTful endpoints or gRPC Protobuf definitions with explicit request payloads, response codes, and query parameters.</p>",
+      "conceptual_breakdown": [
+        "<strong>API Signature:</strong> HTTP Method + URL path + Query parameters + Request Headers (Authorization, Idempotency-Key).",
+        "<strong>Data Contract:</strong> Strict JSON / Protobuf schema with field types, required/optional flags, and validation rules.",
+        "<strong>Core Entities:</strong> Nouns representing persistent state (e.g. `User`, `Video`, `Comment`, `Channel`)."
+      ],
+      "arch_diagram": {
+        "title": "API Contract and Data Boundary",
+        "tiers": [
+          {
+            "label": "Public Interface",
+            "nodes": [
+              {
+                "name": "POST /api/v1/videos/upload",
+                "type": "client",
+                "icon": "\ud83d\udce4",
+                "what": "Video Upload Endpoint",
+                "why": "Initiates multipart video upload session",
+                "when": "Creator publishes content",
+                "failure": "400 Bad Request on invalid format"
+              },
+              {
+                "name": "GET /api/v1/videos/{id}/manifest",
+                "type": "client",
+                "icon": "\ud83d\udce5",
+                "what": "Streaming Manifest Endpoint",
+                "why": "Returns HLS/DASH .m3u8 playlist",
+                "when": "Playback start",
+                "failure": "404 Not Found if video deleted"
+              }
+            ]
+          },
+          {
+            "label": "Core Data Entities",
+            "nodes": [
+              {
+                "name": "Entity: Video Metadata",
+                "type": "db",
+                "icon": "\ud83d\udccb",
+                "what": "video_id, title, duration, uploader_id, s3_url",
+                "why": "Relational metadata model",
+                "when": "Query / search",
+                "failure": "Stored in PostgreSQL with read replicas"
+              },
+              {
+                "name": "Entity: Video Chunks",
+                "type": "storage",
+                "icon": "\ud83d\udce6",
+                "what": "TS / fMP4 chunks (4-second segments)",
+                "why": "Binary media storage",
+                "when": "CDN edge caching",
+                "failure": "Stored in S3 with 11 Nines durability"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "API Request Contract Validation",
+        "steps": [
+          {
+            "step": 1,
+            "description": "Client invokes POST /api/v1/videos/upload with video title and size metadata.",
+            "active_nodes": [
+              "POST /api/v1/videos/upload"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Gateway validates authorization token and payload schema against API Contract.",
+            "active_nodes": [
+              "POST /api/v1/videos/upload",
+              "Entity: Video Metadata"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "System issues Presigned S3 Upload URL to client. Binary video stream uploads directly to S3 without passing through API servers!",
+            "active_nodes": [
+              "Entity: Video Chunks"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Streaming heavy file uploads through backend API servers burns CPU and network bandwidth. Using presigned object storage URLs offloads massive binary traffic directly to S3.",
+      "comparison_matrix": {
+        "title": "API Protocols for System Boundaries",
+        "headers": [
+          "Protocol",
+          "Serialization Format",
+          "Transport",
+          "Best Suited For"
+        ],
+        "rows": [
+          [
+            "REST over HTTPS",
+            "JSON / Text",
+            "HTTP/1.1 or HTTP/2",
+            "Public client-facing APIs (Web/Mobile)"
+          ],
+          [
+            "gRPC",
+            "Protocol Buffers (Binary)",
+            "HTTP/2 (Multiplexed streams)",
+            "Internal microservice-to-microservice high-speed RPC"
+          ],
+          [
+            "GraphQL",
+            "JSON",
+            "HTTP POST",
+            "Complex dashboards requiring custom field selection in 1 request"
+          ],
+          [
+            "WebSockets",
+            "Raw Binary / Text",
+            "Persistent TCP connection",
+            "Bi-directional real-time chat & live market feeds"
+          ]
+        ]
+      },
+      "failure_scenarios": "Failing to version APIs (`/api/v1/` vs `/api/`): when you change a field name from `userId` to `user_id`, millions of legacy mobile apps in the wild crash instantly upon updating.",
+      "common_mistakes": [
+        {
+          "mistake": "Jumping into database schema design before establishing the public API endpoints",
+          "correction": "Define the API endpoints first. APIs define how the system is used; the database schema is an internal implementation detail that supports the API."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you design a file upload API for a 20 GB video file without exhausting web server memory?",
+          "answer": "Use a two-step API: 1. `POST /videos/upload-session` creates a metadata record and returns a Presigned S3 Multipart Upload URL. 2. The client uploads 5MB chunks directly from the browser to Amazon S3 via S3's Multipart API. The API servers never touch the raw video bytes."
+        }
+      ]
+    },
+    {
+      "id": "interview-scoping-walkthrough",
+      "title": "Interview Case Walkthrough: Scoping 'Design YouTube' from Scratch",
+      "definition": "A step-by-step masterclass demonstrating the exact dialogue, mathematical scoping, and requirement extraction for a top-tier FAANG interview problem: 'Design YouTube'.",
+      "why_we_need_it": "Provides learners with a concrete template they can replicate in real interviews to convert an ambiguous 2-word prompt into a structured, production-ready system design blueprint.",
+      "real_world_analogy": "A courtroom trial opening statement: establishing the exact facts, scope, and boundaries before presenting the detailed evidence.",
+      "how_it_works": "<p>Follow the 5-phase opening formula:</p><ol><li><strong>Clarification (2 mins):</strong> Clarify core features (Upload, Watch, Search). Confirm out of scope (Comments, Live streaming).</li><li><strong>Functional Requirements (2 mins):</strong> 3 core FRs.</li><li><strong>Non-Functional Requirements (2 mins):</strong> Availability (99.99%), Latency (Smooth playback, < 200ms start), Durability (Zero video loss).</li><li><strong>Capacity & Scale Estimation (3 mins):</strong> 1B DAU, 5B video views/day, 50M uploads/day, compute QPS, Storage & CDN egress bandwidth.</li><li><strong>High-Level Architecture (5 mins):</strong> Draw the block diagram.</li></ol>",
+      "conceptual_breakdown": [
+        "<strong>Functional Scope:</strong> 1. Upload Video, 2. Stream/Watch Video, 3. Search Video by Title.",
+        "<strong>Scale Numbers:</strong> 1B DAU &bull; 5 Billion views/day &bull; 50M uploads/day &bull; 100:1 View-to-Upload Ratio.",
+        "<strong>Storage Reality:</strong> 50M videos &times; 100MB avg = 5 PB storage per day &bull; 1.825 Exabytes per year!",
+        "<strong>Egress Bandwidth:</strong> 5B views &times; 100MB / 86,400s = 5.78 TB/sec (Must heavily utilize Global CDN edge caching)."
+      ],
+      "arch_diagram": {
+        "title": "Design YouTube: Scoped High-Level Architecture",
+        "tiers": [
+          {
+            "label": "User Tier",
+            "nodes": [
+              {
+                "name": "Creator Uploading",
+                "type": "client",
+                "icon": "\ud83c\udfa5",
+                "what": "Uploads raw video",
+                "why": "Ingestion",
+                "when": "Write path",
+                "failure": "Chunked resumable upload"
+              },
+              {
+                "name": "Viewer Streaming",
+                "type": "client",
+                "icon": "\ud83d\udcf1",
+                "what": "Streams HLS video",
+                "why": "Egress",
+                "when": "Read path",
+                "failure": "CDN fallback"
+              }
+            ]
+          },
+          {
+            "label": "Traffic & CDN Tier",
+            "nodes": [
+              {
+                "name": "Global Video CDN",
+                "type": "client",
+                "icon": "\ud83c\udf10",
+                "what": "Cloudflare / Akamai",
+                "why": "Caches 95% of video chunks at edge",
+                "when": "Video playback",
+                "failure": "Origin S3 fetch"
+              },
+              {
+                "name": "API Gateway / LB",
+                "type": "lb",
+                "icon": "\u2696\ufe0f",
+                "what": "NGINX / Envoy",
+                "why": "Routes metadata queries",
+                "when": "Search & view actions",
+                "failure": "Multi-AZ redundancy"
+              }
+            ]
+          },
+          {
+            "label": "Processing Tier",
+            "nodes": [
+              {
+                "name": "Upload Service",
+                "type": "service",
+                "icon": "\ud83d\udce4",
+                "what": "Presigned URL generator",
+                "why": "Direct S3 ingestion",
+                "when": "Upload start",
+                "failure": "Auto-scaling"
+              },
+              {
+                "name": "Transcoding Workers",
+                "type": "queue",
+                "icon": "\u2699\ufe0f",
+                "what": "FFmpeg GPU Cluster",
+                "why": "Encodes into 360p, 720p, 1080p, 4K",
+                "when": "Async queue",
+                "failure": "DLQ retry"
+              }
+            ]
+          },
+          {
+            "label": "Data Tier",
+            "nodes": [
+              {
+                "name": "Metadata DB (Postgres)",
+                "type": "db",
+                "icon": "\ud83d\uddc4\ufe0f",
+                "what": "Video title, uploader, views",
+                "why": "Relational metadata",
+                "when": "Queries",
+                "failure": "Read replicas"
+              },
+              {
+                "name": "Raw & Encoded S3 Storage",
+                "type": "storage",
+                "icon": "\ud83d\udce6",
+                "what": "Object Storage (5 PB/day)",
+                "why": "Durable blob storage",
+                "when": "Persistent video storage",
+                "failure": "Cross-region replication"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "YouTube Upload & Streaming Separation",
+        "steps": [
+          {
+            "step": 1,
+            "description": "1. Ingestion: Creator uploads video directly to S3 Raw Bucket via Presigned URL.",
+            "active_nodes": [
+              "Creator Uploading",
+              "Upload Service",
+              "Raw & Encoded S3 Storage"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "2. S3 triggers event to Kafka Queue; Transcoding Worker pool encodes chunks into multiple bitrates.",
+            "active_nodes": [
+              "Transcoding Workers",
+              "Raw & Encoded S3 Storage"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "3. Metadata saved in PostgreSQL with Redis caching.",
+            "active_nodes": [
+              "Metadata DB (Postgres)"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "4. Viewer requests video: 95% of chunks streamed directly from nearest Edge CDN PoP in 15ms.",
+            "active_nodes": [
+              "Viewer Streaming",
+              "Global Video CDN"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Encoding videos synchronously during upload would cause 30-minute HTTP timeouts. Using an asynchronous worker pool with message queues decouples upload completion from encoding duration.",
+      "comparison_matrix": {
+        "title": "YouTube Read vs Write Pipeline Separation",
+        "headers": [
+          "Pipeline Dimension",
+          "Upload / Write Path",
+          "Streaming / Read Path"
+        ],
+        "rows": [
+          [
+            "Traffic Volume",
+            "50M uploads/day (~580 writes/sec)",
+            "5 Billion views/day (~57,870 reads/sec)"
+          ],
+          [
+            "Latency Target",
+            "Asynchronous background (minutes acceptable)",
+            "Immediate start (TTFB < 200ms)"
+          ],
+          [
+            "Primary Infrastructure",
+            "Upload Service + Kafka + GPU Transcoder Pool",
+            "Global Edge CDN + S3 Origin + Redis Metadata Cache"
+          ],
+          [
+            "Data Flow",
+            "Client -> S3 Raw Bucket -> Transcoder -> S3 Chunks",
+            "Client -> Edge CDN -> (Cache Miss: S3 Chunks)"
+          ]
+        ]
+      },
+      "failure_scenarios": "Transcoding worker crashes halfway through a 2-hour 4K video encoding: without chunk-level checkpointing, the entire 2-hour job must restart. Solution: Chunk video into 4-second segments and encode chunks independently in parallel.",
+      "common_mistakes": [
+        {
+          "mistake": "Trying to stream video bytes through the PostgreSQL metadata database",
+          "correction": "Never store binary video files in relational databases. Store metadata (title, URL) in SQL and binary chunks in Object Storage (S3) served via CDN."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is Adaptive Bitrate Streaming (HLS / MPEG-DASH) crucial for platforms like YouTube?",
+          "answer": "HLS breaks video into 4-second chunks encoded at multiple resolutions (360p to 4K). The client's video player dynamically monitors live network bandwidth on the fly: if mobile signal drops from 5G to 3G, the player seamlessly requests the next 4-second chunk at 480p instead of buffering."
+        }
+      ]
+    }
+  ]
+}

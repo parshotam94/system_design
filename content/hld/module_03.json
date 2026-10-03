@@ -1,0 +1,674 @@
+{
+  "module_id": "03",
+  "module_title": "Capacity Estimation & Back-of-the-Envelope",
+  "description": "Master QPS, peak multipliers, read/write ratios, storage growth, network bandwidth, memory, cache sizing, and units (KB to PB).",
+  "topics": [
+    {
+      "id": "math-units-and-latency-numbers",
+      "title": "System Units (KB to PB, QPS) & Numbers Every Engineer Should Know",
+      "definition": "The standard engineering arithmetic and latency constants: Powers of 2 ($2^{10} = 1\\text{ KB}$, $2^{20} = 1\\text{ MB}$, $2^{30} = 1\\text{ GB}$, $2^{40} = 1\\text{ TB}$, $2^{50} = 1\\text{ PB}$) and computer hardware latency orders of magnitude.",
+      "why_we_need_it": "Without knowing hardware latency orders of magnitude, you might propose reading from a hard disk during a 10ms real-time trading request, causing a 100x latency SLA breach.",
+      "real_world_analogy": "A civil engineer knowing the weight limit of steel beams (10,000 lbs) versus wood timber (500 lbs) before specifying skyscraper columns.",
+      "how_it_works": "<p>Memorize the 3 core conversion rules and the classic <em>Latency Numbers Every Programmer Should Know</em> (Peter Norvig / Jeff Dean):</p><ul><li>$1\\text{ day} \\approx 86,400\\text{ seconds} \\approx 10^5\\text{ seconds}$ (for fast mental math).</li><li>$1\\text{ Million requests / day} \\approx 12\\text{ QPS}$.</li><li>$100\\text{ Million requests / day} \\approx 1,200\\text{ QPS}$.</li><li>$1\\text{ Billion requests / day} \\approx 12,000\\text{ QPS}$.</li></ul>",
+      "conceptual_breakdown": [
+        "<strong>L1 Cache Hit:</strong> 0.5 nanoseconds ($0.5\\text{ ns}$).",
+        "<strong>L2 Cache Hit:</strong> 7 nanoseconds ($7\\text{ ns}$).",
+        "<strong>RAM Access:</strong> 100 nanoseconds ($100\\text{ ns}$) &bull; $1000\\times$ faster than disk!",
+        "<strong>NVMe SSD Read:</strong> 150 microseconds ($150\\text{ }\\mu\\text{s}$).",
+        "<strong>Cross-Country Network Roundtrip (NYC to SF):</strong> 100 milliseconds ($100\\text{ ms}$).",
+        "<strong>Satellite / Cross-Continental Network Roundtrip:</strong> 200 - 500 milliseconds."
+      ],
+      "arch_diagram": {
+        "title": "Hardware Memory & Latency Hierarchy",
+        "tiers": [
+          {
+            "label": "Ultra Fast (Nanoseconds)",
+            "nodes": [
+              {
+                "name": "CPU L1 / L2 Cache",
+                "type": "cache",
+                "icon": "\u26a1",
+                "what": "0.5 ns - 7 ns",
+                "why": "Hardware register speed",
+                "when": "Active CPU registers",
+                "failure": "L1 cache miss goes to RAM"
+              }
+            ]
+          },
+          {
+            "label": "In-Memory Tier",
+            "nodes": [
+              {
+                "name": "System RAM (Redis)",
+                "type": "cache",
+                "icon": "\ud83e\udde0",
+                "what": "100 ns",
+                "why": "1000x faster than disk",
+                "when": "In-memory caching",
+                "failure": "RAM eviction"
+              }
+            ]
+          },
+          {
+            "label": "Solid State Storage",
+            "nodes": [
+              {
+                "name": "NVMe SSD Read",
+                "type": "db",
+                "icon": "\ud83d\udcbe",
+                "what": "150 \u00b5s",
+                "why": "Persistent high-speed I/O",
+                "when": "Database disk reads",
+                "failure": "Disk wear"
+              }
+            ]
+          },
+          {
+            "label": "Network Boundary",
+            "nodes": [
+              {
+                "name": "Cross-Continent Network",
+                "type": "client",
+                "icon": "\ud83c\udf10",
+                "what": "100 ms (100,000,000 ns!)",
+                "why": "Speed of light in fiber optic cable",
+                "when": "Remote API fetch",
+                "failure": "Network partition"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Latency Speed Comparison Scale",
+        "steps": [
+          {
+            "step": 1,
+            "description": "L1 Cache hit completes in 0.5ns (Equivalent to 1 heart beat).",
+            "active_nodes": [
+              "CPU L1 / L2 Cache"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Main RAM access completes in 100ns (Equivalent to walking across the room).",
+            "active_nodes": [
+              "System RAM (Redis)"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "SSD Read takes 150\u00b5s (Equivalent to walking to the local grocery store).",
+            "active_nodes": [
+              "NVMe SSD Read"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Cross-Country Network roundtrip takes 100ms (Equivalent to walking across the entire globe!).",
+            "active_nodes": [
+              "Cross-Continent Network"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "RAM is $1000\\times$ faster than SSD but costs $10\\times$ more per gigabyte and is volatile (loses data on power loss). Solid system design caches hot data in RAM while keeping durable source-of-truth on SSD.",
+      "comparison_matrix": {
+        "title": "Data Storage Hierarchy & Latencies",
+        "headers": [
+          "Storage Level",
+          "Latency",
+          "Cost per TB",
+          "Volatility"
+        ],
+        "rows": [
+          [
+            "CPU Registers / L1",
+            "0.5 ns - 1 ns",
+            "Extreme ($$$$)",
+            "Volatile"
+          ],
+          [
+            "RAM (DRAM)",
+            "100 ns",
+            "~$3,000 / TB",
+            "Volatile"
+          ],
+          [
+            "NVMe Flash SSD",
+            "100 - 200 \u00b5s",
+            "~$100 / TB",
+            "Non-Volatile (Durable)"
+          ],
+          [
+            "Hard Disk Drive (HDD)",
+            "5 - 10 ms",
+            "~$20 / TB",
+            "Non-Volatile (Sequential only)"
+          ],
+          [
+            "Network Roundtrip (Same DC)",
+            "500 \u00b5s",
+            "Network bandwidth cost",
+            "N/A"
+          ]
+        ]
+      },
+      "failure_scenarios": "Relying on disk seek operations for high-throughput random reads: HDDs can only achieve ~150 IOPS (Input/Output Operations per second) due to physical arm movement. Modern NVMe SSDs deliver 500,000+ IOPS.",
+      "common_mistakes": [
+        {
+          "mistake": "Over-calculating with exact calculator precision (e.g. '86,400 divided by 17.382 equals 4970.658')",
+          "correction": "System design capacity estimation is an order-of-magnitude approximation (Back-of-the-envelope). Round $86,400 \\approx 100,000$ to do fast, clean mental math."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is cross-data-center replication latency bounded by the speed of light in optical fiber?",
+          "answer": "Light travels through fiber glass at ~200,000 km/s (roughly 2/3 the speed of light in vacuum). A roundtrip between New York and London (~11,000 km total) has a theoretical physical minimum latency of ~55ms, meaning no software algorithm can ever make synchronous cross-Atlantic commits in under 60ms."
+        }
+      ]
+    },
+    {
+      "id": "traffic-and-qps-estimation",
+      "title": "DAU/MAU to Average & Peak QPS Estimation",
+      "definition": "The standard methodology for calculating Average Queries Per Second (QPS), Peak Traffic Multipliers, and Read/Write QPS splits from Daily Active Users (DAU).",
+      "why_we_need_it": "Determines how many server instances, database connections, and load balancer clusters are required to handle peak holiday or evening burst traffic without crashing.",
+      "real_world_analogy": "A highway department designing toll booths: you cannot build booths for the 3:00 AM average traffic; you must size them for the 8:30 AM rush-hour peak multiplier (3x - 5x average).",
+      "how_it_works": "<p>Step-by-Step QPS Formula:</p><ol><li>$\\text{Total Daily Requests} = \\text{DAU} \\times \\text{Requests per User per Day}$.</li><li>$\\text{Average QPS} = \\frac{\\text{Total Daily Requests}}{86,400\\text{ seconds}}$.</li><li>$\\text{Peak QPS} = \\text{Average QPS} \\times \\text{Peak Multiplier (typically 2x to 5x)}$.</li><li>Partition into $\\text{Read QPS}$ and $\\text{Write QPS}$ based on the system's Read-to-Write ratio.</li></ol>",
+      "conceptual_breakdown": [
+        "<strong>Example: Twitter-Scale:</strong>",
+        "$\\text{DAU} = 300\\text{ Million}$.",
+        "Avg views per user = 50 tweets/day $\\implies 300\\text{M} \\times 50 = 15\\text{ Billion reads/day}$.",
+        "Avg posts per user = 2 tweets/day $\\implies 300\\text{M} \\times 2 = 600\\text{ Million writes/day}$.",
+        "$\\text{Average Read QPS} = \\frac{15\\times 10^9}{86,400} \\approx 173,600\\text{ Read QPS}$.",
+        "$\\text{Peak Read QPS (2x)} = 173,600 \\times 2 \\approx 350,000\\text{ Peak Read QPS}$.",
+        "$\\text{Average Write QPS} = \\frac{600\\times 10^6}{86,400} \\approx 7,000\\text{ Write QPS}$ (Peak $\\approx 14,000\\text{ Write QPS}$)."
+      ],
+      "arch_diagram": {
+        "title": "QPS Sizing and Server Fleet Capacity",
+        "tiers": [
+          {
+            "label": "Peak Ingress",
+            "nodes": [
+              {
+                "name": "350,000 Peak Read QPS",
+                "type": "client",
+                "icon": "\u26a1",
+                "what": "350k concurrent requests/sec",
+                "why": "Incoming peak load",
+                "when": "Rush hour / Breaking news",
+                "failure": "Rate limiter sheds excess load"
+              }
+            ]
+          },
+          {
+            "label": "Stateless Fleet",
+            "nodes": [
+              {
+                "name": "350 Web App Servers (1k QPS each)",
+                "type": "service",
+                "icon": "\ud83d\udda5\ufe0f",
+                "what": "Auto-scaling EC2 / K8s Pods",
+                "why": "Each modern 8-core server handles ~1,000 QPS",
+                "when": "Stateless compute",
+                "failure": "Auto-scaling group provisions +50 servers"
+              }
+            ]
+          },
+          {
+            "label": "Storage Ingress",
+            "nodes": [
+              {
+                "name": "14,000 Write QPS",
+                "type": "db",
+                "icon": "\ud83d\udcbe",
+                "what": "14k database inserts/sec",
+                "why": "Exceeds single Postgres primary capacity",
+                "when": "Write path",
+                "failure": "Partitioned into 10 Database Shards"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Peak QPS Traffic Absorption",
+        "steps": [
+          {
+            "step": 1,
+            "description": "World Cup Final triggers sudden 350,000 QPS burst on Twitter timeline.",
+            "active_nodes": [
+              "350,000 Peak Read QPS"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Load Balancer spreads 350,000 QPS evenly across 350 web application servers (1,000 QPS per instance).",
+            "active_nodes": [
+              "350,000 Peak Read QPS",
+              "350 Web App Servers (1k QPS each)"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "14,000 Write QPS routed to Kafka Queue to prevent database write deadlocks.",
+            "active_nodes": [
+              "14,000 Write QPS"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Over-provisioning servers for 10x peak traffic 24/7 wastes millions of dollars. Using Cloud Horizontal Pod Autoscaling (HPA) automatically provisions nodes when CPU > 70% and scales down at night.",
+      "comparison_matrix": {
+        "title": "QPS Scale Tiers and Typical Hardware Requirements",
+        "headers": [
+          "QPS Range",
+          "System Archetype",
+          "App Tier Hardware",
+          "Database Strategy"
+        ],
+        "rows": [
+          [
+            "1 - 500 QPS",
+            "Small Startup",
+            "1 - 2 EC2 instances",
+            "Single PostgreSQL RDS instance"
+          ],
+          [
+            "500 - 5,000 QPS",
+            "Medium Enterprise",
+            "5 - 10 instances behind ALB",
+            "Primary + 2 Read Replicas + Redis Cache"
+          ],
+          [
+            "5,000 - 50,000 QPS",
+            "High Scale (Uber, Airbnb)",
+            "50 - 100 microservice pods",
+            "Sharded Database + Distributed Redis Cluster + Kafka"
+          ],
+          [
+            "50,000 - 500,000+ QPS",
+            "Hyper Scale (Twitter, Netflix)",
+            "500+ pods across multiple AZs",
+            "NoSQL (Cassandra/DynamoDB) + Global Edge CDNs"
+          ]
+        ]
+      },
+      "failure_scenarios": "Calculating only average QPS and ignoring peak traffic: during breaking news or Cyber Monday sales, traffic spikes 4x, overwhelming connection pools and crashing the entire platform.",
+      "common_mistakes": [
+        {
+          "mistake": "Assuming a single database primary can handle 50,000 write queries per second",
+          "correction": "A single PostgreSQL/MySQL primary typically caps at 5,000 - 10,000 write QPS depending on disk IOPS. Beyond that, you MUST shard the database or write to Kafka queues asynchronously."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you calculate how many server instances are needed given a peak of 100,000 QPS?",
+          "answer": "Assuming a typical production web server (e.g. Go, Java Netty, or C++ Crow) handles ~1,000 requests per second safely at 60% CPU utilization, you need: $\\frac{100,000\\text{ QPS}}{1,000\\text{ QPS/server}} = 100\\text{ server instances}$. Add 20% buffer for redundancy ($120\\text{ instances}$)."
+        }
+      ]
+    },
+    {
+      "id": "storage-and-bandwidth-estimation",
+      "title": "Read/Write Ratios, Storage Growth & Ingress/Egress Bandwidth",
+      "definition": "Formulas for calculating daily storage ingestion, 5-year capacity growth with replication overhead, and network ingress/egress bandwidth in Gigabits per second (Gbps).",
+      "why_we_need_it": "Ensures you budget for sufficient disk capacity, avoid cloud network egress bill shocks, and know when to compress payloads or adopt object storage tiering.",
+      "real_world_analogy": "A water treatment plant: estimating both daily water inflow pipe diameter (ingress bandwidth) and water reservoir tank volume for 5-year drought reserves (storage capacity).",
+      "how_it_works": "<p>Storage & Bandwidth Formulas:</p><ol><li>$\\text{Daily Storage} = \\text{Daily Writes} \\times \\text{Average Payload Size}$.</li><li>$\\text{5-Year Storage} = \\text{Daily Storage} \\times 365\\text{ days} \\times 5\\text{ years} \\times 3\\text{ (Replication Factor)}$.</li><li>$\\text{Ingress Bandwidth} = \\text{Write QPS} \\times \\text{Average Write Size} \\times 8\\text{ (bits/byte)}$.</li><li>$\\text{Egress Bandwidth} = \\text{Read QPS} \\times \\text{Average Read Size} \\times 8\\text{ (bits/byte)}$.</li></ol>",
+      "conceptual_breakdown": [
+        "<strong>Example: Instagram Photo Storage:</strong>",
+        "20 Million photo uploads / day &bull; 200 KB average compressed JPEG size.",
+        "$\\text{Daily Storage} = 20\\text{M} \\times 200\\text{ KB} = 4\\text{ Terabytes / day}$.",
+        "$\\text{1-Year Storage} = 4\\text{ TB} \\times 365 = 1.46\\text{ Petabytes / year}$.",
+        "$\\text{5-Year Storage with 3x Replication} = 1.46\\text{ PB} \\times 5 \\times 3 \\approx 21.9\\text{ Petabytes}$.",
+        "$\\text{Egress Bandwidth (200M photo views/day)} = \\frac{200\\times 10^6 \\times 200\\text{ KB}}{86,400} \\approx 463\\text{ MB/sec} = 3.7\\text{ Gbps}$."
+      ],
+      "arch_diagram": {
+        "title": "Storage Growth & Bandwidth Pipeline",
+        "tiers": [
+          {
+            "label": "Network Ingress/Egress",
+            "nodes": [
+              {
+                "name": "Egress: 3.7 Gbps",
+                "type": "client",
+                "icon": "\ud83d\udce1",
+                "what": "Outgoing photo stream",
+                "why": "Delivers photos to users",
+                "when": "User browsing",
+                "failure": "CDN edge caching reduces origin egress by 90%"
+              }
+            ]
+          },
+          {
+            "label": "Storage Tiering",
+            "nodes": [
+              {
+                "name": "Hot Storage (S3 Standard)",
+                "type": "storage",
+                "icon": "\ud83d\udd25",
+                "what": "First 30 days photos (~120 TB)",
+                "why": "Frequent access",
+                "when": "New posts",
+                "failure": "Instant NVMe retrieval"
+              },
+              {
+                "name": "Cold Storage (S3 Glacier)",
+                "type": "db",
+                "icon": "\ud83e\uddca",
+                "what": "Past 5 years photos (~21 PB)",
+                "why": "90% cheaper storage cost",
+                "when": "Old archives",
+                "failure": "Lifecycle transition policy"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Storage Tiering Lifecycle Flow",
+        "steps": [
+          {
+            "step": 1,
+            "description": "New photo uploaded: Written to S3 Standard Hot Tier (4 TB ingested daily).",
+            "active_nodes": [
+              "Hot Storage (S3 Standard)"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "First 30 days: 95% of reads served from CDN Edge & Hot Tier.",
+            "active_nodes": [
+              "Network Ingress/Egress",
+              "Hot Storage (S3 Standard)"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "After 90 days: Automated S3 Lifecycle Rule moves photo to S3 Glacier Deep Archive, slashing storage bills by 85%.",
+            "active_nodes": [
+              "Cold Storage (S3 Glacier)"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Storing 22 Petabytes in standard SSD storage costs ~$50,000/month. Using automated S3 Lifecycle policies to transition cold photos older than 60 days to Amazon S3 Glacier cuts costs down to ~$8,000/month.",
+      "comparison_matrix": {
+        "title": "Storage Pricing & Access Latency Tiers (AWS Example)",
+        "headers": [
+          "Storage Class",
+          "Cost per GB/mo",
+          "Retrieval Latency",
+          "Durability",
+          "Best For"
+        ],
+        "rows": [
+          [
+            "S3 Standard",
+            "$0.023",
+            "Milliseconds",
+            "99.999999999% (11 9s)",
+            "Active photos & feeds (First 30 days)"
+          ],
+          [
+            "S3 Infrequent Access (IA)",
+            "$0.0125",
+            "Milliseconds",
+            "11 Nines",
+            "Photos accessed 1-2 times a month"
+          ],
+          [
+            "S3 Glacier Flexible",
+            "$0.0036",
+            "Minutes to Hours",
+            "11 Nines",
+            "Archives older than 90 days"
+          ],
+          [
+            "S3 Glacier Deep Archive",
+            "$0.00099",
+            "12 Hours",
+            "11 Nines",
+            "Long-term compliance / multi-year backups"
+          ]
+        ]
+      },
+      "failure_scenarios": "Forgetting replication overhead: calculating 1 PB raw storage, but forgetting that 3x replication (Primary + 2 Standbys) requires purchasing 3 PB of physical disk space.",
+      "common_mistakes": [
+        {
+          "mistake": "Confusing Megabytes per second (MB/s) with Megabits per second (Mbps)",
+          "correction": "Remember that 1 Byte = 8 bits ($1\\text{ MB/s} = 8\\text{ Mbps}$). Network bandwidth is quoted in bits (Gbps); storage is quoted in Bytes (GB/TB)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you calculate 5-year storage requirements for a chat app handling 100M messages per day?",
+          "answer": "1. Average message = 100 bytes text + 100 bytes metadata = 200 bytes. 2. Daily text = $100\\text{M} \\times 200\\text{ bytes} = 20\\text{ GB/day}$. 3. Add media: if 10% contain a 100KB thumbnail = $10\\text{M} \\times 100\\text{ KB} = 1\\text{ TB/day}$. 4. Total daily = $\\sim 1.02\\text{ TB/day}$. 5. 5-Year storage with 3x replication = $1.02\\text{ TB} \\times 365 \\times 5 \\times 3 \\approx 5.58\\text{ Petabytes}$."
+        }
+      ]
+    },
+    {
+      "id": "memory-and-cache-sizing",
+      "title": "Memory, 80/20 Rule & Distributed Cache Sizing",
+      "definition": "The Pareto Principle (80/20 rule) applied to systems design: 20% of content generates 80% of read traffic. Sizing in-memory caches (Redis) to hold this hot 20% guarantees an 80%+ cache hit ratio.",
+      "why_we_need_it": "RAM is expensive ($3,000/TB vs $100/TB for SSD). Sizing cache appropriately avoids overpaying for RAM while protecting the database from read overload.",
+      "real_world_analogy": "A library front desk: keeping the top 20 bestsellers on the counter shelf for instant pickup, rather than walking into the 5-story basement archive for every customer.",
+      "how_it_works": "<p>Cache Sizing Formula:</p><ol><li>Calculate total daily read request volume in Bytes: $\\text{Daily Volume} = \\text{Daily Read Requests} \\times \\text{Average Payload Size}$.</li><li>Apply the 80/20 Pareto rule: $\\text{Cache Memory (RAM)} = \\text{Daily Volume} \\times 0.20$.</li><li>Add 25% overhead for Redis metadata & pointer memory structures: $\\text{Total RAM} = \\text{Cache Memory} \\times 1.25$.</li></ol>",
+      "conceptual_breakdown": [
+        "<strong>Example: E-Commerce Product Catalog:</strong>",
+        "500 Million product page views per day &bull; 50 KB product JSON payload.",
+        "$\\text{Daily Read Volume} = 500\\text{M} \\times 50\\text{ KB} = 25\\text{ Terabytes / day}$.",
+        "$\\text{20% Hot Working Set} = 25\\text{ TB} \\times 0.20 = 5\\text{ TB RAM}$.",
+        "With 25% Redis metadata overhead: $5\\text{ TB} \\times 1.25 = 6.25\\text{ TB RAM}$.",
+        "Sizing the cluster: A fleet of 50 Redis nodes with 128 GB RAM each ($50 \\times 128\\text{ GB} = 6.4\\text{ TB}$) easily caches all hot products."
+      ],
+      "arch_diagram": {
+        "title": "80/20 Distributed Cache Cluster Sizing",
+        "tiers": [
+          {
+            "label": "Incoming Reads",
+            "nodes": [
+              {
+                "name": "500M Daily Product Reads",
+                "type": "client",
+                "icon": "\ud83d\udecd\ufe0f",
+                "what": "500M page requests",
+                "why": "High read traffic",
+                "when": "E-Commerce browsing",
+                "failure": "Fast cache lookup"
+              }
+            ]
+          },
+          {
+            "label": "In-Memory Cache (80% Traffic)",
+            "nodes": [
+              {
+                "name": "6.25 TB Redis Cluster (50 Nodes)",
+                "type": "cache",
+                "icon": "\u26a1",
+                "what": "50 x 128GB RAM Nodes",
+                "why": "Holds top 20% hot products (80% hits)",
+                "when": "Cache HIT (Sub-millisecond)",
+                "failure": "Redis Sentinel auto-failover"
+              }
+            ]
+          },
+          {
+            "label": "Database Tier (20% Traffic)",
+            "nodes": [
+              {
+                "name": "PostgreSQL Primary + Replicas",
+                "type": "db",
+                "icon": "\ud83d\uddc4\ufe0f",
+                "what": "Durable product catalog",
+                "why": "Handles only 20% cache misses",
+                "when": "Cache MISS (Cold products)",
+                "failure": "Connection pool guard"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Pareto 80/20 Cache Hit vs Miss Traversal",
+        "steps": [
+          {
+            "step": 1,
+            "description": "User requests trending iPhone 15 page. Query hits Redis Cache. 80% HIT probability!",
+            "active_nodes": [
+              "500M Daily Product Reads",
+              "6.25 TB Redis Cluster (50 Nodes)"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "Redis returns product JSON in 0.8ms. Database receives zero traffic load.",
+            "active_nodes": [
+              "6.25 TB Redis Cluster (50 Nodes)"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "User requests obscure 2012 cable adapter (Cold item). Cache MISS.",
+            "active_nodes": [
+              "500M Daily Product Reads",
+              "PostgreSQL Primary + Replicas"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "Service queries PostgreSQL, returns item, and asynchronously populates Redis with 24h TTL.",
+            "active_nodes": [
+              "PostgreSQL Primary + Replicas",
+              "6.25 TB Redis Cluster (50 Nodes)"
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "Caching 100% of all data in RAM costs a fortune with diminishing returns ($25\\text{ TB RAM} \\approx \\$75,000/\\text{month}$). Caching the top 20% costs $\\$15,000/\\text{month}$ while absorbing 80%+ of total traffic.",
+      "comparison_matrix": {
+        "title": "Cache Eviction Policies Comparison",
+        "headers": [
+          "Policy",
+          "Eviction Rule",
+          "Best Suited For",
+          "Weakness"
+        ],
+        "rows": [
+          [
+            "LRU (Least Recently Used)",
+            "Evicts item unused for longest time",
+            "General web caching, feeds, product pages",
+            "Polluted by single-pass batch scans"
+          ],
+          [
+            "LFU (Least Frequently Used)",
+            "Evicts item with lowest request count",
+            "Consistent hot assets (e.g. site logo, celebrity profiles)",
+            "Historical items stay cached forever"
+          ],
+          [
+            "FIFO (First In First Out)",
+            "Evicts oldest inserted item",
+            "Simple streaming buffers",
+            "May evict frequently accessed hot keys"
+          ],
+          [
+            "Random Eviction",
+            "Picks random victim node",
+            "Uniform access distributions",
+            "Sub-optimal hit ratio"
+          ]
+        ]
+      },
+      "failure_scenarios": "Redis out-of-memory crash (OOM): if you do not configure an explicit maxmemory eviction policy (`maxmemory-policy allkeys-lru`), Redis rejects all new write requests when RAM is full (`OOM command not allowed`).",
+      "common_mistakes": [
+        {
+          "mistake": "Calculating cache size based only on raw string payload without accounting for Redis object overhead",
+          "correction": "Always add 20% - 30% memory buffer for Redis internal hash table pointers, jemalloc memory fragmentation, and key metadata."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you size a distributed cache for a news website with 50M daily article reads where each article is 100 KB?",
+          "answer": "1. Daily read volume = $50\\text{M} \\times 100\\text{ KB} = 5\\text{ TB}$. 2. 80/20 Rule: Hot working set = $20\\% \\times 5\\text{ TB} = 1\\text{ TB RAM}$. 3. Add 25% Redis pointer overhead = $1.25\\text{ TB RAM}$. 4. Sizing: Deploy 10 Redis nodes with 128 GB RAM each (Total 1.28 TB RAM)."
+        }
+      ]
+    },
+    {
+      "id": "interactive-capacity-calculator",
+      "title": "Interactive Back-of-the-Envelope Capacity Calculator Tool",
+      "definition": "A live interactive browser-based calculator allowing learners to adjust DAU, read/write ratios, payload size, and peak multipliers to dynamically compute system throughput and storage scale.",
+      "why_we_need_it": "Builds intuitive muscle memory for mental arithmetic during high-pressure system design interviews.",
+      "real_world_analogy": "A flight simulator for system architects: tweaking passenger load factors and seeing fuel consumption numbers update in real time.",
+      "how_it_works": "<p>Adjust the sliders below to calculate QPS, Bandwidth, 5-Year Storage, and RAM Cache requirements live using real-time JavaScript formula engines.</p>",
+      "capacity_calculator": true,
+      "conceptual_breakdown": [
+        "<strong>Real-time Reactive Math:</strong> Calculates Average QPS, Peak QPS ($2.5\\times$), Daily Ingestion, 5-Year Storage ($3\\times$ replicas), and 80/20 RAM sizing instantly.",
+        "<strong>Unit Normalization:</strong> Automatically converts raw bytes into KB, MB, GB, TB, and PB based on magnitude.",
+        "<strong>Interview Cheat Sheet:</strong> Use these exact formulas in FAANG whiteboard interviews."
+      ],
+      "tradeoffs": "Capacity estimation is not about exact financial auditing; it is about choosing the right architectural tier (e.g. knowing whether you need 1 Postgres DB or a 50-node Cassandra cluster).",
+      "comparison_matrix": {
+        "title": "Quick Reference Scale Table",
+        "headers": [
+          "DAU Scale",
+          "Average QPS (10 req/user)",
+          "Peak QPS (2.5x)",
+          "Daily Storage (10KB payload)",
+          "5-Yr 3x Replica Storage"
+        ],
+        "rows": [
+          [
+            "1 Million",
+            "116 QPS",
+            "290 QPS",
+            "10 GB / day",
+            "54.7 TB"
+          ],
+          [
+            "10 Million",
+            "1,157 QPS",
+            "2,893 QPS",
+            "100 GB / day",
+            "547.5 TB"
+          ],
+          [
+            "50 Million",
+            "5,787 QPS",
+            "14,467 QPS",
+            "500 GB / day",
+            "2.73 PB"
+          ],
+          [
+            "200 Million",
+            "23,148 QPS",
+            "57,870 QPS",
+            "2 TB / day",
+            "10.95 PB"
+          ],
+          [
+            "1 Billion",
+            "115,740 QPS",
+            "289,350 QPS",
+            "10 TB / day",
+            "54.75 PB"
+          ]
+        ]
+      },
+      "failure_scenarios": "Designing a single server architecture for a problem whose math reveals 50,000 Write QPS and 10 PB storage: an instant failure in any senior engineering review.",
+      "common_mistakes": [
+        {
+          "mistake": "Skipping capacity estimation in an interview and jumping directly into drawing microservice boxes",
+          "correction": "Always spend 3-4 minutes on estimation. The numbers dictate whether you need simple SQL replicas or multi-region NoSQL sharding."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is the capacity estimation step so critical for justifying architectural decisions to interviewers?",
+          "answer": "Because architecture without numbers is pure speculation. When you calculate 30,000 Write QPS, you have mathematical proof for why you chose a NoSQL database or message queue rather than a single SQL database."
+        }
+      ]
+    }
+  ]
+}
