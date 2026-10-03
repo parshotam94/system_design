@@ -1,0 +1,153 @@
+{
+  "module_id": "11",
+  "module_title": "NoSQL Databases: Key-Value, Document, Wide-Column, Graph",
+  "description": "Master NoSQL architectures: Key-Value (Redis/DynamoDB), Document (MongoDB), Wide-Column (Cassandra/ScyllaDB), and Graph (Neo4j) database engines.",
+  "topics": [
+    {
+      "id": "nosql-categories-and-internals",
+      "title": "The 4 NoSQL Engines: Key-Value, Document, Wide-Column & Graph",
+      "definition": "NoSQL encompasses four distinct non-relational database paradigms designed for horizontal scalability, unstructured schemas, and specific data access access patterns: Key-Value, Document, Wide-Column, and Graph.",
+      "why_we_need_it": "Relational databases cannot scale writes horizontally across hundreds of commodity nodes without complex sharding or sacrificing multi-table ACID transactions. NoSQL specializes data structures for linear scalability.",
+      "real_world_analogy": "Key-Value is a coat check ticket (1 key -> 1 coat). Document store is a physical medical folder full of diverse paper reports. Wide-Column is an enormous spreadsheet where each row can have completely different columns. Graph DB is an airport route map showing flight paths between cities.",
+      "how_it_works": "<p>1. <strong>Key-Value (Redis, DynamoDB):</strong> Simple hash table lookups `O(1)` by primary key.<br>2. <strong>Document (MongoDB, Couchbase):</strong> Stores self-contained JSON/BSON documents with nested sub-objects and dynamic schemas.<br>3. <strong>Wide-Column (Cassandra, ScyllaDB, HBase):</strong> Two-dimensional key-value store indexed by `(Partition Key, Clustering Key)` with sparse columns.<br>4. <strong>Graph (Neo4j, AWS Neptune):</strong> Stores Nodes, Edges (Relationships), and Properties, performing index-free adjacency graph traversals in `O(1)` per hop.</p>",
+      "conceptual_breakdown": [
+        "<strong>Key-Value:</strong> Ultra-fast, minimal query flexibility (get/put/delete by key).",
+        "<strong>Document:</strong> High developer velocity, rich ad-hoc query capabilities on JSON attributes.",
+        "<strong>Wide-Column:</strong> Massive write throughput, time-series telemetry, query-driven table modeling.",
+        "<strong>Graph:</strong> Complex multi-hop relational traversals (social networks, fraud detection, recommendation engines)."
+      ],
+      "comparison_matrix": {
+        "title": "The 4 NoSQL Database Families",
+        "columns": [
+          "Paradigm",
+          "Primary Engine",
+          "Data Structure",
+          "Query Flexibility",
+          "Best Fit Use Case"
+        ],
+        "rows": [
+          [
+            "Key-Value",
+            "Redis / DynamoDB",
+            "Hash Map / Key-Blob",
+            "Low (Key lookup only)",
+            "User sessions, caching, shopping carts"
+          ],
+          [
+            "Document",
+            "MongoDB / Couchbase",
+            "JSON / BSON documents",
+            "High (Secondary indexes on nested fields)",
+            "Content management, user profiles, e-commerce catalogs"
+          ],
+          [
+            "Wide-Column",
+            "Cassandra / ScyllaDB",
+            "LSM Tree + Sparse Rows",
+            "Moderate (Query restricted to partition key)",
+            "IoT time-series metrics, message history, financial audits"
+          ],
+          [
+            "Graph",
+            "Neo4j / Amazon Neptune",
+            "Nodes & Edges Pointer Graph",
+            "Very High (Graph Cypher queries)",
+            "Social networks, fraud rings, knowledge graphs"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Graph DB Traversal Explosions:</strong> Querying 6-degrees of separation on high-degree 'celebrity' nodes (millions of edges) causes exponential graph traversal blow-up and out-of-memory crashes. <em>Mitigation:</em> Restrict max traversal depth (`LIMIT 3`) and prune dense nodes.",
+      "common_mistakes": [
+        {
+          "mistake": "Treating Apache Cassandra like a relational database and trying to perform ad-hoc filtering or JOINs.",
+          "correction": "Cassandra requires Query-Driven Data Modeling: create 1 dedicated table per query pattern."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "When would you choose Cassandra over MongoDB in a system design interview?",
+          "answer": "Choose Cassandra for write-heavy (>100k QPS) time-series data or multi-region masterless active-active replication without single points of failure. Choose MongoDB when you need rich flexible document querying, secondary indexes, and atomic updates on nested JSON structures."
+        }
+      ]
+    },
+    {
+      "id": "mongodb-and-document-stores",
+      "title": "Document Stores: MongoDB BSON, Indexing & Embedding vs Referencing",
+      "definition": "Document stores serialize data into self-describing BSON (Binary JSON) records. Data modeling revolves around the fundamental trade-off between Embedding (nested sub-documents) and Referencing (normalized ID pointers).",
+      "why_we_need_it": "Modern applications work natively with object models. Embedding related entities inside a single document allows fetching all required UI data in a single disk read without complex multi-table SQL JOINs.",
+      "real_world_analogy": "Embedding is putting a passport photo and driver's license inside a wallet so you have everything at once. Referencing is keeping a locker key in your wallet; you must walk to the locker whenever you need your passport.",
+      "how_it_works": "<p><strong>Embedding (1-to-Few):</strong> Store child items (e.g., user addresses) directly inside the parent document `user: { name: 'Alice', addresses: [{ city: 'NYC' }] }`. Read is `O(1)` atomic.<br><strong>Referencing (1-to-Many / Many-to-Many):</strong> Store foreign ObjectIds `order: { user_id: ObjectId('...') }` and use `$lookup` aggregation to join when needed, preventing 16MB document size limits.</p>",
+      "conceptual_breakdown": [
+        "<strong>16MB BSON Limit:</strong> MongoDB enforces a hard 16MB limit per document to prevent RAM bloat during memory-mapped I/O.",
+        "<strong>WiredTiger Engine:</strong> Uses B-Trees for indexes, document-level locking, and snappy compression in memory.",
+        "<strong>Replica Sets:</strong> 1 Primary node for writes with automatic failover election via Raft-like consensus to Secondary read replicas."
+      ],
+      "failure_scenarios": "<strong>Unbounded Document Growth:</strong> Embedding an activity log array inside a user document causes document growth, triggering frequent expensive disk relocations and eventually crashing into the 16MB document size limit.",
+      "common_mistakes": [
+        {
+          "mistake": "Embedding unbounded arrays (e.g. comments on a viral post) inside a single document.",
+          "correction": "Use Referencing: store comments in a separate collection with a `post_id` index."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What are the rules of thumb for Embedding vs Referencing in MongoDB?",
+          "answer": "Embed for 1-to-1 or 1-to-Few relationships where child data is always queried together with the parent and has bounded size. Reference for 1-to-Many (>100 children), Many-to-Many, or when child records are frequently accessed independently."
+        }
+      ]
+    },
+    {
+      "id": "cassandra-and-wide-column",
+      "title": "Wide-Column Stores: Apache Cassandra, LSM-Trees & Tunable Consistency",
+      "definition": "Apache Cassandra is a masterless, linearly scalable wide-column distributed database utilizing Consistent Hashing, Log-Structured Merge (LSM) trees, and Tunable Consistency (Quorum reads/writes).",
+      "why_we_need_it": "Traditional databases have a single primary master for writes, creating a write throughput ceiling and single point of failure. Cassandra allows ANY node in a 1,000-node cluster to accept writes with zero downtime.",
+      "real_world_analogy": "A decentralized team of 10 equal partners: anyone can sign a receipt and inform the team via a gossip protocol. If 3 partners are traveling, the remaining 7 partners continue approving business seamlessly.",
+      "how_it_works": "<p>1. <strong>Partition Key:</strong> Hashes key (Murmur3) to determine which cluster nodes hold the data on the token ring.<br>2. <strong>Clustering Key:</strong> Sorts data physically on disk within that partition.<br>3. <strong>Write Path:</strong> Writes append to CommitLog on disk (durability) and MemTable in RAM (blazing fast). When MemTable is full, flushed sequentially to immutable SSTables.<br>4. <strong>Tunable Consistency:</strong> Formula `R + W > N` guarantees strong consistency (where N = Replication Factor, W = Write Quorum, R = Read Quorum).</p>",
+      "conceptual_breakdown": [
+        "<strong>Masterless (Peer-to-Peer):</strong> No master node. All nodes communicate via the Gossip Protocol.",
+        "<strong>Compaction:</strong> Background worker merges multiple SSTables, discarding tombstone deletes and stale versions.",
+        "<strong>Tombstones:</strong> Deletes in Cassandra don't erase disk immediately; they write a 'tombstone' marker with a TTL to prevent zombie resurrects during anti-entropy repair."
+      ],
+      "tradeoffs": "<strong>Trade-off:</strong> Blazing write speed and high availability in exchange for no JOINs, no aggregations (`GROUP BY`), and having to duplicate data into multiple tables to satisfy different query filters.",
+      "failure_scenarios": "<strong>Tombstone Overload:</strong> Deleting millions of rows creates huge volumes of tombstones; queries scanning through millions of tombstones trigger `TombstoneOverwhelmingException` and crash the node. <em>Mitigation:</em> Design tables with short TTLs or drop entire partition tables.",
+      "common_mistakes": [
+        {
+          "mistake": "Designing Cassandra tables around entities instead of specific query patterns.",
+          "correction": "Model Cassandra tables strictly around queries: 1 Table = 1 SELECT query shape."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Cassandra achieve Strong Consistency with Tunable Consistency parameters?",
+          "answer": "By setting Replication Factor `N = 3`, Write Consistency `LOCAL_QUORUM` (2 nodes), and Read Consistency `LOCAL_QUORUM` (2 nodes). Because `W + R > N` (2 + 2 = 4 > 3), the read set and write set are mathematically guaranteed to overlap by at least one node holding the latest timestamped record."
+        }
+      ]
+    },
+    {
+      "id": "dynamodb-and-single-table-design",
+      "title": "Amazon DynamoDB & Single-Table Design Architecture",
+      "definition": "Amazon DynamoDB is a fully managed serverless key-value and document database offering single-digit millisecond latency at any scale. Single-Table Design is an advanced modeling pattern where an entire application domain is stored inside a single DynamoDB table using overloaded Partition (PK) and Sort Keys (SK).",
+      "why_we_need_it": "In multi-table DynamoDB designs, fetching a user and their 10 recent orders requires multiple network round-trips. Single-Table Design allows retrieving heterogeneous entities (User + Orders + Items) in a single ultra-fast `Query` API call.",
+      "real_world_analogy": "A physical binder organized with tabs: under tab `USER#123`, page 1 is their Profile, pages 2-10 are their Orders, and page 11 is their Shipping Address. Flipping to tab `USER#123` retrieves everything in one glance.",
+      "how_it_works": "<p>1. <strong>Partition Key (PK):</strong> Determines the physical partition storage node.<br>2. <strong>Sort Key (SK):</strong> Organizes and sorts items within that partition.<br>3. <strong>Overloading:</strong> Generic names `PK` and `SK` store multiple entity types (e.g. `PK = USER#101, SK = METADATA` for User; `PK = USER#101, SK = ORDER#2026-001` for Order).<br>4. <strong>GSI (Global Secondary Index):</strong> Allows swapping keys (e.g., `GSI1-PK = ORDER#2026-001, GSI1-SK = STATUS#SHIPPED`) to query reverse relationships.</p>",
+      "conceptual_breakdown": [
+        "<strong>Query vs Scan:</strong> `Query` uses PK and is sub-10ms; `Scan` scans the entire database table and is a critical production anti-pattern.",
+        "<strong>RCU and WCU:</strong> Read/Write Capacity Units govern provisioned throughput (1 RCU = 4KB strong read/sec; 1 WCU = 1KB write/sec).",
+        "<strong>DAX (DynamoDB Accelerator):</strong> In-memory microsecond cache tier for DynamoDB."
+      ],
+      "failure_scenarios": "<strong>Hot Partition Throttling:</strong> If all writes use the same Partition Key (e.g. `PK = DATE#2026-10-03`), a single physical partition exceeds its 1,000 WCU limit and DynamoDB returns `ProvisionedThroughputExceededException`. <em>Mitigation:</em> Suffix partition keys with random salt hashes (`PK = DATE#2026-10-03#rand(0, 10)`).",
+      "common_mistakes": [
+        {
+          "mistake": "Using DynamoDB `Scan` in production API request paths.",
+          "correction": "Always design access patterns using `Query` on PK and SK with GSIs."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What is the primary trade-off of DynamoDB Single-Table Design?",
+          "answer": "It provides extreme predictable single-digit millisecond latency and cost efficiency at massive scale, but requires all access patterns to be known upfront; ad-hoc reporting or unexpected new query patterns require building new GSIs or exporting to analytical stores (Athena/Snowflake)."
+        }
+      ]
+    }
+  ]
+}

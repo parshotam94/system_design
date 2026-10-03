@@ -1,0 +1,309 @@
+{
+  "module_id": "06",
+  "module_title": "System Architecture Patterns",
+  "description": "Master monolithic vs microservices trade-offs, layered & hexagonal architectures, serverless event-driven topologies, and CQRS / Event Sourcing patterns.",
+  "topics": [
+    {
+      "id": "monolith-to-microservices",
+      "title": "Monolith, Modular Monolith & Microservices Trade-offs",
+      "definition": "Monoliths package all business domains, UI, and persistence into a single deployable binary. Microservices decompose systems into independently deployable, bounded-context services communicating over lightweight network protocols (HTTP/gRPC/Kafka).",
+      "why_we_need_it": "Monoliths start fast with zero network serialization overhead, but as engineering organizations grow to hundreds of developers, shared database schemas and single deployment pipelines cause catastrophic deployment bottlenecks and blast radius explosions.",
+      "real_world_analogy": "A Monolith is a Swiss Army Knife: compact, all-in-one, handy. Microservices are an entire specialized industrial tool workshop: each tool is maintained by a separate craftsman and can be upgraded independently without breaking the entire building.",
+      "how_it_works": "<p>In a <strong>Modular Monolith</strong>, business domains (Orders, Users, Payments) are strictly isolated into distinct code packages with explicit interface boundaries and private database tables, but run within a single process. In <strong>Microservices</strong>, each bounded context runs as its own containerized process with its own private database, communicating asynchronously via message brokers or synchronously via gRPC/REST.</p>",
+      "conceptual_breakdown": [
+        "<strong>Conway's Law:</strong> Organizations design systems that mirror their communication structures. Independent two-pizza teams require independent microservice deployables.",
+        "<strong>Database per Service:</strong> The cardinal rule of microservices. Sharing a database across services couples their schemas and breaks independent deployability.",
+        "<strong>Dual-Edged Sword:</strong> Microservices introduce distributed tracing complexity, network latency hops, partial failures, eventual consistency dilemmas, and data synchronization overhead."
+      ],
+      "arch_diagram": {
+        "title": "Monolith vs Microservices Architecture Topology",
+        "tiers": [
+          {
+            "label": "Client Layer",
+            "nodes": [
+              {
+                "name": "Single Gateway / LB",
+                "type": "gateway",
+                "icon": "\ud83d\udeaa",
+                "what": "Ingress API Gateway & TLS termination",
+                "why": "Single entrypoint for web and mobile clients",
+                "when": "Always used to route traffic across services",
+                "failure": "Multi-region redundant gateway failover"
+              }
+            ]
+          },
+          {
+            "label": "Services Layer",
+            "nodes": [
+              {
+                "name": "Auth Service",
+                "type": "service",
+                "icon": "\ud83d\udd11",
+                "what": "JWT tokens & identity validation",
+                "why": "Decoupled authentication logic",
+                "when": "On every authenticated request",
+                "failure": "Token validation cached locally via public keys"
+              },
+              {
+                "name": "Order Service",
+                "type": "service",
+                "icon": "\ud83d\udce6",
+                "what": "Checkout & order lifecycle workflows",
+                "why": "High transaction isolation",
+                "when": "User creates or checks orders",
+                "failure": "Saga pattern compensation rollback"
+              },
+              {
+                "name": "Payment Service",
+                "type": "service",
+                "icon": "\ud83d\udcb3",
+                "what": "Third-party payment gateway integration",
+                "why": "PCI-DSS compliance isolation",
+                "when": "Order payment processing",
+                "failure": "Idempotent payment capture and retry queues"
+              }
+            ]
+          },
+          {
+            "label": "Decoupled Databases",
+            "nodes": [
+              {
+                "name": "Auth DB (Redis/Postgres)",
+                "type": "database",
+                "icon": "\ud83d\uddc4\ufe0f",
+                "what": "User credentials & refresh tokens",
+                "why": "Sub-millisecond token lookups",
+                "when": "Login and session refresh",
+                "failure": "Replica failover"
+              },
+              {
+                "name": "Order DB (PostgreSQL)",
+                "type": "database",
+                "icon": "\ud83d\udc18",
+                "what": "Relational ACID storage for order line items",
+                "why": "Strict financial consistency",
+                "when": "Order placement",
+                "failure": "Multi-AZ synchronous replication"
+              },
+              {
+                "name": "Payment DB (DynamoDB)",
+                "type": "database",
+                "icon": "\u26a1",
+                "what": "High throughput append-only ledger",
+                "why": "Infinite scaling with partition keys",
+                "when": "Payment capture events",
+                "failure": "Global tables multi-region failover"
+              }
+            ]
+          }
+        ]
+      },
+      "system_flow_animation": {
+        "title": "Microservice Saga Pattern Checkout Flow",
+        "steps": [
+          {
+            "num": 1,
+            "title": "Client Initiates Checkout",
+            "actor": "Client -> API Gateway",
+            "desc": "Client sends POST /orders with Cart Items and Idempotency Key.",
+            "node": "Single Gateway / LB"
+          },
+          {
+            "num": 2,
+            "title": "Order Service Creates Pending Order",
+            "actor": "API Gateway -> Order Service",
+            "desc": "Order service creates order in state 'PENDING' and publishes 'OrderCreated' event to Kafka.",
+            "node": "Order Service"
+          },
+          {
+            "num": 3,
+            "title": "Payment Service Consumes & Charges",
+            "actor": "Payment Service -> Stripe API",
+            "desc": "Payment service consumes event, charges credit card, and publishes 'PaymentSucceeded'.",
+            "node": "Payment Service"
+          },
+          {
+            "num": 4,
+            "title": "Order Confirmed & Response Returned",
+            "actor": "Order Service -> Client",
+            "desc": "Order service transitions status to 'CONFIRMED' and pushes WebSocket update to user.",
+            "node": "Order DB (PostgreSQL)"
+          }
+        ]
+      },
+      "comparison_matrix": {
+        "title": "Architectural Paradigms Comparison",
+        "columns": [
+          "Dimension",
+          "Monolith",
+          "Modular Monolith",
+          "Microservices"
+        ],
+        "rows": [
+          [
+            "Deployment Complexity",
+            "Very Low (Single artifact)",
+            "Low (Single artifact)",
+            "High (Kubernetes, CI/CD per service)"
+          ],
+          [
+            "Network Latency",
+            "Zero (In-memory calls)",
+            "Zero (In-memory function calls)",
+            "High (Network hops + serialization)"
+          ],
+          [
+            "Team Scalability",
+            "Poor (>50 devs causes lock contention)",
+            "High (Domain code ownership)",
+            "Very High (Independent service teams)"
+          ],
+          [
+            "Data Consistency",
+            "Strong ACID DB transactions",
+            "Strong ACID DB transactions",
+            "Eventual consistency (Sagas / 2PC)"
+          ],
+          [
+            "Blast Radius",
+            "High (Bug crashes entire process)",
+            "High (Single runtime crash)",
+            "Low (Isolated service crashes)"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Distributed Partial Failures:</strong> Service A calls B, which calls C. If C hangs, thread pools in A and B get exhausted, causing cascading cluster failure. <em>Mitigation:</em> Strict timeout policies (e.g., 200ms), circuit breakers (e.g., Resilience4j/Envoy), and graceful fallback degrades.",
+      "common_mistakes": [
+        {
+          "mistake": "Adopting microservices before product-market fit or with a team of 3 developers.",
+          "correction": "Start with a well-structured Modular Monolith. Refactor bounded contexts into microservices only when organizational scaling demands it."
+        },
+        {
+          "mistake": "Multiple microservices directly querying or mutating each other's database tables.",
+          "correction": "Strictly enforce Database-per-Service. Cross-service communication must always occur via public API contracts or event streams."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you handle distributed transactions across microservices without 2-Phase Commit (2PC)?",
+          "answer": "Use the <strong>Saga Pattern</strong> (Choreographed via Kafka events or Orchestrated via a state machine workflow engine like Temporal/AWS Step Functions). Each local transaction updates its own DB and publishes an event; if a step fails, compensating transactions are executed in reverse order to restore consistency."
+        }
+      ]
+    },
+    {
+      "id": "three-tier-and-layered-architecture",
+      "title": "Three-Tier, N-Tier & Hexagonal / Clean Architecture",
+      "definition": "Layered and Hexagonal (Ports and Adapters) architectures structure application code into concentric rings of responsibility, isolating business logic from external frameworks, databases, and transport protocols.",
+      "why_we_need_it": "Without architectural boundaries, database queries and HTTP handlers become intertwined with core domain algorithms, making testing impossible and locking the codebase into specific third-party vendors.",
+      "real_world_analogy": "A power outlet and plug: Your laptop charger (domain logic) uses a standardized 2-prong port. It does not care if the electricity comes from solar, nuclear, or hydro (adapters).",
+      "how_it_works": "<p>The <strong>Dependency Inversion Principle</strong> dictates that inner layers define interfaces (Ports), and outer infrastructure layers implement those interfaces (Adapters). Domain business logic has ZERO external dependencies.</p>",
+      "conceptual_breakdown": [
+        "<strong>Domain Layer (Core):</strong> Pure business entities and domain rules with no dependencies on SQL, HTTP, or libraries.",
+        "<strong>Application Layer (Use Cases):</strong> Orchestrates domain models to fulfill application use cases (e.g., RegisterUserUseCase).",
+        "<strong>Infrastructure / Adapters:</strong> PostgreSQL repository implementations, REST API controllers, Kafka event producers."
+      ],
+      "tradeoffs": "<strong>Trade-off:</strong> Hexagonal architecture introduces boilerplate DTO mappers and interface abstractions in exchange for near-100% unit-testability and seamless technology migration (e.g. swapping PostgreSQL for DynamoDB with zero business logic changes).",
+      "failure_scenarios": "<strong>Domain Leakage:</strong> Leaking ORM models (e.g., Hibernate/GORM entities) into API responses exposes internal DB columns to public clients. Always use separate API DTOs.",
+      "common_mistakes": [
+        {
+          "mistake": "Calling the database directly from UI/HTTP controller handlers.",
+          "correction": "Inject an Application Service / UseCase interface into the controller to maintain separation of concerns."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What is the primary benefit of Hexagonal Architecture in high-concurrency production systems?",
+          "answer": "It allows mocking all I/O boundaries during testing, enables rapid refactoring of database storage engines without rewriting core algorithms, and enforces strict separation between network transport protocols and business invariants."
+        }
+      ]
+    },
+    {
+      "id": "serverless-and-event-driven",
+      "title": "Serverless Functions (FaaS) & Event-Driven Architecture",
+      "definition": "Serverless (FaaS) executes stateless code snippets on demand in ephemeral sandboxes (AWS Lambda, Google Cloud Run) with automatic scaling to zero. Event-Driven Architecture (EDA) coordinates decoupled services via asynchronous event publication and consumption.",
+      "why_we_need_it": "Traditional 24/7 provisioned servers incur continuous compute costs during idle periods. Serverless allows pay-per-millisecond execution, while event-driven architecture eliminates synchronous blocking HTTP latency.",
+      "real_world_analogy": "Uber driver dispatch: A passenger requesting a ride publishes a 'RideRequested' event. Nearby drivers consume this event asynchronously without the passenger having to call 50 drivers one by one on the phone.",
+      "how_it_works": "<p>Producers emit immutable domain events (e.g. `UserSignedUp`, `VideoUploaded`) to an event router or log (AWS EventBridge, Apache Kafka). Independent consumer services subscribe to event topics, processing messages asynchronously with retry policies and dead-letter queues (DLQs).</p>",
+      "conceptual_breakdown": [
+        "<strong>Cold Starts:</strong> The latency spike (100ms - 2s) when a cloud provider spins up a new micro-VM container sandbox on the first invocation.",
+        "<strong>At-Least-Once Delivery:</strong> Event buses guarantee messages won't be lost, but duplicate events can arrive. Consumers MUST be idempotent.",
+        "<strong>Dead-Letter Queue (DLQ):</strong> Unprocessable or poison-pill events are routed to a separate queue after maximum retry attempts for developer inspection."
+      ],
+      "tradeoffs": "<strong>Trade-off:</strong> Eventual consistency and asynchronous debugging complexity in exchange for infinite burst elasticity, decoupled deployment lifecycles, and zero idle compute costs.",
+      "failure_scenarios": "<strong>Event Loopback Storm:</strong> Service A emits Event 1 -> Service B consumes it and emits Event 2 -> Service A consumes Event 2 and emits Event 1 again, burning millions of Lambda executions. <em>Mitigation:</em> Event idempotency hashes and strict topic cycle validation.",
+      "common_mistakes": [
+        {
+          "mistake": "Using serverless functions for long-running batch computing (>15 min) or persistent WebSocket connections.",
+          "correction": "Use dedicated containerized workloads (ECS/Kubernetes) for long-lived processes and persistent TCP sockets."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you mitigate serverless cold starts in latency-critical APIs?",
+          "answer": "Use Provisioned Concurrency, keep deployment packages lightweight (avoid huge dependencies), choose fast runtimes (Go/Rust/Node.js over heavy JVM runtimes), and configure periodic warm-up pings."
+        }
+      ]
+    },
+    {
+      "id": "cqrs-and-event-sourcing",
+      "title": "CQRS (Command Query Responsibility Segregation) & Event Sourcing",
+      "definition": "CQRS separates data mutation operations (Commands) from read operations (Queries) into distinct models and database engines. Event Sourcing persists state not as a mutable snapshot, but as an immutable append-only sequence of historical domain events.",
+      "why_we_need_it": "In high-scale systems, read workloads (e.g. 100,000 QPS) often dwarf write workloads (e.g. 500 QPS). Traditional single-database schemas force difficult indexing compromises between write throughput and complex analytical search queries.",
+      "real_world_analogy": "A bank account ledger: The bank never stores just a single mutable number `balance = $500`. It stores every single deposit and withdrawal transaction line. Your balance is calculated by replaying all historical ledger entries.",
+      "how_it_works": "<p>1. <strong>Command Side:</strong> Writes send commands to an ACID write store (e.g., PostgreSQL or EventStoreDB), which appends an immutable event (`ItemAddedToCart`).<br>2. <strong>Projection Worker:</strong> Asynchronously consumes events and projects denormalized read models into specialized query databases (e.g. Elasticsearch for full-text search, Redis for key-value lookups).<br>3. <strong>Query Side:</strong> Reads query the read-optimized store directly with sub-5ms response times.</p>",
+      "conceptual_breakdown": [
+        "<strong>Command Side:</strong> Focuses exclusively on domain validation, invariants, and high-speed appending.",
+        "<strong>Query Side:</strong> Focuses exclusively on denormalized, zero-JOIN reads customized for UI views.",
+        "<strong>Event Store:</strong> The single source of truth. Entire read databases can be destroyed and rebuilt from scratch by replaying events from offset 0."
+      ],
+      "comparison_matrix": {
+        "title": "CRUD vs CQRS + Event Sourcing",
+        "columns": [
+          "Feature",
+          "Traditional CRUD",
+          "CQRS + Event Sourcing"
+        ],
+        "rows": [
+          [
+            "State Storage",
+            "Current mutable snapshot (UPDATE/DELETE)",
+            "Immutable append-only event stream (INSERT only)"
+          ],
+          [
+            "Audit Trail",
+            "Manual audit tables or triggers",
+            "Built-in 100% complete chronological audit history"
+          ],
+          [
+            "Read Performance",
+            "Limited by JOINs & relational indexes",
+            "Blazing fast (Denormalized views in Redis/Elasticsearch)"
+          ],
+          [
+            "Consistency",
+            "Immediate Strong Consistency",
+            "Eventual Consistency between Command and Query stores"
+          ],
+          [
+            "Implementation Complexity",
+            "Low",
+            "High (Requires event projectors, schema versioning & snapshots)"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Projection Lag:</strong> A user updates their profile (Command) and immediately refreshes the page, but the Read Store has not caught up yet due to a 50ms Kafka consumer delay, causing user confusion. <em>Mitigation:</em> Read-your-own-writes consistency (routing reads to primary or using version tokens).",
+      "common_mistakes": [
+        {
+          "mistake": "Applying Event Sourcing and CQRS to simple CRUD applications like blogs or basic internal dashboards.",
+          "correction": "Only use CQRS/Event Sourcing for complex domains with rich domain events, high read-to-write disparities, or strict regulatory audit requirements (e.g., Banking, E-commerce, Healthcare)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you handle event schema evolution in an Event Sourced system when business rules change over time?",
+          "answer": "Use Schema Upcasting (converting old event versions v1 -> v2 dynamically when reading from the log), Weak Schema validation (Avro/Protobuf optional fields), or version-specific event handler methods."
+        }
+      ]
+    }
+  ]
+}

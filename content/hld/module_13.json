@@ -1,0 +1,143 @@
+{
+  "module_id": "13",
+  "module_title": "Distributed Systems Core: CAP, PACELC & Consistency Models",
+  "description": "Master CAP Theorem, PACELC, the 8 Fallacies of Distributed Computing, Consistency Models (Linearizable to Eventual), and Vector Clocks.",
+  "topics": [
+    {
+      "id": "cap-theorem-explained",
+      "title": "CAP Theorem: Consistency, Availability & Partition Tolerance",
+      "definition": "The CAP Theorem (Brewer's Theorem) states that in any asynchronous distributed network subject to network partitions (P), a system can guarantee at most two of the three properties: Consistency (C) or Availability (A). Because network partitions are unavoidable in physical reality, the real trade-off is CP vs AP.",
+      "why_we_need_it": "Hardware cables get cut, routers reboot, and cross-datacenter fiber links fail. CAP provides the mathematical foundation for making deliberate architectural trade-offs during network partitions.",
+      "real_world_analogy": "Two bank tellers in different cities whose telephone wire gets cut (Partition). If a customer deposits $100 in City A: Either Teller B refuses to dispense cash until the phone is fixed (CP - Consistency over Availability), or Teller B dispenses cash based on old balance, risking overdrafts (AP - Availability over Consistency).",
+      "how_it_works": "<p>1. <strong>Consistency (Linearizability):</strong> Every read receives the most recent write or an error.<br>2. <strong>Availability:</strong> Every non-failing node returns a non-error response for every request (no guarantee it is the newest write).<br>3. <strong>Partition Tolerance:</strong> The system continues operating despite arbitrary dropped or delayed network packets between nodes.<br>4. <strong>The CP Choice (e.g. HBase, Zookeeper, etcd):</strong> Rejects writes or returns errors to preserve 100% data correctness.<br>5. <strong>The AP Choice (e.g. Cassandra, DynamoDB, Couchbase):</strong> Accepts writes on all sides of the partition, resolving conflicts later via eventual consistency.</p>",
+      "conceptual_breakdown": [
+        "<strong>'CA' is a Myth:</strong> You cannot 'choose CA'. A system without Partition Tolerance is a single machine that crashes whenever a network wire disconnects.",
+        "<strong>Normal Mode vs Partition Mode:</strong> In normal operation (no network partition), systems provide BOTH Consistency and Availability."
+      ],
+      "comparison_matrix": {
+        "title": "CP vs AP Systems Comparison",
+        "columns": [
+          "Dimension",
+          "CP Systems (Consistency + Partition Tolerance)",
+          "AP Systems (Availability + Partition Tolerance)"
+        ],
+        "rows": [
+          [
+            "Behavior during Partition",
+            "Blocks or returns errors on isolated nodes",
+            "Accepts reads and writes on all partitions"
+          ],
+          [
+            "Data Freshness",
+            "Always returns latest committed data",
+            "May return stale or conflicting data"
+          ],
+          [
+            "Conflict Resolution",
+            "Not needed (Only 1 valid leader commits)",
+            "Last-Write-Wins (LWW) or Vector Clocks / CRDTs"
+          ],
+          [
+            "Typical Technologies",
+            "etcd, Consul, Zookeeper, Google Spanner, CockroachDB",
+            "Apache Cassandra, Amazon DynamoDB, CouchDB"
+          ],
+          [
+            "Best Application Domain",
+            "Financial ledgers, distributed locks, cluster metadata",
+            "Shopping carts, social media feeds, IoT metrics"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Misclassifying System Requirements:</strong> Choosing AP for a banking balance ledger allows double-spending during network partitions; choosing CP for a social feed causes global site outages whenever a minor switch stutters.",
+      "common_mistakes": [
+        {
+          "mistake": "Claiming an RDBMS like PostgreSQL is a 'CA system' in a distributed systems interview.",
+          "correction": "In a distributed context, network partitions are inevitable; PostgreSQL in a distributed replica setup is CP or AP depending on synchronous vs asynchronous replication configuration."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is it mathematically impossible for a distributed system to achieve CA during a network partition?",
+          "answer": "If Node 1 and Node 2 cannot communicate (Partition P), and a client writes data to Node 1: if Node 2 serves a subsequent read, it must either return stale data (violating Consistency C) or refuse to answer / return an error (violating Availability A)."
+        }
+      ]
+    },
+    {
+      "id": "pacelc-theorem-deep-dive",
+      "title": "PACELC Theorem: Latency vs Consistency in Normal Operation",
+      "definition": "The PACELC Theorem extends CAP by stating: If there is a **P**artition, how does your system choose between **A**vailability and **C**onsistency? **E**lse (in normal operation), how does your system trade off **L**atency vs **C**onsistency?",
+      "why_we_need_it": "Partitions happen <0.1% of the time. PACELC explains the engineering trade-offs made 99.9% of the time during normal operation: waiting for synchronous multi-node replication increases read/write latency.",
+      "real_world_analogy": "A restaurant chef: During a storm (Partition), do you close (CP) or serve cold food (AP)? On a normal sunny day (Else), do you make customers wait 30 minutes for a freshly cooked meal (Consistency/PC) or serve instant pre-made buffet food in 10 seconds (Latency/PA/EL)?",
+      "how_it_works": "<p>Classifications:<br>&bull; <strong>PC/EC (e.g. Google Spanner, etcd):</strong> Under partition choose Consistency; during normal operation choose Consistency (higher latency for consensus).<br>&bull; <strong>PA/EL (e.g. Cassandra, DynamoDB, Riak):</strong> Under partition choose Availability; during normal operation choose Latency (async replication for sub-5ms responses).<br>&bull; <strong>PA/EC (e.g. MongoDB):</strong> Under partition chooses Availability; during normal operation waits for primary commit consistency.</p>",
+      "conceptual_breakdown": [
+        "<strong>Latency vs Consistency:</strong> Strong consistency requires waiting for cross-node network round-trips (`fsync` + ACK), increasing p99 latency.",
+        "<strong>Modern Cloud Reality:</strong> Most system design decisions in production are actually **EL** (Latency) vs **EC** (Consistency) decisions."
+      ],
+      "failure_scenarios": "<strong>High p99 Latency from Over-Constrained Consistency:</strong> Setting synchronous write replication across 3 continents to achieve EC drops write throughput to <50 QPS and spikes p99 latency to 350ms due to speed-of-light propagation delays.",
+      "common_mistakes": [
+        {
+          "mistake": "Relying solely on CAP theorem without understanding the latency cost of strong consistency in normal operating conditions.",
+          "correction": "Use PACELC to evaluate latency vs consistency trade-offs when designing multi-region distributed architectures."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How is Amazon DynamoDB classified under the PACELC theorem?",
+          "answer": "DynamoDB is classified as **PA/EL**: during a network partition it favors Availability (PA); during normal operation it defaults to low Latency with eventual consistency (EL), but allows developers to opt into EC (Strong Consistency) on individual read operations."
+        }
+      ]
+    },
+    {
+      "id": "fallacies-of-distributed-computing",
+      "title": "The 8 Fallacies of Distributed Computing",
+      "definition": "The 8 Fallacies of Distributed Computing are false assumptions developers make when transitioning from single-process monoliths to networked distributed systems, originally formulated by Peter Deutsch and James Gosling.",
+      "why_we_need_it": "Assuming the network is perfect leads to missing timeouts, lack of retries, unhandled partial failures, and catastrophic cascade crashes.",
+      "real_world_analogy": "Assuming every postal package mailed will arrive in exactly 24 hours without being lost, damaged, delayed by rain, or delivered to the wrong address.",
+      "how_it_works": "<p>The 8 Core Fallacies:<br>1. <strong>The network is reliable:</strong> Packets drop, switches reboot, links flap.<br>2. <strong>Latency is zero:</strong> Every RPC incurs network traversal and serialization cost.<br>3. <strong>Bandwidth is infinite:</strong> Large payloads congest NICs and saturation queues.<br>4. <strong>The network is secure:</strong> Zero-trust mTLS encryption is mandatory.<br>5. <strong>Topology doesn't change:</strong> Nodes constantly autoscale, die, and move IPs.<br>6. <strong>There is one administrator:</strong> Multiple teams configure firewalls, DNS, and proxies independently.<br>7. <strong>Transport cost is zero:</strong> Serialization (JSON/Protobuf) and TLS crypto burn CPU.<br>8. <strong>The network is homogeneous:</strong> Systems run across Linux, Windows, ARM, x86, iOS, and Android.</p>",
+      "conceptual_breakdown": [
+        "<strong>Partial Failure:</strong> In a single process, code either runs or crashes. In distributed systems, a server can hang indefinitely without failing.",
+        "<strong>Architectural Safeguards:</strong> Timeouts, Circuit Breakers, Exponential Backoff with Jitter, Bulkheads, and Idempotency Keys."
+      ],
+      "failure_scenarios": "<strong>Infinite Socket Hang:</strong> Calling an external HTTP API without an explicit socket timeout causes client worker threads to hang forever when the remote server freezes, completely depleting the web server thread pool within 2 minutes.",
+      "common_mistakes": [
+        {
+          "mistake": "Instantiating network HTTP clients without configuring explicit connect and read timeouts.",
+          "correction": "Always set aggressive connect timeouts (e.g. 500ms) and read timeouts (e.g. 2s) on all outbound network requests."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Which of the 8 Fallacies causes the most production outages and how is it mitigated?",
+          "answer": "'The network is reliable' and 'Latency is zero'. When downstreams hang, upstream callers exhaust thread pools and collapse. Mitigate using strict timeouts, circuit breakers, rate limiters, and bulkhead thread pool isolation."
+        }
+      ]
+    },
+    {
+      "id": "vector-clocks-and-eventual-consistency",
+      "title": "Logical Clocks: Lamport Timestamps, Vector Clocks & CRDTs",
+      "definition": "Logical Clocks and Vector Clocks are mechanisms for capturing causal relationships and event ordering in distributed systems without relying on synchronized physical wall-clock time. Conflict-Free Replicated Data Types (CRDTs) enable concurrent edits to converge automatically without conflicts.",
+      "why_we_need_it": "Physical server clocks suffer from Clock Drift (NTP synchronization skew). Relying on physical `System.currentTimeMillis()` causes Last-Write-Wins (LWW) to silently erase valid user updates.",
+      "real_world_analogy": "Numbering messages in a postal pen-pal correspondence: Message 1, 2, 3... Even if Letter 3 arrives before Letter 2 due to postal delays, you know Letter 2 was written first based on its causal sequence number.",
+      "how_it_works": "<p>1. <strong>Lamport Timestamps:</strong> A single scalar counter incremented on every event and passed in RPC headers. Defines a partial order (`Happens-Before` relation $A \\rightarrow B$).<br>2. <strong>Vector Clocks:</strong> An array of logical counters, one per node $V = [N_1: c_1, N_2: c_2, ...]$. Allows distinguishing between causally ordered events ($V_A < V_B$) and concurrent conflicting events ($V_A \\parallel V_B$).<br>3. <strong>CRDTs (State-based & Operation-based):</strong> Mathematical data structures (G-Counter, PN-Counter, LWW-Element-Set, Text CRDTs in Google Docs/Figma) whose merge operations are Commutative, Associative, and Idempotent ($A + B = B + A$).</p>",
+      "conceptual_breakdown": [
+        "<strong>Happens-Before Relationship ($\\rightarrow$):</strong> If event A caused event B, then $V(A) < V(B)$.",
+        "<strong>Concurrent Conflicts:</strong> If neither vector clock dominates, a causal conflict occurred; application prompts user or merges via domain rules.",
+        "<strong>CRDT Convergence:</strong> All replicas eventually reach the exact same state once all update operations are exchanged, with ZERO locking."
+      ],
+      "failure_scenarios": "<strong>Clock Skew Data Erasure in Cassandra LWW:</strong> Server A's physical clock is 500ms in the future due to bad NTP. When Server B writes a newer update with a correct clock, Cassandra silently discards B's update because A's timestamp appears higher, permanently losing data.",
+      "common_mistakes": [
+        {
+          "mistake": "Relying on physical timestamps for distributed transaction sequencing across independent server nodes.",
+          "correction": "Use Vector Clocks, Hybrid Logical Clocks (HLC), or Google TrueTime (GPS + Atomic Clocks) for deterministic ordering."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do Vector Clocks detect concurrent conflicts between two write operations?",
+          "answer": "Given two vector clocks $V_A$ and $V_B$: if every counter in $V_A \\ge V_B$ with at least one strictly greater, $V_A$ causally succeeds $V_B$. If $V_A$ has some counters greater than $V_B$ while $V_B$ has other counters greater than $V_A$, the writes occurred concurrently in parallel without knowledge of each other, signaling a conflict that requires resolution."
+        }
+      ]
+    }
+  ]
+}

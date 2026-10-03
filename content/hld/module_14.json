@@ -1,0 +1,119 @@
+{
+  "module_id": "14",
+  "module_title": "Distributed Consensus & Coordination",
+  "description": "Master distributed consensus protocols (Raft, Paxos), cluster coordination engines (Zookeeper, etcd), leader election, and distributed locking with Redlock.",
+  "topics": [
+    {
+      "id": "raft-consensus-algorithm",
+      "title": "Raft Consensus Algorithm: Leader Election, Log Replication & Safety",
+      "definition": "Raft is a distributed consensus algorithm designed for understandability, equivalent to multi-Paxos in fault tolerance and performance. It maintains a replicated state machine across a cluster of $2F+1$ nodes, tolerating up to $F$ node failures.",
+      "why_we_need_it": "In distributed databases and Kubernetes control planes, all nodes must agree on the exact sequence of state updates and elect a single authoritative leader without split-brain.",
+      "real_world_analogy": "A parliamentary committee of 5 members: 1 elected Chairperson leads the agenda. To pass any new rule, at least 3 members (Quorum) must vote yes. If the Chairperson passes out, the remaining members vote and elect a new Chairperson immediately.",
+      "how_it_works": "<p>1. <strong>Node Roles:</strong> Leader, Follower, or Candidate.<br>2. <strong>Leader Election:</strong> Followers expect periodic heartbeats. If a randomized Election Timeout (150ms-300ms) elapses without heartbeats, a Follower converts to Candidate, increments `currentTerm`, and requests votes. First to win Quorum (`(N/2)+1`) becomes Leader.<br>3. <strong>Log Replication:</strong> Clients send commands to the Leader. Leader appends command to its log and sends `AppendEntries` RPCs to Followers. Once a majority of followers acknowledge writing to their disk, the Leader commits the entry and applies it to its state machine.<br>4. <strong>Safety Invariants:</strong> Election Safety, Leader Append-Only, Log Matching Property, and Leader Completeness (a candidate must possess all committed logs to win election).</p>",
+      "conceptual_breakdown": [
+        "<strong>Odd Number of Nodes:</strong> Clusters use 3 or 5 nodes (3 nodes tolerate 1 failure; 5 nodes tolerate 2 failures).",
+        "<strong>Split Votes:</strong> Randomized election timers prevent simultaneous candidate voting deadlocks.",
+        "<strong>Term Numbers:</strong> Logical clocks that detect obsolete leaders and stale RPCs."
+      ],
+      "comparison_matrix": {
+        "title": "Raft vs Paxos vs Zab Consensus Comparison",
+        "columns": [
+          "Dimension",
+          "Raft (etcd, Consul, CockroachDB)",
+          "Multi-Paxos (Google Spanner, Chubby)",
+          "Zab (Apache Zookeeper)"
+        ],
+        "rows": [
+          [
+            "Understandability",
+            "High (Decomposed into Election, Replication, Safety)",
+            "Very Low (Abstract, notoriously difficult)",
+            "Moderate (Primary-Backup with epoch recovery)"
+          ],
+          [
+            "Leader Role",
+            "Strong Leader (All writes & reads go to leader)",
+            "Weak/Multi-Leader (Any node can propose)",
+            "Primary Leader (Atomic broadcast)"
+          ],
+          [
+            "Log Discrepancies",
+            "Leader forces followers to overwrite discrepancies",
+            "Complex reconciliation rounds",
+            "Followers sync to Leader's epoch snapshot"
+          ],
+          [
+            "Production Adoption",
+            "etcd (Kubernetes), TiKV, CockroachDB, Raft engines",
+            "Google Spanner, AWS internal control planes",
+            "Apache Kafka (pre-KRaft), Apache Hadoop"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Network Partition Split Brain:</strong> A 5-node cluster splits into Partition A (2 nodes with old leader) and Partition B (3 nodes). Partition B elects a new leader and reaches Quorum (3/5) for writes. Partition A cannot reach Quorum (2/5) and rejects writes. When reconnected, Partition A's old leader steps down and overwrites its log with B's authoritative log.",
+      "common_mistakes": [
+        {
+          "mistake": "Deploying an even number of consensus nodes (e.g. 4 nodes).",
+          "correction": "Always use an odd number of nodes ($2F+1$). 4 nodes still only tolerate 1 failure while requiring a 3-node Quorum, giving worse availability than 3 nodes."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Raft guarantee that a newly elected Leader contains all previously committed log entries?",
+          "answer": "Followers will reject `RequestVote` RPCs from any Candidate whose log is less up-to-date than their own (compared by last log term, then last log index). Because any committed entry must reside on a majority of nodes, and winning an election requires votes from a majority of nodes, the winning candidate is mathematically guaranteed to overlap with at least one node holding all committed entries."
+        }
+      ]
+    },
+    {
+      "id": "etcd-and-zookeeper",
+      "title": "Cluster Coordination Engines: etcd vs Apache Zookeeper",
+      "definition": "Distributed coordination engines provide strongly consistent hierarchical key-value storage, distributed locks, cluster membership heartbeats, leader election, and event watchers for cloud infrastructure.",
+      "why_we_need_it": "Kubernetes clusters, distributed databases, and Kafka brokers require a rock-solid single source of truth for node discovery, configuration management, and failover coordination.",
+      "real_world_analogy": "A master building directory and key registry: all security guards, elevator operators, and maintenance teams read and watch this one verified board to coordinate building operations.",
+      "how_it_works": "<p><strong>etcd (Go, Raft):</strong> Stores keys in a multi-version concurrency control (MVCC) bbolt key-value store. Provides gRPC APIs, atomic transactions (`Txn`), lease-based key expiration, and long-lived streaming Watchers on key prefixes.<br><strong>Zookeeper (Java, Zab):</strong> Hierarchical tree structure resembling a filesystem (`/services/auth/node-1`). Provides ephemeral znodes (auto-deleted on client disconnect) and sequential znodes for distributed leader elections.</p>",
+      "conceptual_breakdown": [
+        "<strong>Kubernetes Backbone:</strong> etcd stores 100% of Kubernetes cluster state (Pods, Services, Deployments, Secrets).",
+        "<strong>Watch Mechanism:</strong> Clients subscribe to key prefixes via HTTP/2 or gRPC streams, receiving push notifications in <1ms when configurations change.",
+        "<strong>Ephemeral Leases:</strong> Nodes attach a 5-second lease to their registration key; if the node crashes and stops renewing the lease, the key vanishes automatically."
+      ],
+      "failure_scenarios": "<strong>Slow Disk fsync Stalling etcd:</strong> etcd requires continuous disk `fsync` on WAL commits. If running on slow HDDs or shared cloud EBS volumes with noisy neighbors, fsync latency spikes to >50ms, causing missed Raft heartbeats, leader election storms, and Kubernetes API freezes. <em>Mitigation:</em> Run etcd exclusively on dedicated NVMe SSDs.",
+      "common_mistakes": [
+        {
+          "mistake": "Storing large binary payloads or application databases (>100MB) in etcd.",
+          "correction": "etcd is optimized for small metadata keys (<10KB) with total database size limit of 2GB to 8GB."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do ephemeral znodes in Zookeeper enable automated Leader Election?",
+          "answer": "All candidate nodes attempt to create the same ephemeral znode (e.g., `/app/leader`). The first node to succeed becomes Leader. Remaining nodes set a Watcher on that znode. If the Leader crashes, its session disconnects, Zookeeper automatically deletes the ephemeral znode, and the Watcher alerts remaining nodes to race to create the znode and become the new Leader."
+        }
+      ]
+    },
+    {
+      "id": "distributed-locks-and-redlock",
+      "title": "Distributed Locks: Redis (SETNX / Redlock) vs etcd Leases",
+      "definition": "Distributed Locks enforce mutual exclusion across multiple independent processes running on separate servers to prevent concurrent execution of critical sections (e.g. charging a payment or booking a seat).",
+      "why_we_need_it": "Standard programming language mutexes (`std::mutex`, `synchronized`) only work within a single operating system process memory space. Distributed locks coordinate across multiple cloud machines.",
+      "real_world_analogy": "A single physical restroom key hanging on a hook: only one employee at the office can hold the key at a time. If someone takes the key, everyone else must wait for it to be returned.",
+      "how_it_works": "<p>1. <strong>Redis Single-Node Lock:</strong> `SET resource_name my_random_token NX PX 30000` (Acquire lock only if Not eXists, with 30s TTL). Release via atomic Lua script matching `my_random_token`.<br>2. <strong>Redlock Algorithm:</strong> To survive Redis master crash before async replica sync, client acquires lock on a majority (e.g. 3 of 5) of independent Redis master nodes.<br>3. <strong>etcd / Zookeeper Locks (Safest):</strong> Acquire lock via ephemeral lease and monotonic sequence numbers (Fencing Tokens).</p>",
+      "conceptual_breakdown": [
+        "<strong>Fencing Tokens:</strong> Every lock grant generates a monotonically increasing counter (1, 2, 3...). The shared storage resource (DB) rejects any write with a token lower than the highest seen token, preventing GC pause corruption.",
+        "<strong>GC Pause Vulnerability (Martin Kleppmann critique):</strong> Process A acquires lock -> freezes in a 60s Java GC pause -> lock TTL expires -> Process B acquires lock -> Process A wakes up and writes corrupted data simultaneously."
+      ],
+      "failure_scenarios": "<strong>Asynchronous Redis Failover Lock Duplication:</strong> Client A acquires lock on Redis Master. Master crashes before replicating to Replica. Replica is promoted to Master. Client B acquires the same lock. Now Client A and Client B both hold the lock simultaneously. <em>Mitigation:</em> Use Redlock across 5 independent masters or use etcd/Consul.",
+      "common_mistakes": [
+        {
+          "mistake": "Releasing a distributed lock in Redis with a simple `DEL lock_key` command.",
+          "correction": "Never use simple `DEL`. If your process ran slow and the lock expired, you will delete another process's newly acquired lock. Always use a Lua script verifying token ownership."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What is a Fencing Token and why is it mandatory for 100% correct distributed locking?",
+          "answer": "A Fencing Token is an incrementing sequence number issued by the lock service. It protects against cases where a lock holder freezes (e.g. GC pause or network stall) and continues executing after its lock lease expired. The backend storage system verifies that incoming write tokens are greater than all previously accepted tokens, dropping stale writes from expired lock holders."
+        }
+      ]
+    }
+  ]
+}

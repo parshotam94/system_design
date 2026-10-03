@@ -1,0 +1,145 @@
+{
+  "module_id": "09",
+  "module_title": "Database Foundations & Relational DBs",
+  "description": "Master Relational vs NoSQL paradigms, ACID transactions, normalization vs denormalization trade-offs, connection pooling, and concurrency locking strategies.",
+  "topics": [
+    {
+      "id": "relational-vs-nosql-paradigm",
+      "title": "Relational (RDBMS) vs NoSQL: Data Modeling & Query Paradigms",
+      "definition": "Relational databases (RDBMS) store structured data in tables with predefined schemas, foreign keys, and ACID guarantees using SQL. NoSQL databases prioritize horizontal scalability, schema flexibility, and partition tolerance using diverse models (Document, Key-Value, Wide-Column, Graph).",
+      "why_we_need_it": "Choosing the wrong storage engine early in system design leads to severe scaling bottlenecks, excessive operational maintenance, or catastrophic data corruption.",
+      "real_world_analogy": "An RDBMS is a standardized corporate filing cabinet with strict alphabetical folders and mandatory forms. NoSQL is a versatile shipping container yard: you can load palletized boxes (Documents), giant bulk grain (Key-Value), or connected shipping routes (Graph).",
+      "how_it_works": "<p><strong>RDBMS (PostgreSQL, MySQL):</strong> Organizes entities into normalized tables, enforcing integrity constraints via foreign keys and performing relational JOINs at query time.<br><strong>NoSQL (MongoDB, Cassandra, DynamoDB):</strong> Denormalizes data into self-contained records or partitioned key spaces, eliminating multi-table JOINs to enable linear horizontal partitioning across hundreds of server nodes.</p>",
+      "conceptual_breakdown": [
+        "<strong>When to choose RDBMS:</strong> Complex relational queries, strict ACID transaction requirements (financial ledgers, order checkouts), structured schemas.",
+        "<strong>When to choose NoSQL:</strong> Massive write throughput (>100k QPS), unstructured/evolving schemas, global multi-region replication, horizontal scaling beyond single-node storage limits."
+      ],
+      "comparison_matrix": {
+        "title": "RDBMS vs NoSQL Core Comparison Matrix",
+        "columns": [
+          "Dimension",
+          "Relational Databases (RDBMS)",
+          "NoSQL Databases"
+        ],
+        "rows": [
+          [
+            "Data Model",
+            "Tables, Rows, Columns with fixed schema",
+            "Key-Value, Document (JSON/BSON), Wide-Column, Graph"
+          ],
+          [
+            "Transactions",
+            "Strict ACID guarantees",
+            "BASE (Basically Available, Soft state, Eventual consistency)"
+          ],
+          [
+            "Scalability",
+            "Vertical (Scale-up) primary + Read replicas",
+            "Horizontal (Scale-out) sharding across commodity nodes"
+          ],
+          [
+            "Query Mechanism",
+            "Structured SQL with complex JOINs",
+            "Primary Key / Partition Key lookups or specialized APIs"
+          ],
+          [
+            "Examples",
+            "PostgreSQL, MySQL, Oracle, SQLite",
+            "Redis, MongoDB, Apache Cassandra, Neo4j, DynamoDB"
+          ]
+        ]
+      },
+      "tradeoffs": "<strong>Trade-off:</strong> RDBMS offers strong relational integrity and complex query flexibility at the cost of horizontal write scaling limits; NoSQL offers near-infinite horizontal write scaling at the cost of eventual consistency and lack of multi-table JOINs.",
+      "failure_scenarios": "<strong>Scaling Out RDBMS Joins:</strong> Running a 6-table JOIN on an RDBMS table with 500 million rows locks tables, burns 100% CPU, and causes query timeouts. <em>Mitigation:</em> Denormalize query views or pre-aggregate data in read models.",
+      "common_mistakes": [
+        {
+          "mistake": "Assuming NoSQL is always faster than RDBMS for all workloads.",
+          "correction": "A properly indexed PostgreSQL query on a single machine easily outperforms a poorly keyed distributed NoSQL query."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "When would you deliberately choose a relational database over NoSQL in an interview?",
+          "answer": "When the system requires strict ACID transactions across multiple entities (e.g. banking transfers, order checkouts), when data has rich relational foreign-key connections requiring ad-hoc JOIN queries, or when data volume comfortably fits within a single primary database instance with read replicas."
+        }
+      ]
+    },
+    {
+      "id": "acid-transactions-explained",
+      "title": "ACID Properties: Atomicity, Consistency, Isolation & Durability",
+      "definition": "ACID is a set of four non-negotiable guarantees provided by database transaction management systems to ensure data reliability and validity despite software crashes, network partitions, or concurrent updates.",
+      "why_we_need_it": "In a financial money transfer of $100 from Account A to Account B, if the server crashes after deducting from A but before adding to B, money vanishes into thin air without ACID Atomicity guarantees.",
+      "real_world_analogy": "Sending an express delivery package: The delivery is an all-or-nothing event (Atomicity). The recipient must sign for it (Consistency). Other packages on the truck don't mix their contents (Isolation). Once delivered and signed, the package cannot vanish even if the truck breaks down later (Durability).",
+      "how_it_works": "<p>1. <strong>Atomicity:</strong> All operations in a transaction succeed or all are rolled back (All-or-Nothing). Implemented via Write-Ahead Logging (WAL) and undo logs.<br>2. <strong>Consistency:</strong> The transaction transitions database from one valid state to another, enforcing all constraints, triggers, and foreign keys.<br>3. <strong>Isolation:</strong> Concurrent transactions execute without interfering with one another. Implemented via Multi-Version Concurrency Control (MVCC) or 2-Phase Locking (2PL).<br>4. <strong>Durability:</strong> Once committed, updates survive power outages and server crashes. Implemented by flushing WAL to non-volatile disk (`fsync`).</p>",
+      "conceptual_breakdown": [
+        "<strong>WAL (Write-Ahead Logging):</strong> The database writes changes sequentially to an append-only transaction log on disk BEFORE modifying in-memory data pages.",
+        "<strong>fsync Trade-off:</strong> Executing `fsync` on every single commit guarantees durability but limits single-thread disk write throughput to ~1,000-5,000 QPS."
+      ],
+      "failure_scenarios": "<strong>Dirty Reads & Lost Updates:</strong> Without proper transaction isolation, Transaction A reads uncommitted data from Transaction B, which later rolls back, leading to catastrophic decision errors based on phantom data.",
+      "common_mistakes": [
+        {
+          "mistake": "Keeping long-running external HTTP API calls inside an open database transaction block.",
+          "correction": "Never make network I/O calls inside a DB transaction; it holds database locks open, exhausting connection pools."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Write-Ahead Logging (WAL) guarantee both Atomicity and Durability?",
+          "answer": "WAL records all intent modifications to an append-only log on disk before modifying database pages in RAM. On crash recovery, the database scans the WAL: committed transactions with unwritten pages are REDO-ed (Durability), while uncommitted in-flight transactions are UNDO-ed (Atomicity)."
+        }
+      ]
+    },
+    {
+      "id": "normalization-vs-denormalization",
+      "title": "Database Normalization (1NF to 3NF) vs Intentional Denormalization",
+      "definition": "Normalization is the systematic process of organizing database tables to eliminate data redundancy and anomalies (1NF, 2NF, 3NF, BCNF). Denormalization is the intentional re-introduction of redundancy to optimize read performance and eliminate expensive JOINs.",
+      "why_we_need_it": "Over-normalized databases require 8-table JOINs for simple web pages, causing severe query latency. Completely unnormalized databases suffer from update anomalies where editing a user's name leaves hundreds of rows with conflicting stale names.",
+      "real_world_analogy": "Normalization is keeping one master employee record and referencing Employee ID in 20 departments. Denormalization is printing the employee's name directly on every department door badge to avoid calling HR every time someone walks into a room.",
+      "how_it_works": "<p>1. <strong>1NF:</strong> Atomic values (no repeating groups/arrays in a single cell).<br>2. <strong>2NF:</strong> In 1NF and no partial dependencies on composite primary keys.<br>3. <strong>3NF:</strong> In 2NF and no transitive dependencies (non-key columns depend ONLY on primary key).<br>4. <strong>Denormalization:</strong> Storing `user_name` directly in `orders` table to display order histories in a single-table lookup without joining the `users` table.</p>",
+      "conceptual_breakdown": [
+        "<strong>Write-Heavy vs Read-Heavy:</strong> Normalization optimizes for write speed and storage integrity; Denormalization optimizes for read speed and throughput.",
+        "<strong>Sync Burden:</strong> When denormalized data is updated (e.g., user changes username), all duplicate copies must be updated asynchronously (via CDC or events)."
+      ],
+      "tradeoffs": "<strong>Trade-off:</strong> Denormalization achieves lightning-fast reads with zero JOINs in exchange for larger disk footprints and the complexity of keeping duplicate columns synchronized across tables.",
+      "failure_scenarios": "<strong>Update Anomaly in Denormalized Tables:</strong> A user changes their email address, but an async job fails halfway, leaving 50 historical order records with the old email and 50 with the new email. <em>Mitigation:</em> Use Transactional Outbox pattern or Event Sourcing to guarantee eventual consistency.",
+      "common_mistakes": [
+        {
+          "mistake": "Prematurely denormalizing database tables before identifying real read latency bottlenecks.",
+          "correction": "Start with 3NF normalization. Introduce selective denormalization only after profiling queries and verifying index optimizations are insufficient."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you maintain data consistency across denormalized tables in a microservices architecture?",
+          "answer": "Use Change Data Capture (CDC via Debezium/Kafka) or Domain Event Streams. When the primary entity updates, an event is emitted, and background consumer workers asynchronously update all denormalized projections."
+        }
+      ]
+    },
+    {
+      "id": "connection-pooling-and-locks",
+      "title": "Connection Pooling, Optimistic vs Pessimistic Locking & Deadlocks",
+      "definition": "Connection pooling reuses persistent database connections to eliminate the overhead of TCP and TLS handshakes. Concurrency locking controls access to shared database rows: Pessimistic Locking prevents concurrent modifications via explicit locks (`SELECT FOR UPDATE`), while Optimistic Locking validates record versions at commit time (`version = version + 1`).",
+      "why_we_need_it": "Opening a new PostgreSQL connection consumes ~10MB of server memory and requires a 3-way handshake + TLS negotiation. Creating 5,000 connections simultaneously exhausts server RAM and crashes the database.",
+      "real_world_analogy": "Connection Pooling is a taxi fleet: instead of buying a new car for every passenger and scrapping it after the trip, passengers share a pool of 50 active taxis. Pessimistic Locking is holding the taxi door shut while you shop; Optimistic Locking is letting anyone try to hail a cab, but only the first person to tap their card gets the ride.",
+      "how_it_works": "<p><strong>Connection Poolers (e.g., PgBouncer, HikariCP):</strong> Maintain a warm pool of 50-200 open backend connections, multiplexing thousands of incoming application client requests over them.<br><strong>Pessimistic Locking:</strong> Executes `SELECT * FROM inventory WHERE item_id = 1 FOR UPDATE`. Other transactions trying to read/modify item 1 are blocked until commit/rollback.<br><strong>Optimistic Locking:</strong> Executes `UPDATE inventory SET stock = stock - 1, version = version + 1 WHERE item_id = 1 AND version = 3`. If row count affected is 0, another transaction updated it first; application retries.</p>",
+      "conceptual_breakdown": [
+        "<strong>When to use Optimistic Locking:</strong> Low-to-moderate contention workloads (e.g. editing user profiles). High throughput, zero blocking.",
+        "<strong>When to use Pessimistic Locking:</strong> High-contention financial or ticket booking scenarios (e.g. reserving the last concert ticket) where rollback retries would be expensive.",
+        "<strong>Deadlocks:</strong> Occur when Transaction 1 holds Lock A and requests Lock B, while Transaction 2 holds Lock B and requests Lock A. DB engine detects cycles and aborts one transaction."
+      ],
+      "failure_scenarios": "<strong>Connection Pool Exhaustion:</strong> Application threads take connections from the pool but leak them due to unhandled exceptions, stalling all incoming requests. <em>Mitigation:</em> Strict connection acquisition timeouts (`connectionTimeout = 250ms`, `maxLifetime = 30min`).",
+      "common_mistakes": [
+        {
+          "mistake": "Acquiring locks in arbitrary order across multiple transactions, triggering database deadlocks.",
+          "correction": "Always enforce a globally consistent lock acquisition order (e.g. sort resource IDs in ascending order: Lock ID 10 then Lock ID 20)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why does setting a database connection pool size too high (e.g. 5,000) degrade performance rather than improve it?",
+          "answer": "Operating systems on multi-core CPUs spend more time performing CPU context switching and disk I/O queue contention than executing actual queries. The optimal pool size formula is `connections = (2 * CPU cores) + disk spindle count` (often ~20-50 connections for peak throughput)."
+        }
+      ]
+    }
+  ]
+}

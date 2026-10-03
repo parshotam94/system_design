@@ -1,0 +1,273 @@
+{
+  "module_id": "08",
+  "module_title": "Caching Strategies & Distributed Caches",
+  "description": "Master Cache-Aside, Read-Through, Write-Through, Write-Back, Redis vs Memcached architecture, eviction algorithms (LRU/LFU), and advanced failure traps (Stampede, Avalanche, Penetration).",
+  "topics": [
+    {
+      "id": "caching-fundamentals-and-locality",
+      "title": "Caching Fundamentals: Hits, Misses, TTL & Eviction Policies (LRU/LFU)",
+      "definition": "Caching is the practice of storing copies of data in high-speed volatile memory (RAM) to serve future requests with sub-millisecond latency and protect slow disk-based databases from excessive load.",
+      "why_we_need_it": "Reading from RAM takes ~100 nanoseconds, while reading from NVMe SSD takes ~100 microseconds (1,000x slower) and network DB queries take ~5 to 20 milliseconds (100,000x slower). Caching provides massive throughput acceleration.",
+      "real_world_analogy": "Keeping your favorite books on your desktop study table (RAM Cache) rather than walking to the national library (Disk/Database) every time you need to look up a sentence.",
+      "how_it_works": "<p>When a request arrives, the application checks the cache. A <strong>Cache Hit</strong> returns data immediately. A <strong>Cache Miss</strong> reads from the primary database, populates the cache with a <strong>Time-To-Live (TTL)</strong>, and returns the result. When memory is full, an <strong>Eviction Policy</strong> frees space.</p>",
+      "conceptual_breakdown": [
+        "<strong>Cache Hit Ratio:</strong> `Hits / (Hits + Misses)`. Production target is typically >95%.",
+        "<strong>LRU (Least Recently Used):</strong> Evicts items that haven't been accessed for the longest time (Doubly-Linked List + Hash Map, O(1)).",
+        "<strong>LFU (Least Frequently Used):</strong> Evicts items with the lowest access frequency counter.",
+        "<strong>FIFO & Random:</strong> Simpler eviction policies with lower memory overhead."
+      ],
+      "comparison_matrix": {
+        "title": "Cache Eviction Algorithms Comparison",
+        "columns": [
+          "Algorithm",
+          "Mechanism",
+          "Time Complexity",
+          "Memory Overhead",
+          "Best Use Case"
+        ],
+        "rows": [
+          [
+            "LRU (Least Recently Used)",
+            "Evicts oldest accessed item",
+            "O(1) Get & Put",
+            "Moderate (Doubly-linked list pointers)",
+            "General web applications & user sessions"
+          ],
+          [
+            "LFU (Least Frequently Used)",
+            "Evicts lowest hit counter",
+            "O(1) with frequency buckets",
+            "High (Counters + frequency lists)",
+            "Long-term static assets & video recommendation catalogs"
+          ],
+          [
+            "FIFO (First In First Out)",
+            "Evicts oldest inserted item",
+            "O(1) Queue",
+            "Very Low (Simple queue)",
+            "Time-series sequential logging"
+          ],
+          [
+            "TTL Eviction",
+            "Evicts when expiration timestamp passes",
+            "O(1) passive / O(N) active sampling",
+            "Low (Timestamp per key)",
+            "Transient auth tokens and rate-limiting counters"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Cache Polluting Scans:</strong> A large batch job scans millions of obscure records once, evicting all hot items from the LRU cache and dropping the cache hit ratio to 0%. <em>Mitigation:</em> Use 2-Queue (2Q) or Adaptive Replacement Cache (ARC) policies.",
+      "common_mistakes": [
+        {
+          "mistake": "Storing unbounded cache keys without configuring a TTL or MaxMemory Eviction Policy in Redis.",
+          "correction": "Always set a reasonable TTL and configure Redis `maxmemory-policy allkeys-lru`."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you implement an O(1) LRU Cache in code?",
+          "answer": "Combine a `std::unordered_map<Key, Node*>` for O(1) key lookups with a `Doubly-Linked List` of key-value nodes. On read/write, move the accessed node to the head of the list. On eviction, remove the node from the tail."
+        }
+      ]
+    },
+    {
+      "id": "caching-patterns-and-write-strategies",
+      "title": "Caching Patterns: Cache-Aside, Read-Through, Write-Through, Write-Back & Write-Around",
+      "definition": "Caching patterns dictate how applications synchronize data between the volatile cache and the persistent source-of-truth database during read and write operations.",
+      "why_we_need_it": "Without clear write synchronization strategies, caches quickly return stale, corrupted, or inconsistent data, leading to incorrect account balances or broken user states.",
+      "real_world_analogy": "Write-Through is paying cash at a store counter and receiving an instant paper receipt stamped in the cash register ledger. Write-Back is leaving your order on a restaurant tab; the waiter batches and settles the charges at the end of the night.",
+      "how_it_works": "<p>1. <strong>Cache-Aside (Lazy Loading):</strong> Application code directly coordinates both cache and DB. On read: check cache, on miss read DB and write to cache. On write: write to DB, then invalidate (delete) cache key.<br>2. <strong>Read-Through / Write-Through:</strong> Application treats cache as main store; cache library automatically fetches from or writes synchronously to DB.<br>3. <strong>Write-Back (Write-Behind):</strong> Application writes to cache immediately; cache asynchronously batches writes to DB in background (extreme write throughput, risk of data loss on crash).<br>4. <strong>Write-Around:</strong> Writes go directly to DB bypassing cache entirely. Cache is only populated on subsequent read misses.</p>",
+      "conceptual_breakdown": [
+        "<strong>Cache Invalidation Rule:</strong> Always <em>DELETE</em> the cache key on DB write rather than updating it, avoiding race conditions with concurrent writes.",
+        "<strong>Write-Back Superpower:</strong> Absorbs massive write spikes (e.g., IoT sensor telemetry, gaming leaderboards) by batching 10,000 writes into 1 bulk DB INSERT."
+      ],
+      "arch_diagram": {
+        "title": "Caching Topologies & Synchronization Patterns",
+        "tiers": [
+          {
+            "label": "App Layer",
+            "nodes": [
+              {
+                "name": "Application Service",
+                "type": "service",
+                "icon": "\u26a1",
+                "what": "Executes domain business operations",
+                "why": "Controls caching decisions",
+                "when": "Every incoming user read/write",
+                "failure": "Graceful fallback to DB on cache outage"
+              }
+            ]
+          },
+          {
+            "label": "Cache Layer",
+            "nodes": [
+              {
+                "name": "Redis Distributed Cache",
+                "type": "cache",
+                "icon": "\ud83d\udd34",
+                "what": "In-memory key-value store",
+                "why": "Sub-millisecond read access",
+                "when": "Hot data reads",
+                "failure": "Redis Sentinel / Cluster master failover"
+              }
+            ]
+          },
+          {
+            "label": "Persistent Storage",
+            "nodes": [
+              {
+                "name": "PostgreSQL Primary DB",
+                "type": "database",
+                "icon": "\ud83d\udc18",
+                "what": "Durable ACID relational database",
+                "why": "Single source of truth",
+                "when": "Cache misses and transactional mutations",
+                "failure": "Synchronous standby replica promotion"
+              }
+            ]
+          }
+        ]
+      },
+      "tradeoffs": "<strong>Trade-off:</strong> Cache-Aside provides high resilience (cache outage doesn't stop reads) with eventual consistency; Write-Through guarantees zero stale reads with higher write latency.",
+      "failure_scenarios": "<strong>Write-Back Data Loss on Node Crash:</strong> If an in-memory cache node dies before dirty pages are flushed to the database, recent writes are permanently lost. <em>Mitigation:</em> Use Write-Back only for non-critical telemetry or ensure battery-backed RAM / append-only files (AOF).",
+      "common_mistakes": [
+        {
+          "mistake": "Updating the cache value directly on write instead of invalidating (deleting) the key.",
+          "correction": "Deleting the key prevents race conditions where an earlier slow write overwrites a newer fast write in the cache."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why should you invalidate (delete) a cache key rather than update it when updating a database record?",
+          "answer": "If two concurrent requests A and B update the same record, Request A might write to DB first, then Request B writes to DB, but Request A updates the cache second due to network jitter, leaving the cache permanently holding stale data from A. Deleting the key forces the next read to fetch the latest state from the DB."
+        }
+      ]
+    },
+    {
+      "id": "redis-vs-memcached-distributed-cache",
+      "title": "Distributed Caching: Redis Architecture vs Memcached",
+      "definition": "Redis and Memcached are the two industry-standard in-memory distributed caching engines. Redis provides rich data structures, persistence, pub/sub, and replication, while Memcached provides simple multi-threaded key-value caching.",
+      "why_we_need_it": "A single application server's local in-memory cache is isolated; when multiple servers scale horizontally, a distributed cache provides a single unified cache tier shared across all nodes.",
+      "real_world_analogy": "Memcached is a high-speed post office locker: simple, ultra-fast, multi-threaded storage. Redis is a Swiss Army Command Center: it holds lockers, sorts documents, keeps backup copies in a safe, and broadcasts alerts over loudspeakers.",
+      "how_it_works": "<p><strong>Memcached:</strong> Pure multi-threaded key-value store. Scales vertically across multi-core CPUs easily. Data is strictly non-persistent strings/blobs.<br><strong>Redis:</strong> Single-threaded event loop (using `epoll`/`kqueue`) for atomic operations with multi-threaded I/O in Redis 6+. Supports Strings, Hashes, Lists, Sets, Sorted Sets (ZSETs), Bitmaps, HyperLogLogs, Geospatial indexes, Lua scripts, and persistence via RDB snapshots & AOF logs.</p>",
+      "conceptual_breakdown": [
+        "<strong>Redis Atomicity:</strong> Single-threaded core execution guarantees that commands like `INCR`, `HSET`, and Lua scripts execute atomically without lock contention.",
+        "<strong>Redis Clustering:</strong> Shards keys across 16,384 hash slots using CRC16 hashing, supporting master-replica failover.",
+        "<strong>Memcached Simplicity:</strong> Better for simple large blob caching where multi-core vertical scaling is desired."
+      ],
+      "comparison_matrix": {
+        "title": "Redis vs Memcached Architectural Comparison",
+        "columns": [
+          "Feature",
+          "Redis",
+          "Memcached"
+        ],
+        "rows": [
+          [
+            "Data Structures",
+            "Strings, Hashes, Lists, Sets, Sorted Sets, Streams",
+            "Simple Key-Value strings only"
+          ],
+          [
+            "Threading Model",
+            "Single-threaded execution loop + Multi-threaded I/O",
+            "Multi-threaded (Scales cleanly on multi-core)"
+          ],
+          [
+            "Persistence",
+            "RDB Snapshots + Append-Only File (AOF)",
+            "None (Pure volatile RAM)"
+          ],
+          [
+            "Replication & High Availability",
+            "Built-in Redis Sentinel & Redis Cluster",
+            "None (Relies on client-side consistent hashing)"
+          ],
+          [
+            "Pub/Sub & Streaming",
+            "Native Pub/Sub & Redis Streams",
+            "None"
+          ],
+          [
+            "Primary Use Case",
+            "Complex caching, leaderboards, rate limiters, sessions",
+            "High-throughput static key-value caching"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Redis Long-Running Command Blockage:</strong> Running `KEYS *` or huge `HGETALL` commands on a million-item hash blocks the single-threaded event loop, stalling all client requests globally. <em>Mitigation:</em> Use `SCAN` and `HSCAN` instead of blocking wildcard commands.",
+      "common_mistakes": [
+        {
+          "mistake": "Running `KEYS *` in a production Redis cluster.",
+          "correction": "Disable `KEYS` command via `rename-command KEYS ''` in `redis.conf` and use cursor-based `SCAN`."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Redis achieve high performance despite being primarily single-threaded?",
+          "answer": "It operates entirely in volatile RAM (zero disk seek latency), utilizes non-blocking I/O multiplexing (`epoll`/`kqueue`) to handle tens of thousands of concurrent network sockets, and avoids CPU context switching and lock contention overheads."
+        }
+      ]
+    },
+    {
+      "id": "cache-stampede-avalanche-penetration",
+      "title": "Cache Traps: Stampede, Avalanche, Penetration, Hot Key Mitigation & Mutex Locks",
+      "definition": "Cache failure traps are systemic breakdown modes where cache misses, expirations, or malicious queries bypass the cache tier and overwhelm backend databases, causing catastrophic cascading outages.",
+      "why_we_need_it": "A system operating at 99% cache hit ratio under 100,000 QPS only sends 1,000 QPS to the database. If a cache failure occurs, the full 100,000 QPS hits the database instantly, destroying it within seconds.",
+      "real_world_analogy": "A security gate at a stadium: Normally guards check tickets in 1 second. If the gate breaks (cache miss), thousands of fans rush the small entrance door simultaneously, crushing the ticket collectors.",
+      "how_it_works": "<p>1. <strong>Cache Stampede (Thundering Herd):</strong> A high-traffic key expires; thousands of concurrent requests miss simultaneously and all query the DB to recompute the same key.<br>2. <strong>Cache Avalanche:</strong> Many keys are set with identical TTLs (e.g. 3600s); they all expire at the exact same second, dumping massive traffic on the DB.<br>3. <strong>Cache Penetration:</strong> Malicious requests query non-existent IDs (e.g. `GET /user/-999`); cache misses every time and hits the DB.<br>4. <strong>Hot Key Saturation:</strong> A celebrity account (e.g., Justin Bieber) gets 500k QPS directed to a single Redis node, saturating its network NIC.</p>",
+      "conceptual_breakdown": [
+        "<strong>Stampede Mitigation:</strong> Distributed Mutex Lock (only 1 thread queries DB; others wait/retry) or Probabilistic Early Expiration (XFetch algorithm).",
+        "<strong>Avalanche Mitigation:</strong> Add random jitter to TTLs: `TTL = 3600 + rand(0, 300)` seconds.",
+        "<strong>Penetration Mitigation:</strong> Bloom Filters (reject invalid keys before hitting DB) or Cache Null Objects with short TTL (e.g. 30s).",
+        "<strong>Hot Key Mitigation:</strong> Local in-memory caching (Caffeine/L1) on application servers or Key Replicas with random suffixes (`key_1`, `key_2`)."
+      ],
+      "system_flow_animation": {
+        "title": "Cache Stampede Distributed Mutex Protection Flow",
+        "steps": [
+          {
+            "num": 1,
+            "title": "Cache Miss for Hot Key",
+            "actor": "1,000 Concurrent Requests -> Cache",
+            "desc": "Key 'trending_news' expires. 1,000 concurrent threads detect a cache miss.",
+            "node": "Redis Distributed Cache"
+          },
+          {
+            "num": 2,
+            "title": "Distributed Lock Acquisition",
+            "actor": "Request #1 -> Redis SETNX",
+            "desc": "Thread #1 successfully acquires lock 'lock:trending_news' via SETNX with 5s lease.",
+            "node": "Application Service"
+          },
+          {
+            "num": 3,
+            "title": "Remaining Requests Wait",
+            "actor": "Requests #2-1000 -> Sleep & Retry",
+            "desc": "Remaining 999 threads fail to acquire lock, sleep 50ms, and retry reading cache.",
+            "node": "Application Service"
+          },
+          {
+            "num": 4,
+            "title": "Database Query & Cache Refresh",
+            "actor": "Request #1 -> DB -> Cache",
+            "desc": "Thread #1 queries DB, updates Redis with new TTL, releases lock. Remaining 999 threads now hit warm cache!",
+            "node": "PostgreSQL Primary DB"
+          }
+        ]
+      },
+      "failure_scenarios": "<strong>Bloom Filter False Positives vs False Negatives:</strong> A Bloom Filter can return a False Positive (says key exists when it doesn't), which safely falls back to DB, but it NEVER returns a False Negative (if it says key does not exist, it definitely does not exist).",
+      "common_mistakes": [
+        {
+          "mistake": "Setting fixed round TTLs (e.g. exactly 1 hour) across all cached database records.",
+          "correction": "Always introduce random TTL jitter (`TTL + random(-10%, +10%)`) to prevent simultaneous Cache Avalanche."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does a Bloom Filter prevent Cache Penetration in high-scale systems?",
+          "answer": "A Bloom Filter is a memory-efficient probabilistic data structure that hashes incoming keys across bit arrays. If the Bloom Filter indicates a key does not exist, the application immediately returns 404 without querying either the cache or the database."
+        }
+      ]
+    }
+  ]
+}

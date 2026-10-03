@@ -1,0 +1,124 @@
+{
+  "module_id": "15",
+  "module_title": "Message Queues & Event Streaming",
+  "description": "Master asynchronous messaging: RabbitMQ vs Apache Kafka, SQS vs SNS, Publish-Subscribe topologies, consumer groups, backpressure, and Dead-Letter Queues (DLQ).",
+  "topics": [
+    {
+      "id": "message-queue-fundamentals",
+      "title": "Message Queues vs Event Streams: Push vs Pull & Point-to-Point vs Pub/Sub",
+      "definition": "Message Queues (RabbitMQ, SQS) buffer transient messages for point-to-point worker task execution with individual message acknowledgments and deletions. Event Streaming platforms (Apache Kafka, Apache Pulsar) record continuous, immutable, ordered append-only logs replayed by multiple consumer groups at their own pace.",
+      "why_we_need_it": "Synchronous HTTP calls couple services tightly: if Service B is slow or down, Service A fails. Message brokers decouple producer execution, absorb massive traffic spikes, and guarantee reliable asynchronous delivery.",
+      "real_world_analogy": "A Message Queue is an individual postal mailbox: you drop a letter in, a postal worker picks it up, delivers it, and shreds the envelope once processed. An Event Stream is a continuous recorded TV broadcast: viewers can tune in live, rewind to yesterday's news, or re-watch episodes from the beginning.",
+      "how_it_works": "<p><strong>Message Queues (Push model / Smart Broker):</strong> Broker tracks individual message delivery, routing messages to available consumer workers via AMQP/HTTP. Messages are deleted upon ACK.<br><strong>Event Streams (Pull model / Dumb Broker, Smart Consumer):</strong> Broker appends events sequentially to disk partitions. Consumers pull batches of messages and track their own cursor position (Offset). Messages persist on disk according to retention policies (e.g. 7 days).</p>",
+      "conceptual_breakdown": [
+        "<strong>Point-to-Point:</strong> Each message is consumed by exactly ONE worker in the consumer pool.",
+        "<strong>Publish-Subscribe (Pub/Sub):</strong> A single published message is broadcast and copied to ALL subscribed queues/services.",
+        "<strong>Backpressure:</strong> Pull-based consumers only fetch as many messages as they have CPU capacity to process, preventing server out-of-memory crashes."
+      ],
+      "comparison_matrix": {
+        "title": "Message Queues (RabbitMQ/SQS) vs Event Streams (Kafka)",
+        "columns": [
+          "Feature",
+          "Message Queues (RabbitMQ / SQS)",
+          "Event Streaming (Apache Kafka / Pulsar)"
+        ],
+        "rows": [
+          [
+            "Data Model",
+            "Transient messages deleted upon ACK",
+            "Persistent, immutable append-only commit log"
+          ],
+          [
+            "Delivery Paradigm",
+            "Push (Broker pushes to workers)",
+            "Pull (Consumers poll batches from brokers)"
+          ],
+          [
+            "Message Ordering",
+            "Strict within single FIFO queue",
+            "Strict within individual partition only"
+          ],
+          [
+            "Message Replay",
+            "Not possible (Deleted once consumed)",
+            "Supported (Reset offset to replay historical data)"
+          ],
+          [
+            "Throughput",
+            "Moderate (10k - 50k msgs/sec)",
+            "Massive (Millions of events/sec via sequential disk I/O)"
+          ],
+          [
+            "Best Use Case",
+            "Background task jobs, complex routing, notifications",
+            "Real-time analytics, event sourcing, CDC, clickstreams"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Poison Pill Crash Loops:</strong> A malformed message causes the worker process to crash with an unhandled exception before sending an ACK. The broker requeues the message, sending it to another worker which also crashes, taking down the entire worker fleet in minutes. <em>Mitigation:</em> Configure Dead-Letter Queues (DLQ) with max retry counts.",
+      "common_mistakes": [
+        {
+          "mistake": "Using Apache Kafka as a simple task queue with individual message acknowledgments and arbitrary delays.",
+          "correction": "Use RabbitMQ or AWS SQS for individual task routing and delay queues; use Kafka for high-throughput stream processing."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is Kafka's pull-based consumer architecture superior to push-based brokers for high-throughput stream processing?",
+          "answer": "Pull-based architecture prevents fast producers from overwhelming slow consumers (built-in backpressure). Consumers control their own polling rate, batch sizes, and memory usage, and can easily replay past data by seeking their offset backwards."
+        }
+      ]
+    },
+    {
+      "id": "kafka-architecture-deep-dive",
+      "title": "Apache Kafka Internals: Topics, Partitions, Offsets & KRaft",
+      "definition": "Apache Kafka is a distributed event store and stream processing platform designed for high throughput (>1M events/sec), horizontal scalability, and low latency (<10ms) using sequential disk I/O and Zero-Copy networking.",
+      "why_we_need_it": "Modern platforms generate billions of telemetry events, audit logs, and transaction streams daily. Kafka serves as the central nervous system connecting microservices and data pipelines.",
+      "real_world_analogy": "A mega-highway with multiple parallel lanes (Partitions). Cars (Events) travel down specific lanes based on their license plate hash. Multiple buses (Consumer Group instances) drive on separate lanes simultaneously without colliding.",
+      "how_it_works": "<p>1. <strong>Topics & Partitions:</strong> A Topic is sharded into multiple Partitions distributed across broker nodes. Partitions are the unit of parallelism.<br>2. <strong>Producers & Partitioning:</strong> Events with identical keys (`user_id`) hash to the SAME partition, guaranteeing strict per-key FIFO ordering.<br>3. <strong>Consumer Groups:</strong> Each partition in a topic is consumed by exactly ONE consumer instance within a consumer group.<br>4. <strong>High-Performance Secrets:</strong> Sequential Disk I/O (as fast as RAM), OS Page Cache, and Zero-Copy network transfer (`sendfile` system call transferring disk data directly to network socket without user-space buffer copies).<br>5. <strong>KRaft:</strong> Modern Kafka consensus protocol replacing external Zookeeper with built-in Raft quorum controllers.</p>",
+      "conceptual_breakdown": [
+        "<strong>Replication Factor (RF):</strong> Each partition has 1 Leader replica and $N-1$ In-Sync Replicas (ISR).",
+        "<strong>`acks=all`:</strong> Producer waits for all ISR replicas to commit before acknowledging success.",
+        "<strong>Consumer Rebalance:</strong> When a consumer joins or leaves, Kafka reassigns partition ownership across group members."
+      ],
+      "failure_scenarios": "<strong>Partition Skew & Hot Partitioning:</strong> If all producers send events with `null` keys or identical keys, 100% of traffic flows to Partition 0, overloading 1 broker while remaining partitions sit idle. <em>Mitigation:</em> Choose high-cardinality partition keys or use default round-robin sticky partitioner.",
+      "common_mistakes": [
+        {
+          "mistake": "Adding more consumer instances than the total number of partitions in a Kafka topic.",
+          "correction": "In Kafka, a single partition can only be consumed by 1 consumer per group. Excess consumers will sit completely idle."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Kafka achieve millions of writes per second on standard mechanical hard drives?",
+          "answer": "Kafka relies exclusively on Sequential Disk Append writes (avoiding random disk seek penalties), utilizes the Linux OS Page Cache heavily, batches network requests, and utilizes OS Zero-Copy (`sendfile`) to stream data directly from page cache to network sockets without CPU copying."
+        }
+      ]
+    },
+    {
+      "id": "sqs-sns-and-cloud-messaging",
+      "title": "AWS SQS, SNS & EventBridge: Fan-Out & Dead-Letter Queues",
+      "definition": "AWS SNS is a managed serverless pub/sub topic service that fans out messages to multiple subscribers. AWS SQS is a distributed message queue service for decoupling worker jobs. SNS + SQS Fan-Out is a foundational cloud architecture pattern.",
+      "why_we_need_it": "When a user places an order, multiple independent subsystems (Inventory, Payment, Shipping, Email) must execute tasks asynchronously without the checkout API making 4 separate HTTP calls.",
+      "real_world_analogy": "A radio station broadcast (SNS): the DJ speaks once over the antenna. Five different people in five different rooms have their own cassette recorders (SQS Queues) recording the song to listen to later.",
+      "how_it_works": "<p>1. <strong>SNS + SQS Fan-Out:</strong> Producer sends a single message to an SNS Topic. SNS immediately pushes copies to 4 distinct SQS queues (OrderQueue, EmailQueue, AnalyticsQueue, InventoryQueue).<br>2. <strong>Visibility Timeout (SQS):</strong> When a worker receives a message, SQS hides it from other workers for 30s. If the worker deletes the message within 30s, it is completed. If the worker crashes, the visibility timeout expires and the message becomes visible to other workers automatically.<br>3. <strong>Dead-Letter Queue (DLQ):</strong> If a message fails processing `maxReceiveCount = 3` times, SQS moves it to a DLQ for manual inspection.</p>",
+      "conceptual_breakdown": [
+        "<strong>Standard vs FIFO SQS:</strong> Standard provides nearly unlimited throughput with at-least-once delivery and best-effort ordering; FIFO guarantees strict ordering and exactly-once deduplication up to 3,000 msgs/sec.",
+        "<strong>Long Polling:</strong> SQS `WaitTimeSeconds = 20` reduces API cost and latency by holding connections open until a message arrives."
+      ],
+      "failure_scenarios": "<strong>Visibility Timeout Exceeded on Slow Tasks:</strong> A worker takes 45 seconds to generate a PDF report with a 30s Visibility Timeout. SQS assumes the worker died and redelivers the message to a second worker, causing duplicate PDF processing. <em>Mitigation:</em> Extend the visibility timeout dynamically via `ChangeMessageVisibility` heartbeat calls.",
+      "common_mistakes": [
+        {
+          "mistake": "Using short polling (`WaitTimeSeconds = 0`) resulting in millions of empty SQS API requests on AWS billing.",
+          "correction": "Always configure SQS Long Polling (`WaitTimeSeconds = 20`)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does the SNS-to-SQS Fan-Out pattern ensure fault isolation between microservices?",
+          "answer": "Each subscriber microservice consumes from its own dedicated SQS queue. If the Email Service experiences an outage and stops consuming, its queue buffers messages safely without affecting or delaying the Payment, Inventory, or Shipping services."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "module_id": "12",
+  "module_title": "Database Scaling & Sharding",
+  "description": "Master Read Replicas, Master-Slave vs Multi-Master replication, Horizontal Sharding, Shard Keys, Resharding, and Distributed 2-Phase Commit (2PC) transactions.",
+  "topics": [
+    {
+      "id": "read-replicas-and-replication-lag",
+      "title": "Primary-Replica Topologies, Async vs Sync Replication & Lag",
+      "definition": "Primary-Replica (Master-Slave) replication separates write operations (directed exclusively to 1 Primary instance) from read operations (distributed across multiple Read Replicas) via transaction log streaming.",
+      "why_we_need_it": "90% of web workloads are read-heavy (e.g., 95% reads, 5% writes). Adding 5 read replicas scales read capacity by 5x without modifying database schemas.",
+      "real_world_analogy": "A newspaper printing press: 1 author writes the master article (Primary); 10 delivery vans distribute copies to readers across the city (Replicas). Readers don't need to visit the author's desk to read the news.",
+      "how_it_works": "<p>1. <strong>Synchronous Replication:</strong> Primary writes WAL and waits for replica ACK before committing to client (Zero data loss, high write latency).<br>2. <strong>Asynchronous Replication:</strong> Primary commits immediately, streaming WAL logs in background (Sub-millisecond writes, risk of Replication Lag and data loss on primary crash).<br>3. <strong>Semi-Synchronous:</strong> Primary waits for at least 1 replica to ACK receipt before committing.</p>",
+      "conceptual_breakdown": [
+        "<strong>Replication Lag:</strong> The time delay (e.g. 50ms to 2s) between a commit on the primary and its replay on a read replica.",
+        "<strong>Read-Your-Own-Writes Consistency:</strong> After a user posts a comment, routing their immediate next read to the Primary (or waiting for replica LSN) so they don't see their own comment disappear."
+      ],
+      "failure_scenarios": "<strong>Split-Brain in Auto-Failover:</strong> A network glitch isolates the Primary; the cluster elects a new Primary. When the old Primary reconnects, both accept writes simultaneously, causing diverging incompatible databases. <em>Mitigation:</em> Enforce STONITH (Shoot The Other Node In The Head) fencing and Quorum elections.",
+      "common_mistakes": [
+        {
+          "mistake": "Routing immediate post-action UI reads to read replicas, causing users to see stale data.",
+          "correction": "Route the modifying user's reads to the Primary for a short grace window (e.g., 2 seconds)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you achieve Read-Your-Own-Writes consistency in an asynchronous replica architecture?",
+          "answer": "Route reads to the Primary DB for recently updated users (based on a short session cookie timestamp), use Replica Lag Tokens (tracking Log Sequence Numbers / LSNs), or pin the user's reads to the primary for 2-5 seconds after any write operation."
+        }
+      ]
+    },
+    {
+      "id": "horizontal-sharding-and-partitioning",
+      "title": "Horizontal Sharding: Range, Hash & Directory-Based Sharding",
+      "definition": "Database Sharding is the horizontal partitioning of a massive database dataset across multiple independent database server instances (Shards), each holding a subset of total rows.",
+      "why_we_need_it": "When database storage exceeds 10TB or write QPS exceeds single-server limits (>20,000 writes/sec), vertical scaling hits a physical hardware wall. Sharding distributes data and write traffic across N database machines.",
+      "real_world_analogy": "Dividing a 5,000-page encyclopedia into 26 distinct physical volumes (A, B, C... Z). If 26 researchers want to read different letters, they all read their own volume simultaneously with zero contention.",
+      "how_it_works": "<p>1. <strong>Hash-Based Sharding:</strong> `Shard_ID = Hash(ShardKey) % Num_Shards`. Provides uniform data distribution across all shards.<br>2. <strong>Range-Based Sharding:</strong> Divides data by contiguous key ranges (e.g. User IDs 1-1M -> Shard 1, 1M-2M -> Shard 2). Allows fast range scans but creates hot spots for recent auto-increment IDs.<br>3. <strong>Directory-Based (Lookup Table):</strong> A central lookup service maps Shard Keys to Shard IDs, enabling dynamic rebalancing without complex mathematical remapping.</p>",
+      "conceptual_breakdown": [
+        "<strong>Shard Key Selection:</strong> The single most critical architectural decision. A good shard key has high cardinality, uniform distribution, and matches primary query access patterns (e.g., `user_id` or `tenant_id`).",
+        "<strong>Cross-Shard Queries:</strong> A query without a shard key (e.g. `SELECT * FROM orders WHERE status = 'PENDING'`) must scatter-gather to ALL shards, destroying performance."
+      ],
+      "failure_scenarios": "<strong>Celebrity Shard Hotspotting:</strong> Sharding Twitter by `user_id` places Elon Musk on Shard 4. Whenever he tweets, millions of likes hit Shard 4, blowing its CPU while Shards 1, 2, 3 sit at 5% load. <em>Mitigation:</em> Hybrid fan-out routing or separate hot-user partitions.",
+      "common_mistakes": [
+        {
+          "mistake": "Sharding by auto-incrementing `created_at` timestamp.",
+          "correction": "This routes 100% of all current write traffic to the single latest shard, completely defeating the purpose of sharding."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What are the major challenges introduced when sharding a relational database?",
+          "answer": "Loss of cross-shard foreign keys and JOINs, complex distributed transactions (requiring 2PC or Sagas), scatter-gather query latency, and high operational overhead when resharding/rebalancing data as the cluster grows."
+        }
+      ]
+    },
+    {
+      "id": "resharding-and-zero-downtime-migration",
+      "title": "Resharding Strategies & Zero-Downtime Data Migration",
+      "definition": "Resharding is the process of splitting existing overloaded shards or increasing the total shard count (e.g. from 16 to 32 shards) while maintaining 100% live production availability and data integrity.",
+      "why_we_need_it": "As business data grows 10x, initial shard storage fills up. Migrating petabytes of live operational data without taking the platform offline is a premier system design challenge.",
+      "real_world_analogy": "Widening a 4-lane highway into an 8-lane highway while 100,000 cars are actively driving on it at 70 mph without stopping traffic.",
+      "how_it_works": "<p>The standard 4-phase Zero-Downtime Migration Pattern:<br>1. <strong>Dual Writing:</strong> Application writes new data to BOTH old and new shard topologies simultaneously.<br>2. <strong>Backfill:</strong> Background batch workers copy historical data from old shards to new shards with Change Data Capture (CDC) deduplication.<br>3. <strong>Data Validation:</strong> Automated verification reconciles checksums between old and new shards.<br>4. <strong>Cutover:</strong> Switch read traffic to new shards, monitor error rates for 48 hours, then turn off writes to old shards.</p>",
+      "conceptual_breakdown": [
+        "<strong>Virtual Shards:</strong> Start with 1,024 virtual shards mapped to 16 physical machines (64 per machine). Scaling to 32 machines simply moves 32 virtual shards to each new machine without changing hash formulas.",
+        "<strong>CDC (Change Data Capture):</strong> Debezium streaming database WAL logs to Kafka guarantees no writes are lost during the multi-hour backfill phase."
+      ],
+      "failure_scenarios": "<strong>Dual-Write Race Conditions:</strong> Writing to Old DB then New DB without distributed transaction guarantees can leave New DB with corrupted or partial records if the application crashes between writes. <em>Mitigation:</em> Use CDC from the Old DB WAL to populate New DB asynchronously instead of in-app dual writing.",
+      "common_mistakes": [
+        {
+          "mistake": "Attempting resharding via a scheduled maintenance downtime window for large datasets.",
+          "correction": "Always implement zero-downtime CDC backfill and virtual sharding topologies."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Virtual Sharding (Pre-Sharding) simplify database scaling?",
+          "answer": "By creating a large fixed number of logical shards (e.g. 1,024) on day one mapped to a few physical servers, future scaling only requires migrating logical database files between servers rather than recomputing shard key hash algorithms across billions of rows."
+        }
+      ]
+    },
+    {
+      "id": "distributed-transactions-and-2pc",
+      "title": "Distributed Transactions: Two-Phase Commit (2PC) vs Sagas",
+      "definition": "Two-Phase Commit (2PC) is a distributed consensus protocol that guarantees ACID atomic transactions across multiple distinct database shards or services. Sagas manage distributed transactions via a sequence of local transactions coordinated with compensating rollback events.",
+      "why_we_need_it": "When financial transfers or order bookings span multiple sharded databases, either all shards commit or all roll back; partial commits corrupt data integrity.",
+      "real_world_analogy": "2PC is a wedding ceremony: The coordinator asks Partner A 'Do you take...?' (Prepare). Partner A says 'I do'. Coordinator asks Partner B (Prepare). Partner B says 'I do'. Coordinator says 'I now pronounce you married' (Commit). If either says 'No', the wedding is cancelled (Abort).",
+      "how_it_works": "<p><strong>2PC Protocol:</strong><br>&bull; <em>Phase 1 (Prepare):</em> Coordinator asks all participants to prepare and lock rows. Nodes write to WAL and respond 'VOTE_COMMIT' or 'VOTE_ABORT'.<br>&bull; <em>Phase 2 (Commit):</em> If ALL voted yes, coordinator logs 'GLOBAL_COMMIT' and sends commit command. If anyone voted no or timed out, coordinator sends 'GLOBAL_ABORT'.<br><strong>Sagas:</strong> Avoids blocking locks. Step 1 commits locally. If Step 3 fails, the saga orchestrator executes Compensating Actions for Steps 2 and 1 in reverse order.</p>",
+      "conceptual_breakdown": [
+        "<strong>2PC Blocking Vulnerability:</strong> If the Coordinator crashes during Phase 2, participant shards hold database row locks indefinitely, blocking all other transactions.",
+        "<strong>Saga Eventual Consistency:</strong> Trades isolation for high throughput; intermediate uncommitted states are visible to other users."
+      ],
+      "comparison_matrix": {
+        "title": "Two-Phase Commit (2PC) vs Saga Pattern",
+        "columns": [
+          "Feature",
+          "Two-Phase Commit (2PC)",
+          "Saga Pattern (Orchestrated/Choreographed)"
+        ],
+        "rows": [
+          [
+            "ACID Guarantee",
+            "Full ACID (Strong Consistency & Isolation)",
+            "ACD (Eventual Consistency, No Isolation)"
+          ],
+          [
+            "Locking & Latency",
+            "Heavy blocking locks held across network round-trips",
+            "Zero distributed locks; fast local commits"
+          ],
+          [
+            "Failure Recovery",
+            "Automatic rollback via WAL logs",
+            "Application-level Compensating Transactions"
+          ],
+          [
+            "Scalability & Throughput",
+            "Poor (Bottlenecks at scale >10 nodes)",
+            "Extremely High (Asynchronous event-driven)"
+          ],
+          [
+            "Best Use Case",
+            "Internal sharded RDBMS partitions",
+            "Cross-microservice business workflows"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Coordinator Crash in 2PC:</strong> Shard 1 voted yes and is holding locks waiting for the coordinator's commit message. The coordinator crashes. Shard 1 cannot commit or abort on its own, locking out all traffic on those rows. <em>Mitigation:</em> 3-Phase Commit (3PC) or Paxos-backed consensus coordinators.",
+      "common_mistakes": [
+        {
+          "mistake": "Using 2PC across microservices spanning multiple cloud regions or third-party APIs.",
+          "correction": "Use Sagas with Idempotent Compensating Actions for distributed microservices."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is Two-Phase Commit rarely used in modern high-throughput internet-scale microservices?",
+          "answer": "2PC is a synchronous, blocking protocol. Holding distributed database locks across network boundaries dramatically increases latency, degrades throughput, and creates availability vulnerabilities whenever any participating node or network link stutters."
+        }
+      ]
+    }
+  ]
+}

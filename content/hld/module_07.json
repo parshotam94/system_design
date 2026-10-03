@@ -1,0 +1,241 @@
+{
+  "module_id": "07",
+  "module_title": "Load Balancing & Reverse Proxies",
+  "description": "Master Layer 4 vs Layer 7 load balancing, balancing algorithms (Round Robin, Least Connections, Consistent Hashing), active health checking, SSL termination, and high-availability failover.",
+  "topics": [
+    {
+      "id": "why-load-balancing-l4-vs-l7",
+      "title": "Why Load Balancers? Layer 4 (Transport) vs Layer 7 (Application) Routing",
+      "definition": "Load Balancers distribute incoming network traffic across multiple backend servers to prevent overload, eliminate single points of failure, and maximize throughput. Layer 4 operates at the transport layer (TCP/UDP IPs & Ports), while Layer 7 operates at the application layer (HTTP headers, URLs, cookies).",
+      "why_we_need_it": "A single web server can only handle a finite number of concurrent TCP connections and CPU requests. Load balancing allows horizontal scaling from 1 server to thousands seamlessly behind a single stable IP.",
+      "real_world_analogy": "L4 is like a postal sorting office routing packages based only on the ZIP code on the envelope (IP/Port). L7 is like an executive assistant opening the letter, reading the request (HTTP header/URL), and forwarding it to the exact department specialist.",
+      "how_it_works": "<p><strong>Layer 4 LB (e.g., AWS NLB, Linux IPVS, HAProxy TCP mode):</strong> Routes raw TCP packets using a 5-tuple hash (Source IP, Source Port, Dest IP, Dest Port, Protocol) without decrypting TLS or inspecting HTTP headers. Extremely high throughput (>10M packets/sec).<br><strong>Layer 2/7 LB (e.g., AWS ALB, NGINX, Envoy):</strong> Terminates TLS, parses HTTP headers/paths (e.g., `/api/v1/video` -> Video Cluster, `/api/v1/auth` -> Auth Cluster), inspects cookies for sticky sessions, and applies rate limiting.</p>",
+      "conceptual_breakdown": [
+        "<strong>L4 Advantages:</strong> Minimal CPU overhead, ultra-low latency (<1ms), packet-level NAT routing.",
+        "<strong>L7 Advantages:</strong> Intelligent content-based routing, header mutation, TLS offloading, gzip compression, and granular microservice path routing.",
+        "<strong>Topology Pattern:</strong> High-traffic systems use L4 LBs at the outer edge to balance traffic across a pool of L7 NGINX/Envoy reverse proxies."
+      ],
+      "arch_diagram": {
+        "title": "Two-Tier Load Balancing Architecture (L4 + L7)",
+        "tiers": [
+          {
+            "label": "Internet & DNS",
+            "nodes": [
+              {
+                "name": "BGP Anycast DNS",
+                "type": "dns",
+                "icon": "\ud83c\udf10",
+                "what": "Geo-routed DNS IP",
+                "why": "Routes user to nearest data center edge",
+                "when": "Initial hostname lookup",
+                "failure": "BGP route withdrawal on DC outage"
+              }
+            ]
+          },
+          {
+            "label": "Tier 1: Layer 4 LBs",
+            "nodes": [
+              {
+                "name": "L4 NLB / IPVS Cluster",
+                "type": "load_balancer",
+                "icon": "\u2696\ufe0f",
+                "what": "High throughput TCP packet router",
+                "why": "Handles millions of raw packets with zero TLS decrypt CPU cost",
+                "when": "TCP connection establishment",
+                "failure": "ECMP (Equal-Cost Multi-Path) hardware router failover"
+              }
+            ]
+          },
+          {
+            "label": "Tier 2: Layer 7 Reverse Proxies",
+            "nodes": [
+              {
+                "name": "NGINX / Envoy API Gateway",
+                "type": "gateway",
+                "icon": "\ud83d\udee1\ufe0f",
+                "what": "TLS termination & path-based router",
+                "why": "Routes /orders to Order App and /users to User App",
+                "when": "HTTP request processing",
+                "failure": "Health check removes unhealthy node in 1s"
+              }
+            ]
+          },
+          {
+            "label": "Application Pools",
+            "nodes": [
+              {
+                "name": "App Server Pool A",
+                "type": "service",
+                "icon": "\ud83d\ude80",
+                "what": "Stateless backend application instances",
+                "why": "Executes business logic",
+                "when": "On incoming HTTP requests",
+                "failure": "Auto-scaling group replaces crashed instances"
+              },
+              {
+                "name": "App Server Pool B",
+                "type": "service",
+                "icon": "\ud83d\ude80",
+                "what": "Stateless backend application instances",
+                "why": "Executes business logic",
+                "when": "On incoming HTTP requests",
+                "failure": "Auto-scaling group replaces crashed instances"
+              }
+            ]
+          }
+        ]
+      },
+      "comparison_matrix": {
+        "title": "Layer 4 vs Layer 7 Load Balancing Matrix",
+        "columns": [
+          "Feature",
+          "Layer 4 (Transport)",
+          "Layer 7 (Application)"
+        ],
+        "rows": [
+          [
+            "Protocol Level",
+            "TCP / UDP / IP",
+            "HTTP / HTTPS / gRPC / WebSockets"
+          ],
+          [
+            "TLS Decryption",
+            "Pass-through (No decryption)",
+            "Terminates & decrypts SSL/TLS certificates"
+          ],
+          [
+            "Path/Header Routing",
+            "Not possible",
+            "Fully supported (e.g. /checkout vs /search)"
+          ],
+          [
+            "Performance & QPS",
+            "Extremely fast (Millions of QPS, <0.5ms latency)",
+            "Moderate (CPU intensive parsing, 10k-100k QPS per core)"
+          ],
+          [
+            "Security & WAF",
+            "Basic IP/Port ACL firewall rules",
+            "Full WAF inspection (SQLi, XSS, header injection)"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Load Balancer as a Single Point of Failure (SPOF):</strong> If the single LB hardware crashes, the entire system goes down. <em>Mitigation:</em> Active-Passive or Active-Active LB clusters with VRRP (Virtual Router Redundancy Protocol) / Keepalived and BGP Anycast.",
+      "common_mistakes": [
+        {
+          "mistake": "Terminating SSL on each backend application server individually instead of the Load Balancer / Reverse Proxy.",
+          "correction": "Offload SSL/TLS termination at the L7 Load Balancer / API Gateway to save CPU cycles on application nodes and centralize certificate renewal."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Equal-Cost Multi-Path (ECMP) routing enable horizontal scaling of Load Balancers?",
+          "answer": "ECMP is a network layer routing strategy where routers hash packet headers and distribute traffic across multiple physical load balancer nodes sharing the same Virtual IP (VIP), preventing any single hardware LB from becoming a bottleneck."
+        }
+      ]
+    },
+    {
+      "id": "load-balancing-algorithms",
+      "title": "Balancing Algorithms: Round Robin, Weighted, Least Conn & IP Hash",
+      "definition": "Load balancing algorithms determine which specific backend server instance receives each incoming request based on deterministic logic, server capacity, active connection load, or client attributes.",
+      "why_we_need_it": "Without proper load distribution algorithms, one server can become saturated and run out of memory while other identical servers sit idle with 2% CPU usage.",
+      "real_world_analogy": "A bank with multiple teller lines: Round Robin sends every customer to the next window regardless of how long the current customer's transaction will take. Least Connections sends the customer to whichever teller currently has the fewest people in their queue.",
+      "how_it_works": "<p>1. <strong>Round Robin:</strong> Cycles sequentially through server list (Server 1 -> 2 -> 3 -> 1). Best for stateless, uniform request durations.<br>2. <strong>Weighted Round Robin:</strong> Assigns higher frequency to servers with greater CPU/RAM capacities (e.g. Server A with weight 3 gets 3x more traffic than Server B with weight 1).<br>3. <strong>Least Connections:</strong> Routes to the server with the fewest active TCP/HTTP connections. Best for long-lived connections (WebSockets, video streaming, file uploads).<br>4. <strong>IP Hash:</strong> Hashes client IP modulo N. Guarantees that requests from the same user always hit the same server (simple sticky sessions).</p>",
+      "conceptual_breakdown": [
+        "<strong>Static vs Dynamic:</strong> Static algorithms (Round Robin, IP Hash) ignore real-time server load; Dynamic algorithms (Least Conn, Least Response Time) inspect live latency and connection pools.",
+        "<strong>Peak Thundering Herd:</strong> Simple IP Hash breaks down when thousands of corporate users browse behind a single corporate NAT gateway with identical public IPs."
+      ],
+      "failure_scenarios": "<strong>The Long-Tail Request Trap in Round Robin:</strong> If 1% of requests take 30 seconds (heavy reports) and 99% take 5ms, Round Robin will eventually dump multiple 30s tasks onto one server, causing thread pool starvation. <em>Mitigation:</em> Use Least Connections or Peak-EWMA (Exponentially Weighted Moving Average) latency routing.",
+      "common_mistakes": [
+        {
+          "mistake": "Using IP Hash for load balancing when clients are behind mega-proxies or mobile cellular carrier NATs.",
+          "correction": "Use cookie-based session affinity or move session state to a shared Redis cluster so requests can be balanced with Least Connections."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "When would you choose Least Response Time over Least Connections?",
+          "answer": "When backend servers have heterogeneous performance characteristics or when some requests involve heavy database processing. Least Response Time directs traffic to the server currently completing requests fastest."
+        }
+      ]
+    },
+    {
+      "id": "consistent-hashing-deep-dive",
+      "title": "Consistent Hashing with Virtual Nodes Deep Dive",
+      "definition": "Consistent Hashing is a distributed hashing technique where both keys and server nodes are mapped to a circular 360-degree hash ring (0 to 2^32 - 1). Adding or removing a server only requires remapping k/N keys, rather than all keys as in traditional modulo hashing.",
+      "why_we_need_it": "In traditional hash routing `hash(key) % N`, when 1 server out of N fails, N changes to N-1, causing almost 100% of cached keys to hash to new servers. This triggers a catastrophic cache stampede that overwhelms backend databases.",
+      "real_world_analogy": "A round table where 4 students are seated. When a paper is passed around, whoever sits immediately clockwise takes it. If one student leaves, only their papers pass to the next student; the other 3 students keep working on their own papers unaffected.",
+      "how_it_works": "<p>1. Hash both Server IDs and Object Keys using the same cryptographic hash function (e.g. MurmurHash3 or MD5) onto a 0 to 2^32-1 integer ring.<br>2. To find the server for a key, hash the key and walk <strong>clockwise</strong> along the ring until encountering the first server node.<br>3. <strong>Virtual Nodes (Vnodes):</strong> To prevent non-uniform data distribution and 'hot spots', each physical server is assigned 100 to 256 virtual positions on the ring (e.g., `NodeA#1`, `NodeA#2`, `NodeA#100`).</p>",
+      "conceptual_breakdown": [
+        "<strong>Minimal Disruption:</strong> Adding server N+1 only takes a fraction of keys from its immediate neighbor. (1/N of keys remapped).",
+        "<strong>Virtual Nodes:</strong> Solves data skew and cascade failures by evenly scattering virtual replicas across the entire keyspace.",
+        "<strong>Used in:</strong> DynamoDB, Apache Cassandra (Token Ring), Memcached / Redis clusters, Akamai CDN routing."
+      ],
+      "system_flow_animation": {
+        "title": "Consistent Hashing Ring Lookup & Node Addition",
+        "steps": [
+          {
+            "num": 1,
+            "title": "Key Hash Calculated",
+            "actor": "Client -> Router",
+            "desc": "Key 'user_8492' hashes to integer value 1,450,200 on the 32-bit hash ring.",
+            "node": "L4 NLB / IPVS Cluster"
+          },
+          {
+            "num": 2,
+            "title": "Clockwise Ring Traversal",
+            "actor": "Router Ring Lookup",
+            "desc": "Router performs binary search on the ring and finds the first node with hash >= 1,450,200 (Node B Virtual Replica #4).",
+            "node": "NGINX / Envoy API Gateway"
+          },
+          {
+            "num": 3,
+            "title": "Node Addition Scenario",
+            "actor": "Cluster Administrator",
+            "desc": "New Node D joins the ring. It only claims a small arc of keys from Node B; Nodes A and C remain completely undisturbed.",
+            "node": "App Server Pool A"
+          }
+        ]
+      },
+      "tradeoffs": "<strong>Trade-off:</strong> Requires maintaining a synchronized client-side or proxy routing table of the hash ring in exchange for preventing database collapse during cluster auto-scaling.",
+      "failure_scenarios": "<strong>Cascading Node Failure without Virtual Nodes:</strong> If Node A dies, all of Node A's load dumps onto Node B immediately clockwise. If Node B becomes overwhelmed and crashes, its load plus Node A's load dumps onto Node C, triggering total cluster collapse. <em>Mitigation:</em> Configure at least 150-250 Virtual Nodes per physical server.",
+      "common_mistakes": [
+        {
+          "mistake": "Using `hash(key) % N` for distributed cache routing in dynamic autoscaling environments.",
+          "correction": "Always use Consistent Hashing with Virtual Nodes for distributed caches and sharded databases."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How many keys need to be relocated when a node is added to a Consistent Hashing cluster of N nodes?",
+          "answer": "On average, only K/N keys are relocated (where K is total keys and N is total servers), compared to almost K keys (100%) in standard modulo hashing."
+        }
+      ]
+    },
+    {
+      "id": "health-checks-failover-sticky-sessions",
+      "title": "Active/Passive Health Checks, DNS Failover & Sticky Sessions",
+      "definition": "Health checking mechanisms detect failing backend nodes and automatically pull them out of service rotation before users encounter 5xx errors. Sticky sessions (session affinity) ensure a client's requests consistently route to the same backend server instance.",
+      "why_we_need_it": "Hardware failures, kernel panics, and out-of-memory crashes are inevitable in distributed systems. Automated health checking provides zero-downtime fault tolerance.",
+      "real_world_analogy": "A hospital triage desk: If a doctor steps out or gets sick, the triage nurse stops sending patients to their examination room immediately and reassigns patients to active doctors.",
+      "how_it_works": "<p><strong>Active Health Checks:</strong> The Load Balancer sends periodic synthetic HTTP requests (e.g. `GET /healthz` every 5 seconds). If a server fails 3 consecutive checks, it is marked 'DOWN'.<br><strong>Passive Health Checks:</strong> The LB monitors real user traffic. If a server returns 5 consecutive `502 Bad Gateway` responses to live users, it is temporarily ejected.<br><strong>Sticky Sessions:</strong> The LB injects an encrypted HTTP cookie (e.g. `AWSALB=xyz`) on the first response. Subsequent requests containing this cookie are routed to the same backend node.</p>",
+      "conceptual_breakdown": [
+        "<strong>Shallow vs Deep Health Checks:</strong> Shallow checks verify the web server is listening; Deep checks verify database connections, disk space, and downstream dependencies (use with care to prevent false cascade alarms).",
+        "<strong>Sticky Session Anti-Pattern:</strong> Sticky sessions create unequal load distribution and cause data loss if a server crashes. Best practice is to store session state in a centralized Redis cluster."
+      ],
+      "failure_scenarios": "<strong>Deep Health Check Cascade Failure:</strong> If an underlying DB slows down, all backend servers fail their deep `/healthz` checks simultaneously, causing the Load Balancer to mark 100% of backend servers unhealthy and return global 503 errors. <em>Mitigation:</em> Keep `/healthz` checks shallow and use readiness/liveness probes properly.",
+      "common_mistakes": [
+        {
+          "mistake": "Writing a `/healthz` endpoint that executes heavy DB queries on every 2-second LB probe across 100 instances.",
+          "correction": "Make `/healthz` lightweight and cache dependency status asynchronously in memory."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is stateless application architecture preferred over Load Balancer sticky sessions?",
+          "answer": "Stateless servers allow any request to be handled by any instance, enabling seamless auto-scaling, instant traffic rebalancing, and zero-downtime rolling deployments without interrupting logged-in user sessions."
+        }
+      ]
+    }
+  ]
+}

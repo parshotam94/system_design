@@ -1,0 +1,184 @@
+{
+  "module_id": "10",
+  "module_title": "Deep Dive SQL: PostgreSQL, MySQL & Indexing",
+  "description": "Master B-Tree index internals, clustered vs secondary indexes, composite indexes & leftmost prefix rules, SQL transaction isolation levels, and EXPLAIN query plan optimization.",
+  "topics": [
+    {
+      "id": "btree-and-indexing-internals",
+      "title": "B-Tree & LSM Index Internals: Clustered vs Secondary Indexes",
+      "definition": "Database indexes are auxiliary search data structures that allow the query engine to locate matching rows in logarithmic time O(log N) instead of performing a full table scan O(N). B-Trees (B+ Trees) optimize for read-heavy disk I/O, while Log-Structured Merge Trees (LSM Trees) optimize for write-heavy throughput.",
+      "why_we_need_it": "A full table scan on a 50-million-row table requires reading gigabytes of raw pages from disk (taking 15-30 seconds). A B-Tree index lookup reaches the exact row in 3 to 4 page hops (taking <1 millisecond).",
+      "real_world_analogy": "An index at the back of a 1,000-page encyclopedia: instead of reading every page from page 1 to 1,000, you look up 'Distributed Systems', find 'page 742', and flip directly there.",
+      "how_it_works": "<p><strong>B+ Tree:</strong> Self-balancing N-ary tree where internal nodes store search keys and leaf nodes store pointers to actual data. Leaf nodes are linked as a doubly-linked list for ultra-fast range scans (`WHERE age BETWEEN 20 AND 30`).<br><strong>Clustered Index (Primary Key):</strong> Table rows are physically sorted and stored on disk in the order of the primary key (e.g. MySQL InnoDB).<br><strong>Secondary Index:</strong> Separate B-Tree whose leaf nodes point to the Clustered Primary Key (MySQL) or physical tuple ID/TID (PostgreSQL Heap).</p>",
+      "conceptual_breakdown": [
+        "<strong>Index Write Penalty:</strong> Every `INSERT`, `UPDATE`, or `DELETE` requires updating every associated index on that table, increasing write latency and disk I/O.",
+        "<strong>LSM Trees (Cassandra/RocksDB):</strong> Writes append to in-memory MemTable and commit log; flushed sequentially to immutable disk SSTables, providing blazing write throughput."
+      ],
+      "comparison_matrix": {
+        "title": "B+ Tree vs LSM Tree Indexing Comparison",
+        "columns": [
+          "Feature",
+          "B+ Tree (PostgreSQL, MySQL)",
+          "LSM Tree (Cassandra, RocksDB, ScyllaDB)"
+        ],
+        "rows": [
+          [
+            "Read Performance",
+            "Blazing fast point & range queries (O(log N))",
+            "Moderate (Requires checking MemTable + Bloom Filters + SSTables)"
+          ],
+          [
+            "Write Performance",
+            "Moderate (Random I/O page updates & rebalancing)",
+            "Extremely high (Sequential append-only writes)"
+          ],
+          [
+            "Space Amplification",
+            "Moderate (Page fragmentation & fill factor)",
+            "Low to Moderate (Periodic compaction needed)"
+          ],
+          [
+            "Primary Workload",
+            "Read-heavy relational OLTP workloads",
+            "Write-heavy telemetry, logging, messaging feeds"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Index Bloat & Fragmentation:</strong> Frequent random updates in PostgreSQL create dead tuples, causing B-Tree indexes to balloon in size and degrade cache hit rates. <em>Mitigation:</em> Configure automated aggressive `VACUUM` and run `REINDEX CONCURRENTLY`.",
+      "common_mistakes": [
+        {
+          "mistake": "Adding an index on every single column in a table with high write volume.",
+          "correction": "Only index columns used in `WHERE`, `JOIN`, and `ORDER BY` clauses; monitor unused indexes via `pg_stat_user_indexes` and drop them."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why are B+ Trees preferred over Binary Search Trees (BST) or Red-Black Trees for database disk storage?",
+          "answer": "B+ Trees have massive branching factors (fan-out of 100 to 1,000 keys per node), keeping tree height very low (3 to 4 levels for millions of rows), which minimizes expensive disk page reads. In addition, linked leaf nodes allow efficient sequential disk range scans."
+        }
+      ]
+    },
+    {
+      "id": "composite-and-covering-indexes",
+      "title": "Composite Indexes, Leftmost Prefix Rule & Covering Indexes",
+      "definition": "A Composite Index is an index on multiple columns `(colA, colB, colC)`. The Leftmost Prefix Rule dictates that queries can only use the index if they filter by the leftmost prefix of indexed columns. A Covering Index includes all columns required by a query, allowing the engine to return results directly from the index without reading table heap pages (Index-Only Scan).",
+      "why_we_need_it": "Multi-column queries (e.g., `WHERE tenant_id = 5 AND status = 'ACTIVE' ORDER BY created_at DESC`) cannot efficiently utilize two separate single-column indexes. A well-designed composite index executes in sub-millisecond time.",
+      "real_world_analogy": "A physical telephone directory sorted by `(Last_Name, First_Name)`. You can effortlessly find all people with Last Name 'Smith', or 'Smith, John'. But you cannot use the phone book to find all people whose First Name is 'John' without reading the entire book from start to finish.",
+      "how_it_works": "<p>1. <strong>Leftmost Prefix Rule:</strong> An index on `(A, B, C)` accelerates queries on `(A)`, `(A, B)`, and `(A, B, C)`. It CANNOT accelerate queries on `(B)` or `(B, C)` alone.<br>2. <strong>Index-Only Scan (Covering Index):</strong> If query `SELECT id, status FROM orders WHERE user_id = 123` is backed by index `(user_id, status, id)`, the database reads data entirely from the index B-Tree in memory, skipping the table data heap entirely (Zero Table I/O).</p>",
+      "conceptual_breakdown": [
+        "<strong>Column Ordering Rule:</strong> Place high-cardinality equality columns first, followed by range/inequality filter columns (`<`, `>`), followed by `ORDER BY` columns.",
+        "<strong>`INCLUDE` Clause (PostgreSQL):</strong> Allows adding payload columns to the leaf pages of an index without making them part of the search key tree (e.g. `CREATE INDEX ON orders (user_id) INCLUDE (status, total_price)`)."
+      ],
+      "failure_scenarios": "<strong>Breaking Leftmost Prefix with Wildcard Starts:</strong> Querying `WHERE last_name LIKE '%son'` bypasses the B-Tree index and triggers a full table scan because the leading character is unknown. <em>Mitigation:</em> Use Trigram (`pg_trgm`) or GIN indexes for leading wildcard text searches.",
+      "common_mistakes": [
+        {
+          "mistake": "Creating 3 separate indexes on (A), (B), and (C) instead of a single composite index on (A, B, C) for multi-column queries.",
+          "correction": "Use a single composite index matching query filtering and sorting orders."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Given an index on `(status, created_at)`, will query `SELECT * FROM orders WHERE created_at > '2026-01-01'` use the index efficiently?",
+          "answer": "No. Because `status` (the leftmost column) is not included in the WHERE clause, the database cannot use the B-Tree hierarchy for prefix search and will perform a full table scan (or inefficient full index scan)."
+        }
+      ]
+    },
+    {
+      "id": "transaction-isolation-levels",
+      "title": "SQL Isolation Levels: Dirty Read, Non-Repeatable Read & Phantom Read",
+      "definition": "SQL Transaction Isolation Levels define the degree to which concurrent transactions are isolated from one another's intermediate data modifications, balancing consistency guarantees against concurrency throughput.",
+      "why_we_need_it": "Without proper isolation, concurrent transactions experience race condition anomalies (Dirty Reads, Non-Repeatable Reads, Phantom Reads, Serialization Anomalies) that corrupt business balances.",
+      "real_world_analogy": "Editing a shared Google Doc: Read Uncommitted is seeing letters appear character-by-character as a colleague types a draft. Serializable is locking the document so only one person can view or edit at a time while everyone else waits in a queue.",
+      "how_it_works": "<p>Standard SQL defines 4 isolation levels:<br>1. <strong>Read Uncommitted:</strong> Allows Dirty Reads (reading uncommitted changes from another transaction).<br>2. <strong>Read Committed (Postgres default):</strong> Prevents Dirty Reads. Queries only see data committed before the query began.<br>3. <strong>Repeatable Read (MySQL default):</strong> Prevents Dirty Reads & Non-Repeatable Reads. Reading the same row twice inside a transaction returns identical data via MVCC snapshots.<br>4. <strong>Serializable:</strong> Highest level. Prevents all anomalies including Phantom Reads and Write Skew as if transactions ran one after another sequentially.</p>",
+      "conceptual_breakdown": [
+        "<strong>Anomalies Defined:</strong><br>&bull; <em>Dirty Read:</em> T1 reads uncommitted data written by T2; T2 rolls back.<br>&bull; <em>Non-Repeatable Read:</em> T1 reads a row; T2 updates that row and commits; T1 reads row again and sees changed values.<br>&bull; <em>Phantom Read:</em> T1 reads rows matching a condition; T2 inserts a new row matching that condition; T1 queries again and sees a new 'phantom' row.<br>&bull; <em>Write Skew:</em> Two transactions read overlapping data, satisfy constraints independently, and make conflicting updates.",
+        "<strong>MVCC (Multi-Version Concurrency Control):</strong> PostgreSQL and MySQL maintain multiple row versions (`xmin`/`xmax`), allowing readers to never block writers and writers to never block readers."
+      ],
+      "comparison_matrix": {
+        "title": "SQL Isolation Levels & Concurrency Anomalies",
+        "columns": [
+          "Isolation Level",
+          "Dirty Read",
+          "Non-Repeatable Read",
+          "Phantom Read",
+          "Write Skew",
+          "Performance Overhead"
+        ],
+        "rows": [
+          [
+            "Read Uncommitted",
+            "\u274c Allowed",
+            "\u274c Allowed",
+            "\u274c Allowed",
+            "\u274c Allowed",
+            "Lowest"
+          ],
+          [
+            "Read Committed",
+            "\u2705 Prevented",
+            "\u274c Allowed",
+            "\u274c Allowed",
+            "\u274c Allowed",
+            "Low (Default in Postgres)"
+          ],
+          [
+            "Repeatable Read",
+            "\u2705 Prevented",
+            "\u2705 Prevented",
+            "\u2705 Prevented (in Postgres/MySQL MVCC)",
+            "\u274c Allowed",
+            "Moderate (Default in MySQL)"
+          ],
+          [
+            "Serializable",
+            "\u2705 Prevented",
+            "\u2705 Prevented",
+            "\u2705 Prevented",
+            "\u2705 Prevented",
+            "Highest (Abort/Retry overhead)"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Serialization Failure Aborts:</strong> Under high concurrency, Serializable isolation triggers serialization errors (`could not serialize access due to concurrent update - 40001`). Applications MUST implement automatic retry loops with exponential backoff.",
+      "common_mistakes": [
+        {
+          "mistake": "Setting global database isolation level to Serializable for high-throughput low-latency web apps.",
+          "correction": "Use Read Committed or Repeatable Read as the default, applying explicit row locks (`SELECT FOR UPDATE`) or optimistic concurrency control only where critical."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Multi-Version Concurrency Control (MVCC) eliminate read-write lock contention in PostgreSQL?",
+          "answer": "MVCC creates a new tuple version with transaction IDs (`xmin`, `xmax`) whenever a row is modified, rather than overwriting existing data. Readers query an immutable snapshot of committed tuples matching their transaction start timestamp, so reads never block writes and writes never block reads."
+        }
+      ]
+    },
+    {
+      "id": "query-optimization-and-explain",
+      "title": "Query Planning, EXPLAIN ANALYZE & Slow Query Optimization",
+      "definition": "Query optimization is the process of inspecting the database Cost-Based Optimizer (CBO) execution plan using `EXPLAIN (ANALYZE, BUFFERS)` to diagnose slow table scans, ineffective indexes, expensive nested loop joins, and disk spills.",
+      "why_we_need_it": "A query that runs in 5ms during local testing can degrade to 45 seconds in production when table size scales from 1,000 rows to 100 million rows.",
+      "real_world_analogy": "A GPS navigation route planner: `EXPLAIN` shows the calculated fastest route (highways vs city streets). `EXPLAIN ANALYZE` actually drives the car, measuring exact traffic delays and road tolls at every intersection.",
+      "how_it_works": "<p>1. <strong>`EXPLAIN`:</strong> Displays the optimizer's estimated plan (Seq Scan, Index Scan, Bitmap Heap Scan, Nested Loop, Hash Join, Merge Join) and estimated cost units.<br>2. <strong>`EXPLAIN ANALYZE`:</strong> Executes the query in real-time, displaying actual execution time (ms), rows returned, and memory buffer hits vs disk reads.<br>3. <strong>Key Warning Signs:</strong> Sequential Scans on large tables, huge discrepancies between estimated vs actual rows (stale stats), and 'Sort Method: external disk' (insufficient `work_mem`).</p>",
+      "conceptual_breakdown": [
+        "<strong>Seq Scan:</strong> Reads every page from disk. Red flag on tables with >10,000 rows.",
+        "<strong>Index Scan:</strong> Traverses B-Tree and fetches matching tuple pages from heap.",
+        "<strong>Bitmap Index Scan:</strong> Builds an in-memory bitmap of matching physical page addresses, sorting them to perform sequential disk I/O.",
+        "<strong>Join Types:</strong> Nested Loop (best for small inputs), Hash Join (best for large unsorted equality joins), Merge Join (best for pre-sorted inputs)."
+      ],
+      "failure_scenarios": "<strong>Outdated Table Statistics:</strong> If a table grows rapidly without `ANALYZE`, the query planner assumes it still has 100 rows and selects an inefficient Nested Loop join instead of a Hash Join, causing 100x latency degradation. <em>Mitigation:</em> Tune autovacuum analyze thresholds.",
+      "common_mistakes": [
+        {
+          "mistake": "Applying functions to indexed columns in WHERE clauses (e.g. `WHERE UPPER(email) = 'TEST@EXAMPLE.COM'`).",
+          "correction": "This disables standard B-Tree indexes. Use expression/functional indexes (`CREATE INDEX ON users (UPPER(email))`) or normalize input before querying."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What is the difference between an Index Scan and a Bitmap Index Scan in PostgreSQL?",
+          "answer": "An Index Scan traverses the B-Tree and immediately fetches matching rows from the heap one by one (ideal when returning very few rows). A Bitmap Index Scan first scans the index to construct a bitmap of matching heap pages in RAM, sorts page numbers physically, and reads them sequentially, drastically reducing random disk I/O when fetching multiple rows."
+        }
+      ]
+    }
+  ]
+}
