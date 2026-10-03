@@ -188,6 +188,16 @@
           "question": "How do you handle distributed transactions across microservices without 2-Phase Commit (2PC)?",
           "answer": "Use the <strong>Saga Pattern</strong> (Choreographed via Kafka events or Orchestrated via a state machine workflow engine like Temporal/AWS Step Functions). Each local transaction updates its own DB and publishes an event; if a step fails, compensating transactions are executed in reverse order to restore consistency."
         }
+      ],
+      "tradeoffs": [
+        {
+          "factor": "Architectural Agility vs System Complexity",
+          "analysis": "Decoupling architectural boundaries increases deployment independence across engineering teams, but introduces distributed network management and operational overhead."
+        },
+        {
+          "factor": "Data Consistency vs Horizontal Scalability",
+          "analysis": "Adopting distributed architectural patterns unlocks elastic horizontal scaling at the expense of transitioning from immediate ACID consistency to eventual consistency."
+        }
       ]
     },
     {
@@ -262,6 +272,42 @@
             "node": "API Gateway"
           }
         ]
+      },
+      "arch_diagram": {
+        "nodes": [
+          {
+            "id": "client",
+            "label": "Client Ingress",
+            "type": "client",
+            "tier": "client"
+          },
+          {
+            "id": "arch_core",
+            "label": "Architecture Core (Three-Tier, N-Tier & Hexa)",
+            "type": "service",
+            "tier": "service"
+          },
+          {
+            "id": "data_tier",
+            "label": "Persistent State Layer",
+            "type": "database",
+            "tier": "database"
+          }
+        ],
+        "connections": [
+          {
+            "from": "client",
+            "to": "arch_core",
+            "label": "Request Flow",
+            "type": "sync"
+          },
+          {
+            "from": "arch_core",
+            "to": "data_tier",
+            "label": "State Persistence",
+            "type": "sync"
+          }
+        ]
       }
     },
     {
@@ -334,6 +380,42 @@
             "actor": "Service -> Client",
             "desc": "Returns sanitized API DTO with HTTP 200/201 and idempotency header.",
             "node": "API Gateway"
+          }
+        ]
+      },
+      "arch_diagram": {
+        "nodes": [
+          {
+            "id": "client",
+            "label": "Client Ingress",
+            "type": "client",
+            "tier": "client"
+          },
+          {
+            "id": "arch_core",
+            "label": "Architecture Core (Serverless Functions (Faa)",
+            "type": "service",
+            "tier": "service"
+          },
+          {
+            "id": "data_tier",
+            "label": "Persistent State Layer",
+            "type": "database",
+            "tier": "database"
+          }
+        ],
+        "connections": [
+          {
+            "from": "client",
+            "to": "arch_core",
+            "label": "Request Flow",
+            "type": "sync"
+          },
+          {
+            "from": "arch_core",
+            "to": "data_tier",
+            "label": "State Persistence",
+            "type": "sync"
           }
         ]
       }
@@ -444,7 +526,53 @@
             "node": "API Gateway"
           }
         ]
-      }
+      },
+      "arch_diagram": {
+        "nodes": [
+          {
+            "id": "client",
+            "label": "Client Ingress",
+            "type": "client",
+            "tier": "client"
+          },
+          {
+            "id": "arch_core",
+            "label": "Architecture Core (CQRS (Command Query Respo)",
+            "type": "service",
+            "tier": "service"
+          },
+          {
+            "id": "data_tier",
+            "label": "Persistent State Layer",
+            "type": "database",
+            "tier": "database"
+          }
+        ],
+        "connections": [
+          {
+            "from": "client",
+            "to": "arch_core",
+            "label": "Request Flow",
+            "type": "sync"
+          },
+          {
+            "from": "arch_core",
+            "to": "data_tier",
+            "label": "State Persistence",
+            "type": "sync"
+          }
+        ]
+      },
+      "tradeoffs": [
+        {
+          "factor": "Architectural Agility vs System Complexity",
+          "analysis": "Decoupling architectural boundaries increases deployment independence across engineering teams, but introduces distributed network management and operational overhead."
+        },
+        {
+          "factor": "Data Consistency vs Horizontal Scalability",
+          "analysis": "Adopting distributed architectural patterns unlocks elastic horizontal scaling at the expense of transitioning from immediate ACID consistency to eventual consistency."
+        }
+      ]
     }
   ]
 }

@@ -27,7 +27,7 @@
               {
                 "name": "CPU L1 / L2 Cache",
                 "type": "cache",
-                "icon": "\u26a1",
+                "icon": "⚡",
                 "what": "0.5 ns - 7 ns",
                 "why": "Hardware register speed",
                 "when": "Active CPU registers",
@@ -41,7 +41,7 @@
               {
                 "name": "System RAM (Redis)",
                 "type": "cache",
-                "icon": "\ud83e\udde0",
+                "icon": "🧠",
                 "what": "100 ns",
                 "why": "1000x faster than disk",
                 "when": "In-memory caching",
@@ -55,8 +55,8 @@
               {
                 "name": "NVMe SSD Read",
                 "type": "db",
-                "icon": "\ud83d\udcbe",
-                "what": "150 \u00b5s",
+                "icon": "💾",
+                "what": "150 µs",
                 "why": "Persistent high-speed I/O",
                 "when": "Database disk reads",
                 "failure": "Disk wear"
@@ -69,7 +69,7 @@
               {
                 "name": "Cross-Continent Network",
                 "type": "client",
-                "icon": "\ud83c\udf10",
+                "icon": "🌐",
                 "what": "100 ms (100,000,000 ns!)",
                 "why": "Speed of light in fiber optic cable",
                 "when": "Remote API fetch",
@@ -98,7 +98,7 @@
           },
           {
             "step": 3,
-            "description": "SSD Read takes 150\u00b5s (Equivalent to walking to the local grocery store).",
+            "description": "SSD Read takes 150µs (Equivalent to walking to the local grocery store).",
             "active_nodes": [
               "NVMe SSD Read"
             ]
@@ -136,7 +136,7 @@
           ],
           [
             "NVMe Flash SSD",
-            "100 - 200 \u00b5s",
+            "100 - 200 µs",
             "~$100 / TB",
             "Non-Volatile (Durable)"
           ],
@@ -148,7 +148,7 @@
           ],
           [
             "Network Roundtrip (Same DC)",
-            "500 \u00b5s",
+            "500 µs",
             "Network bandwidth cost",
             "N/A"
           ]
@@ -193,7 +193,7 @@
               {
                 "name": "350,000 Peak Read QPS",
                 "type": "client",
-                "icon": "\u26a1",
+                "icon": "⚡",
                 "what": "350k concurrent requests/sec",
                 "why": "Incoming peak load",
                 "when": "Rush hour / Breaking news",
@@ -207,7 +207,7 @@
               {
                 "name": "350 Web App Servers (1k QPS each)",
                 "type": "service",
-                "icon": "\ud83d\udda5\ufe0f",
+                "icon": "🖥️",
                 "what": "Auto-scaling EC2 / K8s Pods",
                 "why": "Each modern 8-core server handles ~1,000 QPS",
                 "when": "Stateless compute",
@@ -221,7 +221,7 @@
               {
                 "name": "14,000 Write QPS",
                 "type": "db",
-                "icon": "\ud83d\udcbe",
+                "icon": "💾",
                 "what": "14k database inserts/sec",
                 "why": "Exceeds single Postgres primary capacity",
                 "when": "Write path",
@@ -332,7 +332,7 @@
               {
                 "name": "Egress: 3.7 Gbps",
                 "type": "client",
-                "icon": "\ud83d\udce1",
+                "icon": "📡",
                 "what": "Outgoing photo stream",
                 "why": "Delivers photos to users",
                 "when": "User browsing",
@@ -346,7 +346,7 @@
               {
                 "name": "Hot Storage (S3 Standard)",
                 "type": "storage",
-                "icon": "\ud83d\udd25",
+                "icon": "🔥",
                 "what": "First 30 days photos (~120 TB)",
                 "why": "Frequent access",
                 "when": "New posts",
@@ -355,7 +355,7 @@
               {
                 "name": "Cold Storage (S3 Glacier)",
                 "type": "db",
-                "icon": "\ud83e\uddca",
+                "icon": "🧊",
                 "what": "Past 5 years photos (~21 PB)",
                 "why": "90% cheaper storage cost",
                 "when": "Old archives",
@@ -471,7 +471,7 @@
               {
                 "name": "500M Daily Product Reads",
                 "type": "client",
-                "icon": "\ud83d\udecd\ufe0f",
+                "icon": "🛍️",
                 "what": "500M page requests",
                 "why": "High read traffic",
                 "when": "E-Commerce browsing",
@@ -485,7 +485,7 @@
               {
                 "name": "6.25 TB Redis Cluster (50 Nodes)",
                 "type": "cache",
-                "icon": "\u26a1",
+                "icon": "⚡",
                 "what": "50 x 128GB RAM Nodes",
                 "why": "Holds top 20% hot products (80% hits)",
                 "when": "Cache HIT (Sub-millisecond)",
@@ -499,7 +499,7 @@
               {
                 "name": "PostgreSQL Primary + Replicas",
                 "type": "db",
-                "icon": "\ud83d\uddc4\ufe0f",
+                "icon": "🗄️",
                 "what": "Durable product catalog",
                 "why": "Handles only 20% cache misses",
                 "when": "Cache MISS (Cold products)",
@@ -668,7 +668,55 @@
           "question": "Why is the capacity estimation step so critical for justifying architectural decisions to interviewers?",
           "answer": "Because architecture without numbers is pure speculation. When you calculate 30,000 Write QPS, you have mathematical proof for why you chose a NoSQL database or message queue rather than a single SQL database."
         }
-      ]
+      ],
+      "arch_diagram": {
+        "nodes": [
+          {
+            "id": "input",
+            "label": "Capacity Inputs (DAU, Reads/Writes)",
+            "type": "client",
+            "tier": "client"
+          },
+          {
+            "id": "qps_engine",
+            "label": "QPS Calculator (Average & Peak)",
+            "type": "service",
+            "tier": "service"
+          },
+          {
+            "id": "storage_engine",
+            "label": "Storage Estimator (Growth per Year)",
+            "type": "database",
+            "tier": "database"
+          },
+          {
+            "id": "cache_engine",
+            "label": "Cache Memory Sizing (80/20 Rule)",
+            "type": "cache",
+            "tier": "cache"
+          }
+        ],
+        "connections": [
+          {
+            "from": "input",
+            "to": "qps_engine",
+            "label": "Calculate QPS",
+            "type": "sync"
+          },
+          {
+            "from": "qps_engine",
+            "to": "storage_engine",
+            "label": "Compute Storage",
+            "type": "sync"
+          },
+          {
+            "from": "qps_engine",
+            "to": "cache_engine",
+            "label": "Compute RAM",
+            "type": "sync"
+          }
+        ]
+      }
     }
   ]
 }
