@@ -1,0 +1,15 @@
+{
+  "module_id": "35",
+  "module_title": "AI/ML Infrastructure & LLM Serving Architecture",
+  "description": "Master production AI/ML architectures: LLM Serving engines (vLLM / Triton / PagedAttention), Vector RAG pipelines, Feature Stores (Feast), and Model Training Pipelines (Kubeflow).",
+  "topics": [
+    {
+      "id": "llm-serving-and-paged-attention",
+      "title": "High-Throughput LLM Serving: vLLM, PagedAttention & Continuous Batching",
+      "definition": "LLM Serving architecture optimizes inference throughput and GPU VRAM utilization for Large Language Models using PagedAttention (virtual memory paging for KV-Cache) and Continuous (Iteration-Level) Batching.",
+      "why_we_need_it": "Traditional naive LLM inference wastes up to 60-80% of GPU VRAM on KV-Cache memory fragmentation and sits idle waiting for variable-length output completions. PagedAttention increases serving throughput by 2x-4x.",
+      "real_world_analogy": "Virtual memory paging in an Operating System: instead of requiring contiguous physical memory for a program, the OS divides memory into small 4KB pages. PagedAttention divides GPU attention memory into discrete block pages so non-contiguous VRAM is utilized 100% without waste.",
+      "how_it_works": "<p>1. <strong>KV-Cache Bottleneck:</strong> During auto-regressive decoding, Transformer models store Key and Value tensors for all previous tokens in GPU memory. For large context windows (128k tokens), KV-cache dwarfs model weight size.<br>2. <strong>PagedAttention (vLLM):</strong> Allocates KV-cache in non-contiguous physical GPU memory blocks (pages), managed via a logical-to-physical block table.<br>3. <strong>Continuous (Iteration-Level) Batching:</strong> As soon as a request finishes generating its stop token, a new incoming request joins the batch at the very next iteration without waiting for the longest request in the batch to complete.<br>4. <strong>Quantization (AWQ, GPTQ, FP8):</strong> Compresses 16-bit weights to 8-bit or 4-bit, doubling GPU serving density.</p>"
+    }
+  ]
+}

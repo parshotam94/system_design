@@ -1,0 +1,121 @@
+{
+  "module_id": "24",
+  "module_title": "Real-World Case Studies 1: Social & Messaging",
+  "description": "End-to-end interview blueprints: Design Twitter/X Newsfeed (Fan-out on write vs read), WhatsApp / Telegram Chat Architecture, and Instagram Photo Sharing.",
+  "topics": [
+    {
+      "id": "design-twitter-newsfeed",
+      "title": "Case Study: Design Twitter / X Newsfeed (Fan-Out on Write vs Read)",
+      "definition": "Design a distributed real-time newsfeed system capable of handling 500 million Daily Active Users (DAU), 500 million tweets/day, and delivering customized chronological / ranked feeds with sub-200ms latency.",
+      "why_we_need_it": "The definitive classic system design interview problem testing distributed caching, fan-out architectures, and handling extreme celebrity skew (Justin Bieber / Elon Musk problem).",
+      "real_world_analogy": "A physical newspaper delivery vs a library corkboard: Fan-out on write is delivering a copy of your flyer into every follower's home mailbox the moment you write it. Fan-out on read is tacking the flyer on a central corkboard and making followers walk to the library to scan and assemble their own feed.",
+      "how_it_works": "<p>1. <strong>Fan-out on Write (Push Model):</strong> When User A posts a tweet, background workers look up User A's followers and inject the tweet ID into every follower's in-memory Redis Home Timeline list (`LPUSH timeline:user_id tweet_id`). Reading feed is a lightning-fast `O(1)` Redis `LRANGE` operation.<br>2. <strong>The Celebrity Problem:</strong> If an account with 100 million followers tweets, fan-out on write requires 100 million Redis writes, locking servers and taking minutes.<br>3. <strong>Hybrid Fan-out Architecture (Production Solution):</strong> Normal users use Fan-out on Write. Celebrity users (>50,000 followers) bypass fan-out on write. When a user requests their feed, the system fetches their precomputed Redis feed AND dynamically fetches tweets from the few celebrities they follow (Fan-out on Read), merging the two lists in memory.</p>",
+      "conceptual_breakdown": [
+        "<strong>Twitter Scale Math:</strong> 500M DAU, 500M tweets/day = 6,000 tweets/sec avg (20,000 peak). Read QPS = 300,000 QPS (50:1 read/write ratio).",
+        "<strong>Storage:</strong> Tweet metadata in PostgreSQL/DynamoDB; User timelines in Redis clusters (storing 800 most recent tweet IDs per active user in RAM).",
+        "<strong>Media:</strong> Photos and videos uploaded directly to S3 via Presigned URLs, served via Global CDN."
+      ],
+      "arch_diagram": {
+        "title": "Twitter / X Hybrid Fan-Out Architecture",
+        "tiers": [
+          {
+            "label": "Client & Ingress",
+            "nodes": [
+              {
+                "name": "Mobile / Web App",
+                "type": "client",
+                "icon": "\ud83d\udcf1",
+                "what": "Twitter Mobile Client",
+                "why": "Renders chronological & algorithmic feeds",
+                "when": "User scrolls timeline",
+                "failure": "Local client SQLite cache fallback"
+              },
+              {
+                "name": "API Gateway / LB",
+                "type": "gateway",
+                "icon": "\ud83d\udee1\ufe0f",
+                "what": "Ingress Envoy Gateway",
+                "why": "TLS termination & auth verification",
+                "when": "Every incoming tweet or feed fetch",
+                "failure": "Multi-region redundant failover"
+              }
+            ]
+          },
+          {
+            "label": "Tweet & Fanout Services",
+            "nodes": [
+              {
+                "name": "Tweet Service",
+                "type": "service",
+                "icon": "\u270d\ufe0f",
+                "what": "Tweet Creation Service",
+                "why": "Persists tweet to DB and emits event to Kafka",
+                "when": "On POST /tweets",
+                "failure": "Queues tweet in local buffer"
+              },
+              {
+                "name": "Fan-Out Engine",
+                "type": "service",
+                "icon": "\u26a1",
+                "what": "Background Fan-out Workers",
+                "why": "Evaluates follower graphs and populates Redis timelines",
+                "when": "Consuming TweetCreated events",
+                "failure": "Kafka consumer group auto-rebalance"
+              }
+            ]
+          },
+          {
+            "label": "Storage & Timeline Caches",
+            "nodes": [
+              {
+                "name": "Redis Timeline Cache",
+                "type": "cache",
+                "icon": "\ud83d\udd34",
+                "what": "In-Memory User Timelines (ZSET / Lists)",
+                "why": "Sub-5ms feed generation",
+                "when": "User opens app / pulls to refresh",
+                "failure": "Reconstructed from DB by background warmers"
+              },
+              {
+                "name": "Tweet & User DB",
+                "type": "database",
+                "icon": "\ud83d\uddc4\ufe0f",
+                "what": "Sharded PostgreSQL / Manhattan DB",
+                "why": "Durable permanent storage of tweet entities",
+                "when": "Cache misses and tweet writes",
+                "failure": "Master-Replica automated failover"
+              }
+            ]
+          }
+        ]
+      },
+      "failure_scenarios": "<strong>Inactive User Redis RAM Bloat:</strong> Precomputing timelines for 500 million registered users who haven't logged in for 3 years wastes terabytes of expensive RAM. <em>Mitigation:</em> Only precompute timelines for users who were active within the last 14 days (Lazy loading on login for inactive users).",
+      "common_mistakes": [
+        {
+          "mistake": "Using pure Fan-out on Read (`SELECT * FROM tweets WHERE user_id IN (following_ids) ORDER BY created_at DESC`) for all 500 million users.",
+          "correction": "This generates catastrophic multi-million row JOIN queries under 300,000 QPS. Use the Hybrid Fan-Out model."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Twitter handle the 'Celebrity Fan-out Problem' in production?",
+          "answer": "Twitter uses a Hybrid approach: tweets from normal users are pushed into their followers' Redis timelines immediately on write (Fan-out on Write). Tweets from celebrity accounts with millions of followers bypass fan-out on write; instead, when a user opens their feed, the system dynamically pulls and merges the latest tweets from any celebrities that user follows (Fan-out on Read)."
+        }
+      ]
+    },
+    {
+      "id": "design-whatsapp-chat-messenger",
+      "title": "Case Study: Design WhatsApp / Messenger (1-on-1 & Group Chat Architecture)",
+      "definition": "Design a globally distributed instant messaging platform supporting 2 billion users, end-to-end encryption (Signal Protocol), 100 billion messages/day, online presence status, and group messaging.",
+      "why_we_need_it": "Tests persistent bi-directional WebSocket connection management, ephemeral message delivery pipelines, distributed presence tracking, and offline message storage.",
+      "real_world_analogy": "A dedicated pneumatic tube system between every pair of office desks: when you drop a capsule in, it shoots instantly to your colleague's desk if they are sitting there. If their desk is empty, the capsule drops into their locked drawer until they return.",
+      "how_it_works": "<p>1. <strong>Connection Gateway:</strong> Millions of mobile clients maintain persistent TCP/WebSocket connections to a fleet of distributed Chat Gateway servers (e.g. built with Erlang/Elixir BEAM or Netty).<br>2. <strong>User Session Registry:</strong> A distributed Redis cluster maps `user_id -> Gateway_Server_ID` (e.g., `Alice -> Gateway-14`, `Bob -> Gateway-89`).<br>3. <strong>Message Delivery Flow (1-on-1):</strong> Alice sends message to Gateway-14. Gateway looks up Bob in Session Registry -> forwards message to Gateway-89 -> Gateway-89 pushes message down Bob's active WebSocket connection.<br>4. <strong>Offline Queue:</strong> If Bob is offline, message is stored in an ephemeral Cassandra/DynamoDB offline queue. When Bob reconnects, he pulls all pending offline messages, and the server deletes them upon ACK.<br>5. <strong>Group Chat:</strong> Group service expands group membership list and creates individual fan-out delivery jobs for each member.</p>",
+      "conceptual_breakdown": [
+        "<strong>End-to-End Encryption (E2EE):</strong> WhatsApp servers CANNOT read message contents; servers only route encrypted ciphertext blobs between public keys.",
+        "<strong>Message Statuses:</strong> Single Tick (Sent to server), Double Grey Tick (Delivered to recipient phone), Blue Double Tick (Read by user).",
+        "<strong>Presence Engine:</strong> Heartbeat pings every 30s update Redis TTL key `presence:{user_id}`."
+      ],
+      "failure_scenarios": "<strong>Massive Group Chat Message Multiplication:</strong> A group with 1,000 members where 50 users are texting simultaneously generates $50 \\times 1,000 = 50,000$ messages per second. <em>Mitigation:</em> Client-side group message pulling and batching via Kafka topics."
+    }
+  ]
+}

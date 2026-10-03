@@ -1,0 +1,118 @@
+{
+  "module_id": "19",
+  "module_title": "Real-Time & Stream Processing",
+  "description": "Master stream processing architectures: Apache Flink vs Kafka Streams, Windowing operations (Tumbling, Sliding, Session), State Management, and Exactly-Once Semantics.",
+  "topics": [
+    {
+      "id": "stream-processing-fundamentals",
+      "title": "Batch vs Stream Processing: Apache Flink, Kafka Streams & Spark Streaming",
+      "definition": "Batch Processing processes bounded, finite historical datasets in scheduled bulk intervals (e.g. hourly Hadoop/Spark jobs). Stream Processing continuously processes unbounded, infinite data streams in real-time with millisecond-to-second latencies (e.g. Apache Flink, Kafka Streams).",
+      "why_we_need_it": "Fraud detection, live ride pricing, stock market alerts, and real-time gaming leaderboards cannot wait for nightly batch jobs; actions must be calculated the instant events happen.",
+      "real_world_analogy": "Batch processing is collecting 100 dirty shirts in a laundry basket and washing them all on Sunday afternoon. Stream processing is washing each shirt the second you take it off.",
+      "how_it_works": "<p>1. <strong>Event Time vs Processing Time:</strong> Event Time is when the event actually occurred on the client device (embedded timestamp in payload); Processing Time is when the stream worker server received the event.<br>2. <strong>Watermarks:</strong> A progress mechanism signaling that all events up to timestamp $T$ have arrived, allowing the engine to close windows and handle out-of-order/late-arriving data.<br>3. <strong>Stateful Stream Processing:</strong> Flink maintains local state (e.g. RocksDB) checkpointed asynchronously to S3/HDFS for instant state recovery.</p>",
+      "conceptual_breakdown": [
+        "<strong>Kappa Architecture:</strong> A single stream processing pipeline (Kafka + Flink) handles both real-time streaming and historical batch replays, replacing complex dual-pipeline Lambda architectures.",
+        "<strong>Kafka Streams vs Apache Flink:</strong> Kafka Streams is a lightweight Java library embedded inside standard microservice JVMs; Flink is a dedicated distributed compute cluster engine."
+      ],
+      "failure_scenarios": "<strong>Late-Arriving Data Drops:</strong> Mobile users in airplane mode submit events 2 hours late. If the watermark has already advanced past that window, events are discarded unless explicit side-outputs are configured. <em>Mitigation:</em> Configure Allowed Lateness windows and Side Outputs in Flink.",
+      "common_mistakes": [
+        {
+          "mistake": "Using processing-time windowing for analytics dependent on real-world chronological order.",
+          "correction": "Always use Event-Time windowing with Watermarks for business-critical stream metrics."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What is the difference between Event Time and Processing Time in stream processing?",
+          "answer": "Event Time is the exact timestamp when the user action occurred at the source (e.g. mobile sensor); Processing Time is the wall-clock time of the server node executing the streaming code. Event Time guarantees deterministic results regardless of network delays or data replays."
+        }
+      ]
+    },
+    {
+      "id": "windowing-and-stateful-processing",
+      "title": "Stream Windowing Strategies: Tumbling, Sliding, Session & Global Windows",
+      "definition": "Windowing divides unbounded continuous event streams into finite chunks of time or event counts for stateful aggregations (e.g., counting total clicks per 5-minute window).",
+      "why_we_need_it": "You cannot calculate 'average clicks' across an infinite stream; you must bound the calculation to specific discrete time windows.",
+      "real_world_analogy": "A restaurant tab window: A Tumbling window is a fixed hourly bill (12-1, 1-2). A Sliding window is checking your spending over the 'past 60 minutes' every 10 minutes. A Session window opens when you sit at the table and closes 30 minutes after your last drink order.",
+      "how_it_works": "<p>1. <strong>Tumbling Windows:</strong> Fixed size, non-overlapping contiguous time blocks (e.g., every 5 minutes: 12:00-12:05, 12:05-12:10).<br>2. <strong>Sliding (Hopping) Windows:</strong> Fixed size with overlapping slide intervals (e.g., 10-minute window sliding every 1 minute).<br>3. <strong>Session Windows:</strong> Dynamically bounded by periods of user inactivity (e.g., group events until an inactivity gap of 30 minutes occurs).<br>4. <strong>Global Windows:</strong> Groups all events with identical keys indefinitely, triggered by custom counts.</p>",
+      "comparison_matrix": {
+        "title": "Stream Windowing Types Comparison",
+        "columns": [
+          "Window Type",
+          "Boundaries",
+          "Overlapping",
+          "Trigger Condition",
+          "Common Use Case"
+        ],
+        "rows": [
+          [
+            "Tumbling Window",
+            "Fixed duration (e.g. 5m)",
+            "No (Clean adjacent edges)",
+            "Window time expires",
+            "Hourly revenue totals, metric dashboards"
+          ],
+          [
+            "Sliding Window",
+            "Fixed duration, slide interval",
+            "Yes (Events belong to multiple windows)",
+            "Slide interval expires",
+            "Moving average latency, 1-hour rate limiters"
+          ],
+          [
+            "Session Window",
+            "Dynamic (Inactivity gap)",
+            "No (Data-driven boundaries)",
+            "Gap timeout exceeded",
+            "User web browsing sessions, gaming matches"
+          ],
+          [
+            "Count Window",
+            "Fixed element count (e.g. 100)",
+            "No",
+            "N items received",
+            "Batch buffer flushing, sensor batching"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Memory Leak in Long Session Windows:</strong> If a user or bot continuously emits an event every 10 seconds, the session window gap timeout never expires, causing Flink to accumulate state indefinitely until the worker dies of Out Of Memory (OOM). <em>Mitigation:</em> Configure maximum session window duration limits.",
+      "common_mistakes": [
+        {
+          "mistake": "Setting ultra-small slide intervals (e.g. 1-hour window sliding every 100ms) leading to exponential memory state duplication.",
+          "correction": "Choose slide intervals proportional to business requirements (e.g. 1-hour window sliding every 1 minute)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do Session Windows differ from Tumbling and Sliding windows in stream processing?",
+          "answer": "Tumbling and Sliding windows have fixed pre-determined time boundaries; Session windows have dynamic, data-driven boundaries that expand as long as events arrive within a configured inactivity gap timeout and close only when silence is detected."
+        }
+      ]
+    },
+    {
+      "id": "exactly-once-processing-semantics",
+      "title": "Delivery Semantics: At-Least-Once, At-Most-Once & Exactly-Once (EOS)",
+      "definition": "Message delivery semantics define the processing guarantees of a distributed streaming pipeline under node failures and network retries: At-Most-Once (0 or 1), At-Least-Once (1 or more, with duplicates), and Exactly-Once (effectively processed exactly once without loss or duplicates).",
+      "why_we_need_it": "In payment processing and financial accounting, duplicating a transaction event charges a customer twice; dropping an event loses money.",
+      "real_world_analogy": "Sending a birthday gift: At-Most-Once is mailing the gift once; if the mail truck crashes, you do nothing (gift lost). At-Least-Once is mailing gifts repeatedly until you receive a thank-you letter (friend might get 3 identical gifts). Exactly-Once is sending a gift with a unique tracking code so your friend signs for it once and refuses any duplicate copies.",
+      "how_it_works": "<p>1. <strong>At-Most-Once:</strong> Commit offset BEFORE processing message. If processing crashes, message is lost.<br>2. <strong>At-Least-Once:</strong> Commit offset AFTER processing message. If server crashes after processing but before offset commit, message is re-processed on restart (duplicates generated).<br>3. <strong>Exactly-Once Processing (EOS):</strong> Achieved via <strong>Idempotent Sinks</strong> (e.g. DB upserts by unique UUID) OR <strong>Two-Phase Commit (2PC) Stream Transactions</strong> (e.g. Kafka Transactions + Flink Checkpointing with Chandy-Lamport distributed snapshotting).</p>",
+      "conceptual_breakdown": [
+        "<strong>'Effectively Once':</strong> Distributed systems cannot stop network packets from being physically transmitted twice. EOS means the end state is *as if* the message was processed exactly once.",
+        "<strong>Chandy-Lamport Algorithm:</strong> Flink injects Barrier markers into the event stream to snapshot consistent operator state without pausing execution."
+      ],
+      "failure_scenarios": "<strong>Duplicate Side Effects in External APIs:</strong> An EOS pipeline successfully deduplicates database writes via Kafka transactions, but an uncoordinated step calls a 3rd-party non-transactional email API inside the streaming loop, sending duplicate emails during worker recovery restarts.",
+      "common_mistakes": [
+        {
+          "mistake": "Assuming `Kafka EOS` guarantees exactly-once delivery to non-transactional external HTTP endpoints.",
+          "correction": "Kafka EOS only guarantees exactly-once within the Kafka-to-Kafka/Flink ecosystem. Interfacing with external systems requires idempotent receiver keys."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Apache Flink achieve End-to-End Exactly-Once Processing across Kafka and external sinks?",
+          "answer": "Flink coordinates distributed Checkpoint Barriers (Chandy-Lamport algorithm) with a Two-Phase Commit (2PC) sink protocol. On checkpoint start, Flink opens a transaction; when all operators acknowledge the checkpoint barrier, the coordinator commits the transaction to Kafka/DB atomically."
+        }
+      ]
+    }
+  ]
+}

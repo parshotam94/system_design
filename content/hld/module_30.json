@@ -1,0 +1,63 @@
+{
+  "module_id": "30",
+  "module_title": "Multi-Region & Disaster Recovery Architecture",
+  "description": "Master Multi-Region Active-Active vs Active-Passive architectures, RPO (Recovery Point Objective), RTO (Recovery Time Objective), Cross-Region Replication, and GDPR Data Residency.",
+  "topics": [
+    {
+      "id": "active-active-vs-active-passive-dr",
+      "title": "Multi-Region Topologies: Active-Active vs Active-Passive & RTO / RPO",
+      "definition": "Multi-Region architecture deploys a system across multiple geographic cloud regions (e.g. US-East, EU-West, AP-South) to survive catastrophic cloud datacenter blackouts and provide ultra-low latency to global users. RTO (Recovery Time Objective) is the maximum acceptable downtime duration; RPO (Recovery Point Objective) is the maximum acceptable data loss window.",
+      "why_we_need_it": "Power outages, hurricanes, or cloud provider regional control plane failures can take down an entire AWS/Azure region. Multi-region guarantees business continuity.",
+      "real_world_analogy": "A corporate bank with headquarters in New York and London: Active-Passive is keeping the London branch closed as an empty backup building that takes 4 hours to open if New York burns down. Active-Active is running both New York and London fully staffed 24/7, processing customer transactions simultaneously.",
+      "how_it_works": "<p>1. <strong>Active-Passive (Hot Standby / Pilot Light):</strong> Primary region serves 100% of traffic. Standby region receives async database replication. On primary disaster, DNS switches to Standby (RTO: 5-30 min, RPO: seconds of replication lag).<br>2. <strong>Active-Active (Multi-Primary):</strong> All regions serve live read and write traffic simultaneously. Requires Conflict-Free Replicated Data Types (CRDTs), CockroachDB/Google Spanner globally distributed consensus, or strict data partitioning by geographic user residency.<br>3. <strong>GeoDNS / Anycast Routing:</strong> Route53 / Cloudflare routes user to geographically closest healthy region.</p>",
+      "comparison_matrix": {
+        "title": "Disaster Recovery Topologies Comparison",
+        "columns": [
+          "Disaster Recovery Strategy",
+          "RTO (Downtime)",
+          "RPO (Data Loss)",
+          "Cost Overhead",
+          "Engineering Complexity"
+        ],
+        "rows": [
+          [
+            "Backup & Restore (Cold Standby)",
+            "Hours to Days",
+            "Hours (Last backup snapshot)",
+            "Lowest (~1.05x)",
+            "Very Low"
+          ],
+          [
+            "Pilot Light (Warm Standby)",
+            "10 - 30 minutes",
+            "Minutes (Replication lag)",
+            "Low (~1.3x)",
+            "Moderate"
+          ],
+          [
+            "Active-Passive (Hot Standby)",
+            "1 - 5 minutes",
+            "Seconds (Near real-time sync)",
+            "High (~1.8x)",
+            "Moderate-High"
+          ],
+          [
+            "Active-Active Multi-Region",
+            "Zero (<1s instant failover)",
+            "Zero (Sync consensus)",
+            "Highest (2x - 3x)",
+            "Extremely High"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "cross-region-replication-and-gdpr",
+      "title": "Cross-Region Data Replication, Split-Brain Prevention & GDPR Residency",
+      "definition": "Cross-region replication synchronizes databases across continents while navigating the speed-of-light latency penalty ($~70ms$ transatlantic round-trip) and complying with legal data sovereignty mandates (GDPR / CCPA / HIPAA).",
+      "why_we_need_it": "Synchronous replication across continents adds 100ms+ latency to every write, while regulatory laws strictly prohibit transmitting European citizens' personal data to US data centers.",
+      "real_world_analogy": "An international shipping company keeping local inventory warehouses in Germany for EU customers and in Texas for US customers, maintaining compliance with local customs tariffs in each country.",
+      "how_it_works": "<p>1. <strong>Geo-Partitioning:</strong> Shard database rows by country/region column (`country_code = 'DE'` -> stored exclusively on EU database nodes).<br>2. <strong>Asynchronous Cross-Region WAL Streaming:</strong> Primary region commits locally in 2ms, streaming WAL changes asynchronously to replica regions via dedicated cloud backbone links.<br>3. <strong>Split-Brain Fencing:</strong> Use odd-numbered region consensus (e.g. 3 regions: US-East, US-West, and EU-West witness node) to prevent two regions from both claiming to be primary during a transoceanic fiber cut.</p>"
+    }
+  ]
+}

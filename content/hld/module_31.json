@@ -1,0 +1,34 @@
+{
+  "module_id": "31",
+  "module_title": "Advanced Distributed Data & Consensus",
+  "description": "Master cutting-edge distributed databases: Google Spanner & TrueTime API (GPS/Atomic clocks), CockroachDB Multi-Raft consensus, and CRDTs in real-time collaborative editors (Figma/Google Docs).",
+  "topics": [
+    {
+      "id": "google-spanner-and-truetime",
+      "title": "Google Spanner Internals: TrueTime API, Atomic Clocks & External Consistency",
+      "definition": "Google Cloud Spanner is the world's first globally distributed database providing both strict External Consistency (Linearizability) and high availability across continents without global locking, powered by hardware GPS and atomic clocks (TrueTime API).",
+      "why_we_need_it": "Traditional distributed databases cannot guarantee cross-datacenter serializable transactions without slow global locks or suffering from physical clock skew anomalies.",
+      "real_world_analogy": "A synchronized global stopwatch: every master referee in Tokyo, London, and New York has a synchronized atomic watch. If an athlete runs at 12:00:00.000 in Tokyo, the London referee knows with 100% mathematical certainty that an event at 12:00:00.005 in London happened strictly after Tokyo.",
+      "how_it_works": "<p>1. <strong>TrueTime API:</strong> Represents time not as a single number, but as an uncertainty interval $[t.earliest, t.latest]$ with bounded error $\\epsilon \\approx 1-7\\text{ms}$.<br>2. <strong>Commit Wait Rule:</strong> When a transaction commits at timestamp $T$, the leader delays returning to the client until $t.earliest > T$ (waiting out the clock uncertainty $\\epsilon$). This guarantees that any subsequent transaction globally will receive a strictly higher commit timestamp.<br>3. <strong>Paxos Groups:</strong> Data is split into Splits (Directories), each managed by its own independent Paxos consensus replication group.<br>4. <strong>Two-Phase Locking (2PL) + Multi-Version Concurrency Control (MVCC):</strong> Readers take lock-free timestamped snapshot reads with zero interference from writers.</p>",
+      "conceptual_breakdown": [
+        "<strong>External Consistency (Linearizability):</strong> If Transaction 2 starts after Transaction 1 commits anywhere in the world, T2's commit timestamp is strictly greater than T1's.",
+        "<strong>Commit Wait:</strong> Waiting out the $\\epsilon$ uncertainty window (~7ms) replaces expensive cross-continent consensus rounds for read transactions."
+      ],
+      "failure_scenarios": "<strong>Clock Uncertainty Drift Spike:</strong> If GPS antennas or atomic clock oscillators fail, uncertainty $\\epsilon$ widens from 2ms to 200ms, causing Spanner commit wait times to spike to 200ms and degrading write throughput globally. <em>Mitigation:</em> Redundant atomic clock master servers in every datacenter.",
+      "interview_questions": [
+        {
+          "question": "How does Spanner's Commit Wait rule eliminate the need for distributed locks during read transactions?",
+          "answer": "By waiting out the clock uncertainty window $\\epsilon$ before finalizing writes, Spanner guarantees that commit timestamps reflect real-world causal ordering. Read transactions simply specify a read timestamp $T_{read}$ and execute lock-free against immutable MVCC snapshots without taking any locks or coordinating with other nodes."
+        }
+      ]
+    },
+    {
+      "id": "cockroachdb-multi-raft",
+      "title": "CockroachDB Architecture: Multi-Raft Consensus, Range Leases & Hybrid Logical Clocks",
+      "definition": "CockroachDB is an open-source distributed SQL database that implements Multi-Raft consensus across 64MB key ranges, Hybrid Logical Clocks (HLC), and Range Leases to achieve horizontal SQL scalability and multi-cloud resilience.",
+      "why_we_need_it": "A single Raft consensus group becomes a write bottleneck for the entire database. Multi-Raft partitions data into thousands of independent Raft groups running in parallel across the cluster.",
+      "real_world_analogy": "A giant company with 1,000 independent product teams: instead of requiring all 10,000 employees to vote on every single decision in one giant meeting, each 10-person team (Range Raft Group) votes on their own localized decisions independently.",
+      "how_it_works": "<p>1. <strong>Ranges (64MB):</strong> Database key space is ordered and sliced into contiguous 64MB Ranges.<br>2. <strong>Multi-Raft:</strong> Each Range is replicated across 3 or 5 nodes via its own independent Raft consensus group.<br>3. <strong>Range Leaseholder:</strong> One node in the Raft group is granted a Range Lease, allowing it to serve read requests directly without round-trip Raft consensus votes.<br>4. <strong>Hybrid Logical Clocks (HLC):</strong> Combines physical wall-clock time with logical Lamport counters, bounding clock skew within a configurable threshold (e.g. 500ms) without requiring atomic clock hardware.</p>"
+    }
+  ]
+}

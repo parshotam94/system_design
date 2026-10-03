@@ -1,0 +1,15 @@
+{
+  "module_id": "39",
+  "module_title": "Cloud-Native & Kubernetes Architecture",
+  "description": "Master Kubernetes architecture: Control Plane (API Server, etcd, Scheduler, Kube-Controller), Worker Nodes (Kubelet, Containerd, Kube-Proxy), CNI Overlay Networking, and Ingress Controllers.",
+  "topics": [
+    {
+      "id": "kubernetes-control-plane-and-networking",
+      "title": "Kubernetes Architecture: Control Plane, Kubelet, CNI Overlay & Ingress Controllers",
+      "definition": "Kubernetes is an open-source container orchestration platform that automates the deployment, scaling, healing, and networking of containerized microservices across a cluster of bare-metal or cloud compute nodes.",
+      "why_we_need_it": "Managing 500 Docker containers manually across 50 servers is impossible: containers crash, hosts run out of memory, and rolling updates require complex custom scripting.",
+      "real_world_analogy": "A giant container shipping port: The Control Plane is the port authority tower scheduling cranes, assigning docking berths (Nodes), and monitoring cargo manifests. The Kubelet is the local crane operator on each ship loading and unloading shipping containers (Pods).",
+      "how_it_works": "<p>1. <strong>Control Plane:</strong><br>&bull; <em>API Server:</em> Stateless gateway handling all REST requests, backed by etcd.<br>&bull; <em>etcd:</em> Distributed key-value store holding 100% of cluster state.<br>&bull; <em>kube-scheduler:</em> Assigns new Pods to worker nodes based on CPU/RAM resources and affinity rules.<br>&bull; <em>kube-controller-manager:</em> Continuously reconciles Desired State vs Actual State.<br>2. <strong>Worker Nodes:</strong><br>&bull; <em>Kubelet:</em> Node agent ensuring containers described in PodSpecs are running and healthy.<br>&bull; <em>Kube-Proxy:</em> Manages IPTables/IPVS routing rules for Kubernetes Service Virtual IPs.<br>&bull; <em>CNI (Container Network Interface - e.g. Cilium / Calico):</em> Implements overlay network (e.g. eBPF or VXLAN) allowing every Pod across the entire cluster to have a unique IP and communicate directly with every other Pod without NAT.</p>"
+    }
+  ]
+}

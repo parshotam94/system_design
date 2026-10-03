@@ -1,0 +1,94 @@
+{
+  "module_id": "21",
+  "module_title": "Security, Authentication & Zero-Trust Architecture",
+  "description": "Master modern security architecture: JWT vs Session cookies, OAuth 2.0 / OpenID Connect, mutual TLS (mTLS), Role & Attribute-Based Access Control (RBAC/ABAC), and OWASP Top 10 mitigation.",
+  "topics": [
+    {
+      "id": "jwt-vs-sessions-and-oauth2",
+      "title": "Authentication Architecture: JWT Tokens vs Stateful Sessions & OAuth 2.0 / OIDC",
+      "definition": "Authentication verifies user identity. Stateful Sessions store session data on the server (e.g. in Redis) and issue an opaque Session ID cookie. Stateless JWTs (JSON Web Tokens) encode cryptographically signed claims directly inside the token string.",
+      "why_we_need_it": "A single centralized session database becomes a severe bottleneck and single point of failure under 100,000 requests per second. Cryptographically signed tokens allow any backend microservice to verify identity locally with zero database lookups.",
+      "real_world_analogy": "A Stateful Session is a coat check ticket: the attendant must look up your coat in the back room closet. A JWT is an embossed official passport: any border guard can verify the cryptographic seal and read your name directly from the passport without calling the president.",
+      "how_it_works": "<p>1. <strong>JWT Structure:</strong> `Header.Payload.Signature` (Base64URL encoded). Verified using asymmetric public/private keys (RS256 / EdDSA).<br>2. <strong>OAuth 2.0 & OIDC:</strong> Authorization framework providing Access Tokens, Refresh Tokens, and Identity Tokens via Authorization Code Flow with PKCE (Proof Key for Code Exchange).<br>3. <strong>Token Rotation Strategy:</strong> Short-lived Access Tokens (15 minutes) + Long-lived Refresh Tokens (30 days) stored in secure `HttpOnly, SameSite=Strict` cookies with automated token rotation.</p>",
+      "conceptual_breakdown": [
+        "<strong>The Invalidation Dilemma:</strong> Because JWTs are stateless, you cannot 'delete' a JWT before its expiration without maintaining a distributed Blacklist in Redis.",
+        "<strong>OIDC (OpenID Connect):</strong> An identity layer built on top of OAuth 2.0 that provides standardized user profile info (`/userinfo`, `id_token`).",
+        "<strong>PKCE:</strong> Protects mobile and single-page apps (SPAs) against authorization code interception attacks."
+      ],
+      "comparison_matrix": {
+        "title": "Stateful Sessions vs Stateless JWTs",
+        "columns": [
+          "Dimension",
+          "Stateful Sessions (Redis)",
+          "Stateless JWTs (RS256)"
+        ],
+        "rows": [
+          [
+            "Server Storage",
+            "Requires Redis cluster storage (~1KB per active user)",
+            "Zero server memory storage required"
+          ],
+          [
+            "Verification Latency",
+            "Network round-trip to Redis (~1-2ms)",
+            "Instant local CPU cryptographic verification (<0.1ms)"
+          ],
+          [
+            "Instant Revocation",
+            "Instant (Delete session key from Redis)",
+            "Hard (Requires token blacklisting or short TTLs)"
+          ],
+          [
+            "Microservice Scalability",
+            "All services query central Redis cluster",
+            "Services verify token locally via public key"
+          ],
+          [
+            "Payload Size",
+            "Small (32-byte opaque cookie string)",
+            "Large (500-2000 bytes sent on every HTTP header)"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Compromised JWT without Revocation:</strong> An employee's JWT token is stolen. Because the token is stateless and valid for 24 hours, the attacker accesses company APIs even after the employee changes their password. <em>Mitigation:</em> Keep access token TTL under 10 minutes and check user `password_changed_at` timestamp in JWT claims.",
+      "common_mistakes": [
+        {
+          "mistake": "Storing sensitive JWT tokens in browser `localStorage` where they are vulnerable to Cross-Site Scripting (XSS) theft.",
+          "correction": "Store tokens in `HttpOnly, Secure, SameSite=Strict` cookies to block JavaScript XSS access."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you revoke a stateless JWT immediately if a user's account is compromised?",
+          "answer": "Implement a distributed Redis Token Revocation Blacklist storing only revoked token IDs (`jti`) with a TTL equal to the remaining token lifetime, or maintain a `token_version` / `revocation_epoch` integer on the user record which invalidates all tokens issued prior to that timestamp."
+        }
+      ]
+    },
+    {
+      "id": "rbac-abac-and-zero-trust",
+      "title": "Authorization Models: RBAC vs ABAC & Zero-Trust Network Architecture",
+      "definition": "RBAC (Role-Based Access Control) grants permissions based on static predefined roles (Admin, Editor, Viewer). ABAC (Attribute-Based Access Control) evaluates dynamic contextual policies based on Subject, Resource, Action, and Environment attributes (e.g. time of day, IP location, device posture). Zero-Trust Architecture enforces 'Never Trust, Always Verify' across all internal and external network boundaries.",
+      "why_we_need_it": "Static roles fail in complex enterprise systems (e.g. 'A doctor can only view patient records in their specific department during active on-call shift hours from an approved hospital iPad'). ABAC solves fine-grained authorization.",
+      "real_world_analogy": "RBAC is a VIP wristband that lets you into the lounge at any time. ABAC is a biometric vault that checks your role, your current security clearance, whether it is during daylight hours, and whether the fire alarm is off before unlocking.",
+      "how_it_works": "<p>1. <strong>Policy Decision Point (PDP) / OPA (Open Policy Agent):</strong> Decouples authorization logic from microservices using Rego declarative policy code.<br>2. <strong>Zero-Trust Principles:</strong> Micro-segmentation, continuous identity verification, ephemeral credentials, and mutual TLS (mTLS) for all internal service-to-service communications.<br>3. <strong>OWASP Top 10 Mitigation:</strong> SQL Injection (Parameterized Prepared Statements), XSS (Content Security Policy + Sanitization), CSRF (SameSite cookies + Anti-CSRF tokens), and SSRF (Private IP metadata blacklists).</p>",
+      "conceptual_breakdown": [
+        "<strong>mTLS (Mutual TLS):</strong> Both client and server authenticate each other with X.509 certificates, encrypting internal service mesh traffic.",
+        "<strong>OPA / Zanzibar:</strong> Google Zanzibar inspired authorization engines (e.g. Ory Keto, Auth0 FGA) for relation-based access control (ReBAC).",
+        "<strong>SSRF Prevention:</strong> Block internal cloud metadata IP `169.254.169.254` and private VPC subnet ranges."
+      ],
+      "failure_scenarios": "<strong>Server-Side Request Forgery (SSRF) Cloud Key Theft:</strong> A user supplies an image URL `http://169.254.169.254/latest/meta-data/iam/security-credentials/`. The backend server fetches it and leaks the AWS EC2 IAM role credentials to the attacker. <em>Mitigation:</em> Strict egress firewalls and blocking all link-local/private IP destinations.",
+      "common_mistakes": [
+        {
+          "mistake": "Relying on network perimeter firewalls and assuming internal microservice traffic is safe (Castle-and-Moat approach).",
+          "correction": "Adopt Zero-Trust Architecture: enforce mTLS, identity verification, and least-privilege RBAC on every internal RPC."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "What is the difference between Policy Enforcement Point (PEP) and Policy Decision Point (PDP)?",
+          "answer": "The PEP (e.g. API Gateway or Service Middleware) intercepts the request and asks the PDP 'Is this action allowed?'. The PDP (e.g. Open Policy Agent) evaluates the request context against declarative policy rules and returns a binary 'ALLOW' or 'DENY' decision to the PEP."
+        }
+      ]
+    }
+  ]
+}

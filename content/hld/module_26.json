@@ -1,0 +1,57 @@
+{
+  "module_id": "26",
+  "module_title": "Real-World Case Studies 3: E-Commerce & Ridesharing",
+  "description": "End-to-end interview blueprints: Design Uber / Lyft (Geo-spatial indexing with H3/S2 & matching engine), Amazon Flash Sale Checkout (High concurrency inventory lock), and Stripe Idempotent Payment Gateway.",
+  "topics": [
+    {
+      "id": "design-uber-ridesharing-system",
+      "title": "Case Study: Design Uber / Lyft (Geospatial Indexing & Driver-Rider Matching Engine)",
+      "definition": "Design a real-time ride-matching and location-tracking system supporting 100 million active riders, 5 million drivers reporting GPS coordinates every 4 seconds, and matching riders to the closest available drivers with sub-second latency.",
+      "why_we_need_it": "Classic interview problem testing high-throughput geospatial time-series indexing (Uber H3 / Google S2 / QuadTrees), WebSocket connection fleets, and distributed ride state machine workflows.",
+      "real_world_analogy": "A city traffic grid divided into thousands of hexagonal honeycomb tiles: drivers broadcast which hexagon tile they are currently inside. When a rider calls a taxi, the system checks their immediate hexagon and surrounding adjacent hexagons to find available cabs.",
+      "how_it_works": "<p>1. <strong>Location Ingestion (5M drivers x 0.25 GPS/sec = 1.25M updates/sec):</strong> Drivers stream GPS `(lat, lon, driver_id, status)` via WebSockets/gRPC to Location Gateway servers -> Location Gateway updates in-memory Redis Geospatial / H3 spatial cluster.<br>2. <strong>Geospatial Indexing (Uber H3 Hexagons):</strong> Divides the Earth's surface into discrete hexagonal hierarchical cells (Resolution 7-9: ~100m to 1km radius). Hexagons provide uniform adjacent neighbor distances (unlike squares).<br>3. <strong>Ride Request & Matching:</strong> Rider requests pickup at `(lat, lon)`. Matching service converts rider lat/lon to H3 Cell ID -> queries Redis for available drivers within that Cell + 6 neighboring cells -> sorts by Estimated Time of Arrival (ETA) via routing engine -> sends dispatch offer to closest driver with a 15-second acceptance timer.</p>",
+      "conceptual_breakdown": [
+        "<strong>Uber H3 Hexagonal Grid:</strong> All 6 adjacent neighbors have identical centroid distance (unlike QuadTree squares where diagonal distance is $\\sqrt{2}x$).",
+        "<strong>Location Buffer (In-Memory):</strong> Storing ephemeral driver coordinates in durable disk databases burns 1.25M writes/sec unnecessarily. Keep live coordinates in Redis RAM with 30s TTL; write only completed trip trajectories to disk.",
+        "<strong>Ride State Machine:</strong> `REQUESTED` -> `MATCHING` -> `ACCEPTED` -> `ARRIVING` -> `IN_TRIP` -> `COMPLETED`."
+      ],
+      "failure_scenarios": "<strong>Double Driver Booking Race Condition:</strong> Two riders request rides in the same isolated neighborhood simultaneously; both are matched to the single available driver. <em>Mitigation:</em> Atomic Redis distributed lock or conditional state transition on driver status (`SET driver:101:status 'OFFERED' NX EX 15`).",
+      "common_mistakes": [
+        {
+          "mistake": "Writing every 4-second GPS coordinate from 5 million drivers directly to a relational PostgreSQL database table.",
+          "correction": "Store ephemeral live location state in an in-memory Redis cluster or memory-mapped geospatial ring buffer; persist only trip audit milestones to durable storage."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why did Uber migrate from QuadTrees to the H3 Hexagonal Hierarchical Spatial Index?",
+          "answer": "QuadTree squares have unequal distances to neighbors (orthogonal neighbors are distance 1, diagonal neighbors are distance 1.414), creating distortion in circular radius searches. Hexagons have 6 neighbors with identical centroid distances, simplifying circular neighborhood expansion algorithms."
+        }
+      ]
+    },
+    {
+      "id": "design-amazon-flash-sale-inventory",
+      "title": "Case Study: Design Amazon / Ticketmaster Flash Sale (High-Concurrency Inventory Reservation)",
+      "definition": "Design an e-commerce flash sale system capable of selling 10,000 limited-edition items or concert tickets to 1 million concurrent users within 60 seconds without overselling or database lock contention.",
+      "why_we_need_it": "Tests ultra-high write concurrency, race condition prevention, multi-stage inventory reservation with TTL expiration, and virtual waiting room queues.",
+      "real_world_analogy": "A concert ticket booth with 100 physical tickets: 5,000 fans line up outside. A security guard lets 100 fans into the ticket window lobby with a 10-minute pass to pay. If someone doesn't pay within 10 minutes, their ticket is handed to the next person waiting in line.",
+      "how_it_works": "<p>1. <strong>Virtual Waiting Room (Cloudflare / Redis Queue):</strong> Intercepts 1M users at the edge; assigns queue positions and drips users into the checkout cluster at a controlled rate (e.g. 500 users/sec).<br>2. <strong>In-Memory Stock Reservation (Redis Lua):</strong> Stock count is preloaded into Redis (`stock:item_123 = 10000`). An atomic Lua script checks `stock > 0`, decrements stock, and creates a 10-minute temporary reservation key (`reservation:user_456`).<br>3. <strong>Payment & Commit:</strong> User proceeds to payment gateway. If payment succeeds, order is confirmed and committed to PostgreSQL. If user abandons or payment fails, a Redis TTL expiration event triggers an inventory compensation rollback (`stock = stock + 1`).</p>",
+      "conceptual_breakdown": [
+        "<strong>Preventing Overselling:</strong> Executing stock decrement in atomic Redis Lua scripts (`redis.call('DECR')`) eliminates database row-lock serialization bottlenecks.",
+        "<strong>Zero DB Lock Contention:</strong> The relational database only receives finalized, already-reserved orders, shielding it from 1M concurrent write attempts."
+      ]
+    },
+    {
+      "id": "design-stripe-payment-gateway",
+      "title": "Case Study: Design Stripe (Idempotent Payment Gateway & Financial Ledger)",
+      "definition": "Design an ultra-reliable payment processing platform processing billions of dollars daily with zero duplicate charges, strict PCI-DSS security compliance, and double-entry accounting ledger guarantees.",
+      "why_we_need_it": "In financial systems, network timeouts are inevitable. Handling retries without charging the customer twice requires bulletproof idempotency and double-entry ledgering.",
+      "real_world_analogy": "A traditional double-entry bank book: money never just appears or disappears. Every financial transaction is recorded as two balancing entries: a Debit to Account A and a Credit to Account B ($Debit + Credit = 0$).",
+      "how_it_works": "<p>1. <strong>Idempotency Layer:</strong> Client generates a UUID `Idempotency-Key: 9f8a...` in HTTP header. The gateway saves the key in Redis/DB inside a transaction. If a retry arrives with the same key, the gateway returns the cached response with zero re-processing.<br>2. <strong>Payment State Machine:</strong> `INITIATED` -> `AUTH_PENDING` -> `AUTHORIZED` -> `CAPTURED` / `REFUNDED`.<br>3. <strong>Double-Entry Ledger:</strong> Every transaction inserts two immutable rows into the ledger table (`Debit: Customer_Card $50.00`, `Credit: Merchant_Balance $48.50`, `Credit: Stripe_Fee $1.50`).</p>",
+      "conceptual_breakdown": [
+        "<strong>Double-Entry Accounting:</strong> Sum of debits must equal sum of credits for every transaction. The ledger is append-only (no `UPDATE` or `DELETE` statements allowed).",
+        "<strong>Webhook Delivery Engine:</strong> Exponential backoff retry queue (1s, 5s, 30s, 1m, 1h, 24h) to deliver payment events to merchant servers with HMAC cryptographic signatures."
+      ]
+    }
+  ]
+}

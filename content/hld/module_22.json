@@ -1,0 +1,93 @@
+{
+  "module_id": "22",
+  "module_title": "Observability, Monitoring & Reliability (SRE)",
+  "description": "Master the 3 Pillars of Observability (Metrics, Logs, Traces), Prometheus & Grafana, Distributed Tracing (OpenTelemetry/Jaeger), and Google SRE reliability principles (SLI, SLO, SLA, Error Budgets).",
+  "topics": [
+    {
+      "id": "three-pillars-of-observability",
+      "title": "The 3 Pillars of Observability: Metrics, Logs & Distributed Traces",
+      "definition": "Observability is the ability to infer the internal state of a complex distributed system based on its external telemetry outputs. The three core pillars are Metrics (numeric aggregated time-series), Logs (timestamped discrete event records), and Distributed Traces (end-to-end request lifecycle graphs spanning multiple microservices).",
+      "why_we_need_it": "When an API request fails in a system of 50 microservices, looking at individual server logs is impossible. Distributed tracing pinpoints the exact service, function, and database query that caused the failure in seconds.",
+      "real_world_analogy": "A hospital patient monitor: Metrics are continuous vital signs (heart rate, blood pressure). Logs are doctor medical notes written in the chart. Distributed Tracing is an X-ray dye passing through blood vessels, illuminating the exact blockage point across all organs.",
+      "how_it_works": "<p>1. <strong>Metrics (Prometheus):</strong> Counter, Gauge, Histogram, Summary. Polled via pull model; ultra-low storage footprint.<br>2. <strong>Logs (Elasticsearch / Grafana Loki):</strong> Structured JSON logs indexed by timestamp and tags.<br>3. <strong>Distributed Tracing (OpenTelemetry / Jaeger):</strong> Injects `trace_id` and `span_id` headers into W3C TraceContext across HTTP/gRPC boundaries. Spans capture start/end timestamps, child spans, tags, and error logs.</p>",
+      "conceptual_breakdown": [
+        "<strong>OpenTelemetry (OTel):</strong> Vendor-neutral standard framework for instrumenting, generating, and collecting telemetry data.",
+        "<strong>The 4 Golden Signals (Google SRE):</strong> Latency, Traffic, Errors, and Saturation.",
+        "<strong>Sampling:</strong> Trace 1% of normal requests + 100% of error/slow requests (Head/Tail Sampling) to minimize storage costs."
+      ],
+      "comparison_matrix": {
+        "title": "Metrics vs Logs vs Distributed Traces",
+        "columns": [
+          "Pillar",
+          "Data Type",
+          "Volume / Cost",
+          "Strengths",
+          "Primary Tool"
+        ],
+        "rows": [
+          [
+            "Metrics",
+            "Aggregated numerical time-series",
+            "Very Low (Constant size)",
+            "Real-time alerting, dashboards, trend analysis",
+            "Prometheus, Grafana, Datadog"
+          ],
+          [
+            "Logs",
+            "Discrete text/JSON event strings",
+            "Very High (Linear with traffic)",
+            "Granular root-cause debugging, error context",
+            "Elasticsearch, OpenSearch, Grafana Loki"
+          ],
+          [
+            "Traces",
+            "Directed Acyclic Graphs (DAG) of Spans",
+            "Moderate (Controlled via sampling)",
+            "Pinpointing distributed latency bottlenecks & cascades",
+            "OpenTelemetry, Jaeger, AWS X-Ray"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>High-Cardinality Metric Explosion:</strong> Storing unique `user_id` or `order_id` as Prometheus metric labels creates millions of unique time-series, consuming hundreds of gigabytes of RAM and crashing Prometheus server. <em>Mitigation:</em> Keep metric labels low-cardinality (e.g. `status_code`, `method`, `service`); put high-cardinality IDs in logs/traces.",
+      "common_mistakes": [
+        {
+          "mistake": "Adding high-cardinality fields (like UUIDs or emails) as Prometheus metric labels.",
+          "correction": "Prometheus metric labels must be bounded (e.g., HTTP status code 200, 400, 500). Use logs and traces for unique identifiers."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Distributed Tracing propagate context across asynchronous message queues like Apache Kafka?",
+          "answer": "OpenTelemetry instruments the message producer to inject the W3C `traceparent` metadata into Kafka message headers. When the consumer worker polls the message, it extracts the traceparent header and starts a child span linked to the original trace ID."
+        }
+      ]
+    },
+    {
+      "id": "sre-sli-slo-sla-error-budgets",
+      "title": "Site Reliability Engineering (SRE): SLIs, SLOs, SLAs & Error Budgets",
+      "definition": "Google SRE methodology establishes quantitative reliability targets: SLIs (Service Level Indicators) measure real-time performance, SLOs (Service Level Objectives) define internal target reliability, SLAs (Service Level Agreements) define contractual commitments with financial penalties, and Error Budgets govern release velocity.",
+      "why_we_need_it": "Aiming for 100% uptime is financially irrational and slows product innovation to a crawl. Error budgets balance feature velocity against platform stability.",
+      "real_world_analogy": "A speed limit and fine: The speedometer is your SLI (real-time speed). The target driving speed is your SLO (staying under 65 mph). The police ticket threshold is your SLA (exceeding 75 mph triggers a fine). The Error Budget is the margin of speed you can safely use to pass a slow truck.",
+      "how_it_works": "<p>1. <strong>SLI (Formula):</strong> `Good_Events / Total_Events` (e.g. `Successful HTTP 2xx requests with latency < 200ms / Total Requests`).<br>2. <strong>SLO (Target):</strong> e.g., 99.9% of requests meet SLI over a rolling 30-day window.<br>3. <strong>Error Budget:</strong> $100\\% - \\text{SLO} = 0.1\\%$ allowed unreliability. If the team has 43 minutes of allowed downtime per month and burns 40 minutes in an outage, new feature deployments freeze and engineering focuses 100% on reliability.</p>",
+      "conceptual_breakdown": [
+        "<strong>99.9% (3 Nines):</strong> 43.8 minutes downtime per month.",
+        "<strong>99.99% (4 Nines):</strong> 4.38 minutes downtime per month.",
+        "<strong>99.999% (5 Nines):</strong> 26.3 seconds downtime per month (requires multi-region active-active zero-downtime automation).",
+        "<strong>Error Budget Freeze:</strong> Automatic policy: when error budget hits 0%, CI/CD pipelines block new feature releases until reliability is restored."
+      ],
+      "failure_scenarios": "<strong>Misaligned SLA vs SLO:</strong> Setting the external customer SLA equal to the internal SLO (e.g. both at 99.99%). Any minor internal SLO breach instantly triggers contractual customer penalty payouts. <em>Mitigation:</em> Make internal SLO strictly tighter than external SLA (e.g. SLO 99.95%, SLA 99.9%).",
+      "common_mistakes": [
+        {
+          "mistake": "Measuring uptime using simple ping checks rather than user-perceived critical user journeys (CUJs).",
+          "correction": "Measure SLIs based on business-critical user journeys (e.g. successful checkout transactions)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does an Error Budget resolve the natural conflict between Product Managers (features) and Operations/SREs (stability)?",
+          "answer": "An Error Budget creates an objective, agreed-upon framework: as long as the error budget is healthy (>0%), product teams have green light to deploy features rapidly and take calculated risks; if outages exhaust the budget, product deployments halt and all engineering effort pivots to stability improvements."
+        }
+      ]
+    }
+  ]
+}

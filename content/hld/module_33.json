@@ -1,0 +1,15 @@
+{
+  "module_id": "33",
+  "module_title": "Microservices Communication & Protocols",
+  "description": "Master modern inter-service communication: gRPC over HTTP/2, Protocol Buffers v3, GraphQL Federation (Apollo Router), and Asynchronous Event Choreography vs Orchestration.",
+  "topics": [
+    {
+      "id": "grpc-and-protobuf-internals",
+      "title": "gRPC & Protocol Buffers v3 Internals: Binary Serialization & HTTP/2 Multiplexing",
+      "definition": "gRPC is a high-performance open-source RPC framework that utilizes HTTP/2 for transport (multiplexing, streaming, header compression) and Protocol Buffers (Protobuf) for compact binary serialization.",
+      "why_we_need_it": "Text-based JSON over HTTP/1.1 incurs severe CPU serialization overhead and requires opening multiple TCP sockets. gRPC is up to 7x-10x faster with 60% smaller payloads.",
+      "real_world_analogy": "JSON is spelling out words using full handwritten English sentences on paper. Protobuf is transmitting compressed binary Morse code pulses: 10x faster and requires 1/5th the ink.",
+      "how_it_works": "<p>1. <strong>Protobuf Binary Encoding:</strong> Uses Varints and Tag-Length-Value (TLV) encoding. Field names are NOT transmitted in the payload; only numeric field tags (`tag 1 = int32`, `tag 2 = string`) are encoded, drastically shrinking payload size.<br>2. <strong>HTTP/2 Multiplexing:</strong> Transmits multiple bidirectional RPC calls concurrently over a single persistent TCP connection using binary streams and HPACK header compression.<br>3. <strong>Streaming Paradigms:</strong> Unary (1 request -> 1 response), Server Streaming, Client Streaming, and Bidirectional Streaming.</p>"
+    }
+  ]
+}

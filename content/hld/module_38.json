@@ -1,0 +1,15 @@
+{
+  "module_id": "38",
+  "module_title": "Distributed Caching Internals & Advanced Topologies",
+  "description": "Master multi-tier caching architectures: L1 In-Memory + L2 Distributed Cache coherence, Redis Cluster Gossip protocol & Slot Resharding, and Cache Stampede Mutex locking.",
+  "topics": [
+    {
+      "id": "two-level-caching-and-redis-cluster",
+      "title": "Two-Level (L1/L2) Caching Coherence & Redis Cluster Internals",
+      "definition": "Two-Level Caching combines a microsecond local in-memory L1 cache (Caffeine/GoCache) on each application server with a sub-millisecond centralized L2 distributed cache (Redis Cluster), maintaining cache coherence via Redis Pub/Sub invalidation broadcasts.",
+      "why_we_need_it": "Hot keys getting 100k QPS saturate a single Redis server's network NIC. An L1 in-memory cache absorbs 95% of reads directly in local process RAM (100 nanosecond latency), protecting Redis.",
+      "real_world_analogy": "A student taking notes: L1 cache is looking at the page currently on your open desk. L2 cache is looking at a shared textbook on the table. The library (Database) is only visited when neither has the answer.",
+      "how_it_works": "<p>1. <strong>L1 + L2 Read Path:</strong> Check local L1 memory -> On Miss check Redis L2 -> On Miss query Database -> Populate L2 and L1.<br>2. <strong>Cache Invalidation Broadcast:</strong> When an application server updates the database, it publishes an invalidation event to a Redis Pub/Sub channel (`cache:invalidate:user_123`). All other application instances receive the message and instantly evict `user_123` from their local L1 memory.<br>3. <strong>Redis Cluster Hash Slots:</strong> Redis Cluster partitions the keyspace across 16,384 Hash Slots (`Slot = CRC16(key) % 16384`). Nodes exchange cluster topology and health pings continuously via the binary Gossip Protocol.</p>"
+    }
+  ]
+}

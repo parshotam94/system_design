@@ -1,0 +1,94 @@
+{
+  "module_id": "23",
+  "module_title": "Deployment Strategies, CI/CD & Infrastructure",
+  "description": "Master zero-downtime deployment patterns (Blue-Green, Canary, Rolling, Shadow/Dark Launching), feature flags, and Infrastructure as Code (Terraform/Kubernetes).",
+  "topics": [
+    {
+      "id": "deployment-strategies-blue-green-canary",
+      "title": "Zero-Downtime Deployments: Rolling, Blue-Green, Canary & Shadow Deployments",
+      "definition": "Deployment strategies manage the safe transition of production traffic from an old software version to a new software version with zero user downtime and immediate rollback capabilities.",
+      "why_we_need_it": "Stopping all servers to deploy new code (Recreate strategy) causes complete site downtime. Faulty releases deployed to 100% of servers simultaneously can cause massive business outages.",
+      "real_world_analogy": "Canary deployment is sending a canary bird into a coal mine: if the canary is healthy, it is safe for miners to enter. If the canary gets sick (errors detected), miners retreat immediately before anyone is harmed.",
+      "how_it_works": "<p>1. <strong>Rolling Deployment:</strong> Incrementally replaces instances one by one (e.g., 25% at a time). Cost-effective, but runs v1 and v2 concurrently in production.<br>2. <strong>Blue-Green Deployment:</strong> Spins up a complete identical duplicate environment (Green) running v2. Runs smoke tests on Green. Load balancer switches 100% of traffic from Blue to Green instantly. Instant rollback by switching router back to Blue.<br>3. <strong>Canary Deployment:</strong> Routes a tiny fraction of real user traffic (1% -> 5% -> 25% -> 100%) to the new version while automated analyzers monitor error rates and latency. Automatically rolls back on anomalies.<br>4. <strong>Shadow (Dark) Deployment:</strong> Duplicates (mirrors) live production traffic at the Load Balancer, sending copies to v2. v2 processes requests but its responses are discarded, validating real-world performance with ZERO user risk.</p>",
+      "comparison_matrix": {
+        "title": "Zero-Downtime Deployment Strategies Comparison",
+        "columns": [
+          "Strategy",
+          "Cost / Resource Overhead",
+          "Rollback Speed",
+          "User Impact on Bug",
+          "Database Complexity"
+        ],
+        "rows": [
+          [
+            "Rolling Deployment",
+            "Zero extra infrastructure (Replaces in-place)",
+            "Slow (Requires reverse rolling update)",
+            "Affects portion of users (25%)",
+            "DB schema must support v1 and v2 simultaneously"
+          ],
+          [
+            "Blue-Green Deployment",
+            "High (2x duplicate server infrastructure)",
+            "Instant (<1s via Load Balancer switch)",
+            "Affects 100% of users if bug slips through smoke tests",
+            "Strict backward/forward schema compatibility required"
+          ],
+          [
+            "Canary Deployment",
+            "Low (Small canary pool)",
+            "Fast (Re-route canary traffic to v1)",
+            "Minimal (Only 1% of users exposed to canary)",
+            "Requires backward-compatible schemas"
+          ],
+          [
+            "Shadow (Dark) Launch",
+            "Moderate (Duplicate compute)",
+            "Instant (Disable mirroring)",
+            "Zero (User never sees shadow responses)",
+            "Shadow writes must be mocked/isolated"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Breaking Database Changes during Rolling Updates:</strong> Deploying v2 with a destructive database migration (e.g. dropping a column) crashes the remaining 75% of v1 servers currently running in production. <em>Mitigation:</em> Follow the Expand-and-Contract (Parallel Run) database migration pattern.",
+      "common_mistakes": [
+        {
+          "mistake": "Renaming or dropping database columns in the same release as application code changes.",
+          "correction": "Always use Expand-and-Contract: Step 1 (Add new column), Step 2 (Dual write to both), Step 3 (Backfill), Step 4 (Read from new), Step 5 (Drop old column in subsequent release)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does the Expand-and-Contract (Parallel Change) pattern enable zero-downtime database schema migrations?",
+          "answer": "It breaks destructive schema changes into non-breaking multi-phase deployments: first expanding the database with new columns/tables while maintaining backward compatibility with old code, running dual-writes, backfilling historical data, switching code to read the new schema, and finally contracting by removing deprecated columns in a future release."
+        }
+      ]
+    },
+    {
+      "id": "feature-flags-and-gitops",
+      "title": "Feature Flags (LaunchDarkly), Trunk-Based Development & GitOps",
+      "definition": "Feature Flags (Feature Toggles) dynamically enable or disable features in production at runtime without redeploying code. GitOps uses Git repositories as the single source of truth for declaratively managed cloud infrastructure and application deployments (ArgoCD/Flux).",
+      "why_we_need_it": "Decoupling code deployment from feature release allows engineering to deploy code continuously to production while product managers control when features go live to specific customer cohorts.",
+      "real_world_analogy": "A physical light switch in an apartment: the electrician installs the wiring and fixtures weeks in advance (Code Deployment), but the lights only turn on when you flip the wall switch (Feature Flag).",
+      "how_it_works": "<p>1. <strong>Feature Flag Evaluation:</strong> Evaluates flags in-memory in <1ms using local rule engines synced via streaming SSE from feature flag servers (LaunchDarkly, Unleash).<br>2. <strong>Targeted Rollouts:</strong> Enable feature for `@company.com` emails -> 10% beta users -> 100% global users.<br>3. <strong>GitOps Workflow:</strong> Developers push Kubernetes manifests to Git -> ArgoCD controller detects drift and reconciles live cluster state automatically.</p>",
+      "conceptual_breakdown": [
+        "<strong>Trunk-Based Development:</strong> Developers merge short-lived branches into `main` multiple times per day behind feature flags, eliminating painful merge conflicts.",
+        "<strong>Kill Switches:</strong> Instant emergency shutdown of misbehaving micro-features in <1s without rollbacks.",
+        "<strong>Technical Debt Warning:</strong> Stale feature flags must be systematically deleted once 100% rolled out."
+      ],
+      "failure_scenarios": "<strong>The Knight Capital Disastrous Stale Flag Bug:</strong> In 2012, Knight Capital repurposed a dead feature flag during an incomplete deployment, triggering dormant automated trading code that executed millions of erroneous financial trades, bankrupting the company ($440M loss) in 45 minutes. <em>Mitigation:</em> Treat feature flags with strict lifecycle audits and never repurpose old flags.",
+      "common_mistakes": [
+        {
+          "mistake": "Leaving permanent feature flag conditionals littered throughout the codebase indefinitely.",
+          "correction": "Create scheduled cleanup tickets to remove feature flag code branches within 2-4 weeks after 100% rollout."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How do Feature Flags decouple Code Deployment from Feature Release?",
+          "answer": "Code Deployment is a technical operation (moving binaries to production servers); Feature Release is a business operation (making functionality visible to users). Feature flags wrap new code in conditionals, allowing code to be deployed safely in a dormant state and activated dynamically at any time via UI controls."
+        }
+      ]
+    }
+  ]
+}

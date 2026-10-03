@@ -1,0 +1,151 @@
+{
+  "module_id": "17",
+  "module_title": "Distributed Storage, Object Stores & Data Lakes",
+  "description": "Master Block vs File vs Object storage, Amazon S3 internal architecture, Google Bigtable / HBase, and Data Lakes vs Data Warehouses (Snowflake/Delta Lake).",
+  "topics": [
+    {
+      "id": "block-vs-file-vs-object-storage",
+      "title": "Storage Paradigms: Block Storage vs File Storage vs Object Storage",
+      "definition": "Block Storage (EBS, SAN) provides raw unformatted disk blocks for OS filesystems and databases. File Storage (NFS, EFS) organizes data in hierarchical folder trees shared across multiple servers. Object Storage (S3, GCS) stores immutable binary blobs accessible via HTTP REST APIs with flat namespaces and rich metadata.",
+      "why_we_need_it": "Storing millions of video uploads or photo attachments in an RDBMS or standard POSIX filesystem exhausts file descriptor inodes and degrades performance. Object storage provides infinite horizontal capacity at 1/10th the cost.",
+      "real_world_analogy": "Block Storage is a blank hard drive you screw into a computer. File Storage is an office filing cabinet where workers share folders. Object Storage is a valet coat check: you hand over a coat and receive a claim ticket ID (URL/UUID) to retrieve it later.",
+      "how_it_works": "<p>1. <strong>Block (AWS EBS / NVMe SSD):</strong> Ultra-low latency (<1ms), high IOPS, mutable byte-level edits. Attached to 1 server.<br>2. <strong>File (NFS / AWS EFS):</strong> POSIX compliant (`open`, `read`, `write`, `seek`), shared read/write across hundreds of compute nodes.<br>3. <strong>Object (AWS S3 / Google Cloud Storage):</strong> Flat namespace, immutable (`PUT`, `GET`, `DELETE`), practically infinite capacity, 99.999999999% (11 9s) durability.</p>",
+      "comparison_matrix": {
+        "title": "Block vs File vs Object Storage Matrix",
+        "columns": [
+          "Dimension",
+          "Block Storage (EBS / SAN)",
+          "File Storage (NFS / EFS)",
+          "Object Storage (S3 / GCS)"
+        ],
+        "rows": [
+          [
+            "Data Structure",
+            "Raw raw sector blocks",
+            "Hierarchical directories & files",
+            "Flat key-value buckets with metadata"
+          ],
+          [
+            "Access Method",
+            "OS SCSI/NVMe storage protocols",
+            "POSIX filesystem API (SMB, NFS)",
+            "HTTP / REST APIs (GET, PUT, DELETE)"
+          ],
+          [
+            "Modifiability",
+            "Direct byte-level updates in place",
+            "File append and in-place byte editing",
+            "Immutable (Edits require replacing whole object)"
+          ],
+          [
+            "Latency & IOPS",
+            "Sub-millisecond, up to 256,000 IOPS",
+            "Low (1-5ms latency)",
+            "Moderate (50-100ms first-byte latency)"
+          ],
+          [
+            "Cost per GB",
+            "High (~$0.08 - $0.12 / GB/mo)",
+            "Moderate (~$0.30 / GB/mo)",
+            "Very Low (~$0.023 / GB/mo)"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>POSIX File Inode Exhaustion:</strong> Storing 100 million tiny thumbnail images in a single Linux ext4 directory exhausts filesystem inodes, causing `No space left on device` errors even when 80% of disk capacity is free. <em>Mitigation:</em> Store unstructured media files exclusively in Object Storage.",
+      "common_mistakes": [
+        {
+          "mistake": "Using S3 object storage for frequently mutated database tables requiring random in-place updates.",
+          "correction": "Use Block Storage (EBS / local NVMe) for databases; use Object Storage for immutable media and append-only backups."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is Object Storage fundamentally more scalable and durable than traditional Block or File storage?",
+          "answer": "Object Storage uses a flat key-value namespace without hierarchical directory lock contention, distributes object chunks across multiple independent storage nodes and availability zones with erasure coding, and accesses data over stateless HTTP REST APIs."
+        }
+      ]
+    },
+    {
+      "id": "s3-object-store-internals",
+      "title": "Amazon S3 Internals: Metadata Partitioning, Erasure Coding & Multipart Upload",
+      "definition": "Amazon S3 is a massively distributed object storage service providing 11 9s durability using distributed LSM-based metadata indexing, Reed-Solomon Erasure Coding, and parallel multipart chunk pipelines.",
+      "why_we_need_it": "Storing exabytes of media requires surviving the loss of entire data centers without data loss while serving hundreds of thousands of concurrent multi-gigabyte video streams.",
+      "real_world_analogy": "Erasure Coding is tearing a 10-page document into 10 pieces and adding 4 math puzzle pieces. Any 10 pieces out of the 14 total are sufficient to instantly reconstruct the entire document, allowing you to lose any 4 pieces without losing a word.",
+      "how_it_works": "<p>1. <strong>Metadata vs Data Plane:</strong> Metadata tier (Key -> Location mapping) is separated from Storage Nodes holding raw binary chunks.<br>2. <strong>Erasure Coding (e.g. Reed-Solomon 8+4):</strong> Objects are split into 8 data chunks + 4 parity chunks distributed across independent AZs. System survives 4 concurrent node/drive crashes with only 1.5x storage overhead (vs 3x for 3-way replication).<br>3. <strong>Multipart Upload:</strong> Files >100MB are uploaded as independent 5MB-5GB parts in parallel. If Part 4 fails, only Part 4 retries without restarting the whole 10GB file.<br>4. <strong>Presigned URLs:</strong> Application generates a short-lived cryptographic signed URL allowing clients to upload directly to S3, bypassing application servers.</p>",
+      "conceptual_breakdown": [
+        "<strong>Strong Read-After-Write Consistency:</strong> Modern S3 guarantees immediate read-after-write consistency for PUTs and DELETEs.",
+        "<strong>Presigned URLs:</strong> Offloads massive video/image upload bandwidth away from backend application web servers.",
+        "<strong>S3 Storage Classes:</strong> Standard, Intelligent-Tiering, Glacier Flexible, and Glacier Deep Archive for tiered lifecycle cost optimization."
+      ],
+      "failure_scenarios": "<strong>S3 Key Prefix Throttling:</strong> Sending >3,500 PUTs or >5,500 GETs per second to a single S3 folder prefix (e.g. `/uploads/2026/`) triggers HTTP 503 Slow Down throttles. <em>Mitigation:</em> Partition prefixes using hash prefixes (e.g. `/uploads/{hash_prefix}/`).",
+      "common_mistakes": [
+        {
+          "mistake": "Streaming heavy 5GB video uploads through backend application web servers to S3.",
+          "correction": "Generate S3 Presigned URLs and let mobile/web clients upload multipart chunks directly to S3."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Erasure Coding achieve higher durability than 3-way replication while saving storage costs?",
+          "answer": "3-way replication incurs a 200% storage overhead (3x total data) and can only survive losing 2 replicas. Reed-Solomon 8+4 Erasure Coding adds only 50% storage overhead (1.5x total data) and can survive losing up to 4 arbitrary disk/node failures simultaneously."
+        }
+      ]
+    },
+    {
+      "id": "data-lakes-and-warehouses",
+      "title": "Analytics Storage: Data Warehouses (Snowflake) vs Data Lakes vs Lakehouses",
+      "definition": "Data Warehouses (Snowflake, BigQuery, Redshift) store structured cleaned data optimized for fast SQL OLAP analytical aggregations. Data Lakes (S3 + Parquet/Iceberg) store massive raw unstructured and semi-structured data at low cost. Lakehouses combine both worlds.",
+      "why_we_need_it": "Transactional OLTP databases crash when business analysts run complex `GROUP BY` analytical queries scanning 500 million rows across 5 years of historical logs.",
+      "real_world_analogy": "A restaurant kitchen (OLTP) focuses on cooking individual fast meals (Transactions). A food manufacturing laboratory (OLAP Data Warehouse) analyzes 5-year sales trends across 10,000 restaurants to optimize supply chains.",
+      "how_it_works": "<p>1. <strong>Columnar Storage (Apache Parquet / ORC):</strong> Stores data on disk grouped by columns rather than rows. Queries like `SELECT AVG(price) FROM sales` only read the `price` column pages from disk, achieving 10x-50x I/O reductions and massive compression.<br>2. <strong>ETL / ELT Pipelines:</strong> Extract raw data from OLTP databases -> Load to S3 Data Lake -> Transform into structured Parquet tables.<br>3. <strong>Table Formats (Apache Iceberg, Delta Lake):</strong> Add ACID transactions, time-travel queries, and schema evolution on top of raw S3 Parquet files.</p>",
+      "comparison_matrix": {
+        "title": "OLTP vs OLAP vs Data Lake",
+        "columns": [
+          "Feature",
+          "OLTP (Postgres / MySQL)",
+          "Data Warehouse (Snowflake / BigQuery)",
+          "Data Lake (S3 + Iceberg / Spark)"
+        ],
+        "rows": [
+          [
+            "Primary Workload",
+            "High-concurrency fast CRUD transactions",
+            "Complex analytical aggregations & BI reporting",
+            "Machine learning, big data batch processing, raw archives"
+          ],
+          [
+            "Storage Format",
+            "Row-oriented pages",
+            "Columnar format (Proprietary micro-partitions)",
+            "Open Columnar formats (Parquet, ORC, Avro)"
+          ],
+          [
+            "Data Structure",
+            "Strict normalized 3NF relational schemas",
+            "Star / Snowflake dimensional schemas",
+            "Raw structured, semi-structured JSON, unstructured logs"
+          ],
+          [
+            "Query Latency",
+            "Sub-10 milliseconds",
+            "Seconds to minutes",
+            "Minutes to hours (Distributed MapReduce / Spark)"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Small Files Problem in Data Lakes:</strong> Streaming millions of tiny 5KB files into an S3 Data Lake causes Spark queries to spend 95% of execution time listing files and opening S3 connections rather than computing. <em>Mitigation:</em> Run periodic file compaction jobs merging tiny files into optimal 128MB-512MB Parquet blocks.",
+      "common_mistakes": [
+        {
+          "mistake": "Running long-running analytical BI reports directly against the production OLTP primary database.",
+          "correction": "Stream transactional data to an analytical OLAP Data Warehouse (BigQuery/Snowflake) via CDC."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is Columnar Storage (Parquet) dramatically faster than Row-based storage for OLAP analytical queries?",
+          "answer": "Analytical queries typically access only a few columns across billions of rows. Columnar storage reads only the specific column data blocks required from disk, skipping all other columns entirely, and achieves high compression ratios (Snappy/ZSTD) because identical data types and similar values are stored together sequentially."
+        }
+      ]
+    }
+  ]
+}

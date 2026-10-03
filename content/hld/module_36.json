@@ -1,0 +1,48 @@
+{
+  "module_id": "36",
+  "module_title": "Edge AI, Real-Time Audio/Video & WebRTC Architecture",
+  "description": "Master ultra-low-latency real-time communications: WebRTC SFU (Selective Forwarding Unit) vs MCU, STUN/TURN/ICE NAT traversal, and Media Servers (Janus / LiveKit).",
+  "topics": [
+    {
+      "id": "webrtc-sfu-vs-mcu-architecture",
+      "title": "WebRTC Multi-Party Conferencing: SFU vs MCU & NAT Traversal (STUN/TURN/ICE)",
+      "definition": "WebRTC provides peer-to-peer real-time audio, video, and data streaming with sub-500ms latency. For group video calls (Zoom, Google Meet, Discord), media servers route streams using SFU (Selective Forwarding Unit) or MCU (Multipoint Control Unit) topologies.",
+      "why_we_need_it": "Mesh peer-to-peer WebRTC collapses for >4 participants because each client must upload $N-1$ video streams simultaneously, saturating uplink bandwidth. SFUs solve group video scaling.",
+      "real_world_analogy": "A conference room with 10 people: Mesh is having 10 separate bilateral phone calls (90 calls total). MCU is having a television director mix all 10 video feeds into one composite picture. SFU is a smart postal hub that receives each person's 1 video feed and efficiently forwards copies to the other 9 people without re-encoding.",
+      "how_it_works": "<p>1. <strong>NAT Traversal (STUN / TURN / ICE):</strong><br>&bull; <em>STUN:</em> Discovers public IP/Port behind simple NAT.<br>&bull; <em>TURN:</em> Relays encrypted media traffic when symmetric firewall NATs block direct P2P connections.<br>&bull; <em>ICE (Interactive Connectivity Establishment):</em> Framework that tries STUN first and smoothly falls back to TURN relay.<br>2. <strong>SFU (Selective Forwarding Unit - e.g. LiveKit, Mediasoup):</strong> Clients upload 1 video stream (Simulcast with High, Med, Low quality layers). The SFU forwards individual streams without re-encoding (ultra-low CPU cost, supports hundreds of callers per server).<br>3. <strong>MCU (Multipoint Control Unit):</strong> Media server decodes, combines, and re-encodes all incoming video streams into 1 single composite video grid (High CPU cost, high latency, ideal only for legacy hardware video endpoints).</p>",
+      "comparison_matrix": {
+        "title": "Mesh vs SFU vs MCU Architecture",
+        "columns": [
+          "Architecture",
+          "Client Upload Bandwidth",
+          "Server CPU Cost",
+          "Latency",
+          "Max Callers"
+        ],
+        "rows": [
+          [
+            "Mesh (P2P)",
+            "High ($O(N)$ streams uploaded)",
+            "Zero (No server required)",
+            "Ultra-Low (<100ms)",
+            "3 - 4 participants"
+          ],
+          [
+            "SFU (Selective Forwarding)",
+            "Low (1 stream uploaded)",
+            "Low (Pure packet forwarding)",
+            "Very Low (100 - 200ms)",
+            "Hundreds of participants (Zoom, Discord)"
+          ],
+          [
+            "MCU (Multipoint Mixing)",
+            "Lowest (1 stream up / 1 down)",
+            "Extremely High (Video re-encoding)",
+            "Moderate (300 - 600ms)",
+            "Limited by server GPU/CPU capacity"
+          ]
+        ]
+      }
+    }
+  ]
+}

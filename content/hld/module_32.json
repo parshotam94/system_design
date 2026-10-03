@@ -1,0 +1,48 @@
+{
+  "module_id": "32",
+  "module_title": "Cost Engineering & FinOps for Cloud Architecture",
+  "description": "Master cloud infrastructure cost optimization: AWS/GCP pricing mechanics, EC2 Spot Instances, S3 tiered lifecycle management, Network Egress cost traps, and Rightsizing.",
+  "topics": [
+    {
+      "id": "cloud-cost-mechanics-and-finops",
+      "title": "Cloud Cost Economics: Compute (Spot/Savings Plans), Storage & Network Egress",
+      "definition": "Cloud Cost Engineering (FinOps) is the discipline of architecting cloud systems to maximize business value while eliminating waste across Compute (On-Demand vs Reserved vs Spot), Storage tiers, and Network Data Transfer (Egress).",
+      "why_we_need_it": "Unoptimized cloud architectures can result in massive monthly AWS/GCP bills (e.g. $100k/month spent on avoidable cross-AZ data transfer and oversized idle compute instances).",
+      "real_world_analogy": "Insulating a house: leaving air conditioning running with open windows (uncompressed data transfer, idle on-demand compute) runs up electric bills. Proper insulation (Spot instances, S3 lifecycle rules, private VPC endpoints) cuts costs by 70% with zero performance loss.",
+      "how_it_works": "<p>1. <strong>Compute Optimization:</strong> Use AWS Savings Plans / Reserved Instances (up to 72% discount) for predictable baseline load + Spot Instances (up to 90% discount) for stateless stateless background worker fleets and ML training.<br>2. <strong>Storage Optimization:</strong> S3 Intelligent-Tiering automatically transitions untouched objects to Glacier Instant / Deep Archive after 30/90 days ($0.023/GB -> $0.00099/GB - a 95% savings).<br>3. <strong>Network Egress Traps:</strong> Data transfer over the public Internet ($0.09/GB) and Cross-AZ data transfer ($0.01/GB in + out) add up to huge costs. <em>Solution:</em> Keep inter-service traffic within the same Availability Zone where possible, and use AWS VPC Endpoints / PrivateLink to avoid internet NAT gateway fees.</p>",
+      "comparison_matrix": {
+        "title": "AWS Compute Pricing Models Comparison",
+        "columns": [
+          "Model",
+          "Discount vs On-Demand",
+          "Commitment",
+          "Interruption Risk",
+          "Best Workload Fit"
+        ],
+        "rows": [
+          [
+            "On-Demand",
+            "0% (Full price)",
+            "None (Pay per second)",
+            "Zero interruptions",
+            "Unpredictable traffic spikes, dev/testing"
+          ],
+          [
+            "Savings Plans / RI",
+            "30% - 72% discount",
+            "1 or 3 year commitment",
+            "Zero interruptions",
+            "Core databases, API gateways, stable baseline services"
+          ],
+          [
+            "Spot Instances",
+            "70% - 90% discount",
+            "None (Bidding spare capacity)",
+            "2-minute interruption notice",
+            "Kafka consumers, batch video encoding, ML training"
+          ]
+        ]
+      }
+    }
+  ]
+}

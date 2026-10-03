@@ -1,0 +1,27 @@
+{
+  "module_id": "28",
+  "module_title": "Real-World Case Studies 5: Gaming, IoT & FinTech",
+  "description": "End-to-end interview blueprints: Design Real-Time Gaming Leaderboard (Redis Sorted Sets), IoT Sensor Ingestion Pipeline (Kafka + Time-Series DB), and Distributed Crypto/Stock Exchange Order Book.",
+  "topics": [
+    {
+      "id": "design-gaming-leaderboard",
+      "title": "Case Study: Design Real-Time Gaming Leaderboard (Redis Sorted Sets)",
+      "definition": "Design a real-time gaming leaderboard system for 50 million active players supporting instant score updates and sub-10ms queries for Top-100 global players and Player Rank lookups.",
+      "why_we_need_it": "Relational queries like `SELECT COUNT(*) FROM scores WHERE score > my_score` take 10+ seconds on 50 million rows. Redis Sorted Sets (Skip Lists) evaluate rank in $O(\\log N)$ time (~1 millisecond).",
+      "real_world_analogy": "A physical race track scoreboard: when a car crosses the finish line, the scoreboard instantly moves their number card up the board without recalculating the times of all 10,000 cars from scratch.",
+      "how_it_works": "<p>1. <strong>Redis Sorted Sets (ZSET):</strong> Combines a Hash Map (for $O(1)$ player score lookups) with a Skip List (for $O(\\log N)$ score insertion and rank retrieval).<br>2. <strong>Score Update:</strong> `ZINCRBY leaderboard:global 50 user_123` ($O(\\log N)$).<br>3. <strong>Top 100 Players:</strong> `ZREVRANGE leaderboard:global 0 99 WITHSCORES` ($O(\\log N + M)$ - sub-1ms).<br>4. <strong>Get My Rank:</strong> `ZREVRANK leaderboard:global user_123` ($O(\\log N)$).<br>5. <strong>Time-Bounded Leaderboards:</strong> Separate Redis keys for `leaderboard:daily:2026-10-03`, `leaderboard:weekly`, and `leaderboard:monthly`.</p>",
+      "conceptual_breakdown": [
+        "<strong>Skip List Internals:</strong> Multi-level linked list with probabilistic forward pointers enabling logarithmic $O(\\log N)$ search and insertion.",
+        "<strong>Tie-Breaking:</strong> When two players have identical scores, encode the earlier timestamp into the fractional part: `Final_Score = Score + (1 - (Timestamp / 1e12))` so earlier players rank higher."
+      ]
+    },
+    {
+      "id": "design-iot-telemetry-pipeline",
+      "title": "Case Study: Design IoT Telemetry Pipeline (MQTT, Kafka & TimescaleDB)",
+      "definition": "Design a connected-vehicle telemetry pipeline ingesting 1 million IoT smart meters / cars emitting sensor telemetry every 5 seconds (200,000 events/sec), processing alerts in real-time, and archiving for historical analytics.",
+      "why_we_need_it": "Tests lightweight binary protocols (MQTT), high-throughput ingest pipelines, downsampling rollups, and Time-Series Databases (TimescaleDB / InfluxDB).",
+      "real_world_analogy": "A network of 1 million weather stations: each station transmits temperature and humidity every 5 seconds over radio. A central weather computer alerts for forest fire heat spikes in 1 second while storing daily averages for climate research.",
+      "how_it_works": "<p>1. <strong>MQTT Ingestion:</strong> Devices connect to MQTT Brokers (EMQX / Mosquitto) over lightweight binary TCP packets.<br>2. <strong>Kafka Stream Buffer:</strong> MQTT broker bridges messages into Apache Kafka `sensor-telemetry` topic.<br>3. <strong>Real-Time Anomaly Engine:</strong> Apache Flink processes sliding windows (e.g. engine temperature > 120\u00b0C for 3 consecutive readings) and pushes immediate push notifications via WebSockets.<br>4. <strong>Time-Series Storage (TimescaleDB / InfluxDB):</strong> Ingests raw data using Hypertables with automatic chunk-based disk compression (90% compression ratio).<br>5. <strong>Continuous Downsampling:</strong> Roll up 5-second raw data into 1-minute, 1-hour, and 1-day averages after 30 days to optimize storage.</p>"
+    }
+  ]
+}

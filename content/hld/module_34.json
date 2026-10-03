@@ -1,0 +1,15 @@
+{
+  "module_id": "34",
+  "module_title": "Data Privacy, Compliance & Governance (GDPR, HIPAA, PCI-DSS)",
+  "description": "Master data regulatory architecture: GDPR Right to be Forgotten in immutable append-only logs, Crypto-Shredding, PCI-DSS Tokenization Vaults, and HIPAA PII / PHI Encryption.",
+  "topics": [
+    {
+      "id": "gdpr-right-to-be-forgotten-crypto-shredding",
+      "title": "GDPR Compliance in Immutable Systems: Crypto-Shredding & Anonymization",
+      "definition": "GDPR Article 17 mandates the 'Right to be Forgotten' (erasing user personal data on request). In immutable systems (Apache Kafka, Event Sourcing, WORM storage), records cannot be deleted. Crypto-Shredding solves this by encrypting each user's PII with a unique per-user encryption key and destroying the key upon deletion request.",
+      "why_we_need_it": "Rewriting multi-terabyte Kafka logs or S3 backups to delete 1 user's email corrupts log offsets and takes hours of compute. Crypto-shredding makes data permanently unreadable in 1 millisecond.",
+      "real_world_analogy": "Locking your diary in a steel safe with a unique key: if you throw the key into a volcano (Crypto-Shredding), the diary is still physically in the room, but no one on Earth can ever read it again.",
+      "how_it_works": "<p>1. <strong>Per-User Key Management:</strong> When User 123 registers, generate a unique AES-256 Data Encryption Key (DEK) managed in AWS KMS / HashiCorp Vault.<br>2. <strong>Field-Level Encryption:</strong> Encrypt all PII fields (Name, Email, SSN, Address) using `DEK_123` before writing to Kafka or PostgreSQL.<br>3. <strong>Crypto-Shredding (Erasure Request):</strong> When User 123 requests account deletion under GDPR, delete `DEK_123` from the Key Vault. All historical Kafka events, S3 backups, and DB records encrypted with that key become permanently unrecoverable random noise, satisfying legal erasure requirements without modifying append-only logs.</p>"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "module_id": "25",
+  "module_title": "Real-World Case Studies 2: Video & Streaming",
+  "description": "End-to-end interview blueprints: Design YouTube (Video Ingestion, Transcoding DAG & CDN Delivery), Netflix Global Streaming Architecture, and Twitch Live Streaming.",
+  "topics": [
+    {
+      "id": "design-youtube-video-platform",
+      "title": "Case Study: Design YouTube (Video Ingestion, Transcoding DAG & Adaptive Bitrate)",
+      "definition": "Design a global video sharing and streaming platform supporting 2 billion users, 500 hours of video uploaded every minute, multi-resolution adaptive bitrate streaming (HLS/DASH), and sub-2-second video start times.",
+      "why_we_need_it": "Tests massive blob storage pipelines, distributed asynchronous task DAG processing, video encoding codecs, and CDN video chunk streaming.",
+      "real_world_analogy": "A global movie film factory: filmmakers upload massive raw film reels (Raw Video). A giant robotic assembly line (Transcoding DAG) cuts the film into 10-second clips, compresses them into 4K, 1080p, 720p, 480p, and 360p formats, and stocks every neighborhood video store (CDN Edge) in the world.",
+      "how_it_works": "<p>1. <strong>Direct-to-S3 Upload:</strong> Client requests Presigned URL from API Gateway and uploads raw MP4/MOV chunks directly to S3 Raw Video Bucket in parallel.<br>2. <strong>Transcoding DAG Engine:</strong> S3 upload event triggers an asynchronous Directed Acyclic Graph (DAG) workflow (e.g. AWS Step Functions / Temporal / Celery).<br>3. <strong>Video Chunking & Parallel Encoding:</strong> Raw video is split into 10-second segments. Worker nodes transcode segments in parallel across multiple codecs (H.264, H.265, AV1) and resolutions (1080p, 720p, 480p, 360p).<br>4. <strong>Packaging & Manifests:</strong> Transcoded chunks are assembled into HLS (`.m3u8` playlist) and DASH (`.mpd`) formats and stored in S3 Output Bucket.<br>5. <strong>Adaptive Bitrate Streaming (ABR):</strong> Video player client detects live network bandwidth and switches quality dynamically (e.g. drops from 1080p to 480p when mobile signal weakens) without buffering.</p>",
+      "conceptual_breakdown": [
+        "<strong>Adaptive Bitrate (ABR):</strong> Client player measures download time of 10s chunks and requests higher/lower bitrate chunk from `.m3u8` playlist accordingly.",
+        "<strong>Video Deduplication:</strong> Compute perceptual hash on first 60s of video to detect and reject duplicate re-uploads.",
+        "<strong>Thumbnail Generation:</strong> Distributed workers extract 5 frame snapshots at $0\\%, 25\\%, 50\\%, 75\\%, 100\\%$ video timestamps."
+      ],
+      "comparison_matrix": {
+        "title": "Video Streaming Protocols Comparison",
+        "columns": [
+          "Protocol",
+          "Transport",
+          "Chunk Duration",
+          "Latency",
+          "Best Use Case"
+        ],
+        "rows": [
+          [
+            "HLS (HTTP Live Streaming)",
+            "Standard HTTP/HTTPS",
+            "2 - 6 seconds",
+            "Moderate (4 - 10s)",
+            "YouTube, Netflix VOD, general mobile video"
+          ],
+          [
+            "DASH (Dynamic Adaptive Streaming)",
+            "Standard HTTP/HTTPS",
+            "2 - 4 seconds",
+            "Moderate (3 - 8s)",
+            "Modern web players, open standard VOD"
+          ],
+          [
+            "LL-HLS (Low Latency HLS)",
+            "HTTP/2 Partial Chunks",
+            "0.5 - 1 second",
+            "Low (1 - 2s)",
+            "Sports streaming, live interactive events"
+          ],
+          [
+            "WebRTC",
+            "UDP / SRTP",
+            "Continuous frame stream",
+            "Ultra-Low (<500ms)",
+            "Twitch streamer chat, Zoom, video calls"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Transcoding Worker Crash Mid-Job:</strong> A worker node running a 45-minute FFmpeg encoding job runs out of memory. <em>Mitigation:</em> Transcode videos as independent 10-second chunks rather than a single monolithic file. If a chunk fails, only that 10s chunk retries.",
+      "common_mistakes": [
+        {
+          "mistake": "Transcoding raw multi-gigabyte video files sequentially on a single server node.",
+          "correction": "Split video into independent GOP (Group of Pictures) chunks and transcode them in parallel across a distributed worker fleet."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Adaptive Bitrate Streaming (ABR) work in modern video players like YouTube?",
+          "answer": "The video is split into short 2-6 second chunks encoded at multiple bitrates (360p, 720p, 1080p, 4K) described in a master playlist manifest (`.m3u8`). The client player continuously measures real-time network throughput; if bandwidth drops, the player seamlessly requests the next 4-second chunk at a lower bitrate without interrupting playback."
+        }
+      ]
+    },
+    {
+      "id": "design-netflix-global-streaming",
+      "title": "Case Study: Design Netflix (Open Connect Appliance CDN & Pre-Positioning)",
+      "definition": "Design Netflix's streaming architecture capable of delivering 15% of global internet downstream traffic with zero buffering using Open Connect Appliances (OCA) embedded directly inside ISP networks.",
+      "why_we_need_it": "Commercial CDNs charge billions for petabyte-scale video traffic. Netflix's Open Connect custom CDN architecture demonstrates extreme edge caching economics.",
+      "real_world_analogy": "A vending machine company placing fully stocked vending machines inside every corporate office building: instead of delivering each soda can across the city on a truck when someone is thirsty, the machine is pre-stocked overnight during off-peak hours.",
+      "how_it_works": "<p>1. <strong>Control Plane (AWS Cloud):</strong> User registration, recommendation algorithms, search, billing, and content management run on AWS.<br>2. <strong>Data Plane (Open Connect Appliances - OCA):</strong> Netflix builds custom high-density FreeBSD storage servers (100Gbps+ throughput) and installs them physically inside thousands of Internet Service Provider (ISP) data centers globally for FREE.<br>3. <strong>Predictive Proactive Caching (Pre-Positioning):</strong> Machine learning models predict which movies will be popular in each city. During off-peak night hours (2 AM - 5 AM), Netflix pushes new movie releases directly to local ISP OCAs.<br>4. <strong>Stream Request:</strong> When user clicks Play, AWS directs client to the exact local OCA inside their ISP router, streaming video over local fiber with 0 cross-continental transit fees.</p>",
+      "conceptual_breakdown": [
+        "<strong>OCA Pre-Positioning:</strong> Eliminates daytime internet transit congestion by pushing video files during night hours.",
+        "<strong>Title Chunking:</strong> Every movie is encoded into ~120 different file variations (resolutions, languages, codecs, bitrates).",
+        "<strong>Multi-OCA Failover:</strong> If local ISP OCA is busy, client smoothly fails over to regional Internet Exchange Point (IXP) OCA."
+      ]
+    }
+  ]
+}

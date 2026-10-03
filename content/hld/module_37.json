@@ -1,0 +1,15 @@
+{
+  "module_id": "37",
+  "module_title": "Complex Event Processing & Fraud Detection Systems",
+  "description": "Master real-time fraud prevention architectures: Apache Flink CEP, Graph DB fraud rings (Neo4j), Real-Time Rule Engines, and Sliding Window Feature Aggregations.",
+  "topics": [
+    {
+      "id": "real-time-fraud-detection-pipeline",
+      "title": "Real-Time Fraud & Anomaly Detection: Flink CEP, Graph DBs & ML Scoring",
+      "definition": "A real-time fraud detection system intercepts financial transactions and user actions, evaluating complex pattern sequences, risk rules, and ML inference models in under 50 milliseconds to block fraudulent credit card transactions and account takeovers.",
+      "why_we_need_it": "Detecting fraud 2 hours after a transaction via batch jobs is too late; once stolen funds leave the bank, recovery is nearly impossible.",
+      "real_world_analogy": "A vigilant airport security scanner: it scans your passport, checks whether you just checked into another airport 5,000 miles away 10 minutes ago (Impossible Velocity), inspects your baggage, and makes a go/no-go decision before you board the plane.",
+      "how_it_works": "<p>1. <strong>Event Stream Ingestion:</strong> Kafka ingests payment authorization events at 50,000 events/sec.<br>2. <strong>Stateful Feature Aggregation (Flink + Redis):</strong> Computes real-time sliding window features (e.g. `user_payment_count_last_10min`, `total_amount_last_1hour`, `distinct_ip_count`).<br>3. <strong>Velocity & Rule Checks:</strong> Impossible Travel Rule: detects Card Swipe in London 10 minutes after Card Swipe in New York ($Velocity > 1,000\\text{ km/h}$).<br>4. <strong>Graph DB Fraud Ring Analysis (Neo4j / Amazon Neptune):</strong> Traverses shared device fingerprints, credit card numbers, and shipping addresses to detect organized crime syndicates sharing stolen identities.<br>5. <strong>ML Risk Scoring (Triton / ONNX):</strong> Low-latency (<5ms) gradient-boosted tree / neural network outputs a Risk Score from 0 to 100. Score $\\ge 85$ -> Block; $60-84$ -> Step-up 2FA challenge; $<60$ -> Approve.</p>"
+    }
+  ]
+}

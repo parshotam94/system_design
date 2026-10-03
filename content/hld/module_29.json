@@ -1,0 +1,29 @@
+{
+  "module_id": "29",
+  "module_title": "Low-Latency Systems & High-Frequency Architecture",
+  "description": "Master microsecond and nanosecond architecture: C++ memory management, Lock-Free Ring Buffers (LMAX Disruptor), Kernel Bypass (DPDK / Solarflare Solarflare OpenOnload), and CPU Cache line alignment (false sharing).",
+  "topics": [
+    {
+      "id": "low-latency-cpp-and-memory",
+      "title": "Low-Latency Engineering: Cache Locality, False Sharing & Zero-Allocation",
+      "definition": "Low-latency systems architecture optimizes software to execute in microseconds ($\\mu s$) or nanoseconds ($ns$) by eliminating operating system context switches, heap allocations in critical paths, and CPU cache misses.",
+      "why_we_need_it": "In High-Frequency Trading (HFT) and real-time ad exchanges, an extra 50 microseconds of latency means losing millions of dollars to competing trading firms.",
+      "real_world_analogy": "A Formula 1 pit stop: instead of searching through a messy toolbox in the garage (Heap memory), every specialized tool is laid out in exact order in the mechanic's hand (L1 CPU Cache) before the car arrives.",
+      "how_it_works": "<p>1. <strong>Zero Dynamic Heap Allocation:</strong> Pre-allocate all memory buffers at server startup (Memory Pools / Arena Allocators). Zero calls to `malloc`/`new` in the hot trade path.<br>2. <strong>CPU Cache Line Alignment (64 Bytes):</strong> Align critical structs to 64-byte boundaries (`alignas(64)`) to prevent <strong>False Sharing</strong> where two CPU cores invalidate each other's L1 cache lines.<br>3. <strong>CPU Core Pinning (Thread Affinity):</strong> Pin critical worker threads to dedicated physical CPU cores (`pthread_setaffinity_np`) and isolate them from the OS scheduler (`isolcpus`), eliminating CPU context-switching overhead.</p>",
+      "conceptual_breakdown": [
+        "<strong>L1 Cache Latency:</strong> ~1 nanosecond (4 cycles).",
+        "<strong>L3 Cache Latency:</strong> ~10-15 nanoseconds.",
+        "<strong>Main RAM Latency:</strong> ~60-100 nanoseconds (100x slower than L1).",
+        "<strong>Branch Prediction:</strong> Use `[[likely]]` and `[[unlikely]]` compiler hints in C++20 to optimize CPU branch instruction pipelines."
+      ]
+    },
+    {
+      "id": "kernel-bypass-and-lockfree-disruptor",
+      "title": "Kernel Bypass (DPDK/Solarflare) & Lock-Free Ring Buffers (Disruptor)",
+      "definition": "Kernel Bypass allows user-space applications to read raw Ethernet packets directly from the Network Interface Card (NIC) hardware ring buffer, bypassing the entire Linux OS TCP/IP kernel stack. Lock-free ring buffers pass messages between threads without mutex lock contention.",
+      "why_we_need_it": "The Linux kernel's network stack (socket buffers, interrupts, context switching) introduces 5 to 25 microseconds of jitter. Kernel bypass cuts network I/O latency to <1 microsecond.",
+      "real_world_analogy": "A dedicated private VIP highway exit directly into your private garage, completely bypassing public highway stoplights and toll booths.",
+      "how_it_works": "<p>1. <strong>Kernel Bypass (DPDK / OpenOnload):</strong> NIC hardware writes network packets directly into user-space shared memory via Direct Memory Access (DMA). Application polls the ring buffer continuously in a busy loop without hardware interrupts.<br>2. <strong>LMAX Disruptor Pattern:</strong> A single circular lock-free Ring Buffer with power-of-2 size. Uses atomic memory barriers and cache-padded sequence numbers to achieve >10 million messages/sec per thread with nanosecond latencies.<br>3. <strong>Mechanical Sympathy:</strong> Designing software algorithms that work in harmony with the underlying hardware CPU architecture.</p>"
+    }
+  ]
+}

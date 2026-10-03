@@ -1,0 +1,89 @@
+{
+  "module_id": "20",
+  "module_title": "Content Delivery Networks (CDNs) & Edge Computing",
+  "description": "Master CDN Edge caching, Dynamic Site Acceleration (DSA), BGP Anycast routing, Cache-Control headers, invalidation strategies, and Edge Workers (Cloudflare Workers / Lambda@Edge).",
+  "topics": [
+    {
+      "id": "cdn-architecture-and-edge-caching",
+      "title": "CDN Architecture: Points of Presence (PoPs), Edge Caching & Anycast BGP",
+      "definition": "A Content Delivery Network (CDN) is a geographically distributed network of Edge proxy servers (Points of Presence / PoPs) that cache and deliver web content (images, videos, HTML, API responses) close to end users to minimize latency and offload origin server infrastructure.",
+      "why_we_need_it": "Speed of light in fiber optic cables takes ~70ms to travel from Tokyo to Virginia. A user in Tokyo requesting data from an origin in Virginia experiences high latency and TCP handshake delays. Serving from a Tokyo CDN Edge PoP delivers content in <5ms.",
+      "real_world_analogy": "A global chain of neighborhood grocery convenience stores: instead of every customer flying to the central factory in Switzerland to buy chocolate, the factory ships pallets to local neighborhood stores so customers buy chocolate in 2 minutes.",
+      "how_it_works": "<p>1. <strong>BGP Anycast Routing:</strong> Multiple CDN PoP servers across 100+ countries share the exact same public IP address. Internet routers automatically direct user packets to the topologically closest PoP.<br>2. <strong>Static Content Delivery:</strong> Images, CSS, JS, and video segments are cached with long TTLs. Cache Hits never touch origin servers.<br>3. <strong>Dynamic Site Acceleration (DSA):</strong> For non-cacheable dynamic requests, CDN maintains persistent, warmed TCP/TLS connection pools to the origin and uses route optimization across private backbone fibers to bypass congested public internet routes.</p>",
+      "conceptual_breakdown": [
+        "<strong>Origin Shield (Tiered Caching):</strong> An intermediate caching layer between Edge PoPs and Origin that consolidates cache misses, preventing origin thundering herds.",
+        "<strong>Cache-Control Directives:</strong> `public, max-age=31536000, immutable` for versioned static assets; `s-maxage` for CDN caches vs `max-age` for browser caches.",
+        "<strong>Stale-While-Revalidate:</strong> Serves stale cached content instantly to user while asynchronously fetching fresh content from origin in the background."
+      ],
+      "comparison_matrix": {
+        "title": "Edge PoP vs Origin Server Delivery",
+        "columns": [
+          "Metric",
+          "Direct Origin Request",
+          "CDN Edge PoP Delivery"
+        ],
+        "rows": [
+          [
+            "Global User Latency",
+            "100ms - 300ms (Cross-continental)",
+            "Sub-10ms (Local edge server)"
+          ],
+          [
+            "Origin Server Load",
+            "100% of all requests hit origin",
+            "90% - 98% absorbed by CDN edge"
+          ],
+          [
+            "TLS Handshake Latency",
+            "Full 1-RTT to distant origin",
+            "Terminated at local edge in 2ms"
+          ],
+          [
+            "DDoS Absorption",
+            "Origin easily saturated",
+            "Absorbed by multi-terabit CDN edge capacity"
+          ]
+        ]
+      },
+      "failure_scenarios": "<strong>Instant Global Cache Invalidation Storm:</strong> Running a global wildcard purge (`PURGE /*`) on an e-commerce CDN flushes millions of cached items, causing 100,000 QPS of subsequent user traffic to hit origin servers simultaneously, crashing the database. <em>Mitigation:</em> Use versioned URLs (`/app.v2.js`) and soft purging.",
+      "common_mistakes": [
+        {
+          "mistake": "Using CDN cache purging as the primary mechanism for static asset updates.",
+          "correction": "Use Content Hashing / Cache Busting in file names (`bundle.a8f2c.js`) with 1-year immutable cache headers."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does BGP Anycast direct users to the nearest CDN Point of Presence (PoP)?",
+          "answer": "With BGP Anycast, all CDN edge data centers advertise the exact same IP prefix into the global Internet routing table (BGP). Upstream ISP routers compute the shortest AS-Path and automatically route the user's TCP packets to the topologically nearest PoP data center."
+        }
+      ]
+    },
+    {
+      "id": "edge-computing-and-workers",
+      "title": "Edge Computing: Cloudflare Workers, Lambda@Edge & V8 Isolates",
+      "definition": "Edge Computing executes lightweight application code and serverless functions directly at CDN edge nodes across the globe, processing user requests within microseconds of their physical location.",
+      "why_we_need_it": "Executing authentication checks, geolocation redirects, A/B testing variations, and personalization at the origin adds unnecessary cross-continental latency. Edge computing evaluates logic right at the user's doorstep.",
+      "real_world_analogy": "A border customs officer stamping visas at the airport gate (Edge) instead of making passengers fly to the capital city just to get a stamp before entering.",
+      "how_it_works": "<p>1. <strong>V8 Isolates (Cloudflare Workers):</strong> Instead of spinning up heavy Docker containers or VMs (which take 500ms+ to boot), Edge Workers run inside lightweight Google V8 JavaScript Isolates with <5ms startup time and tiny memory footprints.<br>2. <strong>Edge Key-Value / D1 Databases:</strong> Globally distributed, eventually consistent edge key-value stores (Workers KV, Upstash) replicated to all PoPs.<br>3. <strong>Common Use Cases:</strong> Dynamic A/B testing, JWT validation, geo-fencing, header mutation, dynamic image resizing, and bot mitigation.</p>",
+      "conceptual_breakdown": [
+        "<strong>Zero Cold Starts:</strong> V8 Isolates start in under 5 milliseconds.",
+        "<strong>Sub-Request Limits:</strong> Edge workers have strict CPU execution time limits (e.g. 50ms) to maintain edge throughput.",
+        "<strong>Edge Rendering (SSR):</strong> Rendering HTML pages at the edge using frameworks like Next.js and Remix."
+      ],
+      "failure_scenarios": "<strong>Origin State Desynchronization at Edge:</strong> An edge worker writes to a locally replicated edge KV store that has a 60-second replication propagation delay, causing a user traveling between regions to read stale state. <em>Mitigation:</em> Route writes to centralized databases or use strong consistency options.",
+      "common_mistakes": [
+        {
+          "mistake": "Running long compute-heavy machine learning inference or heavy batch parsing inside edge workers.",
+          "correction": "Keep Edge Workers focused on lightweight routing, auth validation, and rapid caching transforms; delegate heavy computing to core cloud data centers."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why are V8 Isolates superior to containerized micro-VMs for Edge Computing?",
+          "answer": "V8 Isolates share a single running process memory space while enforcing strict security isolation, allowing thousands of tenant scripts to run on a single edge server with zero container startup overhead, sub-millisecond cold starts, and minimal RAM footprint per tenant."
+        }
+      ]
+    }
+  ]
+}

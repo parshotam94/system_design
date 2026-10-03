@@ -1,0 +1,84 @@
+{
+  "module_id": "18",
+  "module_title": "Search, Indexing & Information Retrieval",
+  "description": "Master full-text search engines (Elasticsearch / Apache Lucene), Inverted Indexes, TF-IDF / BM25 ranking, fuzzy search, and Vector Databases (Pinecone/Milvus) with embeddings.",
+  "topics": [
+    {
+      "id": "inverted-index-and-elasticsearch",
+      "title": "Full-Text Search Internals: Apache Lucene & Inverted Indexes",
+      "definition": "An Inverted Index is a data structure mapping individual words (tokens) to the list of document IDs (postings list) in which they occur. It forms the foundational engine of full-text search platforms like Elasticsearch and OpenSearch.",
+      "why_we_need_it": "Relational SQL queries like `WHERE description LIKE '%system%design%'` perform full table scans across gigabytes of text, taking minutes. An inverted index evaluates full-text search across millions of documents in <10 milliseconds.",
+      "real_world_analogy": "The index at the back of a textbook: looking up the word 'Distributed' gives page numbers `[12, 45, 89, 210]`. Looking up 'Consensus' gives `[45, 89, 300]`. Finding pages discussing both is a simple set intersection: `[45, 89]`.",
+      "how_it_works": "<p>1. <strong>Text Analysis Pipeline:</strong> Character Filters -> Tokenizer (splits into words) -> Token Filters (Lowercasing, Stop-word removal, Stemming: 'running' -> 'run').<br>2. <strong>Inverted Index Structure:</strong> Term Dictionary (B-Tree/FST of unique words) -> Postings List (sorted array of document IDs + term frequencies + positions).<br>3. <strong>Elasticsearch Sharding:</strong> An index is sharded across multiple primary Lucene shards and replica shards with coordinator node routing.</p>",
+      "conceptual_breakdown": [
+        "<strong>Term Dictionary:</strong> Stored as a Finite State Transducer (FST) in RAM for microsecond word lookups.",
+        "<strong>Postings List Compression:</strong> Compressed using Frame of Reference (FoR) and Roaring Bitmaps for ultra-fast bitwise AND/OR intersections.",
+        "<strong>Near Real-Time (NRT):</strong> Changes are written to in-memory buffer and flushed to Lucene segment files every 1s (Refresh Interval)."
+      ],
+      "failure_scenarios": "<strong>Unmapped Dynamic Mapping Explosions:</strong> Ingesting unstructured JSON with dynamic keys creates thousands of new field mappings, blowing the Elasticsearch cluster metadata state and causing cluster-wide master node freezes. <em>Mitigation:</em> Set `dynamic: strict` in index mappings.",
+      "common_mistakes": [
+        {
+          "mistake": "Using Elasticsearch as the primary source-of-truth ACID database for transactions.",
+          "correction": "Always use an ACID RDBMS or NoSQL store as the primary source of truth; sync documents asynchronously to Elasticsearch via CDC for search queries."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does an Inverted Index execute a multi-word search query like 'distributed consensus' in sub-millisecond time?",
+          "answer": "It looks up 'distributed' in the FST dictionary to retrieve its postings list `[1, 5, 8, 12]`, looks up 'consensus' to retrieve `[5, 8, 19]`, and performs a blazing-fast bitwise intersection of the two sorted lists using Roaring Bitmaps, finding common documents `[5, 8]` without scanning any document text."
+        }
+      ]
+    },
+    {
+      "id": "ranking-algorithms-bm25-and-fuzzy",
+      "title": "Relevance Ranking (BM25, TF-IDF) & Fuzzy Search Algorithms",
+      "definition": "Relevance ranking determines the order in which search results appear using BM25 (Best Matching 25) statistical relevance scoring. Fuzzy search handles typos and spelling mistakes using Levenshtein distance and N-gram algorithms.",
+      "why_we_need_it": "Matching 5,000 documents is useless to a user unless the top 10 most relevant documents are accurately ranked on page 1 of search results.",
+      "real_world_analogy": "A research librarian: if you ask for 'Quantum Computing', books mentioning 'Quantum' on every page are ranked higher than a 1,000-page encyclopedia that only mentions the word once in a footnote.",
+      "how_it_works": "<p>1. <strong>TF (Term Frequency):</strong> How often the word appears in the document (with diminishing returns).<br>2. <strong>IDF (Inverse Document Frequency):</strong> How rare the word is across the entire corpus (common words like 'the' have near-zero weight; rare words like 'Paxos' have huge weight).<br>3. <strong>Document Length Normalization:</strong> Penalizes long documents so a short article dedicated to a topic outranks a massive document that mentions the term in passing.<br>4. <strong>Fuzzy Matching:</strong> Uses Levenshtein Edit Distance (insertions, deletions, substitutions) mapped to a Finite State Automaton to find matches within edit distance $\\le 2$.</p>",
+      "conceptual_breakdown": [
+        "<strong>BM25 vs TF-IDF:</strong> BM25 saturates Term Frequency (a document with 100 occurrences of a word doesn't get 10x more score than one with 10 occurrences).",
+        "<strong>N-Gram Tokenization:</strong> Splits words into sub-strings (e.g. 'search' -> `['se', 'sea', 'sear', 'search']`) for instant auto-complete typeahead suggestions."
+      ],
+      "failure_scenarios": "<strong>Fuzzy Wildcard Performance Degradation:</strong> Executing fuzzy queries with edit distance >2 or leading wildcards on huge vocabularies forces Lucene to traverse millions of FST paths, spiking CPU usage to 100%. <em>Mitigation:</em> Limit prefix length (`min_prefix_length = 2`) and max expansions.",
+      "common_mistakes": [
+        {
+          "mistake": "Running deep pagination (`from: 10000, size: 10`) on Elasticsearch clusters.",
+          "correction": "Deep pagination forces coordinator nodes to merge and sort millions of results across all shards. Use `search_after` with cursor sorting instead."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "Why is BM25 preferred over traditional TF-IDF in modern search engines?",
+          "answer": "BM25 introduces Term Frequency Saturation (preventing keyword-stuffing documents from dominating rankings) and Document Length Normalization (adjusting scores based on whether a document is longer or shorter than the average document length in the corpus)."
+        }
+      ]
+    },
+    {
+      "id": "vector-databases-and-embeddings",
+      "title": "Vector Databases & Semantic Search: HNSW, Pinecone & Embeddings",
+      "definition": "Vector Databases (Pinecone, Milvus, Qdrant, pgvector) store high-dimensional dense vector embeddings generated by machine learning models, performing Approximate Nearest Neighbor (ANN) search to find semantic similarity rather than exact keyword matches.",
+      "why_we_need_it": "Keyword search fails when users search for concepts using different words (e.g. 'inexpensive puppy food' vs 'cheap dog kibble'). Semantic vector search understands conceptual meaning.",
+      "real_world_analogy": "A 3D solar system where every book is a planet: books about space travel float close to NASA manuals, while romance novels float together on the other side of the galaxy. Finding similar items is simply finding the closest neighboring planets in space.",
+      "how_it_works": "<p>1. <strong>Embedding Generation:</strong> An AI embedding model (e.g., text-embedding-3-small) converts text/images into a 1536-dimensional floating-point array: $[0.024, -0.812, 0.449, ...]$.<br>2. <strong>Vector Similarity Metrics:</strong> Cosine Similarity, Dot Product, or Euclidean Distance (L2).<br>3. <strong>HNSW (Hierarchical Navigable Small World):</strong> Multi-layer geometric graph indexing structure that navigates high-dimensional space in $O(\\log N)$ time with skip-list highway layers.<br>4. <strong>Hybrid Search:</strong> Combines Dense Vector Search (semantic meaning) with Sparse BM25 Keyword Search (exact keyword matches) using Reciprocal Rank Fusion (RRF).</p>",
+      "conceptual_breakdown": [
+        "<strong>RAG (Retrieval-Augmented Generation):</strong> User query -> Generate embedding -> Query Vector DB for top-5 chunks -> Feed chunks to LLM context.",
+        "<strong>HNSW vs IVF:</strong> HNSW provides high recall and low latency at the cost of high RAM usage; IVF uses clustering for lower memory footprint.",
+        "<strong>pgvector:</strong> PostgreSQL extension adding native vector indexing (`vector(1536)`) for applications wanting to keep relational data and vector embeddings in a single database."
+      ],
+      "failure_scenarios": "<strong>RAM Exhaustion in HNSW Indexes:</strong> HNSW indexes must reside entirely in RAM for fast graph traversal. Storing 50 million 1536-dimensional vectors requires over 300GB of high-speed RAM. <em>Mitigation:</em> Use Product Quantization (PQ) or Scalar Quantization (SQ) to compress vectors by 4x-8x.",
+      "common_mistakes": [
+        {
+          "mistake": "Relying exclusively on Vector Search for SKU numbers, legal terms, or exact product IDs.",
+          "correction": "Vector search struggles with exact alphanumeric serial numbers. Always use Hybrid Search (BM25 + Dense Vectors)."
+        }
+      ],
+      "interview_questions": [
+        {
+          "question": "How does Hierarchical Navigable Small World (HNSW) achieve sub-10ms nearest neighbor search across millions of vectors?",
+          "answer": "HNSW constructs a multi-layered geometric proximity graph inspired by Skip Lists. Top layers have sparse nodes with long-distance links for rapid coarse-grained navigation across the vector space; lower layers have denser links for fine-grained local neighborhood exploration, achieving logarithmic $O(\\log N)$ search complexity."
+        }
+      ]
+    }
+  ]
+}

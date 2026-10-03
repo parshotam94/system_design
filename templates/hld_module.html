@@ -277,21 +277,22 @@
   </div>
 
   <!-- Right Sticky Table of Contents -->
-  <div class="module-toc-col">
-    <div class="toc-card glass-panel" style="border-color: rgba(168, 85, 247, 0.25);">
-      <div class="toc-header">
-        <span style="font-size: 0.85rem; font-weight: 700; color: #fff; text-transform: uppercase;">Topics in Module</span>
-      </div>
-      <div class="toc-list">
-        {% for top in current_module.topics %}
-          <a href="#{{ top.id }}" class="toc-link">
-            <span class="toc-num">{{ loop.index }}</span>
-            <span class="toc-text">{{ top.title }}</span>
-          </a>
-        {% endfor %}
-      </div>
+  <aside class="module-toc" style="border-color: rgba(168, 85, 247, 0.3); background: rgba(15, 23, 42, 0.75);">
+    <div class="toc-title" style="color: #c084fc; display: flex; align-items: center; justify-content: space-between;">
+      <span>Topics in Module</span>
+      <span class="badge badge-sm" style="background: rgba(147, 51, 234, 0.2); color: #c084fc; font-size: 0.7rem;">{{ (module_content.topics or current_module.topics) | length }}</span>
     </div>
-  </div>
+    <ul class="toc-list" id="hld-toc-list">
+      {% for top in (module_content.topics or current_module.topics) %}
+        <li class="toc-item" id="toc-item-{{ top.id }}">
+          <a href="#{{ top.id }}" class="hld-toc-link" data-topic-id="{{ top.id }}" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+            <span class="toc-text" style="flex: 1;">{{ loop.index }}. {{ top.title }}</span>
+            <span class="toc-status-icon" style="font-size: 0.75rem; color: var(--text-muted);">○</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
 </div>
 {% endblock %}
 
@@ -300,5 +301,122 @@
 <script src="/static/js/components/system-flow-anim.js"></script>
 <script src="/static/js/components/capacity-calculator.js"></script>
 <script src="/static/js/components/comparison-table.js"></script>
+<script src="/static/js/components/code-block.js"></script>
 <script src="/static/js/hld_progress.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const moduleId = "{{ current_module.id }}";
+    const statusSelect = document.getElementById('hld-module-status-select');
+
+    // Sync Module Status Dropdown
+    if (statusSelect && window.HLDProgressTracker) {
+      statusSelect.value = window.HLDProgressTracker.getModuleStatus(moduleId);
+      statusSelect.addEventListener('change', (e) => {
+        window.HLDProgressTracker.setModuleStatus(moduleId, e.target.value);
+        if (window.showToast) {
+          window.showToast(`HLD Module ${moduleId} marked as ${e.target.value.replace('_', ' ')}`);
+        }
+      });
+    }
+
+    // Function to update TOC topic status icons
+    function syncTOCIcons() {
+      if (!window.HLDProgressTracker) return;
+      document.querySelectorAll('#hld-toc-list .toc-item').forEach(item => {
+        const link = item.querySelector('.hld-toc-link');
+        const icon = item.querySelector('.toc-status-icon');
+        if (link && icon) {
+          const topicId = link.getAttribute('data-topic-id');
+          const isComp = window.HLDProgressTracker.getTopicStatus(moduleId, topicId) === 'completed';
+          if (isComp) {
+            icon.textContent = '✓';
+            icon.style.color = '#34d399';
+            link.classList.add('completed');
+          } else {
+            icon.textContent = '○';
+            icon.style.color = 'var(--text-muted)';
+            link.classList.remove('completed');
+          }
+        }
+      });
+    }
+
+    syncTOCIcons();
+    window.addEventListener('hldProgressUpdated', syncTOCIcons);
+
+    // Smooth Scroll for TOC Links
+    document.querySelectorAll('.hld-toc-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          history.pushState(null, null, `#${targetId}`);
+        }
+      });
+    });
+
+    // ScrollSpy Intersection Observer for Active TOC Highlighting
+    const topicContainers = document.querySelectorAll('.topic-container');
+    if (topicContainers.length > 0) {
+      const observerOptions = {
+        root: null,
+        rootMargin: '-10% 0px -70% 0px',
+        threshold: 0
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            document.querySelectorAll('.hld-toc-link').forEach(l => l.classList.remove('active'));
+            const activeLink = document.querySelector(`.hld-toc-link[data-topic-id="${id}"]`);
+            if (activeLink) {
+              activeLink.classList.add('active');
+            }
+          }
+        });
+      }, observerOptions);
+
+      topicContainers.forEach(el => observer.observe(el));
+    }
+
+    // Auto-render code blocks if any
+    document.querySelectorAll('.topic-code-target').forEach(el => {
+      const filename = el.getAttribute('data-filename') || 'example.cpp';
+      const code = el.getAttribute('data-code');
+      if (window.CodeBlock && code) {
+        window.CodeBlock.render(el, filename, code);
+      }
+    });
+
+    // Auto-render comparison tables if any
+    document.querySelectorAll('.topic-comp-target').forEach(el => {
+      try {
+        const raw = el.getAttribute('data-comp');
+        if (raw && window.ComparisonTable) {
+          window.ComparisonTable.render(el, JSON.parse(raw));
+        }
+      } catch (e) {
+        console.error('[HLD] Failed to parse comparison matrix', e);
+      }
+    });
+
+    // Auto-render architecture diagrams if any
+    if (window.ArchDiagramComponent) {
+      window.ArchDiagramComponent.initAll();
+    }
+
+    // Auto-render system flow animations if any
+    if (window.SystemFlowAnimationComponent) {
+      window.SystemFlowAnimationComponent.initAll();
+    }
+
+    // Auto-render capacity calculators if any
+    if (window.CapacityCalculatorComponent) {
+      window.CapacityCalculatorComponent.initAll();
+    }
+  });
+</script>
 {% endblock %}
