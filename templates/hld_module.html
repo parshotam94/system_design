@@ -297,26 +297,17 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="/static/js/components/arch-diagram.js"></script>
-<script src="/static/js/components/system-flow-anim.js"></script>
-<script src="/static/js/components/capacity-calculator.js"></script>
-<script src="/static/js/components/comparison-table.js"></script>
-<script src="/static/js/components/code-block.js"></script>
-<script src="/static/js/hld_progress.js"></script>
+<!-- NOTE: hld_progress.js, arch-diagram.js, system-flow-anim.js, capacity-calculator.js,
+     comparison-table.js, and code-block.js are already loaded globally in base.html -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const moduleId = "{{ current_module.id }}";
     const statusSelect = document.getElementById('hld-module-status-select');
 
-    // Sync Module Status Dropdown
+    // Sync Module Status Dropdown value on load
+    // (change event is handled by hld_progress.js bindEvents to avoid duplicates)
     if (statusSelect && window.HLDProgressTracker) {
       statusSelect.value = window.HLDProgressTracker.getModuleStatus(moduleId);
-      statusSelect.addEventListener('change', (e) => {
-        window.HLDProgressTracker.setModuleStatus(moduleId, e.target.value);
-        if (window.showToast) {
-          window.showToast(`HLD Module ${moduleId} marked as ${e.target.value.replace('_', ' ')}`);
-        }
-      });
     }
 
     // Function to update TOC topic status icons
